@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["twizzler_kernel"] = [{"text":"impl AcpiHandler for <a class=\"struct\" href=\"twizzler_kernel/arch/amd64/acpi/struct.AcpiHandlerImpl.html\" title=\"struct twizzler_kernel::arch::amd64::acpi::AcpiHandlerImpl\">AcpiHandlerImpl</a>","synthetic":false,"types":["twizzler_kernel::arch::amd64::acpi::AcpiHandlerImpl"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

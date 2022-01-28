@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["main",""]],"static":[["BAR",""],["FOO",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["STACK_SIZE",""]],"enum":[["BootInfoSystemTable",""]],"fn":[["____start",""],["__stivale_start",""]],"static":[["FRAMEBUFFER_TAG",""],["STACK",""],["STIVALE_HDR",""],["UNMAP_NULL",""]],"struct":[["P2Align12",""],["StivaleBootInfo",""]]});

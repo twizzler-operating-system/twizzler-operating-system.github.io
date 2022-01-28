@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["twizzler_kernel"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/alloc/global/trait.GlobalAlloc.html\" title=\"trait core::alloc::global::GlobalAlloc\">GlobalAlloc</a> for <a class=\"struct\" href=\"twizzler_kernel/memory/allocator/struct.SafeZoneAllocator.html\" title=\"struct twizzler_kernel::memory::allocator::SafeZoneAllocator\">SafeZoneAllocator</a>","synthetic":false,"types":["twizzler_kernel::memory::allocator::SafeZoneAllocator"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

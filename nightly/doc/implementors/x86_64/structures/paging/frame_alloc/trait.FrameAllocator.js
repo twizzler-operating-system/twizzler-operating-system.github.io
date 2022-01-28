@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["twizzler_kernel"] = [{"text":"impl FrameAllocator&lt;Size4KiB&gt; for <a class=\"struct\" href=\"twizzler_kernel/memory/frame/struct.BootFrameAllocator.html\" title=\"struct twizzler_kernel::memory::frame::BootFrameAllocator\">BootFrameAllocator</a>","synthetic":false,"types":["twizzler_kernel::memory::frame::BootFrameAllocator"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
