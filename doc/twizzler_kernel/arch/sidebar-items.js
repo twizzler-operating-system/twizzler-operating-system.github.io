@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["BootInfoSystemTable",""]],"fn":[["init",""],["init_interrupts",""],["init_secondary",""],["jump_to_user",""],["schedule_oneshot_tick",""],["start_clock",""]],"mod":[["acpi",""],["amd64",""],["interrupt",""],["ioapic",""],["lapic",""],["memory",""],["processor",""],["thread",""]]});

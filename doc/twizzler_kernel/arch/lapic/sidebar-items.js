@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["eoi",""],["get_speeds",""],["init",""],["lapic_interrupt",""],["poke_cpu",""],["read_monotonic_nanoseconds",""],["schedule_oneshot_tick",""],["send_ipi",""]]});

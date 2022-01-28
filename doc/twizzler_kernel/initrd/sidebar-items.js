@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_boot_objects",""],["init",""]],"static":[["BOOT_OBJECTS",""]],"struct":[["BootModule",""],["BootObjects",""]]});

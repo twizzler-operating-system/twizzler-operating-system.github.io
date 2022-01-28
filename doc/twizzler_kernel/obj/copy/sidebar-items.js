@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["copy_range_to_object_tree",""],["copy_ranges",""],["split_range",""]],"struct":[["CopySpec",""]]});
