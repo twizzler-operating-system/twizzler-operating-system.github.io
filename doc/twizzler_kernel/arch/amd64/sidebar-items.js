@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["init",""],["init_interrupts",""],["init_secondary",""],["jump_to_user",""],["start_clock",""]],"mod":[["acpi",""],["desctables",""],["interrupt",""],["ioapic",""],["lapic",""],["memory",""],["pit",""],["processor",""],["start",""],["syscall",""],["thread",""]]});

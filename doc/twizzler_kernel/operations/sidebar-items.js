@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["map_object_into_context",""],["read_object",""]]});

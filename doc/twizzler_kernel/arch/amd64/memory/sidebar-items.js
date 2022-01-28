@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["PAGE_SIZE",""],["PAGE_SIZE_HUGE",""],["PAGE_SIZE_LARGE",""],["PHYS_MEM_OFFSET",""]],"fn":[["active_level_4_table",""],["init",""],["phys_to_virt",""],["translate_addr",""],["translate_addr_inner",""]],"struct":[["ArchMemoryContext",""],["Table",""]]});

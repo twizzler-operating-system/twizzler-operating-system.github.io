@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["get_acpi_root",""],["init",""]],"static":[["ACPI",""],["HANDLER",""]],"struct":[["AcpiHandlerImpl",""]]});

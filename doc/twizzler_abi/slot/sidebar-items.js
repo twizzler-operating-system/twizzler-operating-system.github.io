@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["global_allocate",""],["to_vaddr_range",""]]});

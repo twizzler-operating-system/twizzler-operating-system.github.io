@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["EARLY_ALLOCATION_SIZE",""],["HEAP_HUGE_START",""],["HEAP_LARGE_START",""],["HEAP_MAX_LEN",""],["HEAP_START",""]],"fn":[["alloc_error_handler",""],["init",""]],"static":[["EARLY_ALLOCATION_AREA",""],["EARLY_ALLOCATION_PTR",""],["LL_BACKUP_ALLOCATOR",""],["PAGER",""],["SLAB_ALLOCATOR",""]],"struct":[["HeapPager",""],["SafeZoneAllocator",""]]});

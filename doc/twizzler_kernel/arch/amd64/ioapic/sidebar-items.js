@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["ICW1_ICW4",""],["ICW1_INIT",""],["ICW4_8086",""],["PIC1",""],["PIC1_CMD",""],["PIC1_DATA",""],["PIC2",""],["PIC2_CMD",""],["PIC2_DATA",""]],"fn":[["construct_interrupt_data",""],["disable_pic",""],["init",""],["set_interrupt",""]],"static":[["IOAPICS",""]],"struct":[["IOApic",""]]});

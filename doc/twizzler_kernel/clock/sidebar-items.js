@@ -1,1 +1,0 @@
-initSidebarItems({"constant":[["NR_WINDOWS",""]],"fn":[["check_reschedule_oneshot",""],["init",""],["nano_to_ticks",""],["oneshot_clock_hardtick",""],["schedule_oneshot_tick",""],["statclock",""],["ticks_to_nano",""]],"static":[["NEXT_TICK",""],["NR_CPU_TICKS",""],["TIMEOUT_QUEUE",""]],"struct":[["Timeout",""],["TimeoutQueue",""]],"type":[["Nanoseconds",""]]});
