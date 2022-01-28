@@ -69,6 +69,9 @@
 <span id="68">68</span>
 <span id="69">69</span>
 <span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This library provides a common interface for applications that want to talk to the Twizzler</span>
 <span class="doccomment">//! kernel, and defines that interface for both applications and the kernel to follow. It&#39;s made of</span>
 <span class="doccomment">//! several parts:</span>
@@ -76,7 +79,8 @@
 <span class="doccomment">//!   2. System Calls -- see [syscall] and [arch::syscall]</span>
 <span class="doccomment">//!   3. The rest, acting as support for the rust standard library.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! **Note**: All of these interfaces are potentially unstable and should not be used directly by most</span>
+<span class="doccomment">//! # Should I use these APIs?</span>
+<span class="doccomment">//! All of these interfaces are potentially unstable and should not be used directly by most</span>
 <span class="doccomment">//! programs. Instead, the twizzler crate can be used to access standard Twizzler object APIs, and</span>
 <span class="doccomment">//! the rust standard library should be used for general rust programming. Both of these wrap calls</span>
 <span class="doccomment">//! to this library in better, more easily consumed APIs.</span>
@@ -122,6 +126,8 @@
 
 <span class="doccomment">/// We need to provide a basic hook for reporting stack check failure in case we link to a library</span>
 <span class="doccomment">/// that assumes stack protections works (libunwind).</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// This function cannot be called safely, as it will abort unconditionally.</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">__stack_chk_fail</span>() {
     <span class="ident">print_err</span>(<span class="string">&quot;stack overflow -- aborting&quot;</span>);

@@ -765,7 +765,73 @@
 <span id="764">764</span>
 <span id="765">765</span>
 <span id="766">766</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Wrapper functions around for raw_syscall, providing a typed and safer way to interact with the kernel.</span>
+
+<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
 <span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">num::NonZeroUsize</span>, <span class="ident">ptr</span>, <span class="ident">sync::atomic::AtomicU64</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1052,7 +1118,7 @@
     <span class="doccomment">/// `*reference` with the passed `value` using `op` (and optionally inverting the result). If</span>
     <span class="doccomment">/// true, the kernel will put the thread to sleep until another thread comes along and performs</span>
     <span class="doccomment">/// a wake request on that same word of memory.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// References always refer to a particular 64-bit value inside of an object. If a virtual</span>
     <span class="doccomment">/// address is passed as a reference, it is first converted to an object-offset pair based on</span>
     <span class="doccomment">/// the current object mapping of the address space.</span>
@@ -1094,9 +1160,9 @@
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ThreadSyncResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span>;
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ThreadSyncError</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ThreadSyncError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ThreadSyncError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="self">Self</span>
     }
 }
 
@@ -1176,12 +1242,12 @@
 <span class="doccomment">/// Perform a number of [ThreadSync] operations, either waking of threads waiting on words of</span>
 <span class="doccomment">/// memory, or sleeping this thread on one or more words of memory (or both). The order these</span>
 <span class="doccomment">/// requests are processed in is undefined.</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// The caller may optionally specify a timeout, causing this thread to sleep for at-most that</span>
 <span class="doccomment">/// Duration. However, the exact time is not guaranteed (it may be less if the thread is woken up,</span>
 <span class="doccomment">/// or slightly more due to scheduling uncertainty). If no operations are specified, the thread will</span>
 <span class="doccomment">/// sleep until the timeout expires.</span>
-<span class="doccomment">/// </span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// Returns either Ok(bool), indicating if the timeout expired or not, or Err([ThreadSyncError]),</span>
 <span class="doccomment">/// indicating failure. After return, the kernel may have modified the ThreadSync entries to</span>
 <span class="doccomment">/// indicate additional information about each request (errors or status).</span>
@@ -1212,14 +1278,22 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// Specifications for an object-copy from a source object. The specified ranges are</span>
+<span class="doccomment">/// source:[src_start, src_start + len) copied to &lt;some unspecified destination object&gt;:[dest_start,</span>
+<span class="doccomment">/// dest_start + len). Each range must start within an object, and end within the object.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectSource</span> {
+    <span class="doccomment">/// The ID of the source object.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ObjID</span>,
+    <span class="doccomment">/// The offset into the source object to start the copy.</span>
     <span class="kw">pub</span> <span class="ident">src_start</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The offset into the dest object to start the copy to.</span>
     <span class="kw">pub</span> <span class="ident">dest_start</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The length of the copy.</span>
     <span class="kw">pub</span> <span class="ident">len</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ObjectSource</span> {
+    <span class="doccomment">/// Construct a new ObjectSource.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">ObjID</span>, <span class="ident">src_start</span>: <span class="ident">u64</span>, <span class="ident">dest_start</span>: <span class="ident">u64</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">id</span>,
@@ -1232,37 +1306,53 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// The backing memory type for this object. Currently doesn&#39;t do anything.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BackingType</span> {
+    <span class="doccomment">/// The default, let the kernel decide based on the [LifetimeType] of the object.</span>
     <span class="ident">Normal</span> <span class="op">=</span> <span class="number">0</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BackingType</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Normal</span>
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// The base lifetime type of the object. Note that this does not ensure that the object is stored</span>
+<span class="doccomment">/// in a specific type of memory, the kernel is allowed to migrate objects with the Normal</span>
+<span class="doccomment">/// [BackingType] as it sees fit. For more information on object lifetime, see [the book](https://twizzler-operating-system.github.io/nightly/book/object_lifetime.html).</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LifetimeType</span> {
+    <span class="doccomment">/// This object is volatile, and is expected to be deleted after a power cycle.</span>
     <span class="ident">Volatile</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// This object is persistent, and should be deleted only after an explicit delete call.</span>
     <span class="ident">Persistent</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
 <span class="macro">bitflags!</span> {
+    <span class="doccomment">/// Flags to pass to the object create system call.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectCreateFlags</span>: <span class="ident">u32</span> {
     }
 }
 
 <span class="macro">bitflags!</span> {
+    <span class="doccomment">/// Flags controlling how a particular object tie operates.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateTieFlags</span>: <span class="ident">u32</span> {
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// Full object creation specification, minus ties.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectCreate</span> {
     <span class="ident">kuid</span>: <span class="ident">ObjID</span>,
     <span class="ident">bt</span>: <span class="ident">BackingType</span>,
     <span class="ident">lt</span>: <span class="ident">LifetimeType</span>,
     <span class="ident">flags</span>: <span class="ident">ObjectCreateFlags</span>,
 }
-
 <span class="kw">impl</span> <span class="ident">ObjectCreate</span> {
+    <span class="doccomment">/// Build a new object create specification.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">bt</span>: <span class="ident">BackingType</span>,
         <span class="ident">lt</span>: <span class="ident">LifetimeType</span>,
@@ -1270,7 +1360,7 @@
         <span class="ident">flags</span>: <span class="ident">ObjectCreateFlags</span>,
     ) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">kuid</span>: <span class="ident">kuid</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>.<span class="ident">into</span>()),
+            <span class="ident">kuid</span>: <span class="ident">kuid</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="number">0</span>.<span class="ident">into</span>()),
             <span class="ident">bt</span>,
             <span class="ident">lt</span>,
             <span class="ident">flags</span>,
@@ -1280,12 +1370,15 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// A specification of ties to create.</span>
+<span class="doccomment">/// (see [the book](https://twizzler-operating-system.github.io/nightly/book/object_lifetime.html) for more information on ties).</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateTieSpec</span> {
     <span class="ident">id</span>: <span class="ident">ObjID</span>,
     <span class="ident">flags</span>: <span class="ident">CreateTieFlags</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CreateTieSpec</span> {
+    <span class="doccomment">/// Create a new CreateTieSpec.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">ObjID</span>, <span class="ident">flags</span>: <span class="ident">CreateTieFlags</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">id</span>, <span class="ident">flags</span> }
     }
@@ -1293,10 +1386,15 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
+<span class="doccomment">/// Possible error returns for [sys_object_create].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ObjectCreateError</span> {
+    <span class="doccomment">/// An unknown error occurred.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// One of the arguments was invalid.</span>
     <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// A source or tie object was not found.</span>
     <span class="ident">ObjectNotFound</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// The kernel could not handle one of the source ranges.</span>
     <span class="ident">SourceMisalignment</span> <span class="op">=</span> <span class="number">3</span>,
 }
 
@@ -1311,9 +1409,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectCreateError</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ObjectCreateError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ObjectCreateError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="self">Self</span>
     }
 }
 
@@ -1341,6 +1439,7 @@
     }
 }
 
+<span class="doccomment">/// Create an object, returning either its ID or an error.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_object_create</span>(
     <span class="ident">create</span>: <span class="ident">ObjectCreate</span>,
     <span class="ident">sources</span>: <span class="kw-2">&amp;</span>[<span class="ident">ObjectSource</span>],
@@ -1358,17 +1457,22 @@
         <span class="ident">code</span>,
         <span class="ident">val</span>,
         <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span>,
-        <span class="op">|</span><span class="ident">c</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::object::objid_from_parts</span>(<span class="ident">c</span>, <span class="ident">v</span>),
+        <span class="ident"><span class="kw">crate</span>::object::ObjID::new_from_parts</span>,
         <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">ObjectCreateError::from</span>(<span class="ident">v</span>),
     )
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
+<span class="doccomment">/// Possible error values for [sys_object_map].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ObjectMapError</span> {
+    <span class="doccomment">/// An unknown error occurred.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// The specified object was not found.</span>
     <span class="ident">ObjectNotFound</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// The specified slot was invalid.</span>
     <span class="ident">InvalidSlot</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// The specified protections were invalid.</span>
     <span class="ident">InvalidProtections</span> <span class="op">=</span> <span class="number">3</span>,
 }
 
@@ -1383,9 +1487,9 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectMapError</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ObjectMapError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ObjectMapError</span>) -&gt; <span class="ident">u64</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
     }
 }
 
@@ -1414,10 +1518,12 @@
 }
 
 <span class="macro">bitflags!</span> {
+    <span class="doccomment">/// Flags to pass to [sys_object_map].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MapFlags</span>: <span class="ident">u32</span> {
     }
 }
 
+<span class="doccomment">/// Map an object into the address space with the specified protections.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_object_map</span>(
     <span class="ident">id</span>: <span class="ident">ObjID</span>,
     <span class="ident">slot</span>: <span class="ident">usize</span>,
@@ -1432,23 +1538,31 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// Information about the system.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SysInfo</span> {
+    <span class="doccomment">/// The version of this data structure, to allow expansion.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// Flags. Currently unused.</span>
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The number of CPUs on this system. Hyperthreads are counted as individual CPUs.</span>
     <span class="kw">pub</span> <span class="ident">cpu_count</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// The size of a virtual address page on this system.</span>
     <span class="kw">pub</span> <span class="ident">page_size</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SysInfo</span> {
+    <span class="doccomment">/// Get the number of CPUs on the system.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cpu_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NonZeroUsize</span> {
         <span class="ident">NonZeroUsize::new</span>(<span class="self">self</span>.<span class="ident">cpu_count</span>).<span class="ident">expect</span>(<span class="string">&quot;CPU count from sysinfo should always be non-zero&quot;</span>)
     }
 
+    <span class="doccomment">/// Get the page size of the system.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">page_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">page_size</span>
     }
 }
 
+<span class="doccomment">/// Get a SysInfo struct from the kernel.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_info</span>() -&gt; <span class="ident">SysInfo</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sysinfo</span> <span class="op">=</span> <span class="ident">core::mem::MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">SysInfo</span><span class="op">&gt;</span><span class="ident">::zeroed</span>();
     <span class="kw">unsafe</span> {
@@ -1461,13 +1575,14 @@
 }
 
 <span class="macro">bitflags!</span> {
+    <span class="doccomment">/// Flags to pass to [sys_spawn].</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadSpawnFlags</span>: <span class="ident">u32</span> {
-
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="doccomment">/// Arguments to pass to [sys_spawn].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadSpawnArgs</span> {
     <span class="ident">entry</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
     <span class="ident">stack_base</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
@@ -1479,8 +1594,11 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
+<span class="doccomment">/// Possible error values for [sys_spawn].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ThreadSpawnError</span> {
+    <span class="doccomment">/// An unknown error occurred.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// One of the arguments was invalid.   </span>
     <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
@@ -1493,11 +1611,18 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ThreadSpawnError</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ThreadSpawnError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ThreadSpawnError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
     }
 }
+<span class="comment">/*
+impl Into&lt;u64&gt; for ThreadSpawnError {
+    fn into(self) -&gt; u64 {
+        self as u64
+    }
+}
+*/</span>
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ThreadSpawnError</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
@@ -1521,13 +1646,16 @@
     }
 }
 
+<span class="doccomment">/// Spawn a new thread, returning the ObjID of the thread&#39;s handle or an error.</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// The caller must ensure that the [ThreadSpawnArgs] has sane values.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">sys_spawn</span>(<span class="ident">args</span>: <span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjID</span>, <span class="ident">ThreadSpawnError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">raw_syscall</span>(<span class="ident">Syscall::Spawn</span>, <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">args</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">ThreadSpawnArgs</span> <span class="kw">as</span> <span class="ident">u64</span>]);
     <span class="ident">convert_codes_to_result</span>(
         <span class="ident">code</span>,
         <span class="ident">val</span>,
         <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span>,
-        <span class="op">|</span><span class="ident">c</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident"><span class="kw">crate</span>::object::objid_from_parts</span>(<span class="ident">c</span>, <span class="ident">v</span>),
+        <span class="ident"><span class="kw">crate</span>::object::ObjID::new_from_parts</span>,
         <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">ThreadSpawnError::from</span>(<span class="ident">v</span>),
     )
 }

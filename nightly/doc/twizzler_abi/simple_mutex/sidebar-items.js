@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Mutex",""]]});
+initSidebarItems({"struct":[["Mutex","Simple mutex, supporting sleeping and wakeup. Does no attempt at handling priority or fairness."]]});

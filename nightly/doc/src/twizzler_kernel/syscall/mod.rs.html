@@ -186,17 +186,13 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
-    <span class="ident">object</span>::{<span class="ident">objid_from_parts</span>, <span class="ident">Protections</span>},
+    <span class="ident">object</span>::{<span class="ident">ObjID</span>, <span class="ident">Protections</span>},
     <span class="ident">syscall</span>::{
         <span class="ident">ObjectCreateError</span>, <span class="ident">ObjectMapError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>, <span class="ident">ThreadSpawnError</span>, <span class="ident">ThreadSyncError</span>,
     },
 };
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
-
-<span class="kw">use</span> <span class="ident">twizzler_abi::object::ObjID</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::thread::thread_ctrl</span>;
 
@@ -341,7 +337,7 @@
             <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
             <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg2</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">let</span> <span class="ident">prot</span> <span class="op">=</span> <span class="ident">Protections::from_bits</span>(<span class="ident">context</span>.<span class="ident">arg3</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u32</span>);
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">objid_from_parts</span>(<span class="ident">hi</span>, <span class="ident">lo</span>);
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">ObjID::new_from_parts</span>(<span class="ident">hi</span>, <span class="ident">lo</span>);
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">prot</span>
                 .<span class="ident">map_or</span>(<span class="prelude-val">Err</span>(<span class="ident">ObjectMapError::InvalidProtections</span>), <span class="op">|</span><span class="ident">prot</span><span class="op">|</span> {
                     <span class="ident">object::sys_object_map</span>(<span class="ident">id</span>, <span class="ident">slot</span>, <span class="ident">prot</span>)

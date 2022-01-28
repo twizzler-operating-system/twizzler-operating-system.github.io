@@ -21,18 +21,30 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Some runtime-available executable information. Mostly used for backtracing.</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
 
 <span class="comment">// TODO: this is all a hack</span>
+<span class="doccomment">/// Returns the object ID of the running executable.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_exe_id</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjID</span><span class="op">&gt;</span> {
     <span class="kw">unsafe</span> { <span class="ident"><span class="kw">crate</span>::rt1::get_exec_id</span>() }
 }
 
+<span class="doccomment">/// A particular segment of the loaded executable, corresponding to where the program headers were</span>
+<span class="doccomment">/// loaded into memory.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Segment</span> {
     <span class="kw">pub</span> <span class="ident">vaddr</span>: <span class="ident">usize</span>,
     <span class="kw">pub</span> <span class="ident">len</span>: <span class="ident">usize</span>,
 }
 
+<span class="doccomment">/// Return a given segment for a given loaded executable or library by index, or None of segnr is too large (or if this information is not available).</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_segment</span>(<span class="ident">id</span>: <span class="ident">ObjID</span>, <span class="ident">segnr</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Segment</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">eid</span>) <span class="op">=</span> <span class="ident">get_current_exe_id</span>() {
         <span class="kw">if</span> <span class="ident">eid</span> <span class="op">!</span><span class="op">=</span> <span class="ident">id</span> {

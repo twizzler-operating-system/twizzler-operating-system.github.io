@@ -180,16 +180,80 @@
 <span id="179">179</span>
 <span id="180">180</span>
 <span id="181">181</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Runtime functions for Twizzler userspace. This part of the code is a bit arcane and somewhat</span>
+<span class="doccomment">//! tricky, so buckle up.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! We need to start executing in a _reasonable_ environment before we call into the Rust runtime</span>
+<span class="doccomment">//! init. Rust actually expects a fair bit of us right off the bat --- thread-local storage (TLS), env</span>
+<span class="doccomment">//! vars, args, etc. So our goal will be to set up an environment where we can serve the right</span>
+<span class="doccomment">//! underlying runtime to Rust.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Execution will start at the _start symbol, provided in arch::_start. This will almost</span>
+<span class="doccomment">//! immediately call [twz_runtime_start]. From there, we:</span>
+<span class="doccomment">//!   1. Process the aux array.</span>
+<span class="doccomment">//!   2. Find the TLS template region and store that info.</span>
+<span class="doccomment">//!   3. Create a TLS region for ourselves, the main thread.</span>
+<span class="doccomment">//!   4. Set the TLS region via the kernel.</span>
+<span class="doccomment">//!   5. Run the pre-init array, _init(), and the init_array.</span>
+<span class="doccomment">//!   6. Call std_runtime_start, which jumps into the Rust standard lib.</span>
+<span class="doccomment">//!   7. Exit our thread should we return here.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! And all of that has to happen without a panic runtime, so any errors we encounter we need to</span>
+<span class="doccomment">//! abort(). This is what we get for not linking to libc.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This does not encompass all of the runtime pieces. We also have:</span>
+<span class="doccomment">//!   1. crti and crtn, which we provide, see toolchain/src/crti.rs etc.</span>
+<span class="doccomment">//!   2. crtbegin and friends. These are provided by LLVM&#39;s crtstuff and distributed with the</span>
+<span class="doccomment">//!      toolchain. They have interesting linking requirements, see below.</span>
+<span class="doccomment">//!   3. libunwind. Not strictly required as part of the runtime, but we build with panic_unwind for</span>
+<span class="doccomment">//!      userspace by default, so I&#39;m including it. This also comes from llvm.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! For information about linking order and how the linking actually happens, take a look at</span>
+<span class="doccomment">//! toolchain/src/rust/compiler/rustc_target/spec/{twizzler_base.rs, x86_64-unknown-twizzler.rs, x86_64-unknown-twizzler-linker-script.ld}.</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
 
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
+    <span class="comment">// Defined in the rust stdlib.</span>
     <span class="kw">fn</span> <span class="ident">std_runtime_start</span>(<span class="ident">env</span>: <span class="kw-2">*const</span> <span class="kw-2">*const</span> <span class="ident">i8</span>) -&gt; <span class="ident">i32</span>;
 
+    <span class="comment">// These are defined in the linker script.</span>
     <span class="kw">static</span> <span class="ident">__preinit_array_start</span>: <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>();
     <span class="kw">static</span> <span class="ident">__preinit_array_end</span>: <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>();
     <span class="kw">static</span> <span class="ident">__init_array_start</span>: <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>();
     <span class="kw">static</span> <span class="ident">__init_array_end</span>: <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>();
 
+    <span class="comment">// Defined via crti and crtn.</span>
     <span class="kw">fn</span> <span class="ident">_init</span>();
 
 }
@@ -293,18 +357,14 @@
     }
 }
 
-<span class="comment">/* This is essentially just a hook to get us out of the arch-specific code before calling into std.
- * I don&#39;t know if we have a panic runtime yet, so I&#39;m not going to try doing a catch panic kind of
- * deal. Instead, we expect the runtime start function to return an exit code, and we&#39;ll deal with
- * exiting the thread using that code.
- */</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::aux::AuxEntry</span>;
 <span class="kw">use</span> <span class="ident">core::ptr</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">named_asm_labels</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">twz_runtime_start</span>(<span class="kw-2">mut</span> <span class="ident">aux_array</span>: <span class="kw-2">*const</span> <span class="ident">AuxEntry</span>) -&gt; <span class="op">!</span> {
+<span class="doccomment">/// Called from _start to initialize the runtime and pass control to the Rust stdlib.</span>
+<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">twz_runtime_start</span>(<span class="kw-2">mut</span> <span class="ident">aux_array</span>: <span class="kw-2">*const</span> <span class="ident">AuxEntry</span>) -&gt; <span class="op">!</span> {
     <span class="kw">let</span> <span class="ident">null_env</span>: [<span class="kw-2">*const</span> <span class="ident">i8</span>; <span class="number">4</span>] <span class="op">=</span> [
         <span class="string">b&quot;RUST_BACKTRACE=full\0&quot;</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">i8</span>,
         <span class="ident">ptr::null</span>(),

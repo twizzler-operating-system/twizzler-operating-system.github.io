@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["get_monotonic",""],["get_systemtime",""]]});
+initSidebarItems({"fn":[["get_monotonic","Return a Duration representing an instant in monotonic time."],["get_systemtime","Return a Duration representing the time since the unix epoch."]]});

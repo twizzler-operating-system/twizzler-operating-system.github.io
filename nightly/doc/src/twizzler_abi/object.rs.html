@@ -56,19 +56,41 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="ident">LowerHex</span>, <span class="ident">UpperHex</span>};
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Low-level object APIs, mostly around IDs and basic things like protection definitions and metadata.</span>
+
+<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="ident">LowerHex</span>, <span class="ident">UpperHex</span>};
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
+<span class="doccomment">/// An object ID, represented as a transparent wrapper type. Any value where the upper 64 bits are</span>
+<span class="doccomment">/// zero is invalid.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjID</span>(<span class="ident">u128</span>);
 
 <span class="kw">impl</span> <span class="ident">ObjID</span> {
+    <span class="doccomment">/// Create a new ObjID out of a 128 bit value.</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u128</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span>(<span class="ident">id</span>)
     }
 
+    <span class="doccomment">/// Split an object ID into upper and lower values, useful for syscalls.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
         ((<span class="self">self</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>, (<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="number">0xffffffffffffffff</span>) <span class="kw">as</span> <span class="ident">u64</span>)
+    }
+
+    <span class="doccomment">/// Build a new ObjID out of a high part and a low part.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_parts</span>(<span class="ident">hi</span>: <span class="ident">u64</span>, <span class="ident">lo</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">ObjID::new</span>(((<span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">64</span>) <span class="op">|</span> (<span class="ident">lo</span> <span class="kw">as</span> <span class="ident">u128</span>))
     }
 }
 
@@ -102,14 +124,14 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">objid_from_parts</span>(<span class="ident">hi</span>: <span class="ident">u64</span>, <span class="ident">lo</span>: <span class="ident">u64</span>) -&gt; <span class="ident">ObjID</span> {
-    <span class="ident">ObjID::new</span>(((<span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">64</span>) <span class="op">|</span> (<span class="ident">lo</span> <span class="kw">as</span> <span class="ident">u128</span>))
-}
-
 <span class="macro">bitflags::bitflags!</span> {
+    <span class="doccomment">/// Mapping protections for mapping objects into the address space.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Protections</span>: <span class="ident">u32</span> {
+        <span class="doccomment">/// Read allowed.</span>
         <span class="kw">const</span> <span class="ident">READ</span> <span class="op">=</span> <span class="number">1</span>;
+        <span class="doccomment">/// Write allowed.</span>
         <span class="kw">const</span> <span class="ident">WRITE</span> <span class="op">=</span> <span class="number">2</span>;
+        <span class="doccomment">/// Exec allowed.</span>
         <span class="kw">const</span> <span class="ident">EXEC</span> <span class="op">=</span> <span class="number">4</span>;
     }
 }

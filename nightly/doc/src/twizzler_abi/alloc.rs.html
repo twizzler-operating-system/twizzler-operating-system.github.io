@@ -226,33 +226,14 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
+</pre><pre class="rust"><code><span class="doccomment">//! Global allocation. Used by the Rust standard library as the global allocator. Similar to</span>
+<span class="doccomment">//! malloc() and friends.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Currently, we maintain a list of allocatable objects, adding as needed, that we can pull from.</span>
+<span class="doccomment">//! We used a simple linked-list allocator to perform allocation within objects. This whole system</span>
+<span class="doccomment">//! can be optimized dramatically.</span>
+
+<span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">intrinsics</span>::{<span class="ident">copy_nonoverlapping</span>, <span class="ident">write_bytes</span>},
     <span class="ident">ptr</span>::{<span class="self">self</span>, <span class="ident">NonNull</span>},
@@ -267,9 +248,6 @@
         <span class="ident">ObjectCreateFlags</span>,
     },
 };
-
-<span class="comment">//static mut SCRATCH: [u8; 4096] = [0; 4096];</span>
-<span class="comment">//static SCRATCH_PTR: AtomicUsize = AtomicUsize::new(0);</span>
 
 <span class="kw">const</span> <span class="ident">NR_SLOTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
 <span class="kw">struct</span> <span class="ident">TwzGlobalAlloc</span> {
@@ -349,12 +327,10 @@
                 <span class="kw">return</span>;
             }
         }
-        <span class="kw">for</span> <span class="ident">slot</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">other_slots</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">slot</span>) <span class="op">=</span> <span class="ident">slot</span> {
-                <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">is_in</span>(<span class="ident">ptr</span>) {
-                    <span class="ident">slot</span>.<span class="ident">free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
-                    <span class="kw">return</span>;
-                }
+        <span class="kw">for</span> <span class="ident">slot</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">other_slots</span>.<span class="ident">iter_mut</span>().<span class="ident">flatten</span>() {
+            <span class="kw">if</span> <span class="ident">slot</span>.<span class="ident">is_in</span>(<span class="ident">ptr</span>) {
+                <span class="ident">slot</span>.<span class="ident">free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
+                <span class="kw">return</span>;
             }
         }
         <span class="macro">panic!</span>(<span class="string">&quot;free for pointer that was not allocated by us&quot;</span>);
@@ -420,56 +396,24 @@
     )
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_alloc</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
+<span class="doccomment">/// Allocate a region of memory as specified by `layout`. Minimum 16-byte alignment. If we are out</span>
+<span class="doccomment">/// of memory, return null.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// The caller must ensure that the returned memory is freed at the right time.</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">global_alloc</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
     <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">adj_layout</span>(<span class="ident">layout</span>);
-    <span class="comment">/* crate::syscall::sys_kernel_console_write(
-        b&quot;alloc\n&quot;,
-        crate::syscall::KernelConsoleWriteFlags::empty(),
-    );
-    unsafe {
-        crate::arch::syscall::raw_syscall(
-            crate::syscall::Syscall::Null,
-            &amp;[0, layout.size() as u64, layout.align() as u64],
-        );
-    }
-    */</span>
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">TGA_LOCK</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">TGA</span>.<span class="ident">allocate</span>(<span class="ident">layout</span>);
-        <span class="ident">TGA_LOCK</span>.<span class="ident">unlock</span>();
-        <span class="ident">res</span>
-    };
-    <span class="comment">/*
-    unsafe {
-        crate::arch::syscall::raw_syscall(
-            crate::syscall::Syscall::Null,
-            &amp;[res as u64, layout.size() as u64, layout.align() as u64],
-        );
-    }
-    */</span>
+    <span class="ident">TGA_LOCK</span>.<span class="ident">lock</span>();
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">TGA</span>.<span class="ident">allocate</span>(<span class="ident">layout</span>);
+    <span class="ident">TGA_LOCK</span>.<span class="ident">unlock</span>();
     <span class="ident">res</span>
-    <span class="comment">/*
-    let start = SCRATCH_PTR.load(Ordering::SeqCst);
-    let tstart = if start &gt; 0 {
-        ((start - 1) &amp; !(layout.align() - 1)) + layout.align()
-    } else {
-        start
-    };
-    let nstart = tstart + core::cmp::max(layout.size(), layout.align());
-    if SCRATCH_PTR
-        .compare_exchange(start, nstart, Ordering::SeqCst, Ordering::SeqCst)
-        .is_err()
-    {
-        return global_alloc(layout);
-    }
-    if tstart + layout.size() &gt;= 4096 {
-        panic!(&quot;out of early memory&quot;);
-    }
-    return unsafe { SCRATCH.as_mut_ptr().add(start) };
-    */</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_free</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) {
+<span class="doccomment">/// Free a region of previously allocated memory. If ptr is null, do nothing.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// The caller must ensure the prevention of use-after-free and double-free.</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">global_free</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) {
     <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">adj_layout</span>(<span class="ident">layout</span>);
     <span class="comment">/*crate::syscall::sys_kernel_console_write(
         b&quot;free\n&quot;,
@@ -479,28 +423,32 @@
     <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
         <span class="kw">return</span>;
     }
-    <span class="kw">unsafe</span> {
-        <span class="ident">TGA_LOCK</span>.<span class="ident">lock</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">TGA</span>.<span class="ident">free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
-        <span class="ident">TGA_LOCK</span>.<span class="ident">unlock</span>();
-        <span class="ident">res</span>
-    }
+    <span class="ident">TGA_LOCK</span>.<span class="ident">lock</span>();
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">TGA</span>.<span class="ident">free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
+    <span class="ident">TGA_LOCK</span>.<span class="ident">unlock</span>();
+    <span class="ident">res</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_realloc</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>, <span class="ident">new_size</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
+<span class="doccomment">/// Reallocate a region of memory. Acts like realloc.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// The caller must prevent use-after-free and double-free for ptr, and it must track the returned</span>
+<span class="doccomment">/// memory properly as in [global_alloc].</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">global_realloc</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>, <span class="ident">new_size</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
     <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">adj_layout</span>(<span class="ident">layout</span>);
     <span class="kw">let</span> <span class="ident">new_layout</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::internal_unwrap</span>(
         <span class="ident">Layout::from_size_align</span>(<span class="ident">new_size</span>, <span class="ident">layout</span>.<span class="ident">align</span>()).<span class="ident">ok</span>(),
         <span class="string">&quot;failed to create Layout for realloc&quot;</span>,
     );
+    <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
+        <span class="kw">return</span> <span class="ident">global_alloc</span>(<span class="ident">new_layout</span>);
+    }
     <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">global_alloc</span>(<span class="ident">new_layout</span>);
-    <span class="kw">unsafe</span> {
-        <span class="kw">if</span> <span class="ident">layout</span>.<span class="ident">size</span>() <span class="op">&lt;</span> <span class="ident">new_size</span> {
-            <span class="ident">write_bytes</span>(<span class="ident">new</span>.<span class="ident">add</span>(<span class="ident">layout</span>.<span class="ident">size</span>()), <span class="number">0</span>, <span class="ident">new_size</span> <span class="op">-</span> <span class="ident">layout</span>.<span class="ident">size</span>());
-            <span class="ident">copy_nonoverlapping</span>(<span class="ident">ptr</span>, <span class="ident">new</span>, <span class="ident">layout</span>.<span class="ident">size</span>());
-        } <span class="kw">else</span> {
-            <span class="ident">copy_nonoverlapping</span>(<span class="ident">ptr</span>, <span class="ident">new</span>, <span class="ident">new_size</span>);
-        }
+    <span class="kw">if</span> <span class="ident">layout</span>.<span class="ident">size</span>() <span class="op">&lt;</span> <span class="ident">new_size</span> {
+        <span class="ident">write_bytes</span>(<span class="ident">new</span>.<span class="ident">add</span>(<span class="ident">layout</span>.<span class="ident">size</span>()), <span class="number">0</span>, <span class="ident">new_size</span> <span class="op">-</span> <span class="ident">layout</span>.<span class="ident">size</span>());
+        <span class="ident">copy_nonoverlapping</span>(<span class="ident">ptr</span>, <span class="ident">new</span>, <span class="ident">layout</span>.<span class="ident">size</span>());
+    } <span class="kw">else</span> {
+        <span class="ident">copy_nonoverlapping</span>(<span class="ident">ptr</span>, <span class="ident">new</span>, <span class="ident">new_size</span>);
     }
     <span class="ident">global_free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
     <span class="ident">new</span>

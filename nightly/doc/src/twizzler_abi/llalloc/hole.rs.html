@@ -386,8 +386,6 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::alloc::Layout</span>;
 <span class="kw">use</span> <span class="ident">core::mem</span>;
 <span class="kw">use</span> <span class="ident">core::mem</span>::{<span class="ident">align_of</span>, <span class="ident">size_of</span>};
@@ -464,9 +462,7 @@
             <span class="ident">size</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::min_size</span>();
         }
         <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">align_up</span>(<span class="ident">size</span>, <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">Hole</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">layout</span>.<span class="ident">align</span>()).<span class="ident">unwrap</span>();
-
-        <span class="ident">layout</span>
+        <span class="ident">Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">layout</span>.<span class="ident">align</span>()).<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Searches the list for a big enough hole.</span>
@@ -619,8 +615,8 @@
             <span class="ident">addr</span>: <span class="ident">aligned_hole</span>.<span class="ident">addr</span>,
             <span class="ident">size</span>: <span class="ident">required_size</span>,
         },
-        <span class="ident">front_padding</span>: <span class="ident">front_padding</span>,
-        <span class="ident">back_padding</span>: <span class="ident">back_padding</span>,
+        <span class="ident">front_padding</span>,
+        <span class="ident">back_padding</span>,
     })
 }
 
@@ -635,7 +631,7 @@
         <span class="kw">let</span> <span class="ident">allocation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Allocation</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous</span>
             .<span class="ident">next</span>
             .<span class="ident">as_mut</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">split_hole</span>(<span class="ident">current</span>.<span class="ident">info</span>(), <span class="ident">layout</span>.<span class="ident">clone</span>()));
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">split_hole</span>(<span class="ident">current</span>.<span class="ident">info</span>(), <span class="ident">layout</span>));
         <span class="kw">match</span> <span class="ident">allocation</span> {
             <span class="prelude-val">Some</span>(<span class="ident">allocation</span>) =&gt; {
                 <span class="comment">// link the front/back padding</span>
@@ -752,7 +748,7 @@
                 <span class="comment">// after:   ___XXX__FFFF___    where F is the freed block</span>
 
                 <span class="kw">let</span> <span class="ident">new_hole</span> <span class="op">=</span> <span class="ident">Hole</span> {
-                    <span class="ident">size</span>: <span class="ident">size</span>,
+                    <span class="ident">size</span>,
                     <span class="ident">next</span>: <span class="ident">hole</span>.<span class="ident">next</span>.<span class="ident">take</span>(), <span class="comment">// the reference to the Y block (if it exists)</span>
                 };
                 <span class="comment">// write the new hole to the freed memory</span>

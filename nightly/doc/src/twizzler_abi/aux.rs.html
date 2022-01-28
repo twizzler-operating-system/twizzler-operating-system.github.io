@@ -10,15 +10,43 @@
 <span id="9"> 9</span>
 <span id="10">10</span>
 <span id="11">11</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+</pre><pre class="rust"><code><span class="doccomment">//! When running a new program (and thus, initializing a new runtime), the new program expects to</span>
+<span class="doccomment">//! receive some information about how it was started, including arguments, env vars, etc. These are</span>
+<span class="doccomment">//! passed to the new program through the _start function as an array of AuxEntries as its only argument.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This array of entries is an unspecified length and is terminated by the Null entry at the end of</span>
+<span class="doccomment">//! the array.</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="doccomment">/// Auxillary information provided to a new program on runtime entry.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AuxEntry</span> {
+    <span class="doccomment">/// Ends the aux array.</span>
     <span class="ident">Null</span>,
+    <span class="doccomment">/// A pointer to this program&#39;s program headers, and the number of them. See the ELF</span>
+    <span class="doccomment">/// specification for more info.</span>
     <span class="ident">ProgramHeaders</span>(<span class="ident">u64</span>, <span class="ident">usize</span>),
+    <span class="doccomment">/// A pointer to the env var array.</span>
     <span class="ident">Environment</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// A pointer to the arguments array.</span>
     <span class="ident">Arguments</span>(<span class="ident">u64</span>),
+    <span class="doccomment">/// The object ID of the executable.</span>
     <span class="ident">ExecId</span>(<span class="ident">ObjID</span>),
 }
 </code></pre></div>

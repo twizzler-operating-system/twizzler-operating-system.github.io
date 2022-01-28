@@ -1,1 +1,1 @@
-initSidebarItems({});
+initSidebarItems({"fn":[["raw_syscall","Call into the kernel to perform a synchronous system call. The args array can be at most 6 long, and the meaning of the args depends on the system call. The kernel can return two 64-bit values, whose meaning depends on the system call."]]});

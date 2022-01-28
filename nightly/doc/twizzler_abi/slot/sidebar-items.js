@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["global_allocate",""],["to_vaddr_range",""]]});
+initSidebarItems({"fn":[["global_allocate","Allocate a slot in the address space where we could map a new object."],["to_vaddr_range","Return the vaddr range of a slot (start address, end address)."]]});
