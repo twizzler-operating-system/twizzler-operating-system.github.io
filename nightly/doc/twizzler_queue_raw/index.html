@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="A raw queue interface for Twizzler, making no assumptions about where the underlying headers and circular buffers are located. This means you probably don’t want to use this — instead, I suggest you use the wrapped version of this library, twizzler-queue, since that actually interacts with the object system."><meta name="keywords" content="rust, rustlang, rust-lang, twizzler_queue_raw"><title>twizzler_queue_raw - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css"disabled><link rel="stylesheet" type="text/css" href="../dark.css"disabled><link rel="stylesheet" type="text/css" href="../light.css"id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../twizzler_queue_raw/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate twizzler_queue_raw</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all twizzler_queue_raw's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><div id="sidebar-vars" data-name="twizzler_queue_raw" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">twizzler_queue_raw</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/twizzler_queue_raw/lib.rs.html#1-547" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A raw queue interface for Twizzler, making no assumptions about where the underlying headers and
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../twizzler_queue_raw/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate twizzler_queue_raw</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all twizzler_queue_raw's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><div id="sidebar-vars" data-name="twizzler_queue_raw" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">twizzler_queue_raw</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/twizzler_queue_raw/lib.rs.html#1-703" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>A raw queue interface for Twizzler, making no assumptions about where the underlying headers and
 circular buffers are located. This means you probably don’t want to use this — instead, I
 suggest you use the wrapped version of this library, twizzler-queue, since that actually
 interacts with the object system.</p>
@@ -17,50 +17,42 @@ maintained in terms of “turns”, that indicate which “go around” of the q
 <h2 id="lets-look-at-an-insert" class="section-header"><a href="#lets-look-at-an-insert">Let’s look at an insert</a></h2>
 <p>Here’s what the queue looks like to start with. The 0_ indicates that it’s empty, and turn is
 set to 0.</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code> <span class="ident">b</span>
- <span class="ident">t</span>
- <span class="ident">h</span>
-[<span class="number">0_</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
+<div class="example-wrap"><pre class="language-text"><code> b
+ t
+ h
+[0_, 0_, 0_]</code></pre></div>
 <p>When inserting, the thread first reserves space:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code> <span class="ident">b</span>
- <span class="ident">t</span>
-     <span class="ident">h</span>
-[<span class="number">0_</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
+<div class="example-wrap"><pre class="language-text"><code> b
+ t
+     h
+[0_, 0_, 0_]</code></pre></div>
 <p>Then it fills out the data:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code> <span class="ident">b</span>
- <span class="ident">t</span>
-     <span class="ident">h</span>
-[<span class="number">0X</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
+<div class="example-wrap"><pre class="language-text"><code> b
+ t
+     h
+[0X, 0_, 0_]</code></pre></div>
 <p>Then it toggles the turn bit:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code> <span class="ident">b</span>
- <span class="ident">t</span>
-     <span class="ident">h</span>
-[<span class="number">1X</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
+<div class="example-wrap"><pre class="language-text"><code> b
+ t
+     h
+[1X, 0_, 0_]</code></pre></div>
 <p>Next, it bumps the doorbell (and maybe wakes up a waiting consumer):</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code>     <span class="ident">b</span>
- <span class="ident">t</span>
-     <span class="ident">h</span>
-[<span class="number">1X</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
+<div class="example-wrap"><pre class="language-text"><code>     b
+ t
+     h
+[1X, 0_, 0_]</code></pre></div>
 <p>Now, let’s say the consumer comes along and dequeues. First, it checks if it’s empty by
 comparing tail and bell, and finds it’s not empty. Then it checks if it’s the correct turn. This
 turn is 1, so yes. Next, it remove the data from the queue:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code>     <span class="ident">b</span>
- <span class="ident">t</span>
-     <span class="ident">h</span>
-[<span class="number">1_</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
+<div class="example-wrap"><pre class="language-text"><code>     b
+ t
+     h
+[1_, 0_, 0_]</code></pre></div>
 <p>And then finally it increments the tail counter:</p>
-
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code>     <span class="ident">b</span>
-     <span class="ident">t</span>
-     <span class="ident">h</span>
-[<span class="number">1_</span>, <span class="number">0_</span>, <span class="number">0_</span>]</code></pre></div>
-</div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="example-wrap"><pre class="language-text"><code>     b
+     t
+     h
+[1_, 0_, 0_]</code></pre></div></div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.QueueEntry.html" title="twizzler_queue_raw::QueueEntry struct">QueueEntry</a></div><div class="item-right docblock-short"><p>A queue entry. All queues must be formed of these, as the queue algorithm uses data inside this
 struct as part of its operation. The cmd_slot is used internally to track turn, and the info is
 used by the full queue structure to manage completion. The data T is user data passed around the queue.</p>
@@ -71,5 +63,13 @@ used by the full queue structure to manage completion. The data T is user data p
 </div></div></div><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
 <div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.ReceiveError.html" title="twizzler_queue_raw::ReceiveError enum">ReceiveError</a></div><div class="item-right docblock-short"><p>Possible errors for receiving from a queue.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.SubmissionError.html" title="twizzler_queue_raw::SubmissionError enum">SubmissionError</a></div><div class="item-right docblock-short"><p>Possible errors for submitting to a queue.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.multi_receive.html" title="twizzler_queue_raw::multi_receive fn">multi_receive</a></div><div class="item-right docblock-short"><p>Wait for receiving on multiple raw queues. If any of the passed raw queues can return data, they
+will do so by writing it into the output array at the same index that they are in the <code>queues</code>
+variable. The queues and output arrays must be the same length. If no data is available in any
+queues, then the function will call back on multi_wait, which it expects to wait until <strong>any</strong> of
+the pairs (&amp;x, y) meet the condition that *x != y. Before returning any data, the function will
+callback on multi_ring, to inform multiple queues that data was taken from them. It expects the
+multi_ring function to wake up any waiting threads on the supplied words of memory.</p>
 </div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="twizzler_queue_raw" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
 </body></html>
