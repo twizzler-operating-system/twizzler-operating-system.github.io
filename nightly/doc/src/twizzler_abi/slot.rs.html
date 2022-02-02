@@ -17,6 +17,9 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Manage slots in the address space. Currently not finished.</span>
 
 <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
@@ -35,6 +38,9 @@
     <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> (<span class="ident">slot</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">*</span> (<span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>) <span class="op">-</span> <span class="number">0x1000</span>;
     (<span class="ident">start</span>, <span class="ident">end</span>)
 }
+
+<span class="doccomment">/// Release a slot for reuse.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_release</span>(<span class="ident">_slot</span>: <span class="ident">usize</span>) {}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
 </body></html>

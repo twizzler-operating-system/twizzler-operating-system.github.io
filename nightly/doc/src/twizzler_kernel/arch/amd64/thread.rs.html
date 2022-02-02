@@ -146,6 +146,23 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
@@ -154,7 +171,7 @@
     <span class="ident">arch::amd64::desctables::set_kernel_stack</span>, <span class="ident">processor::KERNEL_STACK_SIZE</span>, <span class="ident">thread::Thread</span>,
 };
 
-<span class="kw">const</span> <span class="ident">XSAVE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span>;
+<span class="kw">const</span> <span class="ident">XSAVE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">64</span>))]</span>
 <span class="kw">struct</span> <span class="ident">AlignedXsaveRegion</span>([<span class="ident">u8</span>; <span class="ident">XSAVE_LEN</span>]);
@@ -242,7 +259,24 @@
             <span class="ident">set_kernel_stack</span>(
                 <span class="ident">VirtAddr::new</span>(<span class="self">self</span>.<span class="ident">kernel_stack</span>.<span class="ident">as_ref</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">+</span> <span class="ident">KERNEL_STACK_SIZE</span>,
             );
+            <span class="comment">/*
+            logln!(
+                &quot;switch {} -&gt; {} {:?}&quot;,
+                old_thread.id(),
+                self.id(),
+                self.arch.xsave_region.0.as_ptr()
+            );
+            */</span>
             <span class="macro">asm!</span>(<span class="string">&quot;xsave [{}]&quot;</span>, <span class="kw">in</span>(<span class="ident">reg</span>) <span class="ident">old_thread</span>.<span class="ident">arch</span>.<span class="ident">xsave_region</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>(), <span class="kw">in</span>(<span class="string">&quot;rax&quot;</span>) <span class="number">3</span>, <span class="kw">in</span>(<span class="string">&quot;rdx&quot;</span>) <span class="number">0</span>);
+            <span class="comment">/*
+            for (i, x) in old_thread.arch.xsave_region.0.iter().enumerate() {
+                if i % 16 == 0 {
+                    log!(&quot;\n{}: &quot;, i);
+                }
+                log!(&quot;{:x} &quot;, x);
+            }
+            logln!(&quot;&quot;);
+            */</span>
             <span class="ident">old_thread</span>.<span class="ident">arch</span>.<span class="ident">xsave_inited</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::SeqCst</span>);
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">arch</span>.<span class="ident">xsave_inited</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) {
                 <span class="macro">asm!</span>(<span class="string">&quot;xrstor [{}]&quot;</span>, <span class="kw">in</span>(<span class="ident">reg</span>) <span class="self">self</span>.<span class="ident">arch</span>.<span class="ident">xsave_region</span>.<span class="number">0</span>.<span class="ident">as_ptr</span>(), <span class="kw">in</span>(<span class="string">&quot;rax&quot;</span>) <span class="number">3</span>, <span class="kw">in</span>(<span class="string">&quot;rdx&quot;</span>) <span class="number">0</span>);

@@ -72,6 +72,7 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This library provides a common interface for applications that want to talk to the Twizzler</span>
 <span class="doccomment">//! kernel, and defines that interface for both applications and the kernel to follow. It&#39;s made of</span>
 <span class="doccomment">//! several parts:</span>
@@ -89,7 +90,6 @@
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">naked_functions</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">core_intrinsics</span>)]</span>
-
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">arch</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">alloc</span>;
@@ -100,9 +100,11 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">object</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">doc</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rt1</span>;
+<span class="kw">mod</span> <span class="ident">simple_idcounter</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">simple_mutex</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">slot</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">syscall</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">thread</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time</span>;
 
 <span class="doccomment">/// Simple callback into twizzler_abi made by the standard library once it has initialized the</span>

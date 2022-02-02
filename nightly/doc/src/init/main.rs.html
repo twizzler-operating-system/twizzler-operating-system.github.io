@@ -43,6 +43,10 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">lang_items</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm</span>)]</span>
@@ -76,7 +80,11 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
 <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> };
     <span class="macro">println!</span>(<span class="string">&quot;Hello, World {}&quot;</span>, <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> });
-    <span class="macro">panic!</span>(<span class="string">&quot;panic test&quot;</span>);
+
+    <span class="ident">std::thread::spawn</span>(<span class="op">|</span><span class="op">|</span> {
+        <span class="macro">println!</span>(<span class="string">&quot;hello from thread&quot;</span>);
+    });
+    <span class="comment">//panic!(&quot;panic test&quot;);</span>
     <span class="kw">loop</span> {}
 }
 

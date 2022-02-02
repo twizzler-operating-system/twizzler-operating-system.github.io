@@ -83,12 +83,15 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">memory::context::MappingPerms</span>,
     <span class="ident">obj</span>::{<span class="ident">pages::Page</span>, <span class="ident">PageNumber</span>},
-    <span class="ident">thread::current_memory_context</span>,
+    <span class="ident">thread</span>::{<span class="ident">current_memory_context</span>, <span class="ident">current_thread_ref</span>},
 };
 
 <span class="macro">bitflags::bitflags!</span> {
@@ -107,7 +110,7 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">page_fault</span>(<span class="ident">addr</span>: <span class="ident">VirtAddr</span>, <span class="ident">cause</span>: <span class="ident">PageFaultCause</span>, <span class="ident">flags</span>: <span class="ident">PageFaultFlags</span>, <span class="ident">ip</span>: <span class="ident">VirtAddr</span>) {
-    <span class="kw">if</span> <span class="bool-val">false</span> {
+    <span class="kw">if</span> <span class="bool-val">true</span> {
         <span class="macro">logln!</span>(
             <span class="string">&quot;page fault at {:?} cause {:?} flags {:?}, at {:?}&quot;</span>,
             <span class="ident">addr</span>,
@@ -164,6 +167,9 @@
         }
     } <span class="kw">else</span> {
         <span class="comment">//TODO: fault</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">th</span>) <span class="op">=</span> <span class="ident">current_thread_ref</span>() {
+            <span class="macro">logln!</span>(<span class="string">&quot;user fs {:?}&quot;</span>, <span class="ident">th</span>.<span class="ident">arch</span>.<span class="ident">user_fs</span>);
+        }
         <span class="macro">panic!</span>(<span class="string">&quot;page fault: no obj&quot;</span>);
     }
 }

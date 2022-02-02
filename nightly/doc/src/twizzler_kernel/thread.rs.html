@@ -565,6 +565,49 @@
 <span id="564">564</span>
 <span id="565">565</span>
 <span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">cell::RefCell</span>,
@@ -572,7 +615,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">twizzler_abi::aux::AuxEntry</span>;
+<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{<span class="ident">aux::AuxEntry</span>, <span class="ident">syscall::ThreadSpawnArgs</span>};
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 <span class="kw">use</span> <span class="ident">xmas_elf::program::SegmentData</span>;
 
@@ -637,6 +680,7 @@
     <span class="ident">memory_context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MemoryContextRef</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">kernel_stack</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">KERNEL_STACK_SIZE</span>]<span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">stats</span>: <span class="ident">ThreadStats</span>,
+    <span class="ident">spawn_args</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ThreadSpawnArgs</span><span class="op">&gt;</span>,
 }
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Thread</span> {}
 
@@ -702,6 +746,7 @@
             <span class="ident">current_processor_queue</span>: <span class="ident">AtomicI32::new</span>(<span class="op">-</span><span class="number">1</span>),
             <span class="ident">stats</span>: <span class="ident">ThreadStats::default</span>(),
             <span class="ident">memory_context</span>: <span class="prelude-val">None</span>,
+            <span class="ident">spawn_args</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -709,6 +754,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">thread</span>.<span class="ident">memory_context</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">MemoryContext::new</span>())));
         <span class="ident">thread</span>.<span class="ident">memory_context</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">lock</span>().<span class="ident">add_thread</span>();
+        <span class="ident">thread</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_current_context</span>(<span class="ident">spawn_args</span>: <span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
+        <span class="ident">thread</span>.<span class="ident">memory_context</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current_memory_context</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>());
+        <span class="ident">thread</span>.<span class="ident">memory_context</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">lock</span>().<span class="ident">add_thread</span>();
+        <span class="ident">thread</span>.<span class="ident">spawn_args</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">spawn_args</span>);
         <span class="ident">thread</span>
     }
 
@@ -1117,6 +1170,39 @@ fn object_copy_test() {
             <span class="ident">aux_start</span> <span class="kw">as</span> <span class="ident">u64</span>,
         );
     }
+}
+
+<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">user_new_start</span>() {
+    <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">spawn_args</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
+    <span class="ident">current</span>.<span class="ident">set_tls</span>(<span class="ident">args</span>.<span class="ident">tls</span> <span class="kw">as</span> <span class="ident">u64</span>);
+    <span class="macro">logln!</span>(
+        <span class="string">&quot;thread jtu {:x} {:x} {:x}&quot;</span>,
+        <span class="ident">args</span>.<span class="ident">entry</span>,
+        <span class="ident">args</span>.<span class="ident">stack_base</span> <span class="op">+</span> <span class="ident">args</span>.<span class="ident">stack_size</span>,
+        <span class="ident">args</span>.<span class="ident">tls</span>
+    );
+    <span class="kw">unsafe</span> {
+        <span class="ident"><span class="kw">crate</span>::arch::jump_to_user</span>(
+            <span class="ident">VirtAddr::new</span>(<span class="ident">args</span>.<span class="ident">entry</span> <span class="kw">as</span> <span class="ident">u64</span>),
+            <span class="comment">/* TODO: this is x86 specific */</span>
+            <span class="ident">VirtAddr::new</span>((<span class="ident">args</span>.<span class="ident">stack_base</span> <span class="op">+</span> <span class="ident">args</span>.<span class="ident">stack_size</span> <span class="op">-</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u64</span>),
+            <span class="ident">args</span>.<span class="ident">arg</span> <span class="kw">as</span> <span class="ident">u64</span>,
+        )
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_user</span>(<span class="ident">args</span>: <span class="ident">ThreadSpawnArgs</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">Thread::new_with_current_context</span>(<span class="ident">args</span>);
+    <span class="macro">logln!</span>(
+        <span class="string">&quot;starting new thread {} with stack {:p}&quot;</span>,
+        <span class="ident">thread</span>.<span class="ident">id</span>,
+        <span class="ident">thread</span>.<span class="ident">kernel_stack</span>
+    );
+    <span class="kw">unsafe</span> {
+        <span class="ident">thread</span>.<span class="ident">init</span>(<span class="ident">user_new_start</span>);
+    }
+    <span class="ident">schedule_new_thread</span>(<span class="ident">thread</span>);
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_init</span>() {
