@@ -49,6 +49,11 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">lang_items</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm</span>)]</span>
@@ -80,14 +85,19 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
 <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">BAR</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">named_asm_labels</span>)]</span>
 <span class="kw">fn</span> <span class="ident">main</span>() {
-    <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> };
+    <span class="kw">let</span> <span class="ident">_foo</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> };
     <span class="macro">println!</span>(<span class="string">&quot;Hello, World {}&quot;</span>, <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> });
 
-    <span class="ident">std::thread::spawn</span>(<span class="op">|</span><span class="op">|</span> {
+    <span class="kw">let</span> <span class="ident">j</span> <span class="op">=</span> <span class="ident">std::thread::spawn</span>(<span class="op">|</span><span class="op">|</span> {
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1</span> {
             <span class="macro">println!</span>(<span class="string">&quot;hello from thread&quot;</span>);
         }
+        <span class="number">234</span>
     });
+
+    <span class="macro">println!</span>(<span class="string">&quot;joining...&quot;</span>);
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">j</span>.<span class="ident">join</span>();
+    <span class="macro">println!</span>(<span class="string">&quot;joined {:?}&quot;</span>, <span class="ident">res</span>);
     <span class="comment">//panic!(&quot;panic test&quot;);</span>
     <span class="kw">loop</span> {}
 }
