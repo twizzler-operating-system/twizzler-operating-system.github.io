@@ -55,6 +55,9 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">clock::Nanoseconds</span>, <span class="ident">thread::current_thread_ref</span>, <span class="ident">BootInfo</span>};
@@ -99,13 +102,16 @@
     <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">syscall::X86SyscallContext::create_jmp_context</span>(<span class="ident">target</span>, <span class="ident">stack</span>, <span class="ident">arg</span>);
     <span class="ident"><span class="kw">crate</span>::thread::exit_kernel</span>();
 
-    <span class="kw">let</span> <span class="ident">user_fs</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">arch</span>
-        .<span class="ident">user_fs</span>
-        .<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-    <span class="ident">x86_64::registers::segmentation::FS::write_base</span>(<span class="ident">VirtAddr::new</span>(<span class="ident">user_fs</span>));
-    <span class="ident">x86::msr::wrmsr</span>(<span class="ident">x86::msr::IA32_FS_BASE</span>, <span class="ident">user_fs</span>);
+    {
+        <span class="comment">/* we need this scope the drop the current thread ref before returning to user */</span>
+        <span class="kw">let</span> <span class="ident">user_fs</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">arch</span>
+            .<span class="ident">user_fs</span>
+            .<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
+        <span class="ident">x86_64::registers::segmentation::FS::write_base</span>(<span class="ident">VirtAddr::new</span>(<span class="ident">user_fs</span>));
+        <span class="ident">x86::msr::wrmsr</span>(<span class="ident">x86::msr::IA32_FS_BASE</span>, <span class="ident">user_fs</span>);
+    }
     <span class="ident">syscall::return_to_user</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">syscall::X86SyscallContext</span>);
 }
 

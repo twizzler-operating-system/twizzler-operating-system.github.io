@@ -502,6 +502,44 @@
 <span id="501">501</span>
 <span id="502">502</span>
 <span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicPtr</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
@@ -778,6 +816,11 @@
 }
 
 <span class="kw">static</span> <span class="ident">ALL_THREADS</span>: <span class="ident">Spinlock</span><span class="op">&lt;</span><span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">ThreadRef</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Spinlock::new</span>(<span class="ident">BTreeMap::new</span>());
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_thread</span>(<span class="ident">id</span>: <span class="ident">u64</span>) {
+    <span class="ident">ALL_THREADS</span>.<span class="ident">lock</span>().<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
+}
+
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schedule_new_thread</span>(<span class="ident">thread</span>: <span class="ident">Thread</span>) {
     <span class="ident">thread</span>.<span class="ident">set_state</span>(<span class="ident">ThreadState::Running</span>);
     <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">thread</span>);
@@ -804,7 +847,7 @@
     <span class="ident">set_current_thread</span>(<span class="ident">idle</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">switch_to</span>(<span class="ident">thread</span>: <span class="ident">ThreadRef</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">Thread</span>) {
+<span class="kw">fn</span> <span class="ident">switch_to</span>(<span class="ident">thread</span>: <span class="ident">ThreadRef</span>, <span class="ident">old</span>: <span class="ident">ThreadRef</span>) {
     <span class="comment">/*
     logln!(
         &quot;{} switch to {} from {}&quot;,
@@ -822,7 +865,35 @@
     <span class="kw">if</span> <span class="op">!</span><span class="ident">thread</span>.<span class="ident">is_idle_thread</span>() {
         <span class="ident"><span class="kw">crate</span>::clock::schedule_oneshot_tick</span>(<span class="number">1</span>);
     }
-    <span class="ident">thread</span>.<span class="ident">switch_thread</span>(<span class="ident">old</span>);
+    <span class="comment">// logln!(&quot;t {} {}&quot;, old.id(), Arc::strong_count(&amp;old));</span>
+    <span class="comment">/* Okay, so this is a little gross. Basically, we need to drop these references to make
+    sure the refcounts don&#39;t climb every time we switch_to(). But we still need a reference
+    to the underlying thread so we can do the switch_thread call.
+
+    So we manually decrement the refcounts while maintaining a raw pointer to the underlying.
+    Why is this safe?
+      1. For the old pointer, it&#39;s safe because this thread is either exiting, in which case it
+         is placed in the exit queue for THIS CPU, thus we can ensure that the reference will not
+         dangle, since that only gets cleaned up by THIS CPU on the next scheduling softtick. If
+         the thread is not exiting, then it must be either sleeping, and on a queue somewhere else,
+         or its on a different CPU queue. In both cases, the thread is on a different queue. Since
+         the switch_thread function internally must lock to handle SMP cross-cpu scheduling, and
+         after that lock is released, the old pointer is never used (this is part of the contract
+         of the swtich_thread function), we know the old pointer will live at least as long as that
+         lock is held through the switch_thread call, after which switch_to isn&#39;t allowed to look at
+         it anyway. Thus, the pointer will not dangle.
+      2. For the new (thread) pointer, we know this reference is safe because we just wrote it as
+         the current thread pointer for this CPU, so we know it won&#39;t dangle. */</span>
+    <span class="kw">let</span> <span class="ident">threadt</span> <span class="op">=</span> <span class="ident">Arc::into_raw</span>(<span class="ident">thread</span>);
+    <span class="kw">let</span> <span class="ident">oldt</span> <span class="op">=</span> <span class="ident">Arc::into_raw</span>(<span class="ident">old</span>);
+    <span class="kw">unsafe</span> {
+        <span class="ident">Arc::decrement_strong_count</span>(<span class="ident">oldt</span>);
+        <span class="ident">Arc::decrement_strong_count</span>(<span class="ident">threadt</span>);
+        <span class="ident">threadt</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">unwrap</span>()
+            .<span class="ident">switch_thread</span>(<span class="ident">oldt</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>());
+    }
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schedule</span>(<span class="ident">reinsert</span>: <span class="ident">bool</span>) {
@@ -841,6 +912,10 @@
         <span class="comment">// logln!(&quot;{} reinserting thread {}&quot;, processor.id, cur.id());</span>
         <span class="ident">schedule_thread</span>(<span class="ident">cur</span>.<span class="ident">clone</span>());
     }
+    <span class="kw">if</span> <span class="ident">cur</span>.<span class="ident">state</span>() <span class="op">==</span> <span class="ident">ThreadState::Exiting</span> {
+        <span class="comment">//  logln!(&quot;thread {} exit&quot;, cur.id());</span>
+        <span class="ident">processor</span>.<span class="ident">sched</span>.<span class="ident">lock</span>().<span class="ident">push_exited</span>(<span class="ident">cur</span>.<span class="ident">clone</span>());
+    }
     <span class="kw">if</span> <span class="op">!</span><span class="ident">cur</span>.<span class="ident">is_idle_thread</span>() {
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">processor</span>.<span class="ident">load</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
         <span class="macro">assert!</span>(<span class="ident">res</span> <span class="op">&gt;</span> <span class="number">1</span>);
@@ -856,7 +931,7 @@
             <span class="kw">return</span>;
         }
         <span class="ident">next</span>.<span class="ident">current_processor_queue</span>.<span class="ident">store</span>(<span class="op">-</span><span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="ident">switch_to</span>(<span class="ident">next</span>, <span class="kw-2">&amp;</span><span class="ident">cur</span>);
+        <span class="ident">switch_to</span>(<span class="ident">next</span>, <span class="ident">cur</span>);
         <span class="ident">interrupt::set</span>(<span class="ident">istate</span>);
         <span class="kw">return</span>;
     }
@@ -865,7 +940,7 @@
         <span class="kw">let</span> <span class="ident">cp</span> <span class="op">=</span> <span class="ident">current_processor</span>();
         <span class="ident">cp</span>.<span class="ident">stats</span>.<span class="ident">steals</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
         <span class="comment">// logln!(&quot;{} stole thread {}&quot;, current_processor().id, stolen.id());</span>
-        <span class="ident">switch_to</span>(<span class="ident">stolen</span>, <span class="kw-2">&amp;</span><span class="ident">cur</span>);
+        <span class="ident">switch_to</span>(<span class="ident">stolen</span>, <span class="ident">cur</span>);
         <span class="ident">interrupt::set</span>(<span class="ident">istate</span>);
         <span class="kw">return</span>;
     }
@@ -874,7 +949,7 @@
         <span class="ident">interrupt::set</span>(<span class="ident">istate</span>);
         <span class="kw">return</span>;
     }
-    <span class="ident">switch_to</span>(<span class="ident">processor</span>.<span class="ident">idle_thread</span>.<span class="ident">wait</span>().<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">cur</span>);
+    <span class="ident">switch_to</span>(<span class="ident">processor</span>.<span class="ident">idle_thread</span>.<span class="ident">wait</span>().<span class="ident">clone</span>(), <span class="ident">cur</span>);
     <span class="ident">interrupt::set</span>(<span class="ident">istate</span>);
 }
 
@@ -962,6 +1037,7 @@
 
     <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">STAT_COUNTER</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
     <span class="kw">let</span> <span class="ident">cp</span> <span class="op">=</span> <span class="ident">current_processor</span>();
+    <span class="ident">cp</span>.<span class="ident">sched</span>.<span class="ident">lock</span>().<span class="ident">cleanup_exited</span>();
     <span class="kw">let</span> <span class="ident">cur</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cur</span>) <span class="op">=</span> <span class="ident">cur</span> {
         <span class="kw">if</span> <span class="ident">cur</span>.<span class="ident">is_idle_thread</span>() {

@@ -327,6 +327,15 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">ptr::null_mut</span>,
@@ -385,6 +394,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchedulingQueues</span> {
     <span class="kw">pub</span> <span class="ident">queues</span>: [<span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">ThreadRef</span><span class="op">&gt;</span>; <span class="ident">NR_QUEUES</span>],
     <span class="kw">pub</span> <span class="ident">last_chosen_priority</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Priority</span><span class="op">&gt;</span>,
+    <span class="ident">exited</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ThreadRef</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">SchedulingQueues</span> {
@@ -467,6 +477,14 @@
             <span class="self">self</span>.<span class="ident">last_chosen_priority</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         }
         <span class="prelude-val">None</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_exited</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">th</span>: <span class="ident">ThreadRef</span>) {
+        <span class="self">self</span>.<span class="ident">exited</span>.<span class="ident">push</span>(<span class="ident">th</span>);
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cleanup_exited</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="self">self</span>.<span class="ident">exited</span>.<span class="ident">clear</span>();
     }
 }
 
