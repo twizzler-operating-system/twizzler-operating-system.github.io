@@ -638,6 +638,12 @@
 <span id="637">637</span>
 <span id="638">638</span>
 <span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">cell::RefCell</span>,
@@ -645,7 +651,7 @@
 };
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{<span class="ident">aux::AuxEntry</span>, <span class="ident">syscall::ThreadSpawnArgs</span>};
+<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{<span class="ident">aux::AuxEntry</span>, <span class="ident">object::ObjID</span>, <span class="ident">syscall::ThreadSpawnArgs</span>};
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 <span class="kw">use</span> <span class="ident">xmas_elf::program::SegmentData</span>;
 
@@ -712,6 +718,7 @@
     <span class="kw">pub</span> <span class="ident">kernel_stack</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">KERNEL_STACK_SIZE</span>]<span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">stats</span>: <span class="ident">ThreadStats</span>,
     <span class="ident">spawn_args</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ThreadSpawnArgs</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">repr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectRef</span><span class="op">&gt;</span>,
 }
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Thread</span> {}
 
@@ -778,6 +785,7 @@
             <span class="ident">stats</span>: <span class="ident">ThreadStats::default</span>(),
             <span class="ident">memory_context</span>: <span class="prelude-val">None</span>,
             <span class="ident">spawn_args</span>: <span class="prelude-val">None</span>,
+            <span class="ident">repr</span>: <span class="prelude-val">None</span>,
         }
     }
 
@@ -1252,7 +1260,7 @@ fn object_copy_test() {
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_user</span>(<span class="ident">args</span>: <span class="ident">ThreadSpawnArgs</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_user</span>(<span class="ident">args</span>: <span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="ident">ObjID</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">Thread::new_with_current_context</span>(<span class="ident">args</span>);
     <span class="macro">logln!</span>(
         <span class="string">&quot;starting new thread {} with stack {:p}&quot;</span>,
@@ -1262,7 +1270,10 @@ fn object_copy_test() {
     <span class="kw">unsafe</span> {
         <span class="ident">thread</span>.<span class="ident">init</span>(<span class="ident">user_new_start</span>);
     }
+    <span class="ident">thread</span>.<span class="ident">repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">create_blank_object</span>());
+    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">thread</span>.<span class="ident">repr</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">id</span>();
     <span class="ident">schedule_new_thread</span>(<span class="ident">thread</span>);
+    <span class="ident">id</span>
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_init</span>() {
@@ -1275,6 +1286,7 @@ fn object_copy_test() {
     <span class="kw">unsafe</span> {
         <span class="ident">thread</span>.<span class="ident">init</span>(<span class="ident">user_init</span>);
     }
+    <span class="ident">thread</span>.<span class="ident">repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">create_blank_object</span>());
     <span class="ident">schedule_new_thread</span>(<span class="ident">thread</span>);
 }
 </code></pre></div>

@@ -24,19 +24,22 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
     <span class="ident">object::ObjID</span>,
     <span class="ident">syscall</span>::{<span class="ident">ThreadControl</span>, <span class="ident">ThreadSpawnArgs</span>, <span class="ident">ThreadSpawnError</span>},
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">obj::Object</span>, <span class="ident">thread::current_thread_ref</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">thread::current_thread_ref</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_spawn</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjID</span>, <span class="ident">ThreadSpawnError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Object::new</span>());
-    <span class="ident"><span class="kw">crate</span>::obj::register_object</span>(<span class="ident">obj</span>.<span class="ident">clone</span>());
-    <span class="ident"><span class="kw">crate</span>::thread::start_new_user</span>(<span class="kw-2">*</span><span class="ident">args</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">obj</span>.<span class="ident">id</span>())
+    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::thread::start_new_user</span>(<span class="kw-2">*</span><span class="ident">args</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_ctrl</span>(<span class="ident">cmd</span>: <span class="ident">ThreadControl</span>, <span class="ident">arg</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
@@ -44,7 +47,16 @@
         <span class="ident">ThreadControl::SetTls</span> =&gt; {
             <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>().<span class="ident">set_tls</span>(<span class="ident">arg</span>);
         }
-        <span class="ident">ThreadControl::Exit</span> =&gt; <span class="ident"><span class="kw">crate</span>::thread::exit</span>(),
+        <span class="ident">ThreadControl::Exit</span> =&gt; {
+            {
+                <span class="kw">let</span> <span class="ident">th</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();
+                <span class="kw">unsafe</span> {
+                    <span class="ident">th</span>.<span class="ident">repr</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">write_val_and_signal</span>(<span class="number">0x1000</span> <span class="comment">/* TODO: object null page size */</span> <span class="op">+</span> <span class="number">8</span> <span class="comment">/* TODO: thread repr status word */</span>,
+                    <span class="number">1u64</span>, <span class="ident">u64::MAX</span>);
+                }
+            }
+            <span class="ident"><span class="kw">crate</span>::thread::exit</span>();
+        }
         <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(),
     }
     (<span class="number">0</span>, <span class="number">0</span>)

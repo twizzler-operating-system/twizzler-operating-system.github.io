@@ -45,6 +45,41 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::sync::Arc</span>;
 <span class="kw">use</span> <span class="ident">x86_64</span>::{<span class="ident">PhysAddr</span>, <span class="ident">VirtAddr</span>};
 
@@ -52,6 +87,8 @@
     <span class="ident">arch::memory::phys_to_virt</span>,
     <span class="ident">memory::frame</span>::{<span class="self">self</span>, <span class="ident">Frame</span>, <span class="ident">PhysicalFrameFlags</span>},
 };
+
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Object</span>, <span class="ident">PageNumber</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Page</span> {
@@ -75,6 +112,16 @@
         <span class="kw">unsafe</span> { <span class="ident">core::slice::from_raw_parts</span>(<span class="self">self</span>.<span class="ident">as_virtaddr</span>().<span class="ident">as_ptr</span>(), <span class="self">self</span>.<span class="ident">frame</span>.<span class="ident">size</span>()) }
     }
 
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mut_to_val</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
+        <span class="comment">/* TODO: enforce alignment and size of offset */</span>
+        <span class="comment">/* TODO: once we start optimizing frame zeroing, we need to make the frame as non-zeroed here */</span>
+        <span class="kw">let</span> <span class="ident">va</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_virtaddr</span>();
+        <span class="ident">va</span>.<span class="ident">as_mut_ptr</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
+            .<span class="ident">add</span>(<span class="ident">offset</span> <span class="op">/</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>())
+            .<span class="ident">as_mut</span>()
+            .<span class="ident">unwrap</span>()
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
         <span class="kw">unsafe</span> {
             <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">as_virtaddr</span>().<span class="ident">as_mut_ptr</span>(), <span class="self">self</span>.<span class="ident">frame</span>.<span class="ident">size</span>())
@@ -89,6 +136,29 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_frame</span> <span class="op">=</span> <span class="ident">frame::alloc_frame</span>(<span class="ident">PhysicalFrameFlags::empty</span>());
         <span class="ident">new_frame</span>.<span class="ident">copy_contents_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">frame</span>);
         <span class="self">Self</span> { <span class="ident">frame</span>: <span class="ident">new_frame</span> }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Object</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_val_and_signal</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>, <span class="ident">val</span>: <span class="ident">T</span>, <span class="ident">wakeup_count</span>: <span class="ident">u64</span>) {
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj_page_tree</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lock_page_tree</span>();
+            <span class="kw">let</span> <span class="ident">page_number</span> <span class="op">=</span> <span class="ident">PageNumber::from_address</span>(<span class="ident">VirtAddr::new</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">u64</span>));
+            <span class="kw">let</span> <span class="ident">page_offset</span> <span class="op">=</span> <span class="ident">offset</span> <span class="op">%</span> <span class="ident">PageNumber::PAGE_SIZE</span>;
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">page</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">obj_page_tree</span>.<span class="ident">get_page</span>(<span class="ident">page_number</span>, <span class="bool-val">true</span>) {
+                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">page</span>.<span class="ident">get_mut_to_val</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">page_offset</span>);
+                <span class="kw-2">*</span><span class="ident">t</span> <span class="op">=</span> <span class="ident">val</span>;
+            } <span class="kw">else</span> {
+                <span class="kw">let</span> <span class="ident">page</span> <span class="op">=</span> <span class="ident">Page::new</span>();
+                <span class="ident">obj_page_tree</span>.<span class="ident">add_page</span>(<span class="ident">page_number</span>, <span class="ident">page</span>);
+                <span class="ident">drop</span>(<span class="ident">obj_page_tree</span>);
+                <span class="self">self</span>.<span class="ident">write_val_and_signal</span>(<span class="ident">offset</span>, <span class="ident">val</span>, <span class="ident">wakeup_count</span>);
+                <span class="kw">return</span>;
+            }
+            <span class="ident">drop</span>(<span class="ident">obj_page_tree</span>);
+        }
+        <span class="self">self</span>.<span class="ident">wakeup_word</span>(<span class="ident">offset</span>, <span class="ident">wakeup_count</span>);
     }
 }
 </code></pre></div>
