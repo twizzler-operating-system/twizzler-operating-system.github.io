@@ -163,6 +163,9 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">no_std</span>]</span>
 <span class="attribute">#![<span class="ident">no_main</span>]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">alloc_error_handler</span>)]</span>
@@ -180,11 +183,13 @@
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">optimize_attribute</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm_sym</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm_const</span>)]</span>
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">btree_drain_filter</span>)]</span>
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">log</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">arch</span>;
 <span class="kw">mod</span> <span class="ident">clock</span>;
+<span class="kw">mod</span> <span class="ident">condvar</span>;
 <span class="kw">mod</span> <span class="ident">idcounter</span>;
 <span class="kw">mod</span> <span class="ident">image</span>;
 <span class="kw">mod</span> <span class="ident">initrd</span>;
@@ -193,6 +198,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">memory</span>;
 <span class="kw">mod</span> <span class="ident">mutex</span>;
 <span class="kw">mod</span> <span class="ident">obj</span>;
+<span class="kw">mod</span> <span class="ident">once</span>;
 <span class="kw">mod</span> <span class="ident">operations</span>;
 <span class="kw">mod</span> <span class="ident">panic</span>;
 <span class="kw">mod</span> <span class="ident">processor</span>;
@@ -204,10 +210,10 @@
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">bitflags</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::once::Once</span>;
 <span class="kw">use</span> <span class="ident">arch::BootInfoSystemTable</span>;
 <span class="kw">use</span> <span class="ident">initrd::BootModule</span>;
 <span class="kw">use</span> <span class="ident">memory::MemoryRegion</span>;
-<span class="kw">use</span> <span class="ident">spin::Once</span>;
 <span class="kw">use</span> <span class="ident">thread::current_thread_ref</span>;
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 

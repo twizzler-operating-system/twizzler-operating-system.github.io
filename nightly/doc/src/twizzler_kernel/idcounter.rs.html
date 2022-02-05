@@ -96,18 +96,20 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
+<span id="98">98</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">fmt::Display</span>,
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
 };
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::once::Once</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mutex::Mutex</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IdCounter</span> {
     <span class="ident">counter</span>: <span class="ident">AtomicU64</span>,
-    <span class="ident">reuse</span>: <span class="ident">spin::Once</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">reuse</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -119,7 +121,7 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">counter</span>: <span class="ident">AtomicU64::new</span>(<span class="number">1</span>),
-            <span class="ident">reuse</span>: <span class="ident">spin::Once::new</span>(),
+            <span class="ident">reuse</span>: <span class="ident">Once::new</span>(),
         }
     }
 

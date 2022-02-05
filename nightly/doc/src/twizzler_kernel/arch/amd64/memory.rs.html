@@ -420,6 +420,18 @@
 <span id="419">419</span>
 <span id="420">420</span>
 <span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">x86_64</span>::{<span class="ident">structures::paging::PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">VirtAddr</span>};
 
 <span class="kw">fn</span> <span class="ident">translate_addr_inner</span>(<span class="ident">addr</span>: <span class="ident">VirtAddr</span>, <span class="ident">phys_mem_offset</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysAddr</span><span class="op">&gt;</span> {
@@ -613,6 +625,10 @@
     }
 }
 
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArchMemoryContextSwitchInfo</span> {
+    <span class="ident">target</span>: <span class="ident">u64</span>,
+}
+
 <span class="kw">const</span> <span class="ident">PAGE_SIZE_HUGE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
 <span class="kw">const</span> <span class="ident">PAGE_SIZE_LARGE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
 <span class="kw">const</span> <span class="ident">PAGE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x1000</span>;
@@ -638,8 +654,10 @@
         <span class="self">self</span>.<span class="ident">table_root</span>.<span class="ident">frame</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">switch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="ident">x86::controlregs::cr3_write</span>(<span class="self">self</span>.<span class="ident">root</span>().<span class="ident">as_u64</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_switch_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ArchMemoryContextSwitchInfo</span> {
+        <span class="ident">ArchMemoryContextSwitchInfo</span> {
+            <span class="ident">target</span>: <span class="self">self</span>.<span class="ident">root</span>().<span class="ident">as_u64</span>(),
+        }
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_empty_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
@@ -839,6 +857,12 @@
             };
         }
         <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">ArchMemoryContextSwitchInfo</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">switch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="ident">x86::controlregs::cr3_write</span>(<span class="self">self</span>.<span class="ident">target</span>)
     }
 }
 </code></pre></div>

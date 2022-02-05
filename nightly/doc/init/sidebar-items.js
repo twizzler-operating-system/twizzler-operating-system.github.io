@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["main",""]],"static":[["BAR",""],["FOO",""]]});
+initSidebarItems({"fn":[["get_user_input",""],["main",""],["test_mutex",""],["test_thread_sync",""],["test_thread_sync_timeout",""]],"static":[["BAR",""],["BAZ",""],["FOO",""]],"struct":[["Foo",""]]});

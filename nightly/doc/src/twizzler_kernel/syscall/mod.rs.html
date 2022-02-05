@@ -186,10 +186,42 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
     <span class="ident">object</span>::{<span class="ident">ObjID</span>, <span class="ident">Protections</span>},
     <span class="ident">syscall</span>::{
-        <span class="ident">ObjectCreateError</span>, <span class="ident">ObjectMapError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>, <span class="ident">ThreadSpawnError</span>, <span class="ident">ThreadSyncError</span>,
+        <span class="ident">KernelConsoleReadSource</span>, <span class="ident">ObjectCreateError</span>, <span class="ident">ObjectMapError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>,
+        <span class="ident">ThreadSpawnError</span>, <span class="ident">ThreadSyncError</span>,
     },
 };
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
@@ -197,7 +229,8 @@
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::thread::thread_ctrl</span>;
 
 <span class="kw">mod</span> <span class="ident">object</span>;
-<span class="kw">mod</span> <span class="ident">sync</span>;
+<span class="comment">/* TODO: move the requeue stuff into sched and make this private */</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sync</span>;
 <span class="kw">mod</span> <span class="ident">thread</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SyscallContext</span> {
@@ -248,7 +281,7 @@
     <span class="ident">object::sys_object_create</span>(<span class="ident">create</span>, <span class="ident">srcs</span>, <span class="ident">ties</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">type_sys_thread_sync</span>(<span class="ident">ptr</span>: <span class="ident">u64</span>, <span class="ident">len</span>: <span class="ident">u64</span>, <span class="ident">timeoutptr</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">type_sys_thread_sync</span>(<span class="ident">ptr</span>: <span class="ident">u64</span>, <span class="ident">len</span>: <span class="ident">u64</span>, <span class="ident">timeoutptr</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">create_user_slice</span>(<span class="ident">ptr</span>, <span class="ident">len</span>) }.<span class="ident">ok_or</span>(<span class="ident">ThreadSyncError::InvalidArgument</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span>
         <span class="kw">unsafe</span> { <span class="ident">create_user_nullable_ptr</span>(<span class="ident">timeoutptr</span>) }.<span class="ident">ok_or</span>(<span class="ident">ThreadSyncError::InvalidArgument</span>)<span class="question-mark">?</span>;
@@ -311,6 +344,35 @@
                 <span class="ident">sys_kernel_console_write</span>(<span class="ident">slice</span>, <span class="ident">flags</span>);
             }
         }
+        <span class="ident">Syscall::KernelConsoleRead</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg0</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
+            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
+            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg2</span>();
+            <span class="kw">let</span> <span class="ident">source</span>: <span class="ident">KernelConsoleReadSource</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">into</span>();
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">slice</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">create_user_slice</span>(<span class="ident">ptr</span>, <span class="ident">len</span>) } {
+                <span class="kw">match</span> <span class="ident">source</span> {
+                    <span class="ident">KernelConsoleReadSource::Console</span> =&gt; {
+                        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span>
+                            <span class="ident">twizzler_abi::syscall::KernelConsoleReadFlags::from_bits_truncate</span>(
+                                <span class="ident">context</span>.<span class="ident">arg2</span>(),
+                            );
+                        <span class="ident"><span class="kw">crate</span>::log::read_bytes</span>(<span class="ident">slice</span>, <span class="ident">flags</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">into</span>())
+                    }
+                    <span class="ident">KernelConsoleReadSource::Buffer</span> =&gt; {
+                        <span class="kw">let</span> <span class="ident">_flags</span> <span class="op">=</span>
+                            <span class="ident">twizzler_abi::syscall::KernelConsoleReadBufferFlags::from_bits_truncate</span>(
+                                <span class="ident">context</span>.<span class="ident">arg2</span>(),
+                            );
+                        <span class="ident"><span class="kw">crate</span>::log::read_buffer_bytes</span>(<span class="ident">slice</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">into</span>())
+                    }
+                }
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="number">0u64</span>)
+            }
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>);
+            <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">res</span>, <span class="ident">zero_ok</span>, <span class="ident">one_err</span>);
+            <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
+        }
         <span class="ident">Syscall::ObjectCreate</span> =&gt; {
             <span class="kw">let</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg0</span>();
             <span class="kw">let</span> <span class="ident">src_ptr</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
@@ -351,7 +413,7 @@
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
             <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg2</span>();
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">type_sys_thread_sync</span>(<span class="ident">ptr</span>, <span class="ident">len</span>, <span class="ident">timeout</span>);
-            <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">result</span>, <span class="ident">zero_ok</span>, <span class="ident">one_err</span>);
+            <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">result</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">zero_ok</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>), <span class="ident">one_err</span>);
             <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
         }
         <span class="ident">Syscall::SysInfo</span> =&gt; {

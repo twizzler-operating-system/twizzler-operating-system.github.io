@@ -210,14 +210,77 @@
 <span id="209">209</span>
 <span id="210">210</span>
 <span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">twizzler_abi::object::Protections</span>;
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">arch::memory::ArchMemoryContext</span>,
+    <span class="ident">arch::memory</span>::{<span class="ident">ArchMemoryContext</span>, <span class="ident">ArchMemoryContextSwitchInfo</span>},
     <span class="ident">idcounter</span>::{<span class="ident">Id</span>, <span class="ident">IdCounter</span>},
-    <span class="ident">mutex::Mutex</span>,
+    <span class="ident">mutex</span>::{<span class="ident">LockGuard</span>, <span class="ident">Mutex</span>},
     <span class="ident">obj</span>::{<span class="ident">pages::PageRef</span>, <span class="ident">ObjectRef</span>},
 };
 
@@ -243,18 +306,45 @@
 }
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MappingIter</span>;
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryContext</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryContextInner</span> {
     <span class="kw">pub</span> <span class="ident">arch</span>: <span class="ident">ArchMemoryContext</span>,
     <span class="ident">slots</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">MappingRef</span><span class="op">&gt;</span>,
     <span class="ident">id</span>: <span class="ident">Id</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
     <span class="ident">thread_count</span>: <span class="ident">u64</span>,
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MemoryContextRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">MemoryContext</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MemoryContext</span> {
+    <span class="ident">inner</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">MemoryContextInner</span><span class="op">&gt;</span>,
+    <span class="ident">switch_cache</span>: <span class="ident">ArchMemoryContextSwitchInfo</span>,
+}
+
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MemoryContextRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">MemoryContext</span><span class="op">&gt;</span>;
+
+<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">MemoryContextInner</span> {
+    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">MemoryContextInner</span> {}
+
+<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">MemoryContextInner</span> {
+    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">core::cmp::Ordering</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">id</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">MemoryContextInner</span> {
+    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">core::cmp::Ordering</span> {
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">id</span>)
+    }
+}
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">MemoryContext</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
+        <span class="kw">let</span> <span class="ident">ida</span> <span class="op">=</span> { <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">id</span>.<span class="ident">value</span>() };
+        <span class="kw">let</span> <span class="ident">idb</span> <span class="op">=</span> { <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">id</span>.<span class="ident">value</span>() };
+        <span class="ident">ida</span> <span class="op">==</span> <span class="ident">idb</span>
     }
 }
 
@@ -262,19 +352,17 @@
 
 <span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">MemoryContext</span> {
     <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">core::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">id</span>)
+        <span class="kw">let</span> <span class="ident">ida</span> <span class="op">=</span> { <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">id</span>.<span class="ident">value</span>() };
+        <span class="kw">let</span> <span class="ident">idb</span> <span class="op">=</span> { <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">id</span>.<span class="ident">value</span>() };
+        <span class="ident">ida</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">idb</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">MemoryContext</span> {
     <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">core::cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">id</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::idcounter::StableId</span> <span class="kw">for</span> <span class="ident">MemoryContext</span> {
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::idcounter::Id</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>
+        <span class="kw">let</span> <span class="ident">ida</span> <span class="op">=</span> { <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">id</span>.<span class="ident">value</span>() };
+        <span class="kw">let</span> <span class="ident">idb</span> <span class="op">=</span> { <span class="self">self</span>.<span class="ident">inner</span>().<span class="ident">id</span>.<span class="ident">value</span>() };
+        <span class="ident">ida</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">idb</span>)
     }
 }
 
@@ -334,7 +422,7 @@
 }
 
 <span class="kw">static</span> <span class="ident">ID_COUNTER</span>: <span class="ident">IdCounter</span> <span class="op">=</span> <span class="ident">IdCounter::new</span>();
-<span class="kw">impl</span> <span class="ident">MemoryContext</span> {
+<span class="kw">impl</span> <span class="ident">MemoryContextInner</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_blank</span>() -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">arch</span>: <span class="ident">ArchMemoryContext::new_blank</span>(),
@@ -377,13 +465,6 @@
             <span class="self">self</span>.<span class="ident">clear_mappings</span>();
         }
     }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">switch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">arch</span>.<span class="ident">switch</span>();
-        }
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mappings_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="ident">MappingIter</span> {
         <span class="ident">MappingIter::new</span>(<span class="self">self</span>, <span class="ident">start</span>)
     }
@@ -408,7 +489,7 @@
         <span class="self">self</span>.<span class="ident">slots</span>.<span class="ident">insert</span>(<span class="ident">mapping</span>.<span class="ident">slot</span>, <span class="ident">mapping</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_region</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">MemoryContext</span>, <span class="ident">addr</span>: <span class="ident">VirtAddr</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clone_region</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">MemoryContextInner</span>, <span class="ident">addr</span>: <span class="ident">VirtAddr</span>) {
         <span class="kw">for</span> <span class="ident">mapping</span> <span class="kw">in</span> <span class="ident">other_ctx</span>.<span class="ident">mappings_iter</span>(<span class="ident">addr</span>) {
             <span class="self">self</span>.<span class="ident">arch</span>
                 .<span class="ident">map</span>(
@@ -419,6 +500,51 @@
                 )
                 .<span class="ident">unwrap</span>();
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">switch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">arch</span>.<span class="ident">get_switch_info</span>().<span class="ident">switch</span>();
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">MemoryContext</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_blank</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">MemoryContextInner::new_blank</span>());
+        <span class="kw">let</span> <span class="ident">switch_cache</span> <span class="op">=</span> { <span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">arch</span>.<span class="ident">get_switch_info</span>() };
+        <span class="self">Self</span> {
+            <span class="ident">inner</span>,
+            <span class="ident">switch_cache</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">MemoryContextInner::new</span>());
+        <span class="kw">let</span> <span class="ident">switch_cache</span> <span class="op">=</span> { <span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">arch</span>.<span class="ident">get_switch_info</span>() };
+        <span class="self">Self</span> {
+            <span class="ident">inner</span>,
+            <span class="ident">switch_cache</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current</span>() -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">MemoryContextInner::current</span>());
+        <span class="kw">let</span> <span class="ident">switch_cache</span> <span class="op">=</span> { <span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">arch</span>.<span class="ident">get_switch_info</span>() };
+        <span class="self">Self</span> {
+            <span class="ident">inner</span>,
+            <span class="ident">switch_cache</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">switch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe</span> {
+            <span class="self">self</span>.<span class="ident">switch_cache</span>.<span class="ident">switch</span>();
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LockGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">MemoryContextInner</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>()
     }
 }
 </code></pre></div>

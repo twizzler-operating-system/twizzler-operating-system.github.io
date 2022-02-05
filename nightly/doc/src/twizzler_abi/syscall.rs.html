@@ -849,6 +849,134 @@
 <span id="848">848</span>
 <span id="849">849</span>
 <span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
+<span id="889">889</span>
+<span id="890">890</span>
+<span id="891">891</span>
+<span id="892">892</span>
+<span id="893">893</span>
+<span id="894">894</span>
+<span id="895">895</span>
+<span id="896">896</span>
+<span id="897">897</span>
+<span id="898">898</span>
+<span id="899">899</span>
+<span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
+<span id="906">906</span>
+<span id="907">907</span>
+<span id="908">908</span>
+<span id="909">909</span>
+<span id="910">910</span>
+<span id="911">911</span>
+<span id="912">912</span>
+<span id="913">913</span>
+<span id="914">914</span>
+<span id="915">915</span>
+<span id="916">916</span>
+<span id="917">917</span>
+<span id="918">918</span>
+<span id="919">919</span>
+<span id="920">920</span>
+<span id="921">921</span>
+<span id="922">922</span>
+<span id="923">923</span>
+<span id="924">924</span>
+<span id="925">925</span>
+<span id="926">926</span>
+<span id="927">927</span>
+<span id="928">928</span>
+<span id="929">929</span>
+<span id="930">930</span>
+<span id="931">931</span>
+<span id="932">932</span>
+<span id="933">933</span>
+<span id="934">934</span>
+<span id="935">935</span>
+<span id="936">936</span>
+<span id="937">937</span>
+<span id="938">938</span>
+<span id="939">939</span>
+<span id="940">940</span>
+<span id="941">941</span>
+<span id="942">942</span>
+<span id="943">943</span>
+<span id="944">944</span>
+<span id="945">945</span>
+<span id="946">946</span>
+<span id="947">947</span>
+<span id="948">948</span>
+<span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
+<span id="971">971</span>
+<span id="972">972</span>
+<span id="973">973</span>
+<span id="974">974</span>
+<span id="975">975</span>
+<span id="976">976</span>
+<span id="977">977</span>
+<span id="978">978</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Wrapper functions around for raw_syscall, providing a typed and safer way to interact with the kernel.</span>
 
 <span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
@@ -902,20 +1030,40 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Possible errors returned by reading from the kernel console&#39;s input.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KernelConsoleReadError</span> {
+    <span class="doccomment">/// Unknown error.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="doccomment">/// Operation would block, but non-blocking was requested.</span>
-    <span class="ident">WouldBlock</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="ident">WouldBlock</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="doccomment">/// Failed to read because there was no input mechanism made available to the kernel.</span>
-    <span class="ident">NoSuchDevice</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">NoSuchDevice</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="doccomment">/// The input mechanism had an internal error.</span>
-    <span class="ident">IOError</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">IOError</span> <span class="op">=</span> <span class="number">3</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">KernelConsoleReadError</span> {
     <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;unknown error&quot;</span>,
             <span class="ident"><span class="self">Self</span>::WouldBlock</span> =&gt; <span class="string">&quot;operation would block&quot;</span>,
             <span class="ident"><span class="self">Self</span>::NoSuchDevice</span> =&gt; <span class="string">&quot;no way to read from kernel console physical device&quot;</span>,
             <span class="ident"><span class="self">Self</span>::IOError</span> =&gt; <span class="string">&quot;an IO error occurred&quot;</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KernelConsoleReadError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">KernelConsoleReadError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KernelConsoleReadError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">x</span> {
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::WouldBlock</span>,
+            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::NoSuchDevice</span>,
+            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::IOError</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
         }
     }
 }
@@ -941,6 +1089,36 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u64</span>)]</span>
+<span class="doccomment">/// Possible sources for a kernel console read syscall.</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KernelConsoleReadSource</span> {
+    <span class="doccomment">/// Read from the console itself.</span>
+    <span class="ident">Console</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// Read from the kernel write buffer.</span>
+    <span class="ident">Buffer</span> <span class="op">=</span> <span class="number">1</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KernelConsoleReadSource</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">KernelConsoleReadSource</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KernelConsoleReadSource</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">x</span> {
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Buffer</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Console</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KernelConsoleReadFlags</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">KernelConsoleReadFlags</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span>.<span class="ident">bits</span>()
+    }
+}
+
 <span class="doccomment">/// Read from the kernel console input, placing data into `buffer`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is the INPUT mechanism, and not the BUFFER mechanism. For example, if the kernel console is</span>
@@ -949,24 +1127,53 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns the number of bytes read on success and [KernelConsoleReadError] on failure.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_kernel_console_read</span>(
-    <span class="ident">_buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">_flags</span>: <span class="ident">KernelConsoleReadFlags</span>,
+    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
+    <span class="ident">flags</span>: <span class="ident">KernelConsoleReadFlags</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KernelConsoleReadError</span><span class="op">&gt;</span> {
-    <span class="macro">todo!</span>()
+    <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">raw_syscall</span>(
+            <span class="ident">Syscall::KernelConsoleRead</span>,
+            <span class="kw-2">&amp;</span>[
+                <span class="ident">KernelConsoleReadSource::Console</span>.<span class="ident">into</span>(),
+                <span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+                <span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+                <span class="ident">flags</span>.<span class="ident">into</span>(),
+            ],
+        )
+    };
+    <span class="ident">convert_codes_to_result</span>(<span class="ident">code</span>, <span class="ident">val</span>, <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into</span>())
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="doccomment">/// Possible errors returned by reading from the kernel console&#39;s buffer.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">KernelConsoleReadBufferError</span> {
+    <span class="doccomment">/// Unknown error.</span>
+    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
     <span class="doccomment">/// Operation would block, but non-blocking was requested.</span>
-    <span class="ident">WouldBlock</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="ident">WouldBlock</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">KernelConsoleReadBufferError</span> {
     <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;unknown error&quot;</span>,
             <span class="ident"><span class="self">Self</span>::WouldBlock</span> =&gt; <span class="string">&quot;operation would block&quot;</span>,
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KernelConsoleReadBufferError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">KernelConsoleReadBufferError</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KernelConsoleReadBufferError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">x</span> {
+            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::WouldBlock</span>,
+            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
         }
     }
 }
@@ -992,6 +1199,12 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KernelConsoleReadBufferFlags</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">KernelConsoleReadBufferFlags</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">x</span>.<span class="ident">bits</span>()
+    }
+}
+
 <span class="doccomment">/// Read from the kernel console buffer, placing data into `buffer`.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is the BUFFER mechanism, and not the INPUT mechanism. All writes to the kernel console get</span>
@@ -1000,10 +1213,21 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns the number of bytes read on success and [KernelConsoleReadBufferError] on failure.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_kernel_console_read_buffer</span>(
-    <span class="ident">_buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">_flags</span>: <span class="ident">KernelConsoleReadBufferFlags</span>,
+    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
+    <span class="ident">flags</span>: <span class="ident">KernelConsoleReadBufferFlags</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KernelConsoleReadBufferError</span><span class="op">&gt;</span> {
-    <span class="macro">todo!</span>()
+    <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">raw_syscall</span>(
+            <span class="ident">Syscall::KernelConsoleRead</span>,
+            <span class="kw-2">&amp;</span>[
+                <span class="ident">KernelConsoleReadSource::Buffer</span>.<span class="ident">into</span>(),
+                <span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+                <span class="ident">buffer</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+                <span class="ident">flags</span>.<span class="ident">into</span>(),
+            ],
+        )
+    };
+    <span class="ident">convert_codes_to_result</span>(<span class="ident">code</span>, <span class="ident">val</span>, <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into</span>())
 }
 
 <span class="macro">bitflags!</span> {
@@ -1099,6 +1323,15 @@
     <span class="ident">Equal</span> <span class="op">=</span> <span class="number">0</span>,
 }
 
+<span class="kw">impl</span> <span class="ident">ThreadSyncOp</span> {
+    <span class="doccomment">/// Apply the operation to two values, returning the result.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">a</span>: <span class="ident">T</span>, <span class="ident">b</span>: <span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident"><span class="self">Self</span>::Equal</span> =&gt; <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>,
+        }
+    }
+}
+
 <span class="macro">bitflags!</span> {
     <span class="doccomment">/// Flags to pass to sys_thread_sync.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadSyncFlags</span>: <span class="ident">u32</span> {
@@ -1111,7 +1344,7 @@
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="doccomment">/// A reference to a piece of data. May either be a non-realized persistent reference or a virtual address.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ThreadSyncReference</span> {
-    <span class="ident">ObjectRef</span>(<span class="ident">ObjID</span>, <span class="ident">u64</span>),
+    <span class="ident">ObjectRef</span>(<span class="ident">ObjID</span>, <span class="ident">usize</span>),
     <span class="ident">Virtual</span>(<span class="kw-2">*const</span> <span class="ident">AtomicU64</span>),
 }
 
@@ -1119,18 +1352,24 @@
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="doccomment">/// Specification for a thread sleep request.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadSyncSleep</span> {
-    <span class="ident">reference</span>: <span class="ident">ThreadSyncReference</span>,
-    <span class="ident">value</span>: <span class="ident">u64</span>,
-    <span class="ident">op</span>: <span class="ident">ThreadSyncOp</span>,
-    <span class="ident">flags</span>: <span class="ident">ThreadSyncFlags</span>,
+    <span class="doccomment">/// Reference to an atomic u64 that we will compare to.</span>
+    <span class="kw">pub</span> <span class="ident">reference</span>: <span class="ident">ThreadSyncReference</span>,
+    <span class="doccomment">/// The value used for the comparison.</span>
+    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The operation to compare *reference and value to.</span>
+    <span class="kw">pub</span> <span class="ident">op</span>: <span class="ident">ThreadSyncOp</span>,
+    <span class="doccomment">/// Flags to apply to this sleep request.</span>
+    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">ThreadSyncFlags</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="doccomment">/// Specification for a thread wake request.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadSyncWake</span> {
-    <span class="ident">reference</span>: <span class="ident">ThreadSyncReference</span>,
-    <span class="ident">count</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Reference to the word for which we will wake up threads that have gone to sleep.</span>
+    <span class="kw">pub</span> <span class="ident">reference</span>: <span class="ident">ThreadSyncReference</span>,
+    <span class="doccomment">/// Number of threads to wake up.</span>
+    <span class="kw">pub</span> <span class="ident">count</span>: <span class="ident">usize</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ThreadSyncSleep</span> {
@@ -1176,9 +1415,11 @@
     <span class="ident">InvalidReference</span> <span class="op">=</span> <span class="number">1</span>,
     <span class="doccomment">/// An argument was invalid.</span>
     <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="doccomment">/// The operation timed out.</span>
+    <span class="ident">Timeout</span> <span class="op">=</span> <span class="number">3</span>,
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ThreadSyncResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ThreadSyncResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ThreadSyncError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ThreadSyncError</span>) -&gt; <span class="self">Self</span> {
@@ -1193,6 +1434,7 @@
             <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
             <span class="ident"><span class="self">Self</span>::InvalidArgument</span> =&gt; <span class="string">&quot;an argument was invalid&quot;</span>,
             <span class="ident"><span class="self">Self</span>::InvalidReference</span> =&gt; <span class="string">&quot;a reference was invalid&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Timeout</span> =&gt; <span class="string">&quot;the operation timed out&quot;</span>,
         }
     }
 }
@@ -1202,6 +1444,7 @@
         <span class="kw">match</span> <span class="ident">x</span> {
             <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidReference</span>,
             <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidArgument</span>,
+            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::Timeout</span>,
             <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
         }
     }
@@ -1238,6 +1481,14 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_wake</span>(<span class="ident">wake</span>: <span class="ident">ThreadSyncWake</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::Wake</span>(<span class="ident">wake</span>, <span class="prelude-val">Ok</span>(<span class="number">0</span>))
     }
+
+    <span class="doccomment">/// Get the result of the thread sync operation.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ThreadSyncResult</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ThreadSync::Sleep</span>(<span class="kw">_</span>, <span class="ident">e</span>) =&gt; <span class="kw-2">*</span><span class="ident">e</span>,
+            <span class="ident">ThreadSync::Wake</span>(<span class="kw">_</span>, <span class="ident">e</span>) =&gt; <span class="kw-2">*</span><span class="ident">e</span>,
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -1268,13 +1519,18 @@
 <span class="doccomment">/// or slightly more due to scheduling uncertainty). If no operations are specified, the thread will</span>
 <span class="doccomment">/// sleep until the timeout expires.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Returns either Ok(bool), indicating if the timeout expired or not, or Err([ThreadSyncError]),</span>
+<span class="doccomment">/// Returns either Ok(ready_count), indicating how many operations were immediately ready, or Err([ThreadSyncError]),</span>
 <span class="doccomment">/// indicating failure. After return, the kernel may have modified the ThreadSync entries to</span>
-<span class="doccomment">/// indicate additional information about each request (errors or status).</span>
+<span class="doccomment">/// indicate additional information about each request, with Err to indicate error and Ok(n) to</span>
+<span class="doccomment">/// indicate success. For sleep requests, n is 0 if the operation went to sleep or 1 otherwise. For</span>
+<span class="doccomment">/// wakeup requests, n indicates the number of threads woken up by this operation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Note that spurious wakeups are possible, and that even if a timeout occurs the function may</span>
+<span class="doccomment">/// return Ok(0).</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_thread_sync</span>(
     <span class="ident">operations</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">ThreadSync</span>],
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span> {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">operations</span>.<span class="ident">as_mut_ptr</span>();
     <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">operations</span>.<span class="ident">len</span>();
     <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">timeout</span>
@@ -1290,8 +1546,8 @@
     <span class="ident">convert_codes_to_result</span>(
         <span class="ident">code</span>,
         <span class="ident">val</span>,
-        <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="number">0</span>,
-        <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">&gt;</span> <span class="number">0</span>,
+        <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+        <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">usize</span>,
         <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">ThreadSyncError::from</span>(<span class="ident">v</span>),
     )
 }

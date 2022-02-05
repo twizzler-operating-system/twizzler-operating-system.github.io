@@ -226,6 +226,10 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Global allocation. Used by the Rust standard library as the global allocator. Similar to</span>
 <span class="doccomment">//! malloc() and friends.</span>
 <span class="doccomment">//!</span>
@@ -341,7 +345,9 @@
             <span class="self">self</span>.<span class="ident">initial_slot</span> <span class="op">=</span> <span class="ident">AllocSlot::new</span>();
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">initial_slot</span>.<span class="ident">is_none</span>() {
                 <span class="ident"><span class="kw">crate</span>::print_err</span>(<span class="string">&quot;failed to allocate initial allocation object&quot;</span>);
-                <span class="ident"><span class="kw">crate</span>::abort</span>();
+                <span class="kw">unsafe</span> {
+                    <span class="ident"><span class="kw">crate</span>::internal_abort</span>();
+                }
             }
         }
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::internal_unwrap</span>(
@@ -358,7 +364,9 @@
                 <span class="self">self</span>.<span class="ident">other_slots</span>[<span class="self">self</span>.<span class="ident">slot_counter</span>] <span class="op">=</span> <span class="ident">AllocSlot::new</span>();
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">other_slots</span>[<span class="self">self</span>.<span class="ident">slot_counter</span>].<span class="ident">is_none</span>() {
                     <span class="ident"><span class="kw">crate</span>::print_err</span>(<span class="string">&quot;failed to create allocation object&quot;</span>);
-                    <span class="ident"><span class="kw">crate</span>::abort</span>();
+                    <span class="kw">unsafe</span> {
+                        <span class="ident"><span class="kw">crate</span>::internal_abort</span>();
+                    }
                 }
             }
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::internal_unwrap</span>(

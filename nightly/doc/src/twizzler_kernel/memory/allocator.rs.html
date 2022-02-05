@@ -263,6 +263,8 @@
 <span id="262">262</span>
 <span id="263">263</span>
 <span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::alloc</span>::{<span class="ident">GlobalAlloc</span>, <span class="ident">Layout</span>};
 <span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">intrinsics::transmute</span>,
@@ -284,6 +286,8 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HEAP_MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x0000001000000000</span> <span class="op">/</span> <span class="number">16</span>; <span class="comment">//4GB</span>
 
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::spinlock::Spinlock</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::KernelMemoryManager</span>;
 
@@ -410,14 +414,15 @@
     }
 }
 
+<span class="comment">// TODO (urgent): Is it safe to use a spinlock here? Or a mutex here?</span>
 <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PAGER</span>: <span class="ident">HeapPager</span> <span class="op">=</span> <span class="ident">HeapPager::new</span>();
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">LL_BACKUP_ALLOCATOR</span>: <span class="ident">spin::Mutex</span><span class="op">&lt;</span><span class="ident">linked_list_allocator::Heap</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">spin::Mutex::new</span>(<span class="ident">linked_list_allocator::Heap::empty</span>());
+<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">LL_BACKUP_ALLOCATOR</span>: <span class="ident">Spinlock</span><span class="op">&lt;</span><span class="ident">linked_list_allocator::Heap</span><span class="op">&gt;</span> <span class="op">=</span>
+    <span class="ident">Spinlock::new</span>(<span class="ident">linked_list_allocator::Heap::empty</span>());
 
 <span class="kw">const</span> <span class="ident">EARLY_ALLOCATION_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">2</span>;
 <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">EARLY_ALLOCATION_AREA</span>: [<span class="ident">u8</span>; <span class="ident">EARLY_ALLOCATION_SIZE</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="ident">EARLY_ALLOCATION_SIZE</span>];
 <span class="kw">static</span> <span class="ident">EARLY_ALLOCATION_PTR</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SafeZoneAllocator</span>(<span class="ident">spin::mutex::Mutex</span><span class="op">&lt;</span><span class="ident">ZoneAllocator</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SafeZoneAllocator</span>(<span class="ident">Spinlock</span><span class="op">&lt;</span><span class="ident">ZoneAllocator</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">kmm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">KernelMemoryManager</span>) {
     <span class="kw">unsafe</span> {
@@ -525,8 +530,7 @@
 }
 
 <span class="attribute">#[<span class="ident">global_allocator</span>]</span>
-<span class="kw">static</span> <span class="ident">SLAB_ALLOCATOR</span>: <span class="ident">SafeZoneAllocator</span> <span class="op">=</span>
-    <span class="ident">SafeZoneAllocator</span>(<span class="ident">spin::Mutex::new</span>(<span class="ident">ZoneAllocator::new</span>()));
+<span class="kw">static</span> <span class="ident">SLAB_ALLOCATOR</span>: <span class="ident">SafeZoneAllocator</span> <span class="op">=</span> <span class="ident">SafeZoneAllocator</span>(<span class="ident">Spinlock::new</span>(<span class="ident">ZoneAllocator::new</span>()));
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_kernel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
 </body></html>

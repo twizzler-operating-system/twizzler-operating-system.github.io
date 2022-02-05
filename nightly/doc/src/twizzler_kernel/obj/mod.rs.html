@@ -238,6 +238,10 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">fmt::Display</span>,
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU32</span>, <span class="ident">Ordering</span>},
@@ -254,6 +258,8 @@
     <span class="ident">mutex</span>::{<span class="ident">LockGuard</span>, <span class="ident">Mutex</span>},
 };
 
+<span class="kw">use</span> <span class="ident"><span class="self">self</span>::thread_sync::SleepInfo</span>;
+
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">copy</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pages</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pagevec</span>;
@@ -266,6 +272,7 @@
     <span class="ident">flags</span>: <span class="ident">AtomicU32</span>,
     <span class="ident">range_tree</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">range::PageRangeTree</span><span class="op">&gt;</span>,
     <span class="ident">maplist</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="ident">MappingRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">sleep_info</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">SleepInfo</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
@@ -355,6 +362,7 @@
             <span class="ident">flags</span>: <span class="ident">AtomicU32::new</span>(<span class="number">0</span>),
             <span class="ident">range_tree</span>: <span class="ident">Mutex::new</span>(<span class="ident">range::PageRangeTree::new</span>()),
             <span class="ident">maplist</span>: <span class="ident">Mutex::new</span>(<span class="ident">BTreeSet::new</span>()),
+            <span class="ident">sleep_info</span>: <span class="ident">Mutex::new</span>(<span class="ident">SleepInfo::new</span>()),
         }
     }
 

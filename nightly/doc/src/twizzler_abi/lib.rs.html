@@ -73,6 +73,10 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This library provides a common interface for applications that want to talk to the Twizzler</span>
 <span class="doccomment">//! kernel, and defines that interface for both applications and the kernel to follow. It&#39;s made of</span>
 <span class="doccomment">//! several parts:</span>
@@ -112,6 +116,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ready</span>() {}
 
 <span class="doccomment">/// We need to provide a no-mangled abort() call for things like libunwind.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">abort</span>() -&gt; <span class="op">!</span> {
     <span class="kw">unsafe</span> { <span class="ident">internal_abort</span>() }
@@ -130,6 +135,7 @@
 <span class="doccomment">/// that assumes stack protections works (libunwind).</span>
 <span class="doccomment">/// # Safety</span>
 <span class="doccomment">/// This function cannot be called safely, as it will abort unconditionally.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">__stack_chk_fail</span>() {
     <span class="ident">print_err</span>(<span class="string">&quot;stack overflow -- aborting&quot;</span>);
@@ -144,7 +150,9 @@
         <span class="ident">t</span>
     } <span class="kw">else</span> {
         <span class="ident">print_err</span>(<span class="ident">msg</span>);
-        <span class="ident">abort</span>();
+        <span class="kw">unsafe</span> {
+            <span class="ident">internal_abort</span>();
+        }
     }
 }
 </code></pre></div>

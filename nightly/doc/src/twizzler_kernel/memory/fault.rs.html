@@ -130,7 +130,7 @@
         <span class="macro">panic!</span>(<span class="string">&quot;page fault in thread with no memory context&quot;</span>);
     }
     <span class="kw">let</span> <span class="ident">vmc</span> <span class="op">=</span> <span class="ident">vmc</span>.<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">mapping</span> <span class="op">=</span> { <span class="ident">vmc</span>.<span class="ident">lock</span>().<span class="ident">lookup_object</span>(<span class="ident">addr</span>) };
+    <span class="kw">let</span> <span class="ident">mapping</span> <span class="op">=</span> { <span class="ident">vmc</span>.<span class="ident">inner</span>().<span class="ident">lookup_object</span>(<span class="ident">addr</span>) };
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mapping</span>) <span class="op">=</span> <span class="ident">mapping</span> {
         <span class="kw">let</span> <span class="ident">objid</span> <span class="op">=</span> <span class="ident">mapping</span>.<span class="ident">obj</span>.<span class="ident">id</span>();
@@ -139,7 +139,7 @@
         <span class="kw">let</span> <span class="ident">is_write</span> <span class="op">=</span> <span class="ident">cause</span> <span class="op">==</span> <span class="ident">PageFaultCause::Write</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">page</span>, <span class="ident">cow</span>)) <span class="op">=</span> <span class="ident">obj_page_tree</span>.<span class="ident">get_page</span>(<span class="ident">page_number</span>, <span class="ident">is_write</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vmc</span> <span class="op">=</span> <span class="ident">vmc</span>.<span class="ident">lock</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vmc</span> <span class="op">=</span> <span class="ident">vmc</span>.<span class="ident">inner</span>();
             <span class="comment">/* check if mappings changed */</span>
             <span class="kw">if</span> <span class="ident">vmc</span>.<span class="ident">lookup_object</span>(<span class="ident">addr</span>).<span class="ident">map_or</span>(<span class="number">0</span>.<span class="ident">into</span>(), <span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">obj</span>.<span class="ident">id</span>()) <span class="op">!</span><span class="op">=</span> <span class="ident">objid</span> {
                 <span class="ident">drop</span>(<span class="ident">vmc</span>);

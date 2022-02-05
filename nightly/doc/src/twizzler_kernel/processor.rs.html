@@ -342,8 +342,8 @@
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
 };
 
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">once::Once</span>, <span class="ident">spinlock::Spinlock</span>};
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">collections::VecDeque</span>, <span class="ident">vec::Vec</span>};
-<span class="kw">use</span> <span class="ident">spin</span>::{<span class="ident">Mutex</span>, <span class="ident">Once</span>};
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -380,7 +380,7 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Processor</span> {
     <span class="kw">pub</span> <span class="ident">arch</span>: <span class="ident">ArchProcessor</span>,
-    <span class="kw">pub</span> <span class="ident">sched</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">SchedulingQueues</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">sched</span>: <span class="ident">Spinlock</span><span class="op">&lt;</span><span class="ident">SchedulingQueues</span><span class="op">&gt;</span>,
     <span class="ident">running</span>: <span class="ident">AtomicBool</span>,
     <span class="ident">topology_path</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">bool</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u32</span>,
@@ -492,7 +492,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">arch</span>: <span class="ident">ArchProcessor::default</span>(),
-            <span class="ident">sched</span>: <span class="ident">Mutex::new</span>(<span class="ident">Default::default</span>()),
+            <span class="ident">sched</span>: <span class="ident">Spinlock::new</span>(<span class="ident">Default::default</span>()),
             <span class="ident">running</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
             <span class="ident">topology_path</span>: <span class="ident">Once::new</span>(),
             <span class="ident">id</span>,
