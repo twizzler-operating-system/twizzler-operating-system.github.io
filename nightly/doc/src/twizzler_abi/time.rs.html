@@ -15,21 +15,29 @@
 <span id="14">14</span>
 <span id="15">15</span>
 <span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Raw time handling, provides a way to get a monotonic timer and the system time. You should use</span>
 <span class="doccomment">//! the rust standard library&#39;s time functions instead of these directly.</span>
 
 <span class="kw">use</span> <span class="ident">core::time::Duration</span>;
 
-<span class="comment">// TODO</span>
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall</span>::{<span class="ident">sys_read_clock_info</span>, <span class="ident">ClockSource</span>, <span class="ident">ReadClockFlags</span>};
+
 <span class="doccomment">/// Return a Duration representing an instant in monotonic time.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_monotonic</span>() -&gt; <span class="ident">Duration</span> {
-    <span class="ident">Duration::new</span>(<span class="number">0</span>, <span class="number">0</span>)
+    <span class="kw">let</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">sys_read_clock_info</span>(<span class="ident">ClockSource::Monotonic</span>, <span class="ident">ReadClockFlags::empty</span>())
+        .<span class="ident">expect</span>(<span class="string">&quot;failed to get monotonic time from kernel&quot;</span>);
+    <span class="ident">clock_info</span>.<span class="ident">current_value</span>()
 }
 
-<span class="comment">// TODO</span>
 <span class="doccomment">/// Return a Duration representing the time since the unix epoch.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_systemtime</span>() -&gt; <span class="ident">Duration</span> {
-    <span class="ident">Duration::new</span>(<span class="number">0</span>, <span class="number">0</span>)
+    <span class="kw">let</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">sys_read_clock_info</span>(<span class="ident">ClockSource::RealTime</span>, <span class="ident">ReadClockFlags::empty</span>())
+        .<span class="ident">expect</span>(<span class="string">&quot;failed to get monotonic time from kernel&quot;</span>);
+    <span class="ident">clock_info</span>.<span class="ident">current_value</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
