@@ -366,6 +366,7 @@
 <span id="365">365</span>
 <span id="366">366</span>
 <span id="367">367</span>
+<span id="368">368</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::intrinsics::unlikely</span>;
 
 <span class="kw">use</span> <span class="ident">x86</span>::{
@@ -378,6 +379,7 @@
     <span class="ident">arch::memory::phys_to_virt</span>,
     <span class="ident">clock::Nanoseconds</span>,
     <span class="ident">interrupt</span>::{<span class="self">self</span>, <span class="ident">Destination</span>},
+    <span class="ident">processor</span>,
 };
 
 <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">LAPIC_ADDR</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">0</span>;
@@ -623,7 +625,7 @@
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">send_ipi</span>(<span class="ident">dest</span>: <span class="ident">Destination</span>, <span class="ident">vector</span>: <span class="ident">u32</span>) {
     <span class="kw">let</span> (<span class="ident">dest_short</span>, <span class="ident">dest_val</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">dest</span> {
         <span class="ident">Destination::Single</span>(<span class="ident">id</span>) =&gt; (<span class="number">0</span>, <span class="ident">id</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>),
-        <span class="ident">Destination::Bsp</span> =&gt; (<span class="number">0</span>, <span class="number">0</span>),
+        <span class="ident">Destination::Bsp</span> =&gt; (<span class="number">0</span>, <span class="ident">processor::current_processor</span>().<span class="ident">bsp_id</span>() <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>),
         <span class="ident">Destination::All</span> =&gt; (<span class="number">2</span>, <span class="number">0</span>),
         <span class="ident">Destination::AllButSelf</span> =&gt; (<span class="number">3</span>, <span class="number">0</span>),
         <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(),

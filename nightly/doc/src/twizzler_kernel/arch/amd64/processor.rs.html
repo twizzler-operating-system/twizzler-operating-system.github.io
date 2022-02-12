@@ -221,6 +221,22 @@
 <span id="220">220</span>
 <span id="221">221</span>
 <span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicU32</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">vec::Vec</span>};
@@ -313,17 +329,21 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enumerate_cpus</span>() {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enumerate_cpus</span>() -&gt; <span class="ident">u32</span> {
     <span class="kw">let</span> <span class="ident">acpi</span> <span class="op">=</span> <span class="ident">get_acpi_root</span>();
 
     <span class="kw">let</span> <span class="ident">procinfo</span> <span class="op">=</span> <span class="ident">acpi</span>.<span class="ident">platform_info</span>().<span class="ident">unwrap</span>().<span class="ident">processor_info</span>.<span class="ident">unwrap</span>();
+
+    <span class="kw">let</span> <span class="ident">bsp_id</span> <span class="op">=</span> <span class="ident">get_bsp_id</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">procinfo</span>));
+
     <span class="ident"><span class="kw">crate</span>::processor::register</span>(
-        <span class="ident">procinfo</span>.<span class="ident">boot_processor</span>.<span class="ident">local_apic_id</span>,
-        <span class="op">!</span><span class="ident">procinfo</span>.<span class="ident">boot_processor</span>.<span class="ident">is_ap</span>,
+        <span class="ident">procinfo</span>.<span class="ident">boot_processor</span>.<span class="ident">local_apic_id</span>, <span class="ident">bsp_id</span>,
     );
     <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">procinfo</span>.<span class="ident">application_processors</span> {
-        <span class="ident"><span class="kw">crate</span>::processor::register</span>(<span class="ident">p</span>.<span class="ident">local_apic_id</span>, <span class="op">!</span><span class="ident">p</span>.<span class="ident">is_ap</span>);
+        <span class="ident"><span class="kw">crate</span>::processor::register</span>(<span class="ident">p</span>.<span class="ident">local_apic_id</span>, <span class="ident">bsp_id</span>);
     }
+
+    <span class="ident">bsp_id</span>
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_topology</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
@@ -442,6 +462,18 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_ready</span>() -&gt; <span class="ident">bool</span> {
     <span class="kw">unsafe</span> { <span class="ident">x86::bits64::segmentation::rdfsbase</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> }
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_bsp_id</span>(<span class="ident">maybe_processor_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">acpi::platform::ProcessorInfo</span><span class="op">&gt;</span>) -&gt; <span class="ident">u32</span> {
+    <span class="kw">match</span> <span class="ident">maybe_processor_info</span> {
+        <span class="prelude-val">None</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">acpi</span> <span class="op">=</span> <span class="ident">get_acpi_root</span>();
+            <span class="kw">let</span> <span class="ident">processor_info</span> <span class="op">=</span> <span class="ident">acpi</span>.<span class="ident">platform_info</span>().<span class="ident">unwrap</span>().<span class="ident">processor_info</span>.<span class="ident">unwrap</span>();
+
+            <span class="ident">processor_info</span>.<span class="ident">boot_processor</span>.<span class="ident">local_apic_id</span>
+        },
+        <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>.<span class="ident">boot_processor</span>.<span class="ident">local_apic_id</span>
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_kernel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>

@@ -250,8 +250,8 @@
     <span class="ident">arch::init_interrupts</span>();
 
     <span class="macro">logln!</span>(<span class="string">&quot;[kernel::cpu] enumerating and starting secondary CPUs&quot;</span>);
-    <span class="ident">arch::processor::enumerate_cpus</span>();
-    <span class="ident">processor::init_cpu</span>(<span class="ident">image::get_tls</span>());
+    <span class="kw">let</span> <span class="ident">bsp_id</span> <span class="op">=</span> <span class="ident">arch::processor::enumerate_cpus</span>();
+    <span class="ident">processor::init_cpu</span>(<span class="ident">image::get_tls</span>(), <span class="ident">bsp_id</span>);
     <span class="ident">arch::init_secondary</span>();
     <span class="ident">initrd::init</span>(<span class="ident">boot_info</span>.<span class="ident">get_modules</span>());
     <span class="ident">processor::boot_all_secondaries</span>(<span class="ident">image::get_tls</span>());

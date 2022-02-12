@@ -336,6 +336,10 @@
 <span id="335">335</span>
 <span id="336">336</span>
 <span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">ptr::null_mut</span>,
@@ -384,6 +388,7 @@
     <span class="ident">running</span>: <span class="ident">AtomicBool</span>,
     <span class="ident">topology_path</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">bool</span>)<span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u32</span>,
+    <span class="ident">bsp_id</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span> <span class="ident">idle_thread</span>: <span class="ident">Once</span><span class="op">&lt;</span><span class="ident">ThreadRef</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">load</span>: <span class="ident">AtomicU64</span>,
     <span class="kw">pub</span> <span class="ident">stats</span>: <span class="ident">ProcessorStats</span>,
@@ -489,13 +494,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Processor</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">bsp_id</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">arch</span>: <span class="ident">ArchProcessor::default</span>(),
             <span class="ident">sched</span>: <span class="ident">Spinlock::new</span>(<span class="ident">Default::default</span>()),
             <span class="ident">running</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
             <span class="ident">topology_path</span>: <span class="ident">Once::new</span>(),
             <span class="ident">id</span>,
+            <span class="ident">bsp_id</span>,
             <span class="ident">idle_thread</span>: <span class="ident">Once::new</span>(),
             <span class="ident">load</span>: <span class="ident">AtomicU64::new</span>(<span class="number">1</span>),
             <span class="ident">stats</span>: <span class="ident">ProcessorStats::default</span>(),
@@ -503,7 +509,11 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bsp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="number">0</span>
+        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">bsp_id</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bsp_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
+        <span class="self">self</span>.<span class="ident">bsp_id</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Priority</span> {
@@ -574,13 +584,13 @@
     <span class="ident">tcb_base</span>
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_cpu</span>(<span class="ident">tls_template</span>: <span class="ident">TlsInfo</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_cpu</span>(<span class="ident">tls_template</span>: <span class="ident">TlsInfo</span>, <span class="ident">bsp_id</span>: <span class="ident">u32</span>) {
     <span class="kw">let</span> <span class="ident">tcb_base</span> <span class="op">=</span> <span class="ident">init_tls</span>(<span class="ident">tls_template</span>);
     <span class="ident"><span class="kw">crate</span>::arch::processor::init</span>(<span class="ident">tcb_base</span>);
     <span class="kw">unsafe</span> {
         <span class="ident">BOOT_KERNEL_STACK</span> <span class="op">=</span> <span class="number">0xfffffff000001000u64</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>; <span class="comment">//TODO: get this from bootloader config?</span>
-        <span class="ident">CPU_ID</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">//TODO: we should fix this to avoid assuming BSP is ID 0</span>
-        <span class="ident">CURRENT_PROCESSOR</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ALL_PROCESSORS</span>[<span class="number">0</span>].<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
+        <span class="ident">CPU_ID</span> <span class="op">=</span> <span class="ident">bsp_id</span>;
+        <span class="ident">CURRENT_PROCESSOR</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ALL_PROCESSORS</span>[<span class="ident">CPU_ID</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
     }
     <span class="kw">let</span> <span class="ident">topo_path</span> <span class="op">=</span> <span class="ident">arch::processor::get_topology</span>();
     <span class="ident">current_processor</span>().<span class="ident">set_topology</span>(<span class="ident">topo_path</span>);
@@ -659,16 +669,14 @@
     <span class="ident">CPU_MAIN_BARRIER</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">core::sync::atomic::Ordering::SeqCst</span>);
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">is_bsp</span>: <span class="ident">bool</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register</span>(<span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">bsp_id</span>: <span class="ident">u32</span>) {
     <span class="kw">if</span> <span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="ident">ALL_PROCESSORS</span> }.<span class="ident">len</span>() {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;processor ID too large&quot;</span>);
     }
-    <span class="kw">if</span> <span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">is_bsp</span> {
-        <span class="macro">unimplemented!</span>(<span class="string">&quot;we currently assume BSP is ID 0&quot;</span>);
-    }
+
     <span class="kw">unsafe</span> {
-        <span class="ident">ALL_PROCESSORS</span>[<span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Processor::new</span>(<span class="ident">id</span>)));
-        <span class="kw">if</span> <span class="ident">is_bsp</span> {
+        <span class="ident">ALL_PROCESSORS</span>[<span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">Processor::new</span>(<span class="ident">id</span>, <span class="ident">bsp_id</span>)));
+        <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">bsp_id</span> {
             <span class="ident">ALL_PROCESSORS</span>[<span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">set_running</span>();
         }
     }

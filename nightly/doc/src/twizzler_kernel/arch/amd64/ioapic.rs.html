@@ -217,6 +217,11 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">acpi</span>::{<span class="ident">madt::Madt</span>, <span class="ident">sdt::Signature</span>, <span class="ident">InterruptModel</span>};
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
 <span class="kw">use</span> <span class="ident">x86_64::PhysAddr</span>;
@@ -226,7 +231,11 @@
     <span class="ident">spinlock::Spinlock</span>,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">acpi::get_acpi_root</span>, <span class="ident">memory::phys_to_virt</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{
+    <span class="ident">acpi::get_acpi_root</span>,
+    <span class="ident">memory::phys_to_virt</span>,
+    <span class="ident">processor::get_bsp_id</span>,
+};
 
 <span class="kw">struct</span> <span class="ident">IOApic</span> {
     <span class="ident">address</span>: <span class="ident">PhysAddr</span>,
@@ -294,7 +303,7 @@
     } <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
     <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">masked</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> } <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
     <span class="kw">let</span> <span class="ident">destfield</span>: <span class="ident">u64</span> <span class="op">=</span> (<span class="kw">match</span> <span class="ident">destination</span> {
-        <span class="ident">Destination::Bsp</span> =&gt; <span class="number">0</span>,
+        <span class="ident">Destination::Bsp</span> =&gt; <span class="ident">get_bsp_id</span>(<span class="prelude-val">None</span>),
         <span class="ident">Destination::Single</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>,
         <span class="ident">Destination::LowestPriority</span> =&gt; <span class="number">0</span>,
         <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unsupported destination mode {:?} for IOAPIC&quot;</span>, <span class="ident">destination</span>),
@@ -327,6 +336,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() {
     <span class="kw">let</span> <span class="ident">acpi</span> <span class="op">=</span> <span class="ident">get_acpi_root</span>();
+
     <span class="kw">let</span> <span class="ident">madt</span> <span class="op">=</span> <span class="kw">unsafe</span> {
         <span class="ident">acpi</span>.<span class="ident">get_sdt</span>::<span class="op">&lt;</span><span class="ident">Madt</span><span class="op">&gt;</span>(<span class="ident">Signature::MADT</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;unable to get MADT ACPI table&quot;</span>)

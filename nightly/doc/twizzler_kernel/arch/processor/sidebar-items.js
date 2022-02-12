@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["enumerate_cpus",""],["get_topology",""],["halt_and_wait",""],["init",""],["tls_ready",""]],"struct":[["ArchProcessor",""]]});
+initSidebarItems({"fn":[["enumerate_cpus",""],["get_bsp_id",""],["get_topology",""],["halt_and_wait",""],["init",""],["tls_ready",""]],"struct":[["ArchProcessor",""]]});
