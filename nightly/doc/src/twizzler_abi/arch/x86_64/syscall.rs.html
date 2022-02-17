@@ -26,6 +26,9 @@
 <span id="25">25</span>
 <span id="26">26</span>
 <span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall::Syscall</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
@@ -41,7 +44,10 @@
 <span class="doccomment">/// to handle the return values correctly. Additionally, calling the kernel can invoke any kind of</span>
 <span class="doccomment">/// weirdness if you do something wrong.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">raw_syscall</span>(<span class="ident">call</span>: <span class="ident">Syscall</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>]) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
-    <span class="comment">// TODO: enforce args length max</span>
+    <span class="kw">if</span> <span class="ident">core::intrinsics::unlikely</span>(<span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">6</span>) {
+        <span class="ident"><span class="kw">crate</span>::print_err</span>(<span class="string">&quot;too many arguments to raw_syscall&quot;</span>);
+        <span class="ident"><span class="kw">crate</span>::internal_abort</span>();
+    }
     <span class="kw">let</span> <span class="ident">a0</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0u64</span>);
     <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">args</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0u64</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a2</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">args</span>.<span class="ident">get</span>(<span class="number">2</span>).<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="number">0u64</span>);

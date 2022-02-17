@@ -164,7 +164,6 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-<span id="166">166</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="ident">twizzler::object</span>::{<span class="ident">ObjID</span>, <span class="ident">ObjectInitError</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
@@ -217,7 +216,6 @@
     <span class="doccomment">/// the correct type for the underlying data.</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_mmio_offset</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">base_raw</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">MmioInfo</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>;
-        <span class="comment">// TODO</span>
         (<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">MMIO_OFFSET</span> <span class="op">+</span> <span class="ident">offset</span>).<span class="ident">sub</span>(<span class="number">0x1000</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>)
             .<span class="ident">as_mut</span>()
             .<span class="ident">unwrap</span>()

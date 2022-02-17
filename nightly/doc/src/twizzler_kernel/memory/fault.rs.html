@@ -185,7 +185,7 @@
             <span class="ident">vmc</span>.<span class="ident">map_object_page</span>(<span class="ident">addr</span>, <span class="ident">page</span>, <span class="ident">perms</span>);
             <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">PageFaultFlags::PRESENT</span>) {
                 <span class="kw">unsafe</span> {
-                    <span class="comment">// TODO</span>
+                    <span class="comment">// TODO: see #32</span>
                     <span class="macro">asm!</span>(<span class="string">&quot;mov rax, cr3&quot;</span>, <span class="string">&quot;mov cr3, rax&quot;</span>, <span class="ident">lateout</span>(<span class="string">&quot;rax&quot;</span>) <span class="kw">_</span>);
                 }
             }
