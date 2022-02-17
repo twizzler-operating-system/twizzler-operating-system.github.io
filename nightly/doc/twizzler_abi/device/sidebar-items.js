@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["MMIO_OFFSET",""]],"enum":[["BusType",""],["CacheType",""],["DeviceType",""],["SubObjectType",""]],"mod":[["bus",""]],"struct":[["DeviceId",""],["DeviceInterruptFlags",""],["DeviceRepr",""],["InterruptVector",""],["MmioInfo",""]]});

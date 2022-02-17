@@ -230,6 +230,7 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
+<span id="232">232</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Global allocation. Used by the Rust standard library as the global allocator. Similar to</span>
 <span class="doccomment">//! malloc() and friends.</span>
 <span class="doccomment">//!</span>
@@ -277,6 +278,7 @@
         <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">sys_object_create</span>(<span class="ident">create_spec</span>, <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[] <span class="comment">/* TODO: ties */</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
         <span class="ident">sys_object_map</span>(
+            <span class="prelude-val">None</span>,
             <span class="ident">obj</span>,
             <span class="ident">slot</span>,
             <span class="ident">Protections::READ</span> <span class="op">|</span> <span class="ident">Protections::WRITE</span>,

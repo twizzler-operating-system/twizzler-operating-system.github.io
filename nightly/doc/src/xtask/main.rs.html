@@ -628,11 +628,6 @@
 <span id="627">627</span>
 <span id="628">628</span>
 <span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
-<span id="633">633</span>
-<span id="634">634</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">fmt::Display</span>, <span class="ident">path::Path</span>, <span class="ident">process::Command</span>, <span class="ident">str::FromStr</span>, <span class="ident">vec</span>};
 
 <span class="kw">use</span> <span class="ident">cargo_metadata</span>::{<span class="ident">Metadata</span>, <span class="ident">MetadataCommand</span>};
@@ -846,7 +841,7 @@
 
     <span class="kw">if</span> <span class="ident">sub_matches</span>.<span class="ident">is_none</span>() {
         <span class="ident">app</span>.<span class="ident">print_long_help</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Err</span>(<span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;&quot;</span>.<span class="ident">into</span>());
     }
 
     <span class="kw">let</span> <span class="ident">sub_matches</span> <span class="op">=</span> <span class="ident">sub_matches</span>.<span class="ident">unwrap</span>();
@@ -940,7 +935,7 @@
         .<span class="ident">arg</span>(<span class="ident">build_info</span>.<span class="ident">get_twizzler_triple</span>())
         .<span class="ident">status</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to compile crtx&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to compile crtx&quot;</span>.<span class="ident">into</span>());
     }
 
     <span class="prelude-val">Ok</span>(())
@@ -955,7 +950,7 @@
             .<span class="ident">arg</span>(<span class="string">&quot;--recursive&quot;</span>)
             .<span class="ident">status</span>()<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-            <span class="prelude-val">Err</span>(<span class="string">&quot;failed to update git submodules&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to update git submodules&quot;</span>.<span class="ident">into</span>());
         }
     }
 
@@ -963,20 +958,16 @@
         <span class="string">&quot;toolchain/src/config.toml&quot;</span>,
         <span class="string">&quot;toolchain/src/rust/config.toml&quot;</span>,
     );
-    <span class="kw">match</span> <span class="ident">res</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">std::io::ErrorKind::AlreadyExists</span> =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;failed to create hardlink config.toml&quot;</span>)<span class="question-mark">?</span>,
-        },
-        <span class="kw">_</span> =&gt; {}
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">res</span> {
+        <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">std::io::ErrorKind::AlreadyExists</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to create hardlink config.toml&quot;</span>.<span class="ident">into</span>());
+        }
     }
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">std::fs::remove_dir_all</span>(<span class="string">&quot;toolchain/src/rust/library/twizzler-abi&quot;</span>);
-    <span class="kw">match</span> <span class="ident">res</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">std::io::ErrorKind::NotFound</span> =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;failed to remove softlink twizzler-abi&quot;</span>)<span class="question-mark">?</span>,
-        },
-        <span class="kw">_</span> =&gt; {}
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">res</span> {
+        <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">std::io::ErrorKind::NotFound</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to remove softlink twizzler-abi&quot;</span>.<span class="ident">into</span>());
+        }
     }
     <span class="ident">fs_extra::copy_items</span>(
         <span class="kw-2">&amp;</span>[<span class="string">&quot;src/lib/twizzler-abi&quot;</span>],
@@ -999,7 +990,7 @@
         .<span class="ident">current_dir</span>(<span class="string">&quot;toolchain/src/rust&quot;</span>)
         .<span class="ident">status</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to compile rust toolchain&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to compile rust toolchain&quot;</span>.<span class="ident">into</span>());
     }
 
     <span class="kw">for</span> <span class="ident">bi</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">all_supported_build_infos</span>() {
@@ -1015,7 +1006,7 @@
         .<span class="ident">arg</span>(<span class="string">&quot;toolchain/install&quot;</span>)
         .<span class="ident">status</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to link rust Twizzler toolchain with rustup&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to link rust Twizzler toolchain with rustup&quot;</span>.<span class="ident">into</span>());
     }
 
     <span class="prelude-val">Ok</span>(())
@@ -1023,12 +1014,10 @@
 
 <span class="kw">fn</span> <span class="ident">build_std</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DynError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">std::fs::remove_dir_all</span>(<span class="string">&quot;toolchain/src/rust/library/twizzler-abi&quot;</span>);
-    <span class="kw">match</span> <span class="ident">res</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">std::io::ErrorKind::NotFound</span> =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;failed to remove softlink twizzler-abi&quot;</span>)<span class="question-mark">?</span>,
-        },
-        <span class="kw">_</span> =&gt; {}
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">res</span> {
+        <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">kind</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">std::io::ErrorKind::NotFound</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to remove softlink twizzler-abi&quot;</span>.<span class="ident">into</span>());
+        }
     }
     <span class="ident">fs_extra::copy_items</span>(
         <span class="kw-2">&amp;</span>[<span class="string">&quot;src/lib/twizzler-abi&quot;</span>],
@@ -1055,12 +1044,13 @@
         .<span class="ident">current_dir</span>(<span class="string">&quot;toolchain/src/rust&quot;</span>)
         .<span class="ident">status</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to compile rust toolchain&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to compile rust toolchain&quot;</span>.<span class="ident">into</span>());
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
 <span class="kw">fn</span> <span class="ident">cargo_cmd_collection</span>(
     <span class="ident">meta</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>,
     <span class="ident">collection_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -1110,7 +1100,7 @@
 
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">status</span>.<span class="ident">status</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to run cargo command&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to run cargo command&quot;</span>.<span class="ident">into</span>());
     }
     <span class="prelude-val">Ok</span>(())
 }
@@ -1220,7 +1210,7 @@
         .<span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="ident">initrd_files</span>)
         .<span class="ident">status</span>()<span class="question-mark">?</span>;
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to generate initrd&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to generate initrd&quot;</span>.<span class="ident">into</span>());
     }
     <span class="macro">eprintln!</span>(<span class="string">&quot;== BUILDING DISK IMAGE ({}) ==&quot;</span>, <span class="ident">build_info</span>);
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">Command::new</span>(<span class="ident">make_tool_path</span>(<span class="ident">build_info</span>, <span class="string">&quot;image_builder&quot;</span>))
@@ -1229,7 +1219,7 @@
         .<span class="ident">status</span>()<span class="question-mark">?</span>;
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;disk image creation failed&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;disk image creation failed&quot;</span>.<span class="ident">into</span>());
     }
     <span class="prelude-val">Ok</span>(())
 }
@@ -1256,14 +1246,14 @@
         <span class="ident">make_path</span>(<span class="ident">build_info</span>, <span class="bool-val">true</span>, <span class="string">&quot;pmem.img&quot;</span>)
     ));
     <span class="ident">run_cmd</span>.<span class="ident">arg</span>(<span class="string">&quot;-device&quot;</span>).<span class="ident">arg</span>(<span class="string">&quot;nvdimm,id=nvdimm1,memdev=mem1&quot;</span>);
-    <span class="kw">const</span> <span class="ident">RUN_ARGS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;--no-reboot&quot;</span>, <span class="string">&quot;-s&quot;</span>, <span class="string">&quot;-serial&quot;</span>, <span class="string">&quot;mon:stdio&quot;</span>, <span class="string">&quot;-vnc&quot;</span>, <span class="string">&quot;:0&quot;</span>];
+    <span class="kw">const</span> <span class="ident">RUN_ARGS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;--no-reboot&quot;</span>, <span class="string">&quot;-s&quot;</span>, <span class="string">&quot;-serial&quot;</span>, <span class="string">&quot;mon:stdio&quot;</span>]; <span class="comment">//, &quot;-vnc&quot;, &quot;:0&quot;];</span>
     <span class="ident">run_cmd</span>.<span class="ident">args</span>(<span class="ident">RUN_ARGS</span>);
     <span class="ident">run_cmd</span>.<span class="ident">args</span>(<span class="ident">qemu_profile</span>.<span class="ident">get_args</span>());
     <span class="ident">run_cmd</span>.<span class="ident">args</span>(<span class="ident">qemu_args</span>);
 
     <span class="kw">let</span> <span class="ident">exit_status</span> <span class="op">=</span> <span class="ident">run_cmd</span>.<span class="ident">status</span>().<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="op">!</span><span class="ident">exit_status</span>.<span class="ident">success</span>() {
-        <span class="prelude-val">Err</span>(<span class="string">&quot;failed to run qemu&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;failed to run qemu&quot;</span>.<span class="ident">into</span>());
     }
     <span class="prelude-val">Ok</span>(())
 }

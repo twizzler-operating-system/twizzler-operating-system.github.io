@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["serial",""]]});
+initSidebarItems({"fn":[["machine_post_init",""]],"mod":[["pcie",""],["serial",""]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Page",""]],"type":[["PageRef",""]]});
+initSidebarItems({"struct":[["Page",""],["PageFlags",""]],"type":[["PageRef",""]]});

@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["image_builder","init","initrd_gen","twizzler_abi","twizzler_kernel","twizzler_queue_raw","xtask"];
+window.ALL_CRATES = ["devmgr","image_builder","init","initrd_gen","twizzler","twizzler_abi","twizzler_driver","twizzler_kernel","twizzler_queue_raw","xtask"];

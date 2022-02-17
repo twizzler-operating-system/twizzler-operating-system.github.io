@@ -304,43 +304,6 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
-<span id="308">308</span>
-<span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Manage physical frames.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! On kernel initialization, the system will call into [init] in this module to pass information</span>
@@ -360,49 +323,12 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::once::Once</span>;
 <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">x86_64::structures::paging</span>::{<span class="ident">FrameAllocator</span>, <span class="ident">PhysFrame</span>, <span class="ident">Size4KiB</span>};
 <span class="kw">use</span> <span class="ident">x86_64::PhysAddr</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::arch::memory::phys_to_virt</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::spinlock::Spinlock</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">MemoryRegion</span>, <span class="ident">MemoryRegionKind</span>};
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BootFrameAllocator</span> {
-    <span class="ident">regions</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">MemoryRegion</span>],
-    <span class="ident">next</span>: <span class="ident">usize</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">BootFrameAllocator</span> {
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">regions</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">MemoryRegion</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">BootFrameAllocator</span> { <span class="ident">regions</span>, <span class="ident">next</span>: <span class="number">0</span> }
-    }
-
-    <span class="kw">fn</span> <span class="ident">usable_frames</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">PhysFrame</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">regions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">regions</span>.<span class="ident">iter</span>();
-        <span class="kw">let</span> <span class="ident">usable_regions</span> <span class="op">=</span> <span class="ident">regions</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">MemoryRegionKind::UsableRam</span>);
-        <span class="kw">let</span> <span class="ident">addr_ranges</span> <span class="op">=</span>
-            <span class="ident">usable_regions</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">start</span>.<span class="ident">as_u64</span>()..(<span class="ident">r</span>.<span class="ident">start</span>.<span class="ident">as_u64</span>() <span class="op">+</span> <span class="ident">r</span>.<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span>));
-        <span class="kw">let</span> <span class="ident">frame_addresses</span> <span class="op">=</span> <span class="ident">addr_ranges</span>.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">step_by</span>(<span class="number">4096</span> <span class="comment">/* TODO: arch-dep */</span>));
-        <span class="ident">frame_addresses</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">PhysFrame::containing_address</span>(<span class="ident">PhysAddr::new</span>(<span class="ident">addr</span>)))
-    }
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">FrameAllocator</span><span class="op">&lt;</span><span class="ident">Size4KiB</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BootFrameAllocator</span> {
-    <span class="kw">fn</span> <span class="ident">allocate_frame</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysFrame</span><span class="op">&lt;</span><span class="ident">Size4KiB</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">usable_frames</span>().<span class="ident">nth</span>(<span class="self">self</span>.<span class="ident">next</span>);
-        <span class="self">self</span>.<span class="ident">next</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>) <span class="op">=</span> <span class="ident">frame</span> {
-            <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">start_address</span>().<span class="ident">as_u64</span>() <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">allocate_frame</span>();
-            }
-            <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">start_address</span>().<span class="ident">as_u64</span>() <span class="op">&lt;</span> <span class="number">0xa0000</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">allocate_frame</span>();
-            }
-        }
-        <span class="ident">frame</span>
-    }
-}
 
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
@@ -506,7 +432,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Frame</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pa</span>: <span class="ident">PhysAddr</span>, <span class="ident">flags</span>: <span class="ident">PhysicalFrameFlags</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pa</span>: <span class="ident">PhysAddr</span>, <span class="ident">flags</span>: <span class="ident">PhysicalFrameFlags</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">pa</span>, <span class="ident">flags</span> }
     }
 

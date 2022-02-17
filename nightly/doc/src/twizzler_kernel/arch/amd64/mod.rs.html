@@ -58,6 +58,9 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">clock::Nanoseconds</span>, <span class="ident">thread::current_thread_ref</span>, <span class="ident">BootInfo</span>};
@@ -97,6 +100,9 @@
     <span class="ident">pit::setup_freq</span>(<span class="ident">statclock_hz</span>, <span class="ident">stat_cb</span>);
 }
 
+<span class="doccomment">/// Jump into userspace</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// The stack and target must be valid addresses.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">jump_to_user</span>(<span class="ident">target</span>: <span class="ident">VirtAddr</span>, <span class="ident">stack</span>: <span class="ident">VirtAddr</span>, <span class="ident">arg</span>: <span class="ident">u64</span>) {
     <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall::SyscallContext</span>;
     <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">syscall::X86SyscallContext::create_jmp_context</span>(<span class="ident">target</span>, <span class="ident">stack</span>, <span class="ident">arg</span>);

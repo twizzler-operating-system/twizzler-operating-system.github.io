@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["sys_object_create",""],["sys_object_map",""]]});
+initSidebarItems({"fn":[["get_all_handles",""],["get_vmcontext_from_handle",""],["sys_new_handle",""],["sys_object_create",""],["sys_object_map",""]],"static":[["ALL_HANDLES",""]],"struct":[["AllHandles",""],["Handle",""]],"trait":[["ObjectHandle",""]]});

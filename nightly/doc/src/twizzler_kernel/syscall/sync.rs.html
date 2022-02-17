@@ -168,7 +168,6 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::time::Duration</span>;
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">vec::Vec</span>};
@@ -178,7 +177,6 @@
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">mutex::Mutex</span>,
     <span class="ident">obj</span>::{<span class="ident">LookupFlags</span>, <span class="ident">ObjectRef</span>},
     <span class="ident">once::Once</span>,
     <span class="ident">spinlock::Spinlock</span>,
@@ -239,7 +237,7 @@
         <span class="ident">ThreadSyncReference::ObjectRef</span>(<span class="ident">id</span>, <span class="ident">offset</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="kw">crate</span>::obj::lookup_object</span>(<span class="ident">id</span>, <span class="ident">LookupFlags::empty</span>()) {
                 <span class="ident"><span class="kw">crate</span>::obj::LookupResult::Found</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ThreadSyncError::InvalidReference</span>)<span class="question-mark">?</span>,
+                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ThreadSyncError::InvalidReference</span>),
             };
             (<span class="ident">obj</span>, <span class="ident">offset</span>)
         }
@@ -289,7 +287,7 @@
 
     <span class="kw">for</span> <span class="ident">op</span> <span class="kw">in</span> <span class="ident">ops</span> {
         <span class="kw">match</span> <span class="ident">op</span> {
-            <span class="ident">ThreadSync::Sleep</span>(<span class="ident">sleep</span>, <span class="ident">result</span>) =&gt; <span class="kw">match</span> <span class="ident">prep_sleep</span>(<span class="ident">sleep</span>, <span class="ident">unsleeps</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>) {
+            <span class="ident">ThreadSync::Sleep</span>(<span class="ident">sleep</span>, <span class="ident">result</span>) =&gt; <span class="kw">match</span> <span class="ident">prep_sleep</span>(<span class="ident">sleep</span>, <span class="ident">unsleeps</span>.<span class="ident">is_empty</span>()) {
                 <span class="prelude-val">Ok</span>(<span class="ident">se</span>) =&gt; {
                     <span class="kw-2">*</span><span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="ident">se</span>.<span class="ident">did_sleep</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="number">1</span> });
                     <span class="kw">if</span> <span class="ident">se</span>.<span class="ident">did_sleep</span> {
@@ -316,7 +314,7 @@
     <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();
     {
         <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">thread</span>.<span class="ident">enter_critical</span>();
-        <span class="kw">if</span> <span class="ident">unsleeps</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">unsleeps</span>.<span class="ident">is_empty</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) <span class="op">=</span> <span class="ident">timeout</span> {
                 <span class="ident"><span class="kw">crate</span>::clock::register_timeout_callback</span>(
                     <span class="comment">// TODO: fix all our time types</span>
@@ -328,7 +326,7 @@
             <span class="ident">thread</span>.<span class="ident">set_sync_sleep_done</span>();
         }
         <span class="ident">requeue_all</span>();
-        <span class="kw">if</span> <span class="ident">unsleeps</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">unsleeps</span>.<span class="ident">is_empty</span>() {
             <span class="ident">finish_blocking</span>(<span class="ident">guard</span>);
         } <span class="kw">else</span> {
             <span class="ident">drop</span>(<span class="ident">guard</span>);

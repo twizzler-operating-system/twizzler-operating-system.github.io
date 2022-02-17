@@ -432,7 +432,23 @@
 <span id="431">431</span>
 <span id="432">432</span>
 <span id="433">433</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">x86_64</span>::{<span class="ident">structures::paging::PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">VirtAddr</span>};
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi::device::CacheType</span>;
+<span class="kw">use</span> <span class="ident">x86_64</span>::{<span class="ident">structures::paging::PageTable</span>, <span class="ident">PhysAddr</span>, <span class="ident">VirtAddr</span>};
 
 <span class="kw">fn</span> <span class="ident">translate_addr_inner</span>(<span class="ident">addr</span>: <span class="ident">VirtAddr</span>, <span class="ident">phys_mem_offset</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysAddr</span><span class="op">&gt;</span> {
     <span class="kw">use</span> <span class="ident">x86_64::registers::control::Cr3</span>;
@@ -464,7 +480,7 @@
     <span class="prelude-val">Some</span>(<span class="ident">frame</span>.<span class="ident">start_address</span>() <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">addr</span>.<span class="ident">page_offset</span>()))
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">translate_addr</span>(<span class="ident">addr</span>: <span class="ident">VirtAddr</span>, <span class="ident">phys_mem_offset</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysAddr</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate_addr</span>(<span class="ident">addr</span>: <span class="ident">VirtAddr</span>, <span class="ident">phys_mem_offset</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PhysAddr</span><span class="op">&gt;</span> {
     <span class="ident">translate_addr_inner</span>(<span class="ident">addr</span>, <span class="ident">phys_mem_offset</span>)
 }
 
@@ -474,6 +490,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::memory::frame</span>::{<span class="ident">alloc_frame</span>, <span class="ident">PhysicalFrameFlags</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::memory</span>::{<span class="ident">MapFailed</span>, <span class="ident">MappingInfo</span>};
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">phys_mem_offset</span>: <span class="ident">VirtAddr</span>) -&gt; <span class="ident">OffsetPageTable</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">level_4_table</span> <span class="op">=</span> <span class="ident">active_level_4_table</span>(<span class="ident">phys_mem_offset</span>);
     <span class="ident">OffsetPageTable::new</span>(<span class="ident">level_4_table</span>, <span class="ident">phys_mem_offset</span>)
@@ -515,8 +532,8 @@
 
     <span class="attribute">#[<span class="ident">optimize</span>(<span class="ident">speed</span>)]</span>
     <span class="kw">fn</span> <span class="ident">map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>, <span class="ident">entry</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="ident">existing</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_slice</span>()[<span class="ident">idx</span>];
-        <span class="macro">assert!</span>(<span class="ident">existing</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">existing</span> <span class="op">==</span> <span class="ident">entry</span>);
+        <span class="kw">let</span> <span class="ident">_existing</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_slice</span>()[<span class="ident">idx</span>];
+        <span class="comment">//assert!(existing == 0 || existing == entry);</span>
         <span class="self">self</span>.<span class="ident">as_slice_mut</span>()[<span class="ident">idx</span>] <span class="op">=</span> <span class="ident">entry</span>;
     }
 
@@ -801,12 +818,19 @@
         <span class="ident">phys</span>: <span class="ident">PhysAddr</span>,
         <span class="kw-2">mut</span> <span class="ident">length</span>: <span class="ident">usize</span>,
         <span class="ident">flags</span>: <span class="ident">MapFlags</span>,
+        <span class="ident">cache_type</span>: <span class="ident">CacheType</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">MapFailed</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">start</span>.<span class="ident">as_u64</span>().<span class="ident">checked_add</span>(<span class="ident">length</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">is_none</span>() {
             <span class="ident">length</span> <span class="op">-</span><span class="op">=</span> <span class="ident">PAGE_SIZE</span>;
         }
         <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">length</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0usize</span>;
+        <span class="kw">let</span> <span class="ident">cache_bits</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cache_type</span> {
+            <span class="ident">CacheType::WriteBack</span> =&gt; <span class="number">0</span>,
+            <span class="ident">CacheType::WriteCombining</span> =&gt; <span class="number">0</span>, <span class="comment">// TODO: is this correct?</span>
+            <span class="ident">CacheType::WriteThrough</span> =&gt; (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>),
+            <span class="ident">CacheType::Uncachable</span> =&gt; (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>),
+        };
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">start</span>.<span class="ident">as_u64</span>().<span class="ident">checked_add</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">u64</span>);
             <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>) <span class="op">=</span> <span class="ident">addr</span> {
@@ -847,7 +871,10 @@
             }
             <span class="ident">table</span>.<span class="ident">map</span>(
                 <span class="ident">indexes</span>[<span class="ident">nr_recur</span>].<span class="ident">into</span>(),
-                <span class="ident">frame</span>.<span class="ident">as_u64</span>() <span class="op">|</span> <span class="ident">flags</span>.<span class="ident">entry_bits</span>() <span class="op">|</span> <span class="kw">if</span> <span class="ident">nr_recur</span> <span class="op">&lt;</span> <span class="number">3</span> { <span class="number">0b10000000</span> } <span class="kw">else</span> { <span class="number">0</span> },
+                <span class="ident">frame</span>.<span class="ident">as_u64</span>()
+                    <span class="op">|</span> <span class="ident">flags</span>.<span class="ident">entry_bits</span>()
+                    <span class="op">|</span> <span class="kw">if</span> <span class="ident">nr_recur</span> <span class="op">&lt;</span> <span class="number">3</span> { <span class="number">0b10000000</span> } <span class="kw">else</span> { <span class="number">0</span> }
+                    <span class="op">|</span> <span class="ident">cache_bits</span>,
             );
             <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="kw">match</span> <span class="ident">nr_recur</span> {
                 <span class="number">1</span> =&gt; <span class="ident">PAGE_SIZE_HUGE</span>,
@@ -861,6 +888,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ArchMemoryContextSwitchInfo</span> {
+    <span class="doccomment">/// Switch context.</span>
+    <span class="doccomment">/// # Safety</span>
+    <span class="doccomment">/// The context must be valid.</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">switch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="ident">x86::controlregs::cr3_write</span>(<span class="self">self</span>.<span class="ident">target</span>)
     }

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["get_user_input",""],["main",""],["test_mutex",""],["test_thread_sync",""],["test_thread_sync_timeout",""]],"static":[["BAR",""],["BAZ",""],["FOO",""]],"struct":[["Foo",""]]});
+initSidebarItems({"fn":[["enumerate_children",""],["get_user_input",""],["list_subobjs",""],["main",""],["test_kaction",""],["test_load_elf",""],["test_mutex",""],["test_thread_sync",""],["test_thread_sync_timeout",""]],"static":[["BAR",""],["BAZ",""],["FOO",""]],"struct":[["Foo",""]]});

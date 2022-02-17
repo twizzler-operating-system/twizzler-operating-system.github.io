@@ -242,6 +242,12 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">fmt::Display</span>,
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU32</span>, <span class="ident">Ordering</span>},
@@ -373,6 +379,12 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">print_page_tree</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="macro">logln!</span>(<span class="string">&quot;=== PAGE TREE OBJECT {} ===&quot;</span>, <span class="self">self</span>.<span class="ident">id</span>());
         <span class="self">self</span>.<span class="ident">range_tree</span>.<span class="ident">lock</span>().<span class="ident">print_tree</span>();
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Object</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>()
     }
 }
 

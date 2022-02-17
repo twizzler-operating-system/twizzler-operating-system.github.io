@@ -62,7 +62,7 @@
     <span class="kw">let</span> <span class="ident">files</span> <span class="op">=</span> <span class="ident">matches</span>.<span class="ident">values_of</span>(<span class="string">&quot;files&quot;</span>);
     <span class="kw">let</span> <span class="ident">outfile</span> <span class="op">=</span> <span class="ident">File::create</span>(<span class="ident">initrd_output</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">archive</span> <span class="op">=</span> <span class="ident">Builder::new</span>(<span class="ident">outfile</span>);
-    <span class="kw">for</span> <span class="ident">file</span> <span class="kw">in</span> <span class="ident">files</span>.<span class="ident">unwrap_or</span>(<span class="ident">clap::Values::default</span>()) {
+    <span class="kw">for</span> <span class="ident">file</span> <span class="kw">in</span> <span class="ident">files</span>.<span class="ident">unwrap_or_default</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">file</span>).<span class="ident">unwrap</span>();
         <span class="ident">archive</span>
             .<span class="ident">append_file</span>(<span class="ident">Path::new</span>(<span class="ident">file</span>).<span class="ident">file_name</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">f</span>)

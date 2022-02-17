@@ -76,14 +76,10 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pc</span>;
 
 <span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
 <span class="kw">use</span> <span class="ident">core::fmt::Write</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic::AtomicU32</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pc</span>::<span class="kw-2">*</span>;
@@ -116,19 +112,19 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">KernelConsoleReadError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">init</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">data</span>.<span class="ident">len</span>() {
+        <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="ident">data</span> {
             <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">serial</span>.<span class="ident">wait</span>().<span class="ident">get</span>().<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">receive</span>() };
             <span class="kw">match</span> <span class="ident">v</span> {
                 <span class="number">13</span> =&gt; {
                     <span class="macro">log!</span>(<span class="string">&quot;\n&quot;</span>);
-                    <span class="ident">data</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="number">10</span>;
+                    <span class="kw-2">*</span><span class="ident">d</span> <span class="op">=</span> <span class="number">10</span>;
                     <span class="ident">c</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                     <span class="kw">break</span>;
                 }
                 <span class="number">4</span> =&gt; <span class="kw">break</span>,
                 <span class="kw">_</span> =&gt; {
                     <span class="macro">log!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span> <span class="kw">as</span> <span class="ident">char</span>);
-                    <span class="ident">data</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">v</span>
+                    <span class="kw-2">*</span><span class="ident">d</span> <span class="op">=</span> <span class="ident">v</span>
                 }
             }
             <span class="ident">c</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;

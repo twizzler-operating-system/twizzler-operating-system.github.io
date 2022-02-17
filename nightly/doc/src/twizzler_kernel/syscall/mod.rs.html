@@ -217,18 +217,64 @@
 <span id="216">216</span>
 <span id="217">217</span>
 <span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
+    <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionError</span>, <span class="ident">KactionValue</span>},
     <span class="ident">object</span>::{<span class="ident">ObjID</span>, <span class="ident">Protections</span>},
     <span class="ident">syscall</span>::{
-        <span class="ident">KernelConsoleReadSource</span>, <span class="ident">ObjectCreateError</span>, <span class="ident">ObjectMapError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>,
+        <span class="ident">HandleType</span>, <span class="ident">KernelConsoleReadSource</span>, <span class="ident">ObjectCreateError</span>, <span class="ident">ObjectMapError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>,
         <span class="ident">ThreadSpawnError</span>, <span class="ident">ThreadSyncError</span>,
     },
 };
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::thread::thread_ctrl</span>;
+<span class="kw">use</span> <span class="self">self</span>::{<span class="ident">object::sys_new_handle</span>, <span class="ident">thread::thread_ctrl</span>};
 
-<span class="kw">mod</span> <span class="ident">object</span>;
+<span class="comment">// TODO: move the handle stuff into its own file and make this private.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">object</span>;
 <span class="comment">/* TODO: move the requeue stuff into sched and make this private */</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">sync</span>;
 <span class="kw">mod</span> <span class="ident">thread</span>;
@@ -294,6 +340,22 @@
     <span class="ident">info</span>.<span class="ident">flags</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="ident">info</span>.<span class="ident">version</span> <span class="op">=</span> <span class="number">1</span>;
     <span class="ident">info</span>.<span class="ident">page_size</span> <span class="op">=</span> <span class="number">0x1000</span>;
+}
+
+<span class="kw">fn</span> <span class="ident">type_sys_kaction</span>(
+    <span class="ident">cmd</span>: <span class="ident">u64</span>,
+    <span class="ident">hi</span>: <span class="ident">u64</span>,
+    <span class="ident">lo</span>: <span class="ident">u64</span>,
+    <span class="ident">arg</span>: <span class="ident">u64</span>,
+    <span class="ident">_flags</span>: <span class="ident">u64</span>,
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KactionValue</span>, <span class="ident">KactionError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">KactionCmd::try_from</span>(<span class="ident">cmd</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">objid</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hi</span> <span class="op">==</span> <span class="number">0</span> {
+        <span class="prelude-val">None</span>
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">ObjID::new_from_parts</span>(<span class="ident">hi</span>, <span class="ident">lo</span>))
+    };
+    <span class="ident"><span class="kw">crate</span>::device::kaction</span>(<span class="ident">cmd</span>, <span class="ident">objid</span>, <span class="ident">arg</span>)
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -373,6 +435,27 @@
             <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">res</span>, <span class="ident">zero_ok</span>, <span class="ident">one_err</span>);
             <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
         }
+        <span class="ident">Syscall::Kaction</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg0</span>();
+            <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
+            <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg2</span>();
+            <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg3</span>();
+            <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg4</span>();
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">type_sys_kaction</span>(<span class="ident">cmd</span>, <span class="ident">hi</span>, <span class="ident">lo</span>, <span class="ident">arg</span>, <span class="ident">flags</span>);
+            <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">result</span>, <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into</span>(), <span class="ident">zero_err</span>);
+            <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
+        }
+        <span class="ident">Syscall::NewHandle</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg0</span>();
+            <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
+            <span class="kw">let</span> <span class="ident">handle_type</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg2</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
+            <span class="kw">let</span> <span class="ident">_flags</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg3</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handle_type</span>
+                .<span class="ident">try_into</span>()
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">nh</span>: <span class="ident">HandleType</span><span class="op">|</span> <span class="ident">sys_new_handle</span>(<span class="ident">ObjID::new_from_parts</span>(<span class="ident">hi</span>, <span class="ident">lo</span>), <span class="ident">nh</span>));
+            <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">result</span>, <span class="ident">zero_ok</span>, <span class="ident">one_err</span>);
+            <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
+        }
         <span class="ident">Syscall::ObjectCreate</span> =&gt; {
             <span class="kw">let</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg0</span>();
             <span class="kw">let</span> <span class="ident">src_ptr</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg1</span>();
@@ -400,11 +483,16 @@
             <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg2</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">usize</span>;
             <span class="kw">let</span> <span class="ident">prot</span> <span class="op">=</span> <span class="ident">Protections::from_bits</span>(<span class="ident">context</span>.<span class="ident">arg3</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u32</span>);
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">ObjID::new_from_parts</span>(<span class="ident">hi</span>, <span class="ident">lo</span>);
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">prot</span>
-                .<span class="ident">map_or</span>(<span class="prelude-val">Err</span>(<span class="ident">ObjectMapError::InvalidProtections</span>), <span class="op">|</span><span class="ident">prot</span><span class="op">|</span> {
-                    <span class="ident">object::sys_object_map</span>(<span class="ident">id</span>, <span class="ident">slot</span>, <span class="ident">prot</span>)
+            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">arg5</span>();
+            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">create_user_ptr</span>(<span class="ident">handle</span>) };
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handle</span>) <span class="op">=</span> <span class="ident">handle</span> {
+                <span class="ident">prot</span>.<span class="ident">map_or</span>(<span class="prelude-val">Err</span>(<span class="ident">ObjectMapError::InvalidProtections</span>), <span class="op">|</span><span class="ident">prot</span><span class="op">|</span> {
+                    <span class="ident">object::sys_object_map</span>(<span class="ident">id</span>, <span class="ident">slot</span>, <span class="ident">prot</span>, <span class="kw-2">*</span><span class="ident">handle</span>)
                 })
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span> <span class="kw">as</span> <span class="ident">u64</span>);
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span> <span class="kw">as</span> <span class="ident">u64</span>)
+            } <span class="kw">else</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">ObjectMapError::InvalidArgument</span>)
+            };
             <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">result</span>, <span class="ident">zero_ok</span>, <span class="ident">one_err</span>);
             <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
         }

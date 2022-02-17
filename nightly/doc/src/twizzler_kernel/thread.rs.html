@@ -680,6 +680,29 @@
 <span id="679">679</span>
 <span id="680">680</span>
 <span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">cell::RefCell</span>,
@@ -687,7 +710,11 @@
 };
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{<span class="ident">aux::AuxEntry</span>, <span class="ident">object::ObjID</span>, <span class="ident">syscall::ThreadSpawnArgs</span>};
+<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
+    <span class="ident">aux::AuxEntry</span>,
+    <span class="ident">object::ObjID</span>,
+    <span class="ident">syscall</span>::{<span class="ident">ThreadSpawnArgs</span>, <span class="ident">ThreadSpawnError</span>},
+};
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 <span class="kw">use</span> <span class="ident">xmas_elf::program::SegmentData</span>;
 
@@ -695,11 +722,11 @@
     <span class="ident">idcounter</span>::{<span class="ident">Id</span>, <span class="ident">IdCounter</span>},
     <span class="ident">interrupt</span>,
     <span class="ident">memory::context</span>::{<span class="ident">MappingPerms</span>, <span class="ident">MemoryContext</span>, <span class="ident">MemoryContextRef</span>},
-    <span class="ident">mutex::Mutex</span>,
     <span class="ident">obj::ObjectRef</span>,
     <span class="ident">processor</span>::{<span class="ident">get_processor</span>, <span class="ident">KERNEL_STACK_SIZE</span>},
     <span class="ident">sched::schedule_new_thread</span>,
     <span class="ident">spinlock::Spinlock</span>,
+    <span class="ident">syscall::object::get_vmcontext_from_handle</span>,
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
@@ -827,6 +854,7 @@
         }
     }
 
+    <span class="comment">// TODO: cleanup all these new variants</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_new_vm</span>() -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
         <span class="ident">thread</span>.<span class="ident">memory_context</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">MemoryContext::new</span>()));
@@ -836,7 +864,15 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_current_context</span>(<span class="ident">spawn_args</span>: <span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="ident">thread</span>.<span class="ident">memory_context</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current_memory_context</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>());
+        <span class="ident">thread</span>.<span class="ident">memory_context</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">current_memory_context</span>().<span class="ident">unwrap</span>());
+        <span class="ident">thread</span>.<span class="ident">memory_context</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">inner</span>().<span class="ident">add_thread</span>();
+        <span class="ident">thread</span>.<span class="ident">spawn_args</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">spawn_args</span>);
+        <span class="ident">thread</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_handle_context</span>(<span class="ident">spawn_args</span>: <span class="ident">ThreadSpawnArgs</span>, <span class="ident">vmc</span>: <span class="ident">MemoryContextRef</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
+        <span class="ident">thread</span>.<span class="ident">memory_context</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">vmc</span>);
         <span class="ident">thread</span>.<span class="ident">memory_context</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">inner</span>().<span class="ident">add_thread</span>();
         <span class="ident">thread</span>.<span class="ident">spawn_args</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">spawn_args</span>);
         <span class="ident">thread</span>
@@ -1060,6 +1096,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Priority</span> {
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::declare_interior_mutable_const</span>)]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REALTIME</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
         <span class="ident">class</span>: <span class="ident">PriorityClass::RealTime</span>,
         <span class="ident">adjust</span>: <span class="ident">AtomicI32::new</span>(<span class="number">0</span>),
@@ -1240,7 +1277,7 @@ fn object_copy_test() {
         )
         .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">init_obj</span> <span class="op">=</span> <span class="ident">boot_objects</span>.<span class="ident">init</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;no init found&quot;</span>);
-        <span class="kw">let</span> <span class="ident">obj1_data</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::operations::read_object</span>(<span class="kw-2">&amp;</span><span class="ident">init_obj</span>);
+        <span class="kw">let</span> <span class="ident">obj1_data</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::operations::read_object</span>(<span class="ident">init_obj</span>);
         <span class="kw">let</span> <span class="ident">elf</span> <span class="op">=</span> <span class="ident">xmas_elf::ElfFile::new</span>(<span class="kw-2">&amp;</span><span class="ident">obj1_data</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">phinfo</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">for</span> <span class="ident">ph</span> <span class="kw">in</span> <span class="ident">elf</span>.<span class="ident">program_iter</span>() {
@@ -1325,29 +1362,38 @@ fn object_copy_test() {
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_user</span>(<span class="ident">args</span>: <span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="ident">ObjID</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">Thread::new_with_current_context</span>(<span class="ident">args</span>);
-    <span class="macro">logln!</span>(
-        <span class="string">&quot;starting new thread {} with stack {:p}&quot;</span>,
-        <span class="ident">thread</span>.<span class="ident">id</span>,
-        <span class="ident">thread</span>.<span class="ident">kernel_stack</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_user</span>(<span class="ident">args</span>: <span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjID</span>, <span class="ident">ThreadSpawnError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handle</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">vm_context_handle</span> {
+        <span class="kw">let</span> <span class="ident">vmc</span> <span class="op">=</span> <span class="ident">get_vmcontext_from_handle</span>(<span class="ident">handle</span>).<span class="ident">ok_or</span>(<span class="ident">ThreadSpawnError::NotFound</span>)<span class="question-mark">?</span>;
+        <span class="ident">Thread::new_with_handle_context</span>(<span class="ident">args</span>, <span class="ident">vmc</span>)
+    } <span class="kw">else</span> {
+        <span class="ident">Thread::new_with_current_context</span>(<span class="ident">args</span>)
+    };
+    <span class="comment">/*
+    logln!(
+        &quot;starting new thread {} with stack {:p}&quot;,
+        thread.id,
+        thread.kernel_stack
     );
+    */</span>
     <span class="kw">unsafe</span> {
         <span class="ident">thread</span>.<span class="ident">init</span>(<span class="ident">user_new_start</span>);
     }
     <span class="ident">thread</span>.<span class="ident">repr</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">create_blank_object</span>());
     <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">thread</span>.<span class="ident">repr</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">id</span>();
     <span class="ident">schedule_new_thread</span>(<span class="ident">thread</span>);
-    <span class="ident">id</span>
+    <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_new_init</span>() {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">Thread::new_with_new_vm</span>();
-    <span class="macro">logln!</span>(
-        <span class="string">&quot;starting new thread {} with stack {:p}&quot;</span>,
-        <span class="ident">thread</span>.<span class="ident">id</span>,
-        <span class="ident">thread</span>.<span class="ident">kernel_stack</span>
+    <span class="comment">/*
+    logln!(
+        &quot;starting new thread {} with stack {:p}&quot;,
+        thread.id,
+        thread.kernel_stack
     );
+    */</span>
     <span class="kw">unsafe</span> {
         <span class="ident">thread</span>.<span class="ident">init</span>(<span class="ident">user_init</span>);
     }

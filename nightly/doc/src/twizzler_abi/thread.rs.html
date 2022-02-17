@@ -186,12 +186,27 @@
 <span id="185">185</span>
 <span id="186">186</span>
 <span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">ptr</span>,
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
 };
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">object</span>::{<span class="ident">ObjID</span>, <span class="ident">Protections</span>},
     <span class="ident">simple_idcounter::IdCounter</span>,
@@ -231,6 +246,8 @@
 
 <span class="kw">const</span> <span class="ident">STACK_ALIGN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new_thread</span>(
     <span class="ident">objid</span>: <span class="ident">ObjID</span>,
     <span class="ident">base</span>: <span class="kw-2">*mut</span> <span class="ident">ThreadRepr</span>,
@@ -305,10 +322,17 @@
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">spawn</span>(<span class="ident">stack_size</span>: <span class="ident">usize</span>, <span class="ident">entry</span>: <span class="ident">usize</span>, <span class="ident">arg</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">stack_layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align</span>(<span class="ident">stack_size</span>, <span class="ident">STACK_ALIGN</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">stack_base</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::alloc::global_alloc</span>(<span class="ident">stack_layout</span>);
-    <span class="kw">let</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">core::slice::from_raw_parts</span>(<span class="ident">stack_base</span>, <span class="ident">stack_size</span>);
     <span class="kw">let</span> (<span class="ident">tls_set</span>, <span class="ident">tls_base</span>, <span class="ident">tls_len</span>, <span class="ident">tls_align</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::rt1::new_thread_tls</span>().<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">tls_layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align</span>(<span class="ident">tls_len</span>, <span class="ident">tls_align</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">ThreadSpawnArgs::new</span>(<span class="ident">entry</span>, <span class="ident">stack</span>, <span class="ident">tls_set</span>, <span class="ident">arg</span>, <span class="ident">ThreadSpawnFlags::empty</span>());
+    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">ThreadSpawnArgs::new</span>(
+        <span class="ident">entry</span>,
+        <span class="ident">stack_base</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        <span class="ident">stack_size</span>,
+        <span class="ident">tls_set</span>,
+        <span class="ident">arg</span>,
+        <span class="ident">ThreadSpawnFlags::empty</span>(),
+        <span class="prelude-val">None</span>,
+    );
     <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::slot::global_allocate</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
         <span class="ident"><span class="kw">crate</span>::alloc::global_free</span>(<span class="ident">stack_base</span>, <span class="ident">stack_layout</span>);
         <span class="ident"><span class="kw">crate</span>::alloc::global_free</span>(<span class="ident">tls_base</span>, <span class="ident">tls_layout</span>);
@@ -318,6 +342,7 @@
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::syscall::sys_spawn</span>(<span class="ident">args</span>);
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">objid</span>) <span class="op">=</span> <span class="ident">res</span> {
         <span class="kw">let</span> <span class="ident">mapres</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::syscall::sys_object_map</span>(
+            <span class="prelude-val">None</span>,
             <span class="ident">objid</span>,
             <span class="ident">slot</span>,
             <span class="ident">Protections::READ</span> <span class="op">|</span> <span class="ident">Protections::WRITE</span>,
@@ -347,6 +372,8 @@
 }
 
 <span class="doccomment">/// Wait until the specified thread terminates.</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// The thread ID must be a valid thread ID.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">join</span>(<span class="ident">id</span>: <span class="ident">u32</span>) {
     <span class="ident">THREADS_LOCK</span>.<span class="ident">lock</span>();
     <span class="kw">loop</span> {
@@ -370,7 +397,8 @@
     <span class="ident">THREADS_LOCK</span>.<span class="ident">unlock</span>();
 }
 
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">exit</span>() -&gt; <span class="op">!</span> {
+<span class="doccomment">/// Exit the current thread.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exit</span>() -&gt; <span class="op">!</span> {
     <span class="ident"><span class="kw">crate</span>::syscall::sys_thread_exit</span>(<span class="number">0</span>, <span class="ident">ptr::null_mut</span>());
 }
 </code></pre></div>

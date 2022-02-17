@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ObjectInitError",""]],"struct":[["ObjID","An object ID, represented as a transparent wrapper type. Any value where the upper 64 bits are zero is invalid."],["Object",""],["ObjectInitFlags",""],["Protections","Mapping protections for mapping objects into the address space."]]});

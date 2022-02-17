@@ -155,7 +155,7 @@
         <span class="ident">REAL_FREQ</span> <span class="op">=</span> <span class="ident">CRYSTAL_HZ</span> <span class="op">/</span> <span class="ident">count</span>;
         <span class="ident">CB</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cb</span>);
         <span class="macro">logln!</span>(
-            <span class="string">&quot;x86-pit: setting up for statclock with freq {} ({} ms)&quot;</span>,
+            <span class="string">&quot;[kernel::arch::x86-pit] setting up for statclock with freq {} ({} ms)&quot;</span>,
             <span class="ident">REAL_FREQ</span>,
             (<span class="number">1000</span> <span class="op">/</span> <span class="ident">REAL_FREQ</span>)
         );

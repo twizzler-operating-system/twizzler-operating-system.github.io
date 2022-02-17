@@ -30,10 +30,6 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
-<span id="35">35</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">sync::Arc</span>, <span class="ident">vec::Vec</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -59,12 +55,8 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree</span> <span class="op">=</span> <span class="ident">obj</span>.<span class="ident">lock_page_tree</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">alloc::vec!</span>[];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pn</span> <span class="op">=</span> <span class="number">1</span>.<span class="ident">into</span>();
-    <span class="kw">loop</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">get_page</span>(<span class="ident">pn</span>, <span class="bool-val">false</span>) {
-            <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="ident">p</span>.<span class="ident">as_slice</span>());
-        } <span class="kw">else</span> {
-            <span class="kw">break</span>;
-        }
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">p</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">get_page</span>(<span class="ident">pn</span>, <span class="bool-val">false</span>) {
+        <span class="ident">v</span>.<span class="ident">extend_from_slice</span>(<span class="ident">p</span>.<span class="ident">as_slice</span>());
         <span class="ident">pn</span> <span class="op">=</span> <span class="ident">pn</span>.<span class="ident">next</span>();
     }
     <span class="ident">v</span>

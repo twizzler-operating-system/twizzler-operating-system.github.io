@@ -1038,7 +1038,7 @@
 
 <span class="attribute">#[<span class="ident">thread_local</span>]</span>
 <span class="kw">static</span> <span class="ident">STAT_COUNTER</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
-<span class="kw">const</span> <span class="ident">PRINT_STATS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
+<span class="kw">const</span> <span class="ident">PRINT_STATS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schedule_stattick</span>(<span class="ident">dt</span>: <span class="ident">Nanoseconds</span>) {
     <span class="ident">schedule_maybe_rebalance</span>(<span class="ident">dt</span>);
 

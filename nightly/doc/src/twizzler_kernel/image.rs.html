@@ -30,9 +30,6 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
-<span id="32">32</span>
-<span id="33">33</span>
-<span id="34">34</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 <span class="kw">use</span> <span class="ident">xmas_elf::program</span>::{<span class="self">self</span>};
 
@@ -53,16 +50,13 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_tls</span>() -&gt; <span class="ident">TlsInfo</span> {
     <span class="kw">let</span> <span class="ident">elf</span> <span class="op">=</span> <span class="ident">xmas_elf::ElfFile::new</span>(<span class="kw-2">*</span><span class="ident">KERNEL_IMAGE</span>.<span class="ident">wait</span>()).<span class="ident">expect</span>(<span class="string">&quot;failed to parse kernel image&quot;</span>);
     <span class="kw">for</span> <span class="ident">ph</span> <span class="kw">in</span> <span class="ident">elf</span>.<span class="ident">program_iter</span>() {
-        <span class="kw">match</span> <span class="ident">ph</span>.<span class="ident">get_type</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">program::Type::Tls</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">TlsInfo</span> {
-                    <span class="ident">start_addr</span>: <span class="ident">VirtAddr::new</span>(<span class="ident">ph</span>.<span class="ident">virtual_addr</span>()),
-                    <span class="ident">file_size</span>: <span class="ident">ph</span>.<span class="ident">file_size</span>() <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">mem_size</span>: <span class="ident">ph</span>.<span class="ident">mem_size</span>() <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">align</span>: <span class="ident">ph</span>.<span class="ident">align</span>() <span class="kw">as</span> <span class="ident">usize</span>,
-                };
-            }
-            <span class="kw">_</span> =&gt; {}
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">program::Type::Tls</span>) <span class="op">=</span> <span class="ident">ph</span>.<span class="ident">get_type</span>() {
+            <span class="kw">return</span> <span class="ident">TlsInfo</span> {
+                <span class="ident">start_addr</span>: <span class="ident">VirtAddr::new</span>(<span class="ident">ph</span>.<span class="ident">virtual_addr</span>()),
+                <span class="ident">file_size</span>: <span class="ident">ph</span>.<span class="ident">file_size</span>() <span class="kw">as</span> <span class="ident">usize</span>,
+                <span class="ident">mem_size</span>: <span class="ident">ph</span>.<span class="ident">mem_size</span>() <span class="kw">as</span> <span class="ident">usize</span>,
+                <span class="ident">align</span>: <span class="ident">ph</span>.<span class="ident">align</span>() <span class="kw">as</span> <span class="ident">usize</span>,
+            };
         }
     }
     <span class="macro">panic!</span>(<span class="string">&quot;failed to find TLS program header in kernel image&quot;</span>);
