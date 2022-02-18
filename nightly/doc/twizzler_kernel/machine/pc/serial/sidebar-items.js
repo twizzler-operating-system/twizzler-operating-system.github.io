@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SERIAL1",""]]});
+initSidebarItems({"fn":[["interrupt_handler",""],["late_init",""]],"struct":[["LineStsFlags","Line status flags"],["SERIAL1",""],["SerialPort",""]]});

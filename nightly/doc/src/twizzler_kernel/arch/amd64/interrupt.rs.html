@@ -1021,6 +1021,17 @@
 <span id="1020">1020</span>
 <span id="1021">1021</span>
 <span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
 
 <span class="kw">use</span> <span class="ident">x86::current::rflags::RFlags</span>;
@@ -1369,53 +1380,64 @@
         );
     }
 
-    <span class="kw">if</span> <span class="ident">number</span> <span class="op">==</span> <span class="ident">Exception::PageFault</span> <span class="kw">as</span> <span class="ident">u64</span> {
-        <span class="kw">let</span> <span class="ident">cr2</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">x86::controlregs::cr2</span>() };
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">err</span>;
-        <span class="kw">let</span> <span class="ident">cause</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">PageFaultCause::Read</span>
+    <span class="kw">match</span> <span class="ident">number</span> {
+        <span class="number">14</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">cr2</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">x86::controlregs::cr2</span>() };
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">err</span>;
+            <span class="kw">let</span> <span class="ident">cause</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">==</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">==</span> <span class="number">0</span> {
+                    <span class="ident">PageFaultCause::Read</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">PageFaultCause::Write</span>
+                }
             } <span class="kw">else</span> {
-                <span class="ident">PageFaultCause::Write</span>
+                <span class="ident">PageFaultCause::InstructionFetch</span>
+            };
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">PageFaultFlags::empty</span>();
+            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="ident">flags</span>.<span class="ident">insert</span>(<span class="ident">PageFaultFlags::PRESENT</span>);
             }
-        } <span class="kw">else</span> {
-            <span class="ident">PageFaultCause::InstructionFetch</span>
-        };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">PageFaultFlags::empty</span>();
-        <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> <span class="number">1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">flags</span>.<span class="ident">insert</span>(<span class="ident">PageFaultFlags::PRESENT</span>);
+            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="ident">flags</span>.<span class="ident">insert</span>(<span class="ident">PageFaultFlags::USER</span>);
+            }
+            <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="ident">flags</span>.<span class="ident">insert</span>(<span class="ident">PageFaultFlags::INVALID</span>);
+            }
+            <span class="ident"><span class="kw">crate</span>::thread::enter_kernel</span>();
+            <span class="ident"><span class="kw">crate</span>::interrupt::set</span>(<span class="bool-val">true</span>);
+            <span class="ident"><span class="kw">crate</span>::memory::fault::page_fault</span>(
+                <span class="ident">VirtAddr::new</span>(<span class="ident">cr2</span> <span class="kw">as</span> <span class="ident">u64</span>),
+                <span class="ident">cause</span>,
+                <span class="ident">flags</span>,
+                <span class="ident">VirtAddr::new</span>(<span class="ident">ctx</span>.<span class="ident">rip</span>),
+            );
+            <span class="ident"><span class="kw">crate</span>::interrupt::set</span>(<span class="bool-val">false</span>);
+            <span class="ident"><span class="kw">crate</span>::thread::exit_kernel</span>();
         }
-        <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">flags</span>.<span class="ident">insert</span>(<span class="ident">PageFaultFlags::USER</span>);
+        <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">32</span> =&gt; {
+            <span class="macro">panic!</span>(
+                <span class="string">&quot;caught unhandled exception {:?}: {:#?}&quot;</span>,
+                <span class="ident">num_as_exception</span>(<span class="ident">number</span>),
+                <span class="ident">ctx</span>
+            );
         }
-        <span class="kw">if</span> <span class="ident">err</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">flags</span>.<span class="ident">insert</span>(<span class="ident">PageFaultFlags::INVALID</span>);
+        <span class="number">32</span> =&gt; {
+            <span class="kw">if</span> <span class="ident">current_processor</span>().<span class="ident">is_bsp</span>() {
+                <span class="ident">lapic::send_ipi</span>(<span class="ident">Destination::AllButSelf</span>, <span class="number">32</span>);
+            }
+            <span class="ident"><span class="kw">super</span>::pit::timer_interrupt</span>();
         }
-        <span class="ident"><span class="kw">crate</span>::thread::enter_kernel</span>();
-        <span class="ident"><span class="kw">crate</span>::interrupt::set</span>(<span class="bool-val">true</span>);
-        <span class="ident"><span class="kw">crate</span>::memory::fault::page_fault</span>(
-            <span class="ident">VirtAddr::new</span>(<span class="ident">cr2</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="ident">cause</span>,
-            <span class="ident">flags</span>,
-            <span class="ident">VirtAddr::new</span>(<span class="ident">ctx</span>.<span class="ident">rip</span>),
-        );
-        <span class="ident"><span class="kw">crate</span>::interrupt::set</span>(<span class="bool-val">false</span>);
-        <span class="ident"><span class="kw">crate</span>::thread::exit_kernel</span>();
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">number</span> <span class="op">&lt;</span> <span class="number">32</span> {
-        <span class="macro">panic!</span>(
-            <span class="string">&quot;caught unhandled exception {:?}: {:#?}&quot;</span>,
-            <span class="ident">num_as_exception</span>(<span class="ident">number</span>),
-            <span class="ident">ctx</span>
-        );
-    }
-    <span class="kw">if</span> <span class="ident">number</span> <span class="op">==</span> <span class="number">32</span> {
-        <span class="kw">if</span> <span class="ident">current_processor</span>().<span class="ident">is_bsp</span>() {
-            <span class="ident">lapic::send_ipi</span>(<span class="ident">Destination::AllButSelf</span>, <span class="number">32</span>);
+        <span class="number">0x80</span> =&gt; {}
+        <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">240</span> =&gt; {
+            <span class="ident">lapic::lapic_interrupt</span>(<span class="ident">number</span> <span class="kw">as</span> <span class="ident">u16</span>);
         }
-        <span class="ident"><span class="kw">super</span>::pit::timer_interrupt</span>();
-    }
-    <span class="kw">if</span> <span class="ident">number</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">240</span> {
-        <span class="ident">lapic::lapic_interrupt</span>(<span class="ident">number</span> <span class="kw">as</span> <span class="ident">u16</span>);
+        <span class="number">34</span> =&gt; {
+            <span class="comment">// TODO (urgent): why is this being raised?</span>
+        }
+        <span class="number">36</span> =&gt; {
+            <span class="ident"><span class="kw">crate</span>::machine::serial::interrupt_handler</span>();
+        }
+        <span class="kw">_</span> =&gt; <span class="ident"><span class="kw">crate</span>::interrupt::external_interrupt_entry</span>(<span class="ident">number</span> <span class="kw">as</span> <span class="ident">u32</span>),
     }
     <span class="ident">lapic::eoi</span>();
     <span class="ident"><span class="kw">crate</span>::interrupt::post_interrupt</span>();

@@ -61,9 +61,29 @@
 <span id="60">60</span>
 <span id="61">61</span>
 <span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">clock::Nanoseconds</span>, <span class="ident">thread::current_thread_ref</span>, <span class="ident">BootInfo</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">clock::Nanoseconds</span>,
+    <span class="ident">interrupt</span>::{<span class="ident">Destination</span>, <span class="ident">PinPolarity</span>, <span class="ident">TriggerMode</span>},
+    <span class="ident">thread::current_thread_ref</span>,
+    <span class="ident">BootInfo</span>,
+};
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">acpi</span>;
 <span class="kw">mod</span> <span class="ident">desctables</span>;
@@ -123,6 +143,16 @@
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lapic::schedule_oneshot_tick</span>;
 <span class="kw">use</span> <span class="ident">x86_64</span>::{<span class="ident">registers::segmentation::Segment64</span>, <span class="ident">VirtAddr</span>};
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_interrupt</span>(
+    <span class="ident">num</span>: <span class="ident">u32</span>,
+    <span class="ident">masked</span>: <span class="ident">bool</span>,
+    <span class="ident">trigger</span>: <span class="ident">TriggerMode</span>,
+    <span class="ident">polarity</span>: <span class="ident">PinPolarity</span>,
+    <span class="ident">destination</span>: <span class="ident">Destination</span>,
+) {
+    <span class="ident">ioapic::set_interrupt</span>(<span class="ident">num</span> <span class="op">-</span> <span class="number">32</span>, <span class="ident">num</span>, <span class="ident">masked</span>, <span class="ident">trigger</span>, <span class="ident">polarity</span>, <span class="ident">destination</span>);
+}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_kernel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
 </body></html>

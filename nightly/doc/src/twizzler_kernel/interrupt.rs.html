@@ -49,6 +49,10 @@
 <span id="48">48</span>
 <span id="49">49</span>
 <span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::arch</span>::{<span class="self">self</span>, <span class="ident">interrupt::InterProcessorInterrupt</span>};
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -98,6 +102,10 @@
     <span class="ident">LowestPriority</span>,
     <span class="ident">AllButSelf</span>,
     <span class="ident">All</span>,
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">external_interrupt_entry</span>(<span class="ident">_number</span>: <span class="ident">u32</span>) {
+    <span class="comment">//logln!(&quot;external device interrupt {}&quot;, number);</span>
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_kernel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>

@@ -267,6 +267,9 @@
 <span id="266">266</span>
 <span id="267">267</span>
 <span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">lang_items</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm</span>)]</span>
@@ -502,6 +505,9 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
     <span class="macro">println!</span>(<span class="string">&quot;Hello, World {}&quot;</span>, <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> });
 
     <span class="ident">test_load_elf</span>();
+    <span class="kw">loop</span> {
+        <span class="ident">get_user_input</span>();
+    }
     <span class="kw">if</span> <span class="bool-val">false</span> {
         <span class="ident">test_kaction</span>();
         <span class="ident">get_user_input</span>();

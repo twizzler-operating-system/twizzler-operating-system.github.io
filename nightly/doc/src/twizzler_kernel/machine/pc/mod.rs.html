@@ -5,10 +5,12 @@
 <span id="4">4</span>
 <span id="5">5</span>
 <span id="6">6</span>
+<span id="7">7</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">pcie</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serial</span>;
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">machine_post_init</span>() {
+    <span class="ident">serial::late_init</span>();
     <span class="ident">pcie::init</span>();
 }
 </code></pre></div>
