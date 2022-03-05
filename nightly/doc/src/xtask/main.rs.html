@@ -1236,7 +1236,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">run_cmd</span> <span class="op">=</span> <span class="ident">Command::new</span>(<span class="string">&quot;qemu-system-x86_64&quot;</span>);
     <span class="ident">run_cmd</span>.<span class="ident">arg</span>(<span class="string">&quot;-m&quot;</span>).<span class="ident">arg</span>(<span class="string">&quot;1024,slots=4,maxmem=8G&quot;</span>);
     <span class="ident">run_cmd</span>.<span class="ident">arg</span>(<span class="string">&quot;-bios&quot;</span>).<span class="ident">arg</span>(<span class="string">&quot;/usr/share/qemu/OVMF.fd&quot;</span>);
-    <span class="comment">//run_cmd.arg(&quot;-smp&quot;).arg(&quot;4,sockets=1,cores=2,threads=2&quot;);</span>
+    <span class="ident">run_cmd</span>.<span class="ident">arg</span>(<span class="string">&quot;-smp&quot;</span>).<span class="ident">arg</span>(<span class="string">&quot;4,sockets=1,cores=2,threads=2&quot;</span>);
     <span class="ident">run_cmd</span>.<span class="ident">arg</span>(<span class="string">&quot;-drive&quot;</span>).<span class="ident">arg</span>(<span class="macro">format!</span>(
         <span class="string">&quot;format=raw,file={}&quot;</span>,
         <span class="ident">make_path</span>(<span class="ident">build_info</span>, <span class="bool-val">true</span>, <span class="string">&quot;disk.img&quot;</span>)

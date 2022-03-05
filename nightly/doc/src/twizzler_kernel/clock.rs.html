@@ -253,6 +253,12 @@
 <span id="252">252</span>
 <span id="253">253</span>
 <span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">boxed::Box</span>, <span class="ident">vec::Vec</span>};
@@ -269,7 +275,6 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">statclock</span>(<span class="ident">dt</span>: <span class="ident">Nanoseconds</span>) {
     <span class="ident"><span class="kw">crate</span>::sched::schedule_stattick</span>(<span class="ident">dt</span>);
-    <span class="comment">//logln!(&quot;stat {} {}&quot;, current_processor().id, dt);</span>
 }
 
 <span class="kw">const</span> <span class="ident">NR_WINDOWS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
@@ -435,7 +440,7 @@
 
 <span class="comment">// TODO: we could make Nanoseconds an actual type, and Ticks, and then make type-safe conversions</span>
 <span class="comment">// between them.</span>
-<span class="kw">fn</span> <span class="ident">ticks_to_nano</span>(<span class="ident">ticks</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nanoseconds</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ticks_to_nano</span>(<span class="ident">ticks</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Nanoseconds</span><span class="op">&gt;</span> {
     <span class="ident">ticks</span>.<span class="ident">checked_mul</span>(<span class="number">1000000</span>)
 }
 
@@ -447,6 +452,13 @@
 <span class="kw">static</span> <span class="ident">NR_CPU_TICKS</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
 <span class="attribute">#[<span class="ident">thread_local</span>]</span>
 <span class="kw">static</span> <span class="ident">NEXT_TICK</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
+
+<span class="kw">static</span> <span class="ident">BSP_TICK</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_current_ticks</span>() -&gt; <span class="ident">u64</span> {
+    <span class="comment">// TODO: something real</span>
+    <span class="ident">BSP_TICK</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
+}
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schedule_oneshot_tick</span>(<span class="ident">next</span>: <span class="ident">u64</span>) {
     <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">ticks_to_nano</span>(<span class="ident">next</span>).<span class="ident">unwrap</span>();
@@ -472,6 +484,7 @@
     <span class="kw">let</span> <span class="ident">ticks</span> <span class="op">=</span> <span class="ident">NEXT_TICK</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
     <span class="ident">NR_CPU_TICKS</span>.<span class="ident">fetch_add</span>(<span class="ident">ticks</span>, <span class="ident">Ordering::SeqCst</span>);
     <span class="kw">let</span> <span class="ident">to_next_tick</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">current_processor</span>().<span class="ident">is_bsp</span>() {
+        <span class="ident">BSP_TICK</span>.<span class="ident">fetch_add</span>(<span class="ident">ticks</span>, <span class="ident">Ordering::SeqCst</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timeout_queue</span> <span class="op">=</span> <span class="ident">TIMEOUT_QUEUE</span>.<span class="ident">lock</span>();
         <span class="ident">timeout_queue</span>.<span class="ident">hard_advance</span>(<span class="ident">ticks</span> <span class="kw">as</span> <span class="ident">usize</span>);
         <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">timeout_queue</span>.<span class="ident">get_next_ticks</span>();
@@ -491,7 +504,6 @@
         to_next_tick
     );
     */</span>
-
     <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">core::cmp::min</span>(
         <span class="ident">to_next_tick</span>.<span class="ident">unwrap_or</span>(<span class="ident">u64::MAX</span>),
         <span class="ident">sched_next_tick</span>.<span class="ident">unwrap_or</span>(<span class="ident">u64::MAX</span>),

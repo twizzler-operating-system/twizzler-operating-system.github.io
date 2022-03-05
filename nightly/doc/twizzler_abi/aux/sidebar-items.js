@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["AuxEntry","Auxillary information provided to a new program on runtime entry."]]});
+initSidebarItems({"enum":[["AuxEntry","Auxillary information provided to a new program on runtime entry."]],"fn":[["get_kernel_init_info",""]],"struct":[["KernelInitInfo",""],["KernelInitName",""]]});

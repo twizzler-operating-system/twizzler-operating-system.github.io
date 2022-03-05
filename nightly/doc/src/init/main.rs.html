@@ -270,12 +270,77 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">lang_items</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">naked_functions</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">thread_local</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">duration_constants</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
 <span class="comment">//#![no_main]</span>
 
 <span class="comment">/*
@@ -488,15 +553,26 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
     <span class="ident">enumerate_children</span>(<span class="number">0</span>, <span class="ident">id</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">test_load_elf</span>() {
+<span class="kw">fn</span> <span class="ident">exec</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">id</span>: <span class="ident">ObjID</span>, <span class="ident">argid</span>: <span class="ident">ObjID</span>) {
     <span class="kw">let</span> <span class="ident">env</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::env::vars</span>()
         .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">n</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, <span class="ident">n</span>, <span class="ident">v</span>))
         .<span class="ident">collect</span>();
     <span class="kw">let</span> <span class="ident">env_ref</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">env</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_str</span>().<span class="ident">as_bytes</span>()).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;test&quot;</span>.<span class="ident">as_bytes</span>(), <span class="string">&quot;foo&quot;</span>.<span class="ident">as_bytes</span>()];
-    <span class="kw">let</span> <span class="ident">_elf</span> <span class="op">=</span>
-        <span class="ident">twizzler_abi::load_elf::spawn_new_executable</span>(<span class="ident">ObjID::new_from_parts</span>(<span class="number">1</span>, <span class="number">2</span>), <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">env_ref</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">name</span>.<span class="ident">as_bytes</span>()];
+    <span class="kw">let</span> <span class="ident">argstr</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">argid</span>.<span class="ident">as_u128</span>());
+    <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">argstr</span>.<span class="ident">as_bytes</span>());
+    <span class="kw">let</span> <span class="ident">_elf</span> <span class="op">=</span> <span class="ident">twizzler_abi::load_elf::spawn_new_executable</span>(<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">env_ref</span>);
     <span class="comment">//println!(&quot;ELF: {:?}&quot;, elf);</span>
+}
+
+<span class="kw">fn</span> <span class="ident">find_init_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjID</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">init_info</span> <span class="op">=</span> <span class="ident">twizzler_abi::aux::get_kernel_init_info</span>();
+    <span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="ident">init_info</span>.<span class="ident">names</span>() {
+        <span class="kw">if</span> <span class="ident">n</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span> {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">n</span>.<span class="ident">id</span>());
+        }
+    }
+    <span class="prelude-val">None</span>
 }
 
 <span class="kw">fn</span> <span class="ident">main</span>() {
@@ -504,9 +580,61 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
     <span class="kw">let</span> <span class="ident">_foo</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> };
     <span class="macro">println!</span>(<span class="string">&quot;Hello, World {}&quot;</span>, <span class="kw">unsafe</span> { <span class="ident">FOO</span> <span class="op">+</span> <span class="ident">BAR</span> });
 
-    <span class="ident">test_load_elf</span>();
+    <span class="kw">let</span> <span class="ident">create</span> <span class="op">=</span> <span class="ident">ObjectCreate::new</span>(
+        <span class="ident">BackingType::Normal</span>,
+        <span class="ident">LifetimeType::Volatile</span>,
+        <span class="prelude-val">None</span>,
+        <span class="ident">ObjectCreateFlags::empty</span>(),
+    );
+    <span class="kw">let</span> <span class="ident">netid</span> <span class="op">=</span> <span class="ident">twizzler_abi::syscall::sys_object_create</span>(<span class="ident">create</span>, <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]).<span class="ident">unwrap</span>();
+    <span class="comment">/*
+    if let Some(id) = find_init_name(&quot;devmgr&quot;) {
+        exec(&quot;devmgr&quot;, id, ObjID::new(0));
+    } else {
+        eprintln!(&quot;[init] failed to start devmgr&quot;);
+    }
+    */</span>
+    <span class="ident">std::env::set_var</span>(<span class="string">&quot;NETOBJ&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">netid</span>.<span class="ident">as_u128</span>()));
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">find_init_name</span>(<span class="string">&quot;netmgr&quot;</span>) {
+        <span class="ident">exec</span>(<span class="string">&quot;netmgr&quot;</span>, <span class="ident">id</span>, <span class="ident">netid</span>);
+    } <span class="kw">else</span> {
+        <span class="macro">eprintln!</span>(<span class="string">&quot;[init] failed to start netmgr&quot;</span>);
+    }
+
+    <span class="macro">println!</span>(<span class="string">&quot;waiting for network manager to come up&quot;</span>);
+    <span class="ident">twizzler_net::wait_until_network_manager_ready</span>(<span class="ident">netid</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;network manager is up!&quot;</span>);
+
+    <span class="macro">println!</span>(<span class="string">&quot;Hi, welcome to the basic twizzler test console.&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;If you wanted line-editing, you&#39;ve come to the wrong place.&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;A couple commands you can run:&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;   - &#39;nt&#39;: Run the nettest program&quot;</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;... and that&#39;s it, but you can add your OWN things with the magic of PROGRAMMING.&quot;</span>);
     <span class="kw">loop</span> {
-        <span class="ident">get_user_input</span>();
+        <span class="kw">let</span> <span class="ident">reply</span> <span class="op">=</span> <span class="ident">rprompt::prompt_reply_stdout</span>(<span class="string">&quot;&gt; &quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">println!</span>(<span class="string">&quot;got: &lt;{}&gt;&quot;</span>, <span class="ident">reply</span>);
+        <span class="kw">let</span> <span class="ident">cmd</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">reply</span>.<span class="ident">split</span>(<span class="string">&quot; &quot;</span>).<span class="ident">collect</span>();
+        <span class="kw">if</span> <span class="ident">cmd</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">cmd</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">&quot;run&quot;</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">find_init_name</span>(<span class="ident">cmd</span>[<span class="number">1</span>]) {
+                <span class="kw">if</span> <span class="ident">cmd</span>[<span class="number">1</span>] <span class="op">==</span> <span class="string">&quot;nettest&quot;</span> {
+                    <span class="ident">exec</span>(<span class="ident">cmd</span>[<span class="number">1</span>], <span class="ident">id</span>, <span class="ident">netid</span>);
+                } <span class="kw">else</span> {
+                    <span class="ident">exec</span>(<span class="ident">cmd</span>[<span class="number">1</span>], <span class="ident">id</span>, <span class="ident">ObjID::new</span>(<span class="number">0</span>));
+                }
+            } <span class="kw">else</span> {
+                <span class="macro">eprintln!</span>(<span class="string">&quot;[init] failed to start {}&quot;</span>, <span class="ident">cmd</span>[<span class="number">1</span>]);
+            }
+        }
+
+        <span class="kw">if</span> <span class="ident">cmd</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">cmd</span>[<span class="number">0</span>] <span class="op">==</span> <span class="string">&quot;nt&quot;</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">find_init_name</span>(<span class="string">&quot;nettest&quot;</span>) {
+                <span class="ident">exec</span>(<span class="string">&quot;nettest&quot;</span>, <span class="ident">id</span>, <span class="ident">netid</span>);
+            } <span class="kw">else</span> {
+                <span class="macro">eprintln!</span>(<span class="string">&quot;[init] failed to start nettest&quot;</span>);
+            }
+        }
+
+        <span class="comment">//  get_user_input();</span>
     }
     <span class="kw">if</span> <span class="bool-val">false</span> {
         <span class="ident">test_kaction</span>();
@@ -537,8 +665,8 @@ extern &quot;C&quot; fn _start() -&gt; ! {
     <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>, <span class="ident">KactionValue</span>},
     <span class="ident">object::ObjID</span>,
     <span class="ident">syscall</span>::{
-        <span class="ident">sys_kaction</span>, <span class="ident">sys_thread_sync</span>, <span class="ident">ThreadSync</span>, <span class="ident">ThreadSyncFlags</span>, <span class="ident">ThreadSyncReference</span>,
-        <span class="ident">ThreadSyncSleep</span>, <span class="ident">ThreadSyncWake</span>,
+        <span class="ident">sys_kaction</span>, <span class="ident">sys_thread_sync</span>, <span class="ident">BackingType</span>, <span class="ident">LifetimeType</span>, <span class="ident">ObjectCreate</span>, <span class="ident">ObjectCreateFlags</span>,
+        <span class="ident">ThreadSync</span>, <span class="ident">ThreadSyncFlags</span>, <span class="ident">ThreadSyncReference</span>, <span class="ident">ThreadSyncSleep</span>, <span class="ident">ThreadSyncWake</span>,
     },
 };
 </code></pre></div>

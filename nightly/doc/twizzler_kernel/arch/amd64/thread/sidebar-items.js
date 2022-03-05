@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["XSAVE_LEN",""]],"fn":[["__do_switch",""]],"struct":[["AlignedXsaveRegion",""],["ArchThread",""]]});
+initSidebarItems({"constant":[["XSAVE_LEN",""]],"enum":[["Registers",""]],"fn":[["__do_switch",""],["set_upcall",""]],"struct":[["AlignedXsaveRegion",""],["ArchThread",""],["Context",""]],"trait":[["UpcallAble",""]]});

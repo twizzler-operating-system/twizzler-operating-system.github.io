@@ -1032,8 +1032,62 @@
 <span id="1031">1031</span>
 <span id="1032">1032</span>
 <span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
+<span id="1041">1041</span>
+<span id="1042">1042</span>
+<span id="1043">1043</span>
+<span id="1044">1044</span>
+<span id="1045">1045</span>
+<span id="1046">1046</span>
+<span id="1047">1047</span>
+<span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
+<span id="1053">1053</span>
+<span id="1054">1054</span>
+<span id="1055">1055</span>
+<span id="1056">1056</span>
+<span id="1057">1057</span>
+<span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>;
 
+<span class="kw">use</span> <span class="ident">twizzler_abi::upcall</span>::{<span class="ident">ExceptionInfo</span>, <span class="ident">UpcallFrame</span>, <span class="ident">UpcallInfo</span>};
 <span class="kw">use</span> <span class="ident">x86::current::rflags::RFlags</span>;
 <span class="kw">use</span> <span class="ident">x86_64</span>::{<span class="ident">instructions::segmentation::Segment64</span>, <span class="ident">VirtAddr</span>};
 
@@ -1045,7 +1099,11 @@
     <span class="ident">thread::current_thread_ref</span>,
 };
 
-<span class="kw">struct</span> <span class="ident">IsrContext</span> {
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::thread</span>::{<span class="ident">Registers</span>, <span class="ident">UpcallAble</span>};
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IsrContext</span> {
     <span class="ident">r15</span>: <span class="ident">u64</span>,
     <span class="ident">r14</span>: <span class="ident">u64</span>,
     <span class="ident">r13</span>: <span class="ident">u64</span>,
@@ -1067,6 +1125,44 @@
     <span class="ident">rflags</span>: <span class="ident">u64</span>,
     <span class="ident">rsp</span>: <span class="ident">u64</span>,
     <span class="ident">ss</span>: <span class="ident">u64</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">UpcallAble</span> <span class="kw">for</span> <span class="ident">IsrContext</span> {
+    <span class="kw">fn</span> <span class="ident">set_upcall</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">usize</span>, <span class="ident">frame</span>: <span class="ident">u64</span>, <span class="ident">info</span>: <span class="ident">u64</span>, <span class="ident">stack</span>: <span class="ident">u64</span>) {
+        <span class="self">self</span>.<span class="ident">rip</span> <span class="op">=</span> <span class="ident">target</span> <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="self">self</span>.<span class="ident">rdi</span> <span class="op">=</span> <span class="ident">frame</span>;
+        <span class="self">self</span>.<span class="ident">rsi</span> <span class="op">=</span> <span class="ident">info</span>;
+        <span class="self">self</span>.<span class="ident">rsp</span> <span class="op">=</span> <span class="ident">stack</span>;
+    }
+
+    <span class="kw">fn</span> <span class="ident">get_stack_top</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
+        <span class="self">self</span>.<span class="ident">rsp</span>
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IsrContext</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UpcallFrame</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">int</span>: <span class="ident">IsrContext</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">rip</span>: <span class="ident">int</span>.<span class="ident">rip</span>,
+            <span class="ident">rflags</span>: <span class="ident">int</span>.<span class="ident">rflags</span>,
+            <span class="ident">rsp</span>: <span class="ident">int</span>.<span class="ident">rsp</span>,
+            <span class="ident">rbp</span>: <span class="ident">int</span>.<span class="ident">rbp</span>,
+            <span class="ident">rax</span>: <span class="ident">int</span>.<span class="ident">rax</span>,
+            <span class="ident">rbx</span>: <span class="ident">int</span>.<span class="ident">rbx</span>,
+            <span class="ident">rcx</span>: <span class="ident">int</span>.<span class="ident">rcx</span>,
+            <span class="ident">rdx</span>: <span class="ident">int</span>.<span class="ident">rdx</span>,
+            <span class="ident">rdi</span>: <span class="ident">int</span>.<span class="ident">rdi</span>,
+            <span class="ident">rsi</span>: <span class="ident">int</span>.<span class="ident">rsi</span>,
+            <span class="ident">r8</span>: <span class="ident">int</span>.<span class="ident">r8</span>,
+            <span class="ident">r9</span>: <span class="ident">int</span>.<span class="ident">r9</span>,
+            <span class="ident">r10</span>: <span class="ident">int</span>.<span class="ident">r10</span>,
+            <span class="ident">r11</span>: <span class="ident">int</span>.<span class="ident">r11</span>,
+            <span class="ident">r12</span>: <span class="ident">int</span>.<span class="ident">r12</span>,
+            <span class="ident">r13</span>: <span class="ident">int</span>.<span class="ident">r13</span>,
+            <span class="ident">r14</span>: <span class="ident">int</span>.<span class="ident">r14</span>,
+            <span class="ident">r15</span>: <span class="ident">int</span>.<span class="ident">r15</span>,
+        }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">IsrContext</span> {
@@ -1109,11 +1205,14 @@
     <span class="kw">if</span> <span class="ident">user</span> {
         <span class="ident">x86_64::registers::segmentation::FS::write_base</span>(<span class="ident">VirtAddr::new</span>(<span class="ident">kernel_fs</span>));
         <span class="ident">x86::msr::wrmsr</span>(<span class="ident">x86::msr::IA32_FS_BASE</span>, <span class="ident">kernel_fs</span>);
+        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();
+        <span class="ident">t</span>.<span class="ident">set_entry_registers</span>(<span class="ident">Registers::Interrupt</span>(<span class="ident">ctx</span>, <span class="kw-2">*</span><span class="ident">ctx</span>));
     }
     <span class="ident">generic_isr_handler</span>(<span class="ident">ctx</span>, <span class="ident">number</span>, <span class="ident">user</span>);
 
     <span class="kw">if</span> <span class="ident">user</span> {
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();
+        <span class="ident">t</span>.<span class="ident">set_entry_registers</span>(<span class="ident">Registers::None</span>);
         <span class="kw">let</span> <span class="ident">user_fs</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">arch</span>.<span class="ident">user_fs</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
         <span class="ident">x86_64::registers::segmentation::FS::write_base</span>(<span class="ident">VirtAddr::new</span>(<span class="ident">user_fs</span>));
         <span class="ident">x86::msr::wrmsr</span>(<span class="ident">x86::msr::IA32_FS_BASE</span>, <span class="ident">user_fs</span>);
@@ -1368,7 +1467,7 @@
     <span class="kw">unsafe</span> { <span class="ident">core::intrinsics::transmute</span>(<span class="ident">n</span>) }
 }
 
-<span class="kw">fn</span> <span class="ident">generic_isr_handler</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">IsrContext</span>, <span class="ident">number</span>: <span class="ident">u64</span>, <span class="ident">_user</span>: <span class="ident">bool</span>) {
+<span class="kw">fn</span> <span class="ident">generic_isr_handler</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">IsrContext</span>, <span class="ident">number</span>: <span class="ident">u64</span>, <span class="ident">user</span>: <span class="ident">bool</span>) {
     <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">disable</span>());
     <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ctx</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>() };
     <span class="kw">if</span> <span class="ident">number</span> <span class="op">==</span> <span class="ident">Exception::DoubleFault</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">|</span><span class="op">|</span> <span class="ident">number</span> <span class="op">==</span> <span class="ident">Exception::MachineCheck</span> <span class="kw">as</span> <span class="ident">u64</span> {
@@ -1415,11 +1514,18 @@
             <span class="ident"><span class="kw">crate</span>::thread::exit_kernel</span>();
         }
         <span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">32</span> =&gt; {
-            <span class="macro">panic!</span>(
-                <span class="string">&quot;caught unhandled exception {:?}: {:#?}&quot;</span>,
-                <span class="ident">num_as_exception</span>(<span class="ident">number</span>),
-                <span class="ident">ctx</span>
-            );
+            <span class="kw">if</span> <span class="ident">user</span> {
+                <span class="macro">logln!</span>(<span class="string">&quot;user exception {:#?} {:x}&quot;</span>, <span class="ident">ctx</span>, <span class="ident">ctx</span>.<span class="ident">rsp</span>);
+                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();
+                <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">UpcallInfo::Exception</span>(<span class="ident">ExceptionInfo::new</span>(<span class="ident">n</span>, <span class="ident">ctx</span>.<span class="ident">err</span>));
+                <span class="ident">t</span>.<span class="ident">send_upcall</span>(<span class="ident">info</span>);
+            } <span class="kw">else</span> {
+                <span class="macro">panic!</span>(
+                    <span class="string">&quot;caught unhandled exception {:?}: {:#?}&quot;</span>,
+                    <span class="ident">num_as_exception</span>(<span class="ident">number</span>),
+                    <span class="ident">ctx</span>
+                );
+            }
         }
         <span class="number">32</span> =&gt; {
             <span class="kw">if</span> <span class="ident">current_processor</span>().<span class="ident">is_bsp</span>() {

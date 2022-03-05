@@ -168,6 +168,28 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::time::Duration</span>;
 
 <span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">collections::BTreeMap</span>, <span class="ident">vec::Vec</span>};
@@ -253,6 +275,19 @@
 
 <span class="kw">fn</span> <span class="ident">prep_sleep</span>(<span class="ident">sleep</span>: <span class="kw-2">&amp;</span><span class="ident">ThreadSyncSleep</span>, <span class="ident">first_sleep</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SleepEvent</span>, <span class="ident">ThreadSyncError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">obj</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">get_obj</span>(<span class="ident">sleep</span>.<span class="ident">reference</span>)<span class="question-mark">?</span>;
+    <span class="comment">/* 
+    logln!(
+        &quot;{} sleep {} {:x}&quot;,
+        current_thread_ref().unwrap().id(),
+        obj.id(),
+        offset
+    );
+    if let ThreadSyncReference::Virtual(p) = &amp;sleep.reference {
+        logln!(&quot;  =&gt; {:p} {}&quot;, *p, unsafe {
+            (**p).load(core::sync::atomic::Ordering::SeqCst)
+        });
+    }
+    */</span>
     <span class="kw">let</span> <span class="ident">did_sleep</span> <span class="op">=</span> <span class="ident">obj</span>.<span class="ident">setup_sleep_word</span>(<span class="ident">offset</span>, <span class="ident">sleep</span>.<span class="ident">op</span>, <span class="ident">sleep</span>.<span class="ident">value</span>, <span class="ident">first_sleep</span>);
     <span class="prelude-val">Ok</span>(<span class="ident">SleepEvent</span> {
         <span class="ident">obj</span>,
@@ -298,17 +333,26 @@
                 }
                 <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; <span class="kw-2">*</span><span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">x</span>),
             },
-            <span class="ident">ThreadSync::Wake</span>(<span class="ident">wake</span>, <span class="ident">result</span>) =&gt; <span class="kw">match</span> <span class="ident">wakeup</span>(<span class="ident">wake</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">count</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="ident">count</span>);
-                    <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="ident">ready_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="ident">ThreadSync::Wake</span>(<span class="ident">wake</span>, <span class="ident">result</span>) =&gt; {
+                <span class="comment">/*
+                if let ThreadSyncReference::Virtual(p) = &amp;wake.reference {
+                    logln!(&quot; wake =&gt; {:p} {}&quot;, *p, unsafe {
+                        (**p).load(core::sync::atomic::Ordering::SeqCst)
+                    });
+                }
+                */</span>
+                <span class="kw">match</span> <span class="ident">wakeup</span>(<span class="ident">wake</span>) {
+                    <span class="prelude-val">Ok</span>(<span class="ident">count</span>) =&gt; {
+                        <span class="kw-2">*</span><span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="ident">count</span>);
+                        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                            <span class="ident">ready_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                        }
+                    }
+                    <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; {
+                        <span class="kw-2">*</span><span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">x</span>);
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">x</span>) =&gt; {
-                    <span class="kw-2">*</span><span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Err</span>(<span class="ident">x</span>);
-                }
-            },
+            }
         }
     }
     <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>();

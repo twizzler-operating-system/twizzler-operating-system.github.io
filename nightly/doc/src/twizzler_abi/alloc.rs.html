@@ -231,6 +231,22 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Global allocation. Used by the Rust standard library as the global allocator. Similar to</span>
 <span class="doccomment">//! malloc() and friends.</span>
 <span class="doccomment">//!</span>
@@ -247,7 +263,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">llalloc::Heap</span>,
     <span class="ident">object::Protections</span>,
-    <span class="ident">simple_mutex::Mutex</span>,
+    <span class="ident">slot::get_context_object_mut</span>,
     <span class="ident">syscall</span>::{
         <span class="ident">sys_object_create</span>, <span class="ident">sys_object_map</span>, <span class="ident">BackingType</span>, <span class="ident">LifetimeType</span>, <span class="ident">MapFlags</span>, <span class="ident">ObjectCreate</span>,
         <span class="ident">ObjectCreateFlags</span>,
@@ -255,7 +271,7 @@
 };
 
 <span class="kw">const</span> <span class="ident">NR_SLOTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
-<span class="kw">struct</span> <span class="ident">TwzGlobalAlloc</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TwzGlobalAlloc</span> {
     <span class="ident">initial_slot</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AllocSlot</span><span class="op">&gt;</span>,
     <span class="ident">other_slots</span>: [<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AllocSlot</span><span class="op">&gt;</span>; <span class="ident">NR_SLOTS</span>],
     <span class="ident">slot_counter</span>: <span class="ident">usize</span>,
@@ -396,8 +412,8 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">TwzGlobalAlloc</span> {}
 <span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">TwzGlobalAlloc</span> {}
 
-<span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">TGA</span>: <span class="ident">TwzGlobalAlloc</span> <span class="op">=</span> <span class="ident">TwzGlobalAlloc::new</span>();
-<span class="kw">static</span> <span class="ident">TGA_LOCK</span>: <span class="ident">Mutex</span> <span class="op">=</span> <span class="ident">Mutex::new</span>();
+<span class="comment">//static mut TGA: TwzGlobalAlloc = TwzGlobalAlloc::new();</span>
+<span class="comment">//static TGA_LOCK: Mutex = Mutex::new();</span>
 
 <span class="kw">fn</span> <span class="ident">adj_layout</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="ident">Layout</span> {
     <span class="ident"><span class="kw">crate</span>::internal_unwrap</span>(
@@ -413,9 +429,24 @@
 <span class="doccomment">/// The caller must ensure that the returned memory is freed at the right time.</span>
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">global_alloc</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">u8</span> {
     <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">adj_layout</span>(<span class="ident">layout</span>);
-    <span class="ident">TGA_LOCK</span>.<span class="ident">lock</span>();
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">TGA</span>.<span class="ident">allocate</span>(<span class="ident">layout</span>);
-    <span class="ident">TGA_LOCK</span>.<span class="ident">unlock</span>();
+    <span class="comment">/*
+    let mut sz = layout.size();
+    crate::syscall::sys_kernel_console_write(
+        b&quot;ALLOC: &quot;,
+        crate::syscall::KernelConsoleWriteFlags::empty(),
+    );
+    while sz &gt; 0 {
+        crate::syscall::sys_kernel_console_write(
+            &amp;[(sz &amp; 0xf) as u8 + b&#39;a&#39;, 0],
+            crate::syscall::KernelConsoleWriteFlags::empty(),
+        );
+        sz = sz &gt;&gt; 4;
+    }
+    */</span>
+    <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">get_context_object_mut</span>();
+    <span class="ident">ctx</span>.<span class="ident">alloc_lock</span>.<span class="ident">lock</span>();
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">global_alloc</span>.<span class="ident">allocate</span>(<span class="ident">layout</span>);
+    <span class="ident">ctx</span>.<span class="ident">alloc_lock</span>.<span class="ident">unlock</span>();
     <span class="ident">res</span>
 }
 
@@ -433,9 +464,10 @@
     <span class="kw">if</span> <span class="ident">ptr</span>.<span class="ident">is_null</span>() {
         <span class="kw">return</span>;
     }
-    <span class="ident">TGA_LOCK</span>.<span class="ident">lock</span>();
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">TGA</span>.<span class="ident">free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
-    <span class="ident">TGA_LOCK</span>.<span class="ident">unlock</span>();
+    <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">get_context_object_mut</span>();
+    <span class="ident">ctx</span>.<span class="ident">alloc_lock</span>.<span class="ident">lock</span>();
+    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">global_alloc</span>.<span class="ident">free</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
+    <span class="ident">ctx</span>.<span class="ident">alloc_lock</span>.<span class="ident">unlock</span>();
     <span class="ident">res</span>
 }
 

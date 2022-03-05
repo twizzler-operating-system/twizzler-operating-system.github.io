@@ -159,6 +159,10 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Low-level object APIs, mostly around IDs and basic things like protection definitions and metadata.</span>
 
 <span class="kw">use</span> <span class="ident">core</span>::{
@@ -191,6 +195,10 @@
     <span class="doccomment">/// Build a new ObjID out of a high part and a low part.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_parts</span>(<span class="ident">hi</span>: <span class="ident">u64</span>, <span class="ident">lo</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ObjID::new</span>(((<span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">64</span>) <span class="op">|</span> (<span class="ident">lo</span> <span class="kw">as</span> <span class="ident">u128</span>))
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_u128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u128</span> {
+        <span class="self">self</span>.<span class="number">0</span>
     }
 }
 

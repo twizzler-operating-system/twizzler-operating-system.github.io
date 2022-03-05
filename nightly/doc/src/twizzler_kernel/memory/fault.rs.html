@@ -101,6 +101,10 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -153,6 +157,10 @@
         <span class="kw">let</span> <span class="ident">page_number</span> <span class="op">=</span> <span class="ident">PageNumber::from_address</span>(<span class="ident">addr</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj_page_tree</span> <span class="op">=</span> <span class="ident">mapping</span>.<span class="ident">obj</span>.<span class="ident">lock_page_tree</span>();
         <span class="kw">let</span> <span class="ident">is_write</span> <span class="op">=</span> <span class="ident">cause</span> <span class="op">==</span> <span class="ident">PageFaultCause::Write</span>;
+
+        <span class="kw">if</span> <span class="ident">page_number</span> <span class="op">==</span> <span class="ident">PageNumber::from_address</span>(<span class="ident">VirtAddr::new</span>(<span class="number">0</span>)) {
+            <span class="macro">panic!</span>(<span class="string">&quot;zero-page fault {:?} ip: {:?} cause {:?}&quot;</span>, <span class="ident">addr</span>, <span class="ident">ip</span>, <span class="ident">cause</span>);
+        }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">page</span>, <span class="ident">cow</span>)) <span class="op">=</span> <span class="ident">obj_page_tree</span>.<span class="ident">get_page</span>(<span class="ident">page_number</span>, <span class="ident">is_write</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vmc</span> <span class="op">=</span> <span class="ident">vmc</span>.<span class="ident">inner</span>();

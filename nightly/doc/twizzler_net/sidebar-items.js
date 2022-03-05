@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["RxCompletion",""],["RxRequest",""],["TxCompletion",""],["TxRequest",""]],"fn":[["is_network_manager_ready",""],["open_nm_handle",""],["server_open_nm_handle",""],["wait_until_network_manager_ready",""]],"mod":[["addr",""],["buffer",""]],"struct":[["NmHandle",""],["NmHandleManager",""],["NmOpenObjects",""]]});

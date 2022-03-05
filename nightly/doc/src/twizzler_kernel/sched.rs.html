@@ -1083,7 +1083,7 @@
         <span class="kw">if</span> <span class="ident">cp</span>.<span class="ident">id</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">all_threads</span> <span class="op">=</span> <span class="ident">ALL_THREADS</span>.<span class="ident">lock</span>();
             <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">all_threads</span>.<span class="ident">values</span>() {
-                <span class="macro">logln!</span>(<span class="string">&quot;thread {}: {:?}&quot;</span>, <span class="ident">t</span>.<span class="ident">id</span>(), <span class="ident">t</span>.<span class="ident">stats</span>);
+                <span class="macro">logln!</span>(<span class="string">&quot;thread {}: {:?} {:?}&quot;</span>, <span class="ident">t</span>.<span class="ident">id</span>(), <span class="ident">t</span>.<span class="ident">stats</span>, <span class="ident">t</span>.<span class="ident">state</span>);
             }
         }
         <span class="comment">//crate::clock::print_info();</span>

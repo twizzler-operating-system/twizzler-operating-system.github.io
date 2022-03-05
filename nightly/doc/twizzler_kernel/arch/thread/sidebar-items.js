@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["ArchThread",""]]});
+initSidebarItems({"enum":[["Registers",""]],"fn":[["set_upcall",""]],"struct":[["ArchThread",""]],"trait":[["UpcallAble",""]]});

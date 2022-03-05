@@ -74,17 +74,32 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Manage slots in the address space. Currently not finished.</span>
 
 <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">alloc::TwzGlobalAlloc</span>,
     <span class="ident">object::Protections</span>,
     <span class="ident">syscall</span>::{<span class="ident">MapFlags</span>, <span class="ident">ObjectCreate</span>, <span class="ident">ObjectCreateFlags</span>},
 };
 
-<span class="kw">struct</span> <span class="ident">Context</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Context</span> {
     <span class="ident">next_slot</span>: <span class="ident">AtomicUsize</span>,
+    <span class="kw">pub</span> <span class="ident">alloc_lock</span>: <span class="ident"><span class="kw">crate</span>::simple_mutex::Mutex</span>,
+    <span class="kw">pub</span> <span class="ident">global_alloc</span>: <span class="ident">TwzGlobalAlloc</span>,
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
@@ -93,12 +108,19 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RESERVED_DATA</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RESERVED_STACK</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RESERVED_KERNEL_INIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
 <span class="kw">const</span> <span class="ident">RESERVED_CTX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">7</span>;
 <span class="kw">const</span> <span class="ident">ALLOC_START</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
 
-<span class="kw">fn</span> <span class="ident">get_context_object</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Context</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_context_object</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Context</span> {
     <span class="kw">let</span> (<span class="ident">start</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">to_vaddr_range</span>(<span class="ident">RESERVED_CTX</span>);
-    <span class="kw">unsafe</span> { (<span class="ident">start</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Context</span>).<span class="ident">as_ref</span>().<span class="ident">unwrap</span>() }
+    (<span class="ident">start</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Context</span>).<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_context_object_mut</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">Context</span> {
+    <span class="kw">let</span> (<span class="ident">start</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">to_vaddr_range</span>(<span class="ident">RESERVED_CTX</span>);
+    (<span class="ident">start</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Context</span>).<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">runtime_init</span>() {
@@ -129,13 +151,15 @@
             <span class="ident"><span class="kw">crate</span>::internal_abort</span>();
         }
     }
-    <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">get_context_object</span>();
+    <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">get_context_object_mut</span>() };
     <span class="ident">context</span>.<span class="ident">next_slot</span>.<span class="ident">store</span>(<span class="ident">ALLOC_START</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="ident">context</span>.<span class="ident">alloc_lock</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::simple_mutex::Mutex::new</span>();
+    <span class="ident">context</span>.<span class="ident">global_alloc</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::alloc::TwzGlobalAlloc::new</span>();
 }
 
 <span class="doccomment">/// Allocate a slot in the address space where we could map a new object.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">global_allocate</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">get_context_object</span>();
+    <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">get_context_object</span>() };
     <span class="prelude-val">Some</span>(<span class="ident">context</span>.<span class="ident">next_slot</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>))
 }
 

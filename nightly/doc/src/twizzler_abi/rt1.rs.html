@@ -227,6 +227,7 @@
 <span id="226">226</span>
 <span id="227">227</span>
 <span id="228">228</span>
+<span id="229">229</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Runtime functions for Twizzler userspace. This part of the code is a bit arcane and somewhat</span>
 <span class="doccomment">//! tricky, so buckle up.</span>
 <span class="doccomment">//!</span>
@@ -341,7 +342,7 @@
                     <span class="op">&amp;</span> ((<span class="op">!</span><span class="ident">MIN_TLS_ALIGN</span>) <span class="op">+</span> <span class="number">1</span>);
 
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::internal_unwrap</span>(
-                <span class="ident">Layout::from_size_align</span>(<span class="ident">full_tls_size</span>, <span class="ident">MIN_TLS_ALIGN</span>).<span class="ident">ok</span>(),
+                <span class="ident">Layout::from_size_align</span>(<span class="ident">full_tls_size</span>, <span class="ident">tls_align</span>).<span class="ident">ok</span>(),
                 <span class="string">&quot;failed to unwrap TLS layout&quot;</span>,
             );
             <span class="kw">let</span> <span class="ident">tls</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::alloc::global_alloc</span>(<span class="ident">layout</span>);
@@ -422,6 +423,7 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tls</span>) <span class="op">=</span> <span class="ident">tls</span> {
         <span class="ident"><span class="kw">crate</span>::syscall::sys_thread_settls</span>(<span class="ident">tls</span>);
     }
+    <span class="ident"><span class="kw">crate</span>::syscall::sys_thread_set_upcall</span>(<span class="ident"><span class="kw">crate</span>::arch::upcall::upcall_entry</span>);
 
     <span class="kw">unsafe</span> {
         <span class="comment">// Run preinit array</span>

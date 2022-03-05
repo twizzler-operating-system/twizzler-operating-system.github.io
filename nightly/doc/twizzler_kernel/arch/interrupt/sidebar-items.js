@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["InterProcessorInterrupt",""]],"fn":[["disable",""],["init_idt",""],["kernel_interrupt",""],["return_from_interrupt",""],["set",""],["user_interrupt",""]]});
+initSidebarItems({"enum":[["InterProcessorInterrupt",""]],"fn":[["disable",""],["init_idt",""],["kernel_interrupt",""],["return_from_interrupt",""],["set",""],["user_interrupt",""]],"struct":[["IsrContext",""]]});

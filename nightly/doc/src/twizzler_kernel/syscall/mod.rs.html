@@ -261,15 +261,49 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">mem::MaybeUninit</span>, <span class="ident">time::Duration</span>};
+
+<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
     <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionError</span>, <span class="ident">KactionValue</span>},
     <span class="ident">object</span>::{<span class="ident">ObjID</span>, <span class="ident">Protections</span>},
     <span class="ident">syscall</span>::{
-        <span class="ident">HandleType</span>, <span class="ident">KernelConsoleReadSource</span>, <span class="ident">ObjectCreateError</span>, <span class="ident">ObjectMapError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>,
-        <span class="ident">ThreadSpawnError</span>, <span class="ident">ThreadSyncError</span>,
+        <span class="ident">ClockFlags</span>, <span class="ident">ClockInfo</span>, <span class="ident">ClockSource</span>, <span class="ident">HandleType</span>, <span class="ident">KernelConsoleReadSource</span>, <span class="ident">ObjectCreateError</span>,
+        <span class="ident">ObjectMapError</span>, <span class="ident">ReadClockInfoError</span>, <span class="ident">SysInfo</span>, <span class="ident">Syscall</span>, <span class="ident">ThreadSpawnError</span>, <span class="ident">ThreadSyncError</span>,
     },
 };
 <span class="kw">use</span> <span class="ident">x86_64::VirtAddr</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::clock</span>::{<span class="ident">get_current_ticks</span>, <span class="ident">ticks_to_nano</span>};
 
 <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">object::sys_new_handle</span>, <span class="ident">thread::thread_ctrl</span>};
 
@@ -356,6 +390,27 @@
         <span class="prelude-val">Some</span>(<span class="ident">ObjID::new_from_parts</span>(<span class="ident">hi</span>, <span class="ident">lo</span>))
     };
     <span class="ident"><span class="kw">crate</span>::device::kaction</span>(<span class="ident">cmd</span>, <span class="ident">objid</span>, <span class="ident">arg</span>)
+}
+
+<span class="kw">fn</span> <span class="ident">type_read_clock_info</span>(<span class="ident">src</span>: <span class="ident">u64</span>, <span class="ident">info</span>: <span class="ident">u64</span>, <span class="ident">_flags</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">ReadClockInfoError</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">source</span>: <span class="ident">ClockSource</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">info_ptr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">ClockInfo</span><span class="op">&gt;</span> <span class="op">=</span>
+        <span class="kw">unsafe</span> { <span class="ident">create_user_ptr</span>(<span class="ident">info</span>) }.<span class="ident">ok_or</span>(<span class="ident">ReadClockInfoError::InvalidArgument</span>)<span class="question-mark">?</span>;
+
+    <span class="kw">match</span> <span class="ident">source</span> {
+        <span class="ident">ClockSource::Monotonic</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">ticks</span> <span class="op">=</span> <span class="ident">get_current_ticks</span>();
+            <span class="comment">//TODO</span>
+            <span class="kw">let</span> <span class="ident">dur</span> <span class="op">=</span> <span class="ident">Duration::from_nanos</span>(<span class="ident">ticks_to_nano</span>(<span class="ident">ticks</span>).<span class="ident">unwrap</span>());
+            <span class="kw">let</span> <span class="ident">precision</span> <span class="op">=</span> <span class="ident">Duration::from_nanos</span>(<span class="number">1000</span>); <span class="comment">//TODO</span>
+            <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">ClockFlags::MONOTONIC</span>;
+            <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">ClockSource::Monotonic</span>;
+            <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">ClockInfo::new</span>(<span class="ident">dur</span>, <span class="ident">precision</span>, <span class="ident">flags</span>, <span class="ident">source</span>);
+            <span class="ident">info_ptr</span>.<span class="ident">write</span>(<span class="ident">info</span>);
+            <span class="prelude-val">Ok</span>(<span class="number">0</span>)
+        }
+        <span class="ident">ClockSource::RealTime</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ReadClockInfoError::InvalidArgument</span>),
+    }
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -516,6 +571,11 @@
         }
         <span class="ident">Syscall::ThreadCtrl</span> =&gt; {
             <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">thread_ctrl</span>(<span class="ident">context</span>.<span class="ident">arg0</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">into</span>(), <span class="ident">context</span>.<span class="ident">arg1</span>());
+            <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
+        }
+        <span class="ident">Syscall::ReadClockInfo</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">type_read_clock_info</span>(<span class="ident">context</span>.<span class="ident">arg0</span>(), <span class="ident">context</span>.<span class="ident">arg1</span>(), <span class="ident">context</span>.<span class="ident">arg2</span>());
+            <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="ident">convert_result_to_codes</span>(<span class="ident">result</span>, <span class="ident">zero_ok</span>, <span class="ident">one_err</span>);
             <span class="ident">context</span>.<span class="ident">set_return_values</span>(<span class="ident">code</span>, <span class="ident">val</span>);
         }
         <span class="kw">_</span> =&gt; {

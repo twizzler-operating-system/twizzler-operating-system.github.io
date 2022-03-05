@@ -1,0 +1,67 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Support for asynchronous programming on Twizzler. This crate provides executor functionality along with support for async events and waiting, timers and timeouts, and a couple general helper functions."><meta name="keywords" content="rust, rustlang, rust-lang, twizzler_async"><title>twizzler_async - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css"disabled><link rel="stylesheet" type="text/css" href="../dark.css"disabled><link rel="stylesheet" type="text/css" href="../light.css"id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../twizzler_async/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate twizzler_async</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.1.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all twizzler_async's items</p></a><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li><li><a href="#functions">Functions</a></li></ul></div><div id="sidebar-vars" data-name="twizzler_async" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">twizzler_async</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/twizzler_async/lib.rs.html#1-66" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Support for asynchronous programming on Twizzler. This crate provides executor functionality
+along with support for async events and waiting, timers and timeouts, and a couple general
+helper functions.</p>
+<h2 id="executors" class="section-header"><a href="#executors">Executors</a></h2>
+<p>We provide three types of executors:</p>
+<ol>
+<li>block_on, which blocks until the future is completed.</li>
+<li>Thread-local, for futures that aren’t Send.</li>
+<li>Global, which puts tasks in a global scheduling context for thread pools to handle.</li>
+</ol>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
+<p>The most basic way to run a future is:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">block_on</span>(<span class="kw">async</span> { <span class="comment">/* some async code */</span> });</code></pre></div>
+<p>But this of course doesn’t really make it possible to actually run things concurrently, since it
+just waits for this single future. Instead, you probably want to use a real executor. The main
+one you probably want is the global executor:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Task::spawn</span>(<span class="kw">async</span> { <span class="comment">/* some async code */</span> }).<span class="kw">await</span>;</code></pre></div>
+<p>Now, this does assume that there is a thread that has called [mod@run()], eg:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">run</span>(<span class="kw">async</span> { <span class="ident">Task::spawn</span>(<span class="kw">async</span> { <span class="comment">/* some async code */</span> }).<span class="kw">await</span> });</code></pre></div>
+<p>Generally, though, if you want a thread pool, you can spawn a thread into a pool like this:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="ident">std::thread::spawn</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">twizzler_async::run</span>(<span class="ident">std::future::pending</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span>()));</code></pre></div>
+<p>Then, later on, you can spawn a Task and await it. You can also detach a Task with .detach(),
+which just places the thread on the runqueues and runs it without you having to await the result.</p>
+<h2 id="asyncsetup-and-async" class="section-header"><a href="#asyncsetup-and-async">AsyncSetup, and Async<T></a></h2>
+<p>Traits and types for asynchronous operations on objects that have generic wait and signal events.</p>
+<p>For example, a queue might have the following interface presented to the user:</p>
+<ol>
+<li><code>async fn send(T)</code></li>
+<li><code>async fn recv() -&gt; T</code></li>
+</ol>
+<p>Making these functions async requires defining some Future that can wait and be signaled when
+something happens – say we send and want to wait if the queue is full, or recv and want to wait
+if the queue is empty, and of course we don’t want to busy-wait. The queue can implement
+<a href="trait.AsyncDuplexSetup.html" title="AsyncDuplexSetup">AsyncDuplexSetup</a> so that we can wrap the queue in a <a href="struct.AsyncDuplex.html" title="AsyncDuplex">AsyncDuplex</a> and then use its functions
+to access the queue’s underlying structures in a non-blocking way, automatically sleeping when necessary.</p>
+</div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Async.html" title="twizzler_async::Async struct">Async</a></div><div class="item-right docblock-short"><p>A wrapper type around some “handle” that we want to perform asynchronous operations on, where
+that handle must implement <a href="trait.AsyncSetup.html" title="AsyncSetup">AsyncSetup</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.AsyncDuplex.html" title="twizzler_async::AsyncDuplex struct">AsyncDuplex</a></div><div class="item-right docblock-short"><p>A wrapper type around some “handle” that we want to perform asynchronous operations on, where
+that handle must implement <a href="trait.AsyncDuplexSetup.html" title="AsyncDuplexSetup">AsyncDuplexSetup</a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.FlagBlock.html" title="twizzler_async::FlagBlock struct">FlagBlock</a></div><div class="item-right docblock-short"><p>A basic condition variable for async tasks. If you call wait() you get back a future that you
+can await on, which will complete once another tasks calls signal_all(). But there’s a gotcha here.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Task.html" title="twizzler_async::Task struct">Task</a></div><div class="item-right docblock-short"><p>A spawned future. Tasks are futures themselves and yield the output of the spawned future.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Timer.html" title="twizzler_async::Timer struct">Timer</a></div><div class="item-right docblock-short"><p>A timer future that returns after a specified period of time.</p>
+</div></div></div><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AsyncDuplexSetup.html" title="twizzler_async::AsyncDuplexSetup trait">AsyncDuplexSetup</a></div><div class="item-right docblock-short"><p>Implement setting up externally signaled asynchronous events for the async runner to wait for,
+in the case where there is a duplex mode for reading and writing to this object, each of which
+could fail with some “would block” error.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.AsyncSetup.html" title="twizzler_async::AsyncSetup trait">AsyncSetup</a></div><div class="item-right docblock-short"><p>Implement setting up externally signaled asynchronous events for the async runner to wait for,
+in the case where there is a single “runnable” abstraction for this object.</p>
+</div></div></div><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.block_on.html" title="twizzler_async::block_on fn">block_on</a></div><div class="item-right docblock-short"><p>Run a future to completion, sleeping the thread if there is no progress that can be made.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.run.html" title="twizzler_async::run fn">run</a></div><div class="item-right docblock-short"><p>Runs executors.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.timeout_after.html" title="twizzler_async::timeout_after fn">timeout_after</a></div><div class="item-right docblock-short"><p>Await a future until a timeout occurs (or that future completes). If the timeout happens, return
+None, otherwise return Some of the result of the future. This timeout expires after a duration.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.timeout_at.html" title="twizzler_async::timeout_at fn">timeout_at</a></div><div class="item-right docblock-short"><p>Await a future until a timeout occurs (or that future completes). If the timeout happens, return
+None, otherwise return Some of the result of the future. This timeout expires at an instant in time.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.wait_for_first.html" title="twizzler_async::wait_for_first fn">wait_for_first</a></div><div class="item-right docblock-short"><p>A future that waits on two sub-futures until the first one completes. If the second one
+completes first, this future will continue awaiting on the first future. If the first one
+completes first, this future returns immediately without continuing to wait on the second future.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="twizzler_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</body></html>

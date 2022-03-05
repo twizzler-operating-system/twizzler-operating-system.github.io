@@ -29,12 +29,19 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
     <span class="ident">object::ObjID</span>,
     <span class="ident">syscall</span>::{<span class="ident">ThreadControl</span>, <span class="ident">ThreadSpawnArgs</span>, <span class="ident">ThreadSpawnError</span>},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::thread::current_thread_ref</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::thread</span>::{<span class="ident">current_memory_context</span>, <span class="ident">current_thread_ref</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_spawn</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">ThreadSpawnArgs</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjID</span>, <span class="ident">ThreadSpawnError</span><span class="op">&gt;</span> {
     <span class="ident"><span class="kw">crate</span>::thread::start_new_user</span>(<span class="kw-2">*</span><span class="ident">args</span>)
@@ -42,6 +49,10 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_ctrl</span>(<span class="ident">cmd</span>: <span class="ident">ThreadControl</span>, <span class="ident">arg</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
     <span class="kw">match</span> <span class="ident">cmd</span> {
+        <span class="ident">ThreadControl::SetUpcall</span> =&gt; {
+            <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">current_memory_context</span>().<span class="ident">unwrap</span>();
+            <span class="ident">ctx</span>.<span class="ident">set_upcall_address</span>(<span class="ident">arg</span> <span class="kw">as</span> <span class="ident">usize</span>);
+        }
         <span class="ident">ThreadControl::SetTls</span> =&gt; {
             <span class="ident">current_thread_ref</span>().<span class="ident">unwrap</span>().<span class="ident">set_tls</span>(<span class="ident">arg</span>);
         }
@@ -55,7 +66,10 @@
             }
             <span class="ident"><span class="kw">crate</span>::thread::exit</span>();
         }
-        <span class="kw">_</span> =&gt; <span class="macro">todo!</span>(),
+        <span class="ident">ThreadControl::Yield</span> =&gt; {
+            <span class="comment">// TODO: maybe give a priority drop?</span>
+            <span class="ident"><span class="kw">crate</span>::sched::schedule</span>(<span class="bool-val">true</span>);
+        } <span class="comment">//_ =&gt; todo!(),</span>
     }
     (<span class="number">0</span>, <span class="number">0</span>)
 }
