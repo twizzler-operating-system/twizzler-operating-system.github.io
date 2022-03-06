@@ -50,6 +50,15 @@
 <span id="49">49</span>
 <span id="50">50</span>
 <span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
@@ -99,7 +108,16 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ServiceAddr</span> {
-    <span class="ident">TcpPort</span>(<span class="ident">u16</span>),
+    <span class="ident">Null</span>,
+    <span class="ident">Port</span>(<span class="ident">u16</span>),
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ProtType</span> {
+    <span class="ident">Raw</span>,
+    <span class="ident">Icmp</span>,
+    <span class="ident">Tcp</span>,
+    <span class="ident">Udp</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_net" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>

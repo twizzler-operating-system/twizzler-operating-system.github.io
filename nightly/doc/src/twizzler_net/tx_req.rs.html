@@ -32,16 +32,64 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">addr</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">NodeAddr</span>, <span class="ident">ServiceAddr</span>},
+    <span class="ident">addr</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">NodeAddr</span>, <span class="ident">ProtType</span>, <span class="ident">ServiceAddr</span>},
     <span class="ident">req</span>::{<span class="ident">CloseInfo</span>, <span class="ident">ConnectionId</span>, <span class="ident">PacketData</span>},
 };
+
+<span class="macro">bitflags::bitflags!</span> {
+    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionFlags</span>: <span class="ident">u32</span> {
+        <span class="kw">const</span> <span class="ident">RAW</span> <span class="op">=</span> <span class="number">0x1</span>;
+    }
+}
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionInfo</span> {
     <span class="ident">node_addr</span>: <span class="ident">NodeAddr</span>,
     <span class="ident">service_addr</span>: <span class="ident">ServiceAddr</span>,
+    <span class="ident">prot_type</span>: <span class="ident">ProtType</span>,
+    <span class="ident">conn_flags</span>: <span class="ident">ConnectionFlags</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ConnectionInfo</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">node_addr</span>: <span class="ident">NodeAddr</span>,
+        <span class="ident">service_addr</span>: <span class="ident">ServiceAddr</span>,
+        <span class="ident">prot_type</span>: <span class="ident">ProtType</span>,
+        <span class="ident">conn_flags</span>: <span class="ident">ConnectionFlags</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">node_addr</span>,
+            <span class="ident">service_addr</span>,
+            <span class="ident">prot_type</span>,
+            <span class="ident">conn_flags</span>,
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>

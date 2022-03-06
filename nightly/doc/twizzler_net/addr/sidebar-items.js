@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["NodeAddr",""],["ServiceAddr",""]],"struct":[["Ipv4Addr",""]]});
+initSidebarItems({"enum":[["NodeAddr",""],["ProtType",""],["ServiceAddr",""]],"struct":[["Ipv4Addr",""]]});

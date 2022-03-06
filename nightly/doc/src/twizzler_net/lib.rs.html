@@ -202,6 +202,7 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="ident">twizzler::object</span>::{<span class="ident">ObjID</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
@@ -218,8 +219,9 @@
 <span class="kw">mod</span> <span class="ident">req</span>;
 <span class="kw">mod</span> <span class="ident">rx_req</span>;
 <span class="kw">mod</span> <span class="ident">tx_req</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">req</span>::{<span class="ident">CloseInfo</span>, <span class="ident">ConnectionId</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rx_req</span>::{<span class="ident">RxCompletion</span>, <span class="ident">RxRequest</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tx_req</span>::{<span class="ident">TxCompletion</span>, <span class="ident">TxRequest</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tx_req</span>::{<span class="ident">ConnectionFlags</span>, <span class="ident">ConnectionInfo</span>, <span class="ident">TxCompletion</span>, <span class="ident">TxRequest</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">nm_handle</span>::{<span class="ident">open_nm_handle</span>, <span class="ident">NmHandle</span>};
 
