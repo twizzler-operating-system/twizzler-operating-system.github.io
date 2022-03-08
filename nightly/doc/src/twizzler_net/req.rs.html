@@ -17,6 +17,13 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PacketData</span> {
@@ -24,8 +31,15 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">buffer_len</span>: <span class="ident">u32</span>,
 }
 
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionId</span>(<span class="ident">u32</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectionId</span>(<span class="ident">u64</span>);
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConnectionId</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span>(<span class="ident">x</span>)
+    }
+}
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>

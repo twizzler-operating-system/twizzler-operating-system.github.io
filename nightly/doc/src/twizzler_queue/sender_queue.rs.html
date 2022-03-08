@@ -158,6 +158,17 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
     <span class="ident">future::Future</span>,
@@ -207,6 +218,11 @@
     }
 }
 
+<span class="doccomment">/// An async-supported sending-half of a [Queue]. This is to support systems that want to</span>
+<span class="doccomment">/// asynchronously send items to a receiver, under the assumption that the receiver sends</span>
+<span class="doccomment">/// completions to indicate that a request has been finished, and that the send ID can be reused.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Thus, this queue interally allocates, sends, and reuses IDs for requests.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueueSender</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="ident">counter</span>: <span class="ident">AtomicU32</span>,
     <span class="ident">reuse</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -231,6 +247,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Copy</span>, <span class="ident">C</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">QueueSender</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Build a new QueueSender from a [Queue].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">queue</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">counter</span>: <span class="ident">AtomicU32::new</span>(<span class="number">0</span>),
@@ -271,6 +288,10 @@
         }
     }
 
+    <span class="doccomment">/// Submit a request and don&#39;t wait for a response. WARNING: This will burn a request ID,</span>
+    <span class="doccomment">/// preventing it from ever being reused. This function is mostly useful for signalling an &quot;end</span>
+    <span class="doccomment">/// of communication&quot; event across the queue. If you want to submit and not immediately await,</span>
+    <span class="doccomment">/// you probably should create a task for your async block instead.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">submit_no_wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">S</span>, <span class="ident">flags</span>: <span class="ident">SubmissionFlags</span>) {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inner</span>
@@ -279,6 +300,7 @@
             .<span class="ident">submit</span>(<span class="self">self</span>.<span class="ident">next_id</span>(), <span class="ident">item</span>, <span class="ident">flags</span>);
     }
 
+    <span class="doccomment">/// Submit an item and await a completion.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">submit_and_wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">item</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident"><span class="kw">crate</span>::QueueError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_id</span>();
         <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">WaitPoint</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {

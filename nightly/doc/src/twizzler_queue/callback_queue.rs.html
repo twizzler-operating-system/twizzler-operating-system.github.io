@@ -53,6 +53,23 @@
 <span id="52">52</span>
 <span id="53">53</span>
 <span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
 
 <span class="kw">use</span> <span class="ident">twizzler_async</span>::{<span class="ident">AsyncDuplex</span>, <span class="ident">AsyncDuplexSetup</span>};
@@ -64,6 +81,7 @@
     <span class="ident">queue</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// A receiver-side async-enabled queue abstraction.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CallbackQueueReceiver</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">AsyncDuplex</span><span class="op">&lt;</span><span class="ident">CallbackQueueReceiverInner</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -85,12 +103,14 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Copy</span>, <span class="ident">C</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">CallbackQueueReceiver</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a new CallbackQueueReceiver from a [Queue].</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">queue</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">inner</span>: <span class="ident">AsyncDuplex::new</span>(<span class="ident">CallbackQueueReceiverInner</span> { <span class="ident">queue</span> }),
         }
     }
 
+    <span class="doccomment">/// Handle a request in a closure that returns a completion.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Fut</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">QueueError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">u32</span>, <span class="ident">S</span>) -&gt; <span class="ident">Fut</span>,
@@ -105,6 +125,20 @@
             .<span class="ident">write_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">complete</span>(<span class="ident">id</span>, <span class="ident">reply</span>, <span class="ident">SubmissionFlags::NON_BLOCK</span>))
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Receive a request without immediately returning a completion.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">S</span>), <span class="ident">QueueError</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>
+            .<span class="ident">read_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">receive</span>(<span class="ident">ReceiveFlags::NON_BLOCK</span>))
+            .<span class="kw">await</span>
+    }
+
+    <span class="doccomment">/// Send a completion back to the sender.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">reply</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">QueueError</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>
+            .<span class="ident">write_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">complete</span>(<span class="ident">id</span>, <span class="ident">reply</span>, <span class="ident">SubmissionFlags::NON_BLOCK</span>))
+            .<span class="kw">await</span>
     }
 }
 </code></pre></div>

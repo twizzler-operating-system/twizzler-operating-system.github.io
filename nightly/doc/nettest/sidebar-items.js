@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["fill_ping_buffer",""],["handle_ping_recv",""],["handler",""],["main",""],["ping",""]]});
+initSidebarItems({"constant":[["ICMP_ECHO_REQUEST",""]],"fn":[["fill_ping_buffer",""],["handle_ping_recv",""],["handler",""],["main",""],["ping",""]],"struct":[["IcmpHeader",""]]});
