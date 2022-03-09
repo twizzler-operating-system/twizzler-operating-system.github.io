@@ -59,6 +59,10 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
@@ -109,15 +113,19 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ServiceAddr</span> {
     <span class="ident">Null</span>,
-    <span class="ident">Port</span>(<span class="ident">u16</span>),
+    <span class="ident">Icmp</span>,
+    <span class="ident">Tcp</span>(<span class="ident">u16</span>),
+    <span class="ident">Udp</span>(<span class="ident">u16</span>),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ProtType</span> {
-    <span class="ident">Raw</span>,
-    <span class="ident">Icmp</span>,
-    <span class="ident">Tcp</span>,
-    <span class="ident">Udp</span>,
+<span class="kw">impl</span> <span class="ident">ServiceAddr</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ServiceAddr::Tcp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ServiceAddr::Tcp</span>(<span class="number">0</span>),
+            <span class="ident">ServiceAddr::Udp</span>(<span class="kw">_</span>) =&gt; <span class="ident">ServiceAddr::Udp</span>(<span class="number">0</span>),
+            <span class="kw">_</span> =&gt; <span class="kw-2">*</span><span class="self">self</span>,
+        }
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_net" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>

@@ -92,7 +92,6 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
     <span class="ident">sync</span>::{
@@ -110,15 +109,14 @@
 <span class="kw">mod</span> <span class="ident">arp</span>;
 <span class="kw">mod</span> <span class="ident">client_request</span>;
 <span class="kw">mod</span> <span class="ident">endpoint</span>;
-<span class="kw">mod</span> <span class="ident">ethernet</span>;
 <span class="kw">mod</span> <span class="ident">header</span>;
-<span class="kw">mod</span> <span class="ident">icmp</span>;
-<span class="kw">mod</span> <span class="ident">ipv4</span>;
-<span class="kw">mod</span> <span class="ident">layer4</span>;
+<span class="kw">mod</span> <span class="ident">link</span>;
 <span class="kw">mod</span> <span class="ident">listen</span>;
-<span class="kw">mod</span> <span class="ident">nic</span>;
+<span class="kw">mod</span> <span class="ident">network</span>;
 <span class="kw">mod</span> <span class="ident">nics</span>;
+<span class="kw">mod</span> <span class="ident">route</span>;
 <span class="kw">mod</span> <span class="ident">send</span>;
+<span class="kw">mod</span> <span class="ident">transport</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HandleData</span> {
     <span class="ident">conn_id</span>: <span class="ident">AtomicU64</span>,

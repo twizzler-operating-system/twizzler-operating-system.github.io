@@ -167,18 +167,13 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">sync::Arc</span>, <span class="ident">time::Duration</span>};
 
 <span class="kw">use</span> <span class="ident">twizzler_async</span>::{<span class="ident">Task</span>, <span class="ident">Timer</span>};
 <span class="kw">use</span> <span class="ident">twizzler_net</span>::{
-    <span class="ident">addr</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">NodeAddr</span>, <span class="ident">ProtType</span>, <span class="ident">ServiceAddr</span>},
+    <span class="ident">addr</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">NodeAddr</span>, <span class="ident">ServiceAddr</span>},
     <span class="ident">buffer::ManagedBuffer</span>,
-    <span class="ident">ConnectionFlags</span>, <span class="ident">ConnectionInfo</span>, <span class="ident">NmHandle</span>, <span class="ident">RxCompletion</span>, <span class="ident">RxRequest</span>, <span class="ident">TxRequest</span>,
+    <span class="ident">ListenFlags</span>, <span class="ident">ListenInfo</span>, <span class="ident">NmHandle</span>, <span class="ident">RxCompletion</span>, <span class="ident">RxRequest</span>, <span class="ident">TxRequest</span>,
 };
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
@@ -212,12 +207,7 @@
     <span class="ident">twizzler_async::run</span>(<span class="kw">async</span> {
         <span class="comment">// Build a new connection info. It&#39;s not really a &quot;connection&quot;, more of a way to specify a</span>
         <span class="comment">// place to listen at. For ping, that&#39;s ipv4+icmp, raw.</span>
-        <span class="kw">let</span> <span class="ident">conn_info</span> <span class="op">=</span> <span class="ident">ConnectionInfo::new</span>(
-            <span class="ident">NodeAddr::Ipv4</span>(<span class="ident">addr</span>),
-            <span class="ident">ServiceAddr::Null</span>,
-            <span class="ident">ProtType::Icmp</span>,
-            <span class="ident">ConnectionFlags::RAW</span>,
-        );
+        <span class="kw">let</span> <span class="ident">conn_info</span> <span class="op">=</span> <span class="ident">ListenInfo::new</span>(<span class="ident">NodeAddr::Ipv4</span>(<span class="ident">addr</span>), <span class="ident">ServiceAddr::Icmp</span>, <span class="ident">ListenFlags::RAW</span>);
 
         <span class="macro">println!</span>(<span class="string">&quot;sending listen&quot;</span>);
         <span class="comment">// Start listening here.</span>

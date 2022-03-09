@@ -21,11 +21,23 @@
 <span id="20">20</span>
 <span id="21">21</span>
 <span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">addr::Ipv4Addr</span>,
+    <span class="ident">addr</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">NodeAddr</span>, <span class="ident">ServiceAddr</span>},
     <span class="ident">req</span>::{<span class="ident">CloseInfo</span>, <span class="ident">ConnectionId</span>, <span class="ident">PacketData</span>},
-    <span class="ident">tx_req::ConnectionInfo</span>,
 };
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connection</span> {
+    <span class="ident">addr</span>: (<span class="ident">NodeAddr</span>, <span class="ident">ServiceAddr</span>),
+    <span class="ident">peer</span>: (<span class="ident">NodeAddr</span>, <span class="ident">ServiceAddr</span>),
+}
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
@@ -34,7 +46,7 @@
     <span class="ident">RecvFromIpv4</span>(<span class="ident">Ipv4Addr</span>, <span class="ident">PacketData</span>),
     <span class="ident">Recv</span>(<span class="ident">ConnectionId</span>, <span class="ident">PacketData</span>),
     <span class="ident">CloseConnection</span>(<span class="ident">ConnectionId</span>, <span class="ident">CloseInfo</span>),
-    <span class="ident">NewConnection</span>(<span class="ident">ConnectionId</span>, <span class="ident">ConnectionId</span>, <span class="ident">ConnectionInfo</span>),
+    <span class="ident">NewConnection</span>(<span class="ident">ConnectionId</span>, <span class="ident">ConnectionId</span>, <span class="ident">Connection</span>),
     <span class="ident">Close</span>,
 }
 

@@ -71,9 +71,9 @@
 <span class="kw">use</span> <span class="ident">twizzler_queue::QueueError</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ipv4</span>::{<span class="self">self</span>, <span class="ident">setup_ipv4_listen</span>},
+    <span class="ident">link::nic</span>::{<span class="ident">NicBuffer</span>, <span class="ident">SendableBuffer</span>},
     <span class="ident">listen</span>,
-    <span class="ident">nic</span>::{<span class="ident">NicBuffer</span>, <span class="ident">SendableBuffer</span>},
+    <span class="ident">network::ipv4</span>::{<span class="self">self</span>, <span class="ident">setup_ipv4_listen</span>},
     <span class="ident">send</span>, <span class="ident">HandleRef</span>,
 };
 
