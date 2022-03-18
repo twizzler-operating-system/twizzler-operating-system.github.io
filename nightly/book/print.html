@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded "><a href="chapter_1.html"><strong aria-hidden="true">1.</strong> Chapter 1</a></li><li class="chapter-item expanded "><a href="object_lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -135,7 +135,17 @@
 
                 <div id="content" class="content">
                     <main>
-                        <div style="break-before: page; page-break-before: always;"></div><h1 id="building-twizzler"><a class="header" href="#building-twizzler">Building Twizzler</a></h1>
+                        <h1 id="user-space-primitive-documentation"><a class="header" href="#user-space-primitive-documentation">User Space Primitive Documentation</a></h1>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>Since Twizzler is a microkernel, many operations handled by monolithic kernels are instead implemented in userspace. </p>
+<h2 id="where-to-begin"><a class="header" href="#where-to-begin">Where to begin</a></h2>
+<p>Twizzler introduces objects to organize persistent data, rather than files in traditional systems. This provides the benefit of not having to serialize and deserialize data to make it persistent.</p>
+<p>Pages explaining the  main abstractions of the OS are available at the following links: <a href="./Object.html">Objects</a> (for the main data abstraction), <a href="./Views.html">Views</a> (for thread environments), and <a href="./KSO.html">Kernel State Objects</a> (the security model). From these basics, there are a number of features provided by the Twizzler userspace that can be used to enhance programs, but are not necessary for understanding the fundamentals of the OS.</p>
+<ul>
+<li>To get a background on the motivations and a high level understanding of the goals of the operating system, we recommend <a href="https://dl.acm.org/doi/10.1145/3454129">Twizzler: a Data-Centric OS for Non-Volatile Memory</a>. This is a research paper explaining the system for academic readers.</li>
+<li>To just jump in, follow the <a href="./BUILD.html">build guide</a> and look at <a href="https://twizzler-operating-system.github.io/nightly/doc/">the code documentation</a> (essentially manual pages) for primitive functions.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="building-twizzler"><a class="header" href="#building-twizzler">Building Twizzler</a></h1>
 <p>A bit of a time consuming process the first time, so make sure you have some nice tea or something before you start :)</p>
 <h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
 <p>This build process has been tested on an Ubuntu 20.04 system with standard development tools
@@ -196,9 +206,93 @@ with:</p>
 <p>which will bootup a qemu instance. If you want to run the release mode version, you can run </p>
 <pre><code>cargo start-qemu --profile release
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="objects"><a class="header" href="#objects">Objects</a></h1>
+<h2 id="definition"><a class="header" href="#definition">Definition</a></h2>
+<p>Objects are an abstraction of a set of related data with the same lifetime and permissions. This vague definition allows for applications to define what data is contained in a single object in a way that is most reasonable for the particular use case. For example, a B-Tree could contain all nodes in the same object given that the nodes likely have the same permissions and lifetime. However, another tree with different permissions for children could separate these nodes into different objects. For this second example, managing their lifetime can be done with <a href="./Lifetime.html#Ties">ties</a>.</p>
+<p>Kernel interposition is only done when creating and deleting objects, leaving access and modification to userspace facilities and hardware. Access control is limited by specifying policies and letting hardware enforce those policies. This allows the kernel avoid involvement in access, improving performance without sacrificing security. Objects maintain a reference count to prevent deletion of object data when multiple pointers reference it.</p>
+<h2 id="object-creation"><a class="header" href="#object-creation">Object Creation</a></h2>
+<p>When creating objects, the medium storing data can be chosen, such as choosing between volatile DRAM and non-volatile memory. While these options are supported by default, other types can be configured based on the hardware support of the particular machine. Different storage mediums provide different benefits and costs and a more in depth discussion can be found at <a href="./Lifetime.html">lifetime</a>.</p>
+<p>When creating objects, a source object can be denoted, where the new object will be a copy of the original. This allows for easy versioning, as objects can be copied and kept as different versions. Copying an object uses copy-on-write, meaning another copy of the data is only created when a change is made, rather than immediately on creation.</p>
+<h2 id="ids"><a class="header" href="#ids">IDs</a></h2>
+<p>While 2<sup>64</sup> object IDs provides a large enough space for a single computer's address space without worries of running out object IDs, adding the ability to generate IDs without having to interact with a central authority and the Twizzler's future of a transparent single id space on a distributed set of computers creates the possibility of collisions. Thus 128 bits are used to shrink the possibility of collisions and the ability to guess an object ID, while also creating a large enough ID space to allow for distribution.</p>
+<h3 id="id-derivation"><a class="header" href="#id-derivation">ID derivation</a></h3>
+<p>IDs are derived by inputting a nonce, 128 bits of random data, to a hash function. The nonce is provided for objects created using copy-on-write, the objects where a <code>src</code> points to a valid object when calling <code>twz_obj_new()</code> so as to create unique IDs despite having the same object content.</p>
+<p>There is also the ability to create object IDs by hashing the contents of the object. This is most useful for conflict-free replicated data types (CRDTs), where multiple computers are running distributed Twizzler and can aggresively replicate objects without worrying about consistency issues. Hashing to obtain an object ID is designed for immutable objects.</p>
+<!-- CRDT paper, read and explain
+https://hal.inria.fr/hal-00932836/file/CRDTs\_SSS-2011.pdf
+-->
 <div style="break-before: page; page-break-before: always;"></div><h1 id="object-lifetime"><a class="header" href="#object-lifetime">Object Lifetime</a></h1>
-<p>TODO lol</p>
+<h2 id="volatile-memory"><a class="header" href="#volatile-memory">Volatile Memory</a></h2>
+<p>Placing objects in volatile memory (such as DRAM) limits the object lifetime to at most the time of the next power cycle. This can provide easy cleanup for temporary data, such as the result of computation or cached data kept in memory for locality (faster access).</p>
+<p>Objects in volatile memory can be accessed and used in the same ways they are in non-volatile memory.</p>
+<h2 id="ties"><a class="header" href="#ties">Ties</a></h2>
+<!-- page 7 of Twizzler: a Data-Centric OS for Non-Volatile Memory -->
+<p>Ties handle object lifetime by allowing for automatically deleting objects once other constructs are deleted. For example, if an application crashes, the temporary computation might be useless, yet keeping the temporary computation in volatile memory until a power cycle occurs is a waste of that space. Instead, we can tie the lifetime of the object to other objects, such that the object is automatically deleted with the other, freeing the memory before a power cycle. This mechanism is convenient because the kernel does not have to maintain an understanding of the implied lifetime of an object, rather it can be specified relative to other objects.</p>
+<p>Ties also provide the benefit of allowing temporary context (such as stacks and heaps) to be stored in persistent memory, allowing for recovery after a power cycle.</p>
+<p>For example if we have two objects: <em>koala</em> and <em>coldbrew</em>, tying <em>koala</em> to <em>coldbrew</em> means that <em>koala</em> will not be deleted until after <em>coldbrew</em> is. While <em>koala</em> can be deleted immediately after <em>coldbrew</em> is, if <em>koala</em> is tied to multiple objects, it will only be fully deleted when the final object it is tied to is deleted. Additionally, if <em>koala</em> is tied to a handful of objects, once <strong>all</strong> of those objects are deleted, <em>koala</em> will be automatically deleted too. This is similar to the practice of creating a file and immediately unlinking it within Unix, so the file is automatically deleted once the file descriptor is closed.</p>
+<p>Since most construts in Twizzler are just various types of objects, we can use ties to establish a lifetime of objects based on the existence of other objects, such as threads or views. For a more detailed explanation of views, see the <a href="./Views.html">page on views</a>. For temporary computation done in a thread, an instance of computation, objects can be tied to the thread. This provides similar semantics to creating and immediately unlinking files on Unix, as with both, once the application exits, the data is deleted. With views, this provides an address space for an application to run in, possibly over multiple time periods. Tying an object to a view allows the object to exist for as long as the execution state of the application, which could be as long as the application is installed, or only removed when all application data is deleted.</p>
+<h3 id="ties-to-volatile-memory"><a class="header" href="#ties-to-volatile-memory">Ties to Volatile Memory</a></h3>
+<p>Tying volatile objects to each other implies that both objects will be deleted at a power cycle, which is to be expected. However, things get a little more complicated with ties between volatile and persistent objects. Tying a volatile object to a persistent one breaks the semantics of ties in the event of a power cycle, as the volatile object is deleted and the persistent one is not. However, this outcome is to be expected, and we assume programmers will use this when doing temporary computation. Tying a persistent object to a volatile object is dangerous as both objects will be deleted in the event of a power cycle, including an unexpected one.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="pointers"><a class="header" href="#pointers">Pointers</a></h1>
+<!-- Page 10-12 of Twizzler: a Data-Centric OS for Non-Volaile Memory -->
+<h2 id="definition-1"><a class="header" href="#definition-1">Definition</a></h2>
+<p>There are two types of pointers in Twizzler: persistent and dereferenceable. Persistent pointers are used in order refer to external data with no extra context needed. They can be thought of file names on a traditional operating system, where the data exists longer than any process or power cycle. Dereferenceable pointers are references to data in ways that act like traditional memory accesses when programing on other operating systems (such as stack or heap data). Unlike persistent pointers, the data can be acted upon, such as by reading or writing, but additional context is necessary.</p>
+<h2 id="rationale"><a class="header" href="#rationale">Rationale</a></h2>
+<p>Persistent pointers are much more efficient than file I/O, as there is a link to data from the pointer without the need for deserialization of a file. This just allows links of data in data structures, which is what objects are.</p>
+<h2 id="foreign-object-table"><a class="header" href="#foreign-object-table">Foreign Object Table</a></h2>
+<p>Persistent pointers work by indexing into a Foreign Object Table (FOT), which holds a longer reference to the data, allowing for late binding of names. Late binding in FOTs are explained in more detail in a <a href="Pointer.html#late-binding">later section</a>. Persistent pointers are thus just an index of external object wanted (16 bits, allowing for 65,536 object references), and an offset within the foreign object (40 bits, a maximum offset of 1 terabyte). Because access control is at an object granularity, multiple pointers to the same object can use the same FOT entry.</p>
+<h3 id="late-binding"><a class="header" href="#late-binding">Late-Binding</a></h3>
+<p>Late binding of names is used often with libraries to allow for updates of the library without requiring every program using the library to be recompiled. In Twizzler, late-binding is done by putting a name as the entry in the FOT. When creating the FOT entry, a name resolver can also be specified to allow for different objects to have different name resolvers. The actual name resolution happens when converting the persistent pointer to a dereferenceable one, allowing for different objects to be resolved at different times, just based on the name at dereference time.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="permissions"><a class="header" href="#permissions">Permissions</a></h1>
+<p>A thread has permission to access an object if:</p>
+<ul>
+<li>They have not been restricted by a mask (including global mask)</li>
+<li>The thread has the capability, or delegated capability. (by attaching to a security
+context).</li>
+<li>The thread knows the object's name. (security by obscurity)</li>
+</ul>
+<h2 id="permission-values-for-objects"><a class="header" href="#permission-values-for-objects">Permission values for objects</a></h2>
+<p>There are 5 permissions an object can have: read, write, execute, use, and delete. Except for use (and to an extent delete), these permissions exist in Unix systems, and are used in the same way.</p>
+<ul>
+<li><strong>Read:</strong> This allows a thread the ability to look at the contents of an object.</li>
+<li><strong>Write:</strong> This allows a thread the ability to modify an object. </li>
+<li><strong>Execute:</strong> The object can be run as a program.</li>
+<li><strong>Delete:</strong> The object can be deleted. Usually Unix systems include this as part of write
+permissions, and Windows systems allow this to be a separate permission.</li>
+<li><strong>Use:</strong> This marks the object as available for the kernel to operate on, such as a kernel state
+object, further explained on <a href="./KSO.html">kernel state objects</a>. Often times this is used for attaching a thread to a security context.</li>
+</ul>
+<h2 id="masks"><a class="header" href="#masks">Masks</a></h2>
+<p>Masks further restrict permissions to objects. This is similar to <code>umask</code> in Unix systems. For example, while by default any object may have access to an object called <em>bloom</em>, we may want a specific security context called <em>Fall</em> to not have access to the object.</p>
+<p>We do not need signatures on masks because they are part of the security context, meaning threads can only modify the mask if they can modify the security context object.</p>
+<h2 id="capabilities"><a class="header" href="#capabilities">Capabilities</a></h2>
+<p>Capabilities are when permissions a provided to objects as tokens, where the program can access the data if it has a valid token. Unlike previous implementations of capability systems, Twizzler includes an object ID as part of the capability signature to prevent a capability from being stolen by leaking the signature to malicious parties. While this does require identity to be checked in addition to the validity of the signature, this prevents simple leaks of secrets from breaking the security of an object.</p>
+<h2 id="delegation"><a class="header" href="#delegation">Delegation</a></h2>
+<p>Delegation allow for capabilities to be shared and futher restricted with other views. In order to delegate a capability, it must have high permissions within the object it wishes to delegate (enough so as to access the private key of the object).</p>
+<h2 id="late-binding-access-control"><a class="header" href="#late-binding-access-control">Late Binding Access Control</a></h2>
+<p>Rather than checking an object when it is initially accessed, such as in Unix with a call to <code>open()</code>, Twizzler checks access at the time when the operation is done, such as a read or write. This means that a thread can open an object with more permissions than allowed and not cause a fault, and only once that illegal operation is attempted will the fault occur.</p>
+<p>This method for enforcing access control is different from Unix systems because the kernel is not involved for memory access, which is how Twizzler formats all data. However protection still exists because when loading a security context, the MMU is programmed to limit access.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="views"><a class="header" href="#views">Views</a></h1>
+<p>Views are an address space abstraction that sets an environment for threads to run in. Persistent objects are mapped into the view and given dereferenceable virtual pointers. These virtual pointers allow access to the object inside the view.</p>
+<p>Because views are normal objects, they can be written on persistent memory and allow recovery of application state in the event of a crash or power cycle. The abstraction ov views also allows easy sharing of thread state, such as references to data. This is convient as it allows for sharing of data without requiring serialization through a construct like a pipe or file, and without the need of a call to <code>mmap</code>. Sharing views with other threads does provide a security threat, as one thread could corrupt the view for both. To deal with this security vulnerability, there is the abstraction of <a href="./Gates.html">secure API calls/gates</a> which allows communication between threads without allowing one or the other to corrupt another's data.</p>
+<p>When a thread wants to map a new object into the view, they can call _____ and when they attempt to access the object, the kernel will automatically map it in. To change or remove an entry, the kernel must be involved with the function <code>invalidate_view()</code>, to update references to the underlying memory.</p>
+<p>To switch between views, the system call <code>become()</code> is needed.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="kernel-state-objects"><a class="header" href="#kernel-state-objects">Kernel State Objects</a></h1>
+<p>These are normal objects used by both userspace programs and the kernel. For them to be used by the kernel, the use permission must be set. To learn more about the use permission, see <a href="./Permissions.html">Permissions</a>.</p>
+<h2 id="security-contexts"><a class="header" href="#security-contexts">Security Contexts</a></h2>
+<p>A security context is an object that contains information about which objects can be accessed and how (such as managing capabilities). A thread attaches to the security context to gain access to the objects. This can be useful for operations similar to the <code>sudo</code> command on UNIX, where privileges are temporarily increased in order to perform certain privileged operations without fully changing user ID.</p>
+<p>Additionally, security contexts can be used to limit permissions. To prevent a limited thread from shedding their limited permission state, attached contexts can be set as undetachable.</p>
+<!-- TODO: Add section about invalidating cached data of security context when the context is updated or an item is removed --><div style="break-before: page; page-break-before: always;"></div><h1 id="extensions"><a class="header" href="#extensions">Extensions</a></h1>
+<p>This is the interface abstraction in many programming languages, or the functions that must be implemented for drivers, such as <code>read()</code> and <code>write()</code>. In practice, Twizzler's implementation of this applies to objects, where a set of methods are defined and noted such that external threads accessing the object can call the interface methods without a need to understand the specifics of under the hood operations for the object.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<p>Two examples of extensions are IO and Event. IO is useful for reading and writing to an object, and for an object to support the extension, the object must implement the functions <code>read()</code>, <code>write()</code>, <code>ioctl()</code>, and <code>poll()</code>. When registering the extension, the object will provide pointers to all of the functions, so calls to <code>read()</code> for example on the object will know how to implement the function in an object specific way.</p>
+<p>Event is a way of waiting for something to happen to an object, similar to <code>poll()</code> on a file descriptor in Unix. Specific events can be waited for by using <code>event_wait()</code> with the object and event passed in as arguments. Because this is just an interface, an object can implement it in a way that makes sense to it, such as waiting for data from a network or a write to an object to complete.</p>
+<h2 id="tags"><a class="header" href="#tags">Tags</a></h2>
+<p>Tags are a way of uniquely identifying an extension, such as IO, and checking if the object supports the extension. These are stored in the metadata for the object, and when the tag is added to the metadata, a pointer to the functions that implement the interface are also added.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="gates"><a class="header" href="#gates">Gates</a></h1>
+<p>Gates, also known as secure API calls, are a means of exposing a limited set of functions available to an external user. This is similar to system calls, where the user can call into the kernel to do specific actions. Gates are used for interprocess communication.</p>
+<p>Gates are a way of an object exposing a system call like interface. This allows an object to define arbitrary behavior other threads can call. Because external threads can only access the object through the gate, they are restricted from detrimental actions, provided the gate is correctly written. While this does place the responsibility for secure code in the hands of any programmer rather than the typical relegation of secure code to security experts, gates are optional and can be avoided if there is worry about security flaws.</p>
+<p>When writing gates, best security practices are required to avoid vulnerabilities in the gates. As such, beware of timing attacks and other side channels that can be used to subtly exploit the object.</p>
 
                     </main>
 

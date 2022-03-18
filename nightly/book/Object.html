@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Building Twizzler - The Twizzler Operating System</title>
+        <title>Objects - The Twizzler Operating System</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html" class="active">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html" class="active"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,76 +134,30 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="building-twizzler"><a class="header" href="#building-twizzler">Building Twizzler</a></h1>
-<p>A bit of a time consuming process the first time, so make sure you have some nice tea or something before you start :)</p>
-<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
-<p>This build process has been tested on an Ubuntu 20.04 system with standard development tools
-installed, in addition to rustup (which is required). We require rustup because we will build our
-own toolchain during the build, and link the result through rustup for easier invocation of the Rust
-compiler.</p>
-<p>To build a boot image, you'll need the limine bootloader installed. In particular, we need the EFI
-code to help boot Twizzler through their boot protocol.</p>
-<p>To run qemu through the build system, you'll need qemu installed.</p>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Installing the tools:</p>
-<ol>
-<li>sudo apt install build-essential</li>
-<li>sudo apt install python</li>
-<li>sudo apt install cmake</li>
-<li>sudo apt install ninja-build</li>
-</ol>
-<p>Building Twizzler is done in several steps:</p>
-<ol start="0">
-<li>Building xtask.</li>
-<li>Building the toolchain.</li>
-<li>Building Twizzler itself.</li>
-</ol>
-<p>Fortunately, step 0 is handled automatically whenever we try to do anything. That's because xtask is
-the &quot;build system orchestrator&quot;. Essentially, building Twizzler requires using the right toolchain,
-target specification, and compile flags at the right times, so we've placed that complexity in an
-automation tool to make builds easier. To get an idea of what xtask is doing, you can run
-<code>cargo xtask --help</code>. Note that this repo's cargo config provides aliases for the common commands,
-as we will see below.</p>
-<h2 id="step-1-building-the-toolchain"><a class="header" href="#step-1-building-the-toolchain">Step 1: Building the Toolchain</a></h2>
-<p>This step takes the longest, but only has to happen once. Run</p>
-<pre><code>cargo bootstrap
-</code></pre>
-<p>and then wait, while you sip your tea. This will compile llvm and bootstrap the rust compiler, both
-of which take a long time. At the end, you should see a &quot;build completed successfully&quot; message,
-followed by a few lines about building crti and friends. This process ends by linking the toolchain
-to rustup, which you can verify through <code>rustup show</code>, which should list <code>twizzer</code> under the
-installed toolchains.</p>
-<p>Note that this use of rustup means that there can only be one active twizzler toolchain at a time.</p>
-<h2 id="step-2-building-twizzler"><a class="header" href="#step-2-building-twizzler">Step 2: Building Twizzler</a></h2>
-<p>Now that we've got the toolchain built and linked, we can compile the rest of Twizzler. Run</p>
-<pre><code>cargo build-all
-</code></pre>
-<p>which will compile several &quot;collections&quot; of packages:</p>
-<ol>
-<li>The build tools, for things like making the initrd.</li>
-<li>The kernel.</li>
-<li>The userspace applications.</li>
-</ol>
-<p>By default all will be built in debug mode, which will run very slow. You can build for release mode
-with:</p>
-<pre><code>cargo build-all --profile release
-</code></pre>
-<h2 id="step-3-running-twizzler"><a class="header" href="#step-3-running-twizzler">Step 3: Running Twizzler</a></h2>
-<p>You can start Twizzler in Qemu by running</p>
-<pre><code>cargo start-qemu
-</code></pre>
-<p>which will bootup a qemu instance. If you want to run the release mode version, you can run </p>
-<pre><code>cargo start-qemu --profile release
-</code></pre>
+                        <h1 id="objects"><a class="header" href="#objects">Objects</a></h1>
+<h2 id="definition"><a class="header" href="#definition">Definition</a></h2>
+<p>Objects are an abstraction of a set of related data with the same lifetime and permissions. This vague definition allows for applications to define what data is contained in a single object in a way that is most reasonable for the particular use case. For example, a B-Tree could contain all nodes in the same object given that the nodes likely have the same permissions and lifetime. However, another tree with different permissions for children could separate these nodes into different objects. For this second example, managing their lifetime can be done with <a href="./Lifetime.html#Ties">ties</a>.</p>
+<p>Kernel interposition is only done when creating and deleting objects, leaving access and modification to userspace facilities and hardware. Access control is limited by specifying policies and letting hardware enforce those policies. This allows the kernel avoid involvement in access, improving performance without sacrificing security. Objects maintain a reference count to prevent deletion of object data when multiple pointers reference it.</p>
+<h2 id="object-creation"><a class="header" href="#object-creation">Object Creation</a></h2>
+<p>When creating objects, the medium storing data can be chosen, such as choosing between volatile DRAM and non-volatile memory. While these options are supported by default, other types can be configured based on the hardware support of the particular machine. Different storage mediums provide different benefits and costs and a more in depth discussion can be found at <a href="./Lifetime.html">lifetime</a>.</p>
+<p>When creating objects, a source object can be denoted, where the new object will be a copy of the original. This allows for easy versioning, as objects can be copied and kept as different versions. Copying an object uses copy-on-write, meaning another copy of the data is only created when a change is made, rather than immediately on creation.</p>
+<h2 id="ids"><a class="header" href="#ids">IDs</a></h2>
+<p>While 2<sup>64</sup> object IDs provides a large enough space for a single computer's address space without worries of running out object IDs, adding the ability to generate IDs without having to interact with a central authority and the Twizzler's future of a transparent single id space on a distributed set of computers creates the possibility of collisions. Thus 128 bits are used to shrink the possibility of collisions and the ability to guess an object ID, while also creating a large enough ID space to allow for distribution.</p>
+<h3 id="id-derivation"><a class="header" href="#id-derivation">ID derivation</a></h3>
+<p>IDs are derived by inputting a nonce, 128 bits of random data, to a hash function. The nonce is provided for objects created using copy-on-write, the objects where a <code>src</code> points to a valid object when calling <code>twz_obj_new()</code> so as to create unique IDs despite having the same object content.</p>
+<p>There is also the ability to create object IDs by hashing the contents of the object. This is most useful for conflict-free replicated data types (CRDTs), where multiple computers are running distributed Twizzler and can aggresively replicate objects without worrying about consistency issues. Hashing to obtain an object ID is designed for immutable objects.</p>
+<!-- CRDT paper, read and explain
+https://hal.inria.fr/hal-00932836/file/CRDTs\_SSS-2011.pdf
+-->
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="intro.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="BUILD.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="Object.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="Lifetime.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -212,10 +166,10 @@ with:</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="intro.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="BUILD.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="Object.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="Lifetime.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Building Twizzler - The Twizzler Operating System</title>
+        <title>Extensions - The Twizzler Operating System</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html" class="active">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html" class="active"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,76 +134,22 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="building-twizzler"><a class="header" href="#building-twizzler">Building Twizzler</a></h1>
-<p>A bit of a time consuming process the first time, so make sure you have some nice tea or something before you start :)</p>
-<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
-<p>This build process has been tested on an Ubuntu 20.04 system with standard development tools
-installed, in addition to rustup (which is required). We require rustup because we will build our
-own toolchain during the build, and link the result through rustup for easier invocation of the Rust
-compiler.</p>
-<p>To build a boot image, you'll need the limine bootloader installed. In particular, we need the EFI
-code to help boot Twizzler through their boot protocol.</p>
-<p>To run qemu through the build system, you'll need qemu installed.</p>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Installing the tools:</p>
-<ol>
-<li>sudo apt install build-essential</li>
-<li>sudo apt install python</li>
-<li>sudo apt install cmake</li>
-<li>sudo apt install ninja-build</li>
-</ol>
-<p>Building Twizzler is done in several steps:</p>
-<ol start="0">
-<li>Building xtask.</li>
-<li>Building the toolchain.</li>
-<li>Building Twizzler itself.</li>
-</ol>
-<p>Fortunately, step 0 is handled automatically whenever we try to do anything. That's because xtask is
-the &quot;build system orchestrator&quot;. Essentially, building Twizzler requires using the right toolchain,
-target specification, and compile flags at the right times, so we've placed that complexity in an
-automation tool to make builds easier. To get an idea of what xtask is doing, you can run
-<code>cargo xtask --help</code>. Note that this repo's cargo config provides aliases for the common commands,
-as we will see below.</p>
-<h2 id="step-1-building-the-toolchain"><a class="header" href="#step-1-building-the-toolchain">Step 1: Building the Toolchain</a></h2>
-<p>This step takes the longest, but only has to happen once. Run</p>
-<pre><code>cargo bootstrap
-</code></pre>
-<p>and then wait, while you sip your tea. This will compile llvm and bootstrap the rust compiler, both
-of which take a long time. At the end, you should see a &quot;build completed successfully&quot; message,
-followed by a few lines about building crti and friends. This process ends by linking the toolchain
-to rustup, which you can verify through <code>rustup show</code>, which should list <code>twizzer</code> under the
-installed toolchains.</p>
-<p>Note that this use of rustup means that there can only be one active twizzler toolchain at a time.</p>
-<h2 id="step-2-building-twizzler"><a class="header" href="#step-2-building-twizzler">Step 2: Building Twizzler</a></h2>
-<p>Now that we've got the toolchain built and linked, we can compile the rest of Twizzler. Run</p>
-<pre><code>cargo build-all
-</code></pre>
-<p>which will compile several &quot;collections&quot; of packages:</p>
-<ol>
-<li>The build tools, for things like making the initrd.</li>
-<li>The kernel.</li>
-<li>The userspace applications.</li>
-</ol>
-<p>By default all will be built in debug mode, which will run very slow. You can build for release mode
-with:</p>
-<pre><code>cargo build-all --profile release
-</code></pre>
-<h2 id="step-3-running-twizzler"><a class="header" href="#step-3-running-twizzler">Step 3: Running Twizzler</a></h2>
-<p>You can start Twizzler in Qemu by running</p>
-<pre><code>cargo start-qemu
-</code></pre>
-<p>which will bootup a qemu instance. If you want to run the release mode version, you can run </p>
-<pre><code>cargo start-qemu --profile release
-</code></pre>
+                        <h1 id="extensions"><a class="header" href="#extensions">Extensions</a></h1>
+<p>This is the interface abstraction in many programming languages, or the functions that must be implemented for drivers, such as <code>read()</code> and <code>write()</code>. In practice, Twizzler's implementation of this applies to objects, where a set of methods are defined and noted such that external threads accessing the object can call the interface methods without a need to understand the specifics of under the hood operations for the object.</p>
+<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
+<p>Two examples of extensions are IO and Event. IO is useful for reading and writing to an object, and for an object to support the extension, the object must implement the functions <code>read()</code>, <code>write()</code>, <code>ioctl()</code>, and <code>poll()</code>. When registering the extension, the object will provide pointers to all of the functions, so calls to <code>read()</code> for example on the object will know how to implement the function in an object specific way.</p>
+<p>Event is a way of waiting for something to happen to an object, similar to <code>poll()</code> on a file descriptor in Unix. Specific events can be waited for by using <code>event_wait()</code> with the object and event passed in as arguments. Because this is just an interface, an object can implement it in a way that makes sense to it, such as waiting for data from a network or a write to an object to complete.</p>
+<h2 id="tags"><a class="header" href="#tags">Tags</a></h2>
+<p>Tags are a way of uniquely identifying an extension, such as IO, and checking if the object supports the extension. These are stored in the metadata for the object, and when the tag is added to the metadata, a pointer to the functions that implement the interface are also added.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="intro.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="KSO.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="Object.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="Gates.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -212,10 +158,10 @@ with:</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="intro.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="KSO.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="Object.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="Gates.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

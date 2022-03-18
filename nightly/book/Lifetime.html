@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Building Twizzler - The Twizzler Operating System</title>
+        <title>Object Lifetime - The Twizzler Operating System</title>
         <!-- Custom HTML head -->
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html" class="active">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html" class="active"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,76 +134,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="building-twizzler"><a class="header" href="#building-twizzler">Building Twizzler</a></h1>
-<p>A bit of a time consuming process the first time, so make sure you have some nice tea or something before you start :)</p>
-<h2 id="requirements"><a class="header" href="#requirements">Requirements</a></h2>
-<p>This build process has been tested on an Ubuntu 20.04 system with standard development tools
-installed, in addition to rustup (which is required). We require rustup because we will build our
-own toolchain during the build, and link the result through rustup for easier invocation of the Rust
-compiler.</p>
-<p>To build a boot image, you'll need the limine bootloader installed. In particular, we need the EFI
-code to help boot Twizzler through their boot protocol.</p>
-<p>To run qemu through the build system, you'll need qemu installed.</p>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
-<p>Installing the tools:</p>
-<ol>
-<li>sudo apt install build-essential</li>
-<li>sudo apt install python</li>
-<li>sudo apt install cmake</li>
-<li>sudo apt install ninja-build</li>
-</ol>
-<p>Building Twizzler is done in several steps:</p>
-<ol start="0">
-<li>Building xtask.</li>
-<li>Building the toolchain.</li>
-<li>Building Twizzler itself.</li>
-</ol>
-<p>Fortunately, step 0 is handled automatically whenever we try to do anything. That's because xtask is
-the &quot;build system orchestrator&quot;. Essentially, building Twizzler requires using the right toolchain,
-target specification, and compile flags at the right times, so we've placed that complexity in an
-automation tool to make builds easier. To get an idea of what xtask is doing, you can run
-<code>cargo xtask --help</code>. Note that this repo's cargo config provides aliases for the common commands,
-as we will see below.</p>
-<h2 id="step-1-building-the-toolchain"><a class="header" href="#step-1-building-the-toolchain">Step 1: Building the Toolchain</a></h2>
-<p>This step takes the longest, but only has to happen once. Run</p>
-<pre><code>cargo bootstrap
-</code></pre>
-<p>and then wait, while you sip your tea. This will compile llvm and bootstrap the rust compiler, both
-of which take a long time. At the end, you should see a &quot;build completed successfully&quot; message,
-followed by a few lines about building crti and friends. This process ends by linking the toolchain
-to rustup, which you can verify through <code>rustup show</code>, which should list <code>twizzer</code> under the
-installed toolchains.</p>
-<p>Note that this use of rustup means that there can only be one active twizzler toolchain at a time.</p>
-<h2 id="step-2-building-twizzler"><a class="header" href="#step-2-building-twizzler">Step 2: Building Twizzler</a></h2>
-<p>Now that we've got the toolchain built and linked, we can compile the rest of Twizzler. Run</p>
-<pre><code>cargo build-all
-</code></pre>
-<p>which will compile several &quot;collections&quot; of packages:</p>
-<ol>
-<li>The build tools, for things like making the initrd.</li>
-<li>The kernel.</li>
-<li>The userspace applications.</li>
-</ol>
-<p>By default all will be built in debug mode, which will run very slow. You can build for release mode
-with:</p>
-<pre><code>cargo build-all --profile release
-</code></pre>
-<h2 id="step-3-running-twizzler"><a class="header" href="#step-3-running-twizzler">Step 3: Running Twizzler</a></h2>
-<p>You can start Twizzler in Qemu by running</p>
-<pre><code>cargo start-qemu
-</code></pre>
-<p>which will bootup a qemu instance. If you want to run the release mode version, you can run </p>
-<pre><code>cargo start-qemu --profile release
-</code></pre>
+                        <h1 id="object-lifetime"><a class="header" href="#object-lifetime">Object Lifetime</a></h1>
+<h2 id="volatile-memory"><a class="header" href="#volatile-memory">Volatile Memory</a></h2>
+<p>Placing objects in volatile memory (such as DRAM) limits the object lifetime to at most the time of the next power cycle. This can provide easy cleanup for temporary data, such as the result of computation or cached data kept in memory for locality (faster access).</p>
+<p>Objects in volatile memory can be accessed and used in the same ways they are in non-volatile memory.</p>
+<h2 id="ties"><a class="header" href="#ties">Ties</a></h2>
+<!-- page 7 of Twizzler: a Data-Centric OS for Non-Volatile Memory -->
+<p>Ties handle object lifetime by allowing for automatically deleting objects once other constructs are deleted. For example, if an application crashes, the temporary computation might be useless, yet keeping the temporary computation in volatile memory until a power cycle occurs is a waste of that space. Instead, we can tie the lifetime of the object to other objects, such that the object is automatically deleted with the other, freeing the memory before a power cycle. This mechanism is convenient because the kernel does not have to maintain an understanding of the implied lifetime of an object, rather it can be specified relative to other objects.</p>
+<p>Ties also provide the benefit of allowing temporary context (such as stacks and heaps) to be stored in persistent memory, allowing for recovery after a power cycle.</p>
+<p>For example if we have two objects: <em>koala</em> and <em>coldbrew</em>, tying <em>koala</em> to <em>coldbrew</em> means that <em>koala</em> will not be deleted until after <em>coldbrew</em> is. While <em>koala</em> can be deleted immediately after <em>coldbrew</em> is, if <em>koala</em> is tied to multiple objects, it will only be fully deleted when the final object it is tied to is deleted. Additionally, if <em>koala</em> is tied to a handful of objects, once <strong>all</strong> of those objects are deleted, <em>koala</em> will be automatically deleted too. This is similar to the practice of creating a file and immediately unlinking it within Unix, so the file is automatically deleted once the file descriptor is closed.</p>
+<p>Since most construts in Twizzler are just various types of objects, we can use ties to establish a lifetime of objects based on the existence of other objects, such as threads or views. For a more detailed explanation of views, see the <a href="./Views.html">page on views</a>. For temporary computation done in a thread, an instance of computation, objects can be tied to the thread. This provides similar semantics to creating and immediately unlinking files on Unix, as with both, once the application exits, the data is deleted. With views, this provides an address space for an application to run in, possibly over multiple time periods. Tying an object to a view allows the object to exist for as long as the execution state of the application, which could be as long as the application is installed, or only removed when all application data is deleted.</p>
+<h3 id="ties-to-volatile-memory"><a class="header" href="#ties-to-volatile-memory">Ties to Volatile Memory</a></h3>
+<p>Tying volatile objects to each other implies that both objects will be deleted at a power cycle, which is to be expected. However, things get a little more complicated with ties between volatile and persistent objects. Tying a volatile object to a persistent one breaks the semantics of ties in the event of a power cycle, as the volatile object is deleted and the persistent one is not. However, this outcome is to be expected, and we assume programmers will use this when doing temporary computation. Tying a persistent object to a volatile object is dangerous as both objects will be deleted in the event of a power cycle, including an unexpected one.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="intro.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="Object.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                            <a rel="next" href="Object.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="Pointer.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         <div style="clear: both"></div>
@@ -212,10 +163,10 @@ with:</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="intro.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="Object.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                    <a rel="next" href="Object.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="Pointer.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
