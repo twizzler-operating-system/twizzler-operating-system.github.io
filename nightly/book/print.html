@@ -174,7 +174,8 @@ the &quot;build system orchestrator&quot;. Essentially, building Twizzler requir
 target specification, and compile flags at the right times, so we've placed that complexity in an
 automation tool to make builds easier. To get an idea of what xtask is doing, you can run
 <code>cargo xtask --help</code>. Note that this repo's cargo config provides aliases for the common commands,
-as we will see below.</p>
+as we will see below. In fact, it's advisable to NOT use the default cargo commands, and instead run
+everything through xtask.</p>
 <h2 id="step-1-building-the-toolchain"><a class="header" href="#step-1-building-the-toolchain">Step 1: Building the Toolchain</a></h2>
 <p>This step takes the longest, but only has to happen once. Run</p>
 <pre><code>cargo bootstrap

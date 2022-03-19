@@ -1,5 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `tools&#x2F;image_builder&#x2F;src&#x2F;main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css"disabled><link rel="stylesheet" type="text/css" href="../../dark.css"disabled><link rel="stylesheet" type="text/css" href="../../light.css"id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
-    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../image_builder/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `tools&#x2F;image_builder&#x2F;src&#x2F;main.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>main.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../image_builder/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -193,6 +192,19 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Context</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert::TryFrom</span>,
@@ -213,13 +225,18 @@
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
         <span class="ident">path</span>.<span class="ident">canonicalize</span>().<span class="ident">unwrap</span>()
     };
-    <span class="ident">create_disk_images</span>(<span class="kw-2">&amp;</span><span class="ident">kernel_binary_path</span>, <span class="kw-2">&amp;</span><span class="ident">initrd_path</span>);
+    <span class="kw">let</span> <span class="ident">cmdline</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="ident">String::new</span>());
+    <span class="ident">create_disk_images</span>(<span class="kw-2">&amp;</span><span class="ident">kernel_binary_path</span>, <span class="kw-2">&amp;</span><span class="ident">initrd_path</span>, <span class="ident">cmdline</span>);
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_disk_images</span>(<span class="ident">kernel_binary_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">initrd_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">PathBuf</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_disk_images</span>(
+    <span class="ident">kernel_binary_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+    <span class="ident">initrd_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+    <span class="ident">cmdline</span>: <span class="ident">String</span>,
+) -&gt; <span class="ident">PathBuf</span> {
     <span class="comment">//let kernel_manifest_path = locate_cargo_manifest::locate_manifest().unwrap();</span>
     <span class="comment">//let kernel_binary_name = kernel_binary_path.file_name().unwrap().to_str().unwrap();</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">create_uefi_disk_image</span>(<span class="ident">kernel_binary_path</span>, <span class="ident">initrd_path</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">create_uefi_disk_image</span>(<span class="ident">kernel_binary_path</span>, <span class="ident">initrd_path</span>, <span class="ident">cmdline</span>) {
         <span class="macro">panic!</span>(<span class="string">&quot;failed to create disk image: {:?}&quot;</span>, <span class="ident">e</span>);
     }
     <span class="kw">let</span> <span class="ident">disk_image</span> <span class="op">=</span> <span class="ident">kernel_binary_path</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>().<span class="ident">join</span>(<span class="string">&quot;disk.img&quot;</span>);
@@ -232,7 +249,11 @@
     <span class="ident">disk_image</span>
 }
 
-<span class="kw">fn</span> <span class="ident">create_uefi_disk_image</span>(<span class="ident">kernel_binary_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">initrd_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">create_uefi_disk_image</span>(
+    <span class="ident">kernel_binary_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+    <span class="ident">initrd_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
+    <span class="ident">cmdline</span>: <span class="ident">String</span>,
+) -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">efi_file</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="string">&quot;/usr/share/limine/BOOTX64.EFI&quot;</span>);
     <span class="kw">let</span> <span class="ident">efi_size</span> <span class="op">=</span> <span class="ident">fs::metadata</span>(<span class="kw-2">&amp;</span><span class="ident">efi_file</span>)
         .<span class="ident">context</span>(<span class="string">&quot;failed to read metadata of efi file&quot;</span>)<span class="question-mark">?</span>
@@ -244,7 +265,8 @@
         .<span class="ident">context</span>(<span class="string">&quot;failed to read metadata of initrd file&quot;</span>)<span class="question-mark">?</span>
         .<span class="ident">len</span>();
 
-    <span class="kw">let</span> <span class="ident">cfg_data</span> <span class="op">=</span> <span class="string">r#&quot;
+    <span class="kw">let</span> <span class="ident">cfg_data</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="string">r#&quot;
 TIMEOUT=1 
 DEFAULT_ENTRY=1
 :Twizzler
@@ -252,7 +274,10 @@ RESOLUTION=800x600
 PROTOCOL=stivale2
 KERNEL_PATH=boot:///kernel.elf
 MODULE_PATH=boot:///initrd
-&quot;#</span>;
+KERNEL_CMDLINE={}
+&quot;#</span>,
+        <span class="ident">cmdline</span>
+    );
     <span class="comment">// create fat partition</span>
     <span class="kw">let</span> <span class="ident">fat_file_path</span> <span class="op">=</span> {
         <span class="kw">const</span> <span class="ident">MB</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
@@ -291,15 +316,15 @@ MODULE_PATH=boot:///initrd
         <span class="ident">root_dir</span>.<span class="ident">create_dir</span>(<span class="string">&quot;efi/boot&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bootx64</span> <span class="op">=</span> <span class="ident">root_dir</span>.<span class="ident">create_file</span>(<span class="string">&quot;efi/boot/bootx64.efi&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">bootx64</span>.<span class="ident">truncate</span>()<span class="question-mark">?</span>;
-        <span class="ident">io::copy</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">efi_file</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut</span> <span class="ident">bootx64</span>)<span class="question-mark">?</span>;
+        <span class="ident">io::copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">efi_file</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bootx64</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">kernel</span> <span class="op">=</span> <span class="ident">root_dir</span>.<span class="ident">create_file</span>(<span class="string">&quot;kernel.elf&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">kernel</span>.<span class="ident">truncate</span>()<span class="question-mark">?</span>;
-        <span class="ident">io::copy</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">kernel_binary_path</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut</span> <span class="ident">kernel</span>)<span class="question-mark">?</span>;
+        <span class="ident">io::copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">kernel_binary_path</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">kernel</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="ident">root_dir</span>.<span class="ident">create_file</span>(<span class="string">&quot;limine.cfg&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">cfg</span>.<span class="ident">write_all</span>(<span class="ident">cfg_data</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">initrd</span> <span class="op">=</span> <span class="ident">root_dir</span>.<span class="ident">create_file</span>(<span class="string">&quot;initrd&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">initrd</span>.<span class="ident">truncate</span>()<span class="question-mark">?</span>;
-        <span class="ident">io::copy</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">initrd_path</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;mut</span> <span class="ident">initrd</span>)<span class="question-mark">?</span>;
+        <span class="ident">io::copy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">initrd_path</span>)<span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">initrd</span>)<span class="question-mark">?</span>;
 
         <span class="ident">fat_path</span>
     };
@@ -327,7 +352,7 @@ MODULE_PATH=boot:///initrd
         <span class="kw">let</span> <span class="ident">mbr</span> <span class="op">=</span> <span class="ident">gpt::mbr::ProtectiveMBR::with_lb_size</span>(
             <span class="ident">u32::try_from</span>((<span class="ident">image_size</span> <span class="op">/</span> <span class="number">512</span>) <span class="op">-</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="number">0xFF_FF_FF_FF</span>),
         );
-        <span class="ident">mbr</span>.<span class="ident">overwrite_lba0</span>(<span class="kw-2">&amp;mut</span> <span class="ident">image</span>)
+        <span class="ident">mbr</span>.<span class="ident">overwrite_lba0</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">image</span>)
             .<span class="ident">context</span>(<span class="string">&quot;failed to write protective MBR&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// create new GPT in image file</span>
@@ -337,7 +362,7 @@ MODULE_PATH=boot:///initrd
             .<span class="ident">writable</span>(<span class="bool-val">true</span>)
             .<span class="ident">initialized</span>(<span class="bool-val">false</span>)
             .<span class="ident">logical_block_size</span>(<span class="ident">block_size</span>)
-            .<span class="ident">create_from_device</span>(<span class="ident">Box::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">image</span>), <span class="prelude-val">None</span>)
+            .<span class="ident">create_from_device</span>(<span class="ident">Box::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">image</span>), <span class="prelude-val">None</span>)
             .<span class="ident">context</span>(<span class="string">&quot;failed to open UEFI disk image&quot;</span>)<span class="question-mark">?</span>;
         <span class="ident">disk</span>.<span class="ident">update_partitions</span>(<span class="ident">Default::default</span>())
             .<span class="ident">context</span>(<span class="string">&quot;failed to initialize GPT partition table&quot;</span>)<span class="question-mark">?</span>;
@@ -372,8 +397,8 @@ MODULE_PATH=boot:///initrd
             .<span class="ident">seek</span>(<span class="ident">io::SeekFrom::Start</span>(<span class="ident">start_offset</span>))
             .<span class="ident">context</span>(<span class="string">&quot;failed to seek to boot partiiton start&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> <span class="ident">io::copy</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">fat_file_path</span>).<span class="ident">context</span>(<span class="string">&quot;failed to open fat image&quot;</span>)<span class="question-mark">?</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">image</span>,
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">File::open</span>(<span class="kw-2">&amp;</span><span class="ident">fat_file_path</span>).<span class="ident">context</span>(<span class="string">&quot;failed to open fat image&quot;</span>)<span class="question-mark">?</span>,
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">image</span>,
         )
         .<span class="ident">context</span>(<span class="string">&quot;failed to write boot partition content&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">bytes_written</span> <span class="op">!</span><span class="op">=</span> <span class="ident">partition_size</span> {
@@ -388,5 +413,6 @@ MODULE_PATH=boot:///initrd
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="image_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0-nightly (db9d361a4 2021-11-28)" ></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="image_builder" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>
