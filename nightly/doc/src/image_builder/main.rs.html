@@ -205,6 +205,13 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Context</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">convert::TryFrom</span>,
@@ -217,6 +224,10 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">std::env::args</span>().<span class="ident">skip</span>(<span class="number">1</span>); <span class="comment">// skip executable name</span>
 
     <span class="comment">/* TODO: better args processing */</span>
+    <span class="kw">let</span> <span class="ident">disk_image_path</span> <span class="op">=</span> {
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
+        <span class="ident">path</span>
+    };
     <span class="kw">let</span> <span class="ident">kernel_binary_path</span> <span class="op">=</span> {
         <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
         <span class="ident">path</span>.<span class="ident">canonicalize</span>().<span class="ident">unwrap</span>()
@@ -226,30 +237,33 @@
         <span class="ident">path</span>.<span class="ident">canonicalize</span>().<span class="ident">unwrap</span>()
     };
     <span class="kw">let</span> <span class="ident">cmdline</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap_or</span>(<span class="ident">String::new</span>());
-    <span class="ident">create_disk_images</span>(<span class="kw-2">&amp;</span><span class="ident">kernel_binary_path</span>, <span class="kw-2">&amp;</span><span class="ident">initrd_path</span>, <span class="ident">cmdline</span>);
+    <span class="ident">create_disk_images</span>(<span class="kw-2">&amp;</span><span class="ident">disk_image_path</span>, <span class="kw-2">&amp;</span><span class="ident">kernel_binary_path</span>, <span class="kw-2">&amp;</span><span class="ident">initrd_path</span>, <span class="ident">cmdline</span>);
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_disk_images</span>(
+    <span class="ident">disk_image_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">kernel_binary_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">initrd_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">cmdline</span>: <span class="ident">String</span>,
 ) -&gt; <span class="ident">PathBuf</span> {
     <span class="comment">//let kernel_manifest_path = locate_cargo_manifest::locate_manifest().unwrap();</span>
     <span class="comment">//let kernel_binary_name = kernel_binary_path.file_name().unwrap().to_str().unwrap();</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">create_uefi_disk_image</span>(<span class="ident">kernel_binary_path</span>, <span class="ident">initrd_path</span>, <span class="ident">cmdline</span>) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span>
+        <span class="ident">create_uefi_disk_image</span>(<span class="ident">disk_image_path</span>, <span class="ident">kernel_binary_path</span>, <span class="ident">initrd_path</span>, <span class="ident">cmdline</span>)
+    {
         <span class="macro">panic!</span>(<span class="string">&quot;failed to create disk image: {:?}&quot;</span>, <span class="ident">e</span>);
     }
-    <span class="kw">let</span> <span class="ident">disk_image</span> <span class="op">=</span> <span class="ident">kernel_binary_path</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>().<span class="ident">join</span>(<span class="string">&quot;disk.img&quot;</span>);
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">disk_image</span>.<span class="ident">exists</span>() {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">disk_image_path</span>.<span class="ident">exists</span>() {
         <span class="macro">panic!</span>(
             <span class="string">&quot;Disk image does not exist at {} after bootloader build&quot;</span>,
-            <span class="ident">disk_image</span>.<span class="ident">display</span>()
+            <span class="ident">disk_image_path</span>.<span class="ident">display</span>()
         );
     }
-    <span class="ident">disk_image</span>
+    <span class="ident">disk_image_path</span>.<span class="ident">to_path_buf</span>()
 }
 
 <span class="kw">fn</span> <span class="ident">create_uefi_disk_image</span>(
+    <span class="ident">disk_image_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">kernel_binary_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">initrd_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
     <span class="ident">cmdline</span>: <span class="ident">String</span>,
@@ -282,7 +296,7 @@ KERNEL_CMDLINE={}
     <span class="kw">let</span> <span class="ident">fat_file_path</span> <span class="op">=</span> {
         <span class="kw">const</span> <span class="ident">MB</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
 
-        <span class="kw">let</span> <span class="ident">fat_path</span> <span class="op">=</span> <span class="ident">kernel_binary_path</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>().<span class="ident">join</span>(<span class="string">&quot;image.fat&quot;</span>);
+        <span class="kw">let</span> <span class="ident">fat_path</span> <span class="op">=</span> <span class="ident">disk_image_path</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>().<span class="ident">join</span>(<span class="string">&quot;image.fat&quot;</span>);
         <span class="kw">let</span> <span class="ident">fat_file</span> <span class="op">=</span> <span class="ident">fs::OpenOptions::new</span>()
             .<span class="ident">read</span>(<span class="bool-val">true</span>)
             .<span class="ident">write</span>(<span class="bool-val">true</span>)
@@ -331,7 +345,7 @@ KERNEL_CMDLINE={}
 
     <span class="comment">// create gpt disk</span>
     {
-        <span class="kw">let</span> <span class="ident">image_path</span> <span class="op">=</span> <span class="ident">fat_file_path</span>.<span class="ident">parent</span>().<span class="ident">unwrap</span>().<span class="ident">join</span>(<span class="string">&quot;disk.img&quot;</span>);
+        <span class="kw">let</span> <span class="ident">image_path</span> <span class="op">=</span> <span class="ident">disk_image_path</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">image</span> <span class="op">=</span> <span class="ident">fs::OpenOptions::new</span>()
             .<span class="ident">create</span>(<span class="bool-val">true</span>)
             .<span class="ident">truncate</span>(<span class="bool-val">true</span>)
