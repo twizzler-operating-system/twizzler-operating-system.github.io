@@ -151,6 +151,7 @@ code to help boot Twizzler through their boot protocol.</p>
 <li>sudo apt install python</li>
 <li>sudo apt install cmake</li>
 <li>sudo apt install ninja-build</li>
+<li>Install Rust https://www.rust-lang.org/tools/install</li>
 </ol>
 <p>Building Twizzler is done in several steps:</p>
 <ol start="0">
@@ -167,7 +168,8 @@ as we will see below. In fact, it's advisable to NOT use the default cargo comma
 everything through xtask.</p>
 <h2 id="step-1-building-the-toolchain"><a class="header" href="#step-1-building-the-toolchain">Step 1: Building the Toolchain</a></h2>
 <p>This step takes the longest, but only has to happen once. Run</p>
-<pre><code>cargo bootstrap
+<pre><code>cd where/you/cloned/twizzler
+cargo bootstrap
 </code></pre>
 <p>and then wait, while you sip your tea. This will compile llvm and bootstrap the rust compiler, both
 of which take a long time. At the end, you should see a &quot;build completed successfully&quot; message,

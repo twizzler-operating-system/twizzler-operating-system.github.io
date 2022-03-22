@@ -136,7 +136,8 @@
                     <main>
                         <h1 id="user-space-primitive-documentation"><a class="header" href="#user-space-primitive-documentation">User Space Primitive Documentation</a></h1>
 <h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
-<p>Since Twizzler is a microkernel, many operations handled by monolithic kernels are instead implemented in userspace. </p>
+<p>This documentation is largely still a collection of notes based off the previous C-based Twizzler
+system, and is being updated to reflect new APIs.</p>
 <h2 id="where-to-begin"><a class="header" href="#where-to-begin">Where to begin</a></h2>
 <p>Twizzler introduces objects to organize persistent data, rather than files in traditional systems. This provides the benefit of not having to serialize and deserialize data to make it persistent.</p>
 <p>Pages explaining the  main abstractions of the OS are available at the following links: <a href="./Object.html">Objects</a> (for the main data abstraction), <a href="./Views.html">Views</a> (for thread environments), and <a href="./KSO.html">Kernel State Objects</a> (the security model). From these basics, there are a number of features provided by the Twizzler userspace that can be used to enhance programs, but are not necessary for understanding the fundamentals of the OS.</p>
