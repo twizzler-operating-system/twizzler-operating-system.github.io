@@ -210,6 +210,8 @@ with:</p>
 <p>which will bootup a qemu instance. If you want to run the release mode version, you can run </p>
 <pre><code>cargo start-qemu --profile release
 </code></pre>
+<h2 id="step-4-exiting-twizzler"><a class="header" href="#step-4-exiting-twizzler">Step 4: Exiting Twizzler</a></h2>
+<p>At the moment Twizzler does not have a shutdown command.  To exit the QEMU based simulation use the <code>Ctrl-a X</code> command which is a part of the simulator.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="objects"><a class="header" href="#objects">Objects</a></h1>
 <h2 id="definition"><a class="header" href="#definition">Definition</a></h2>
 <p>Objects are an abstraction of a set of related data with the same lifetime and permissions. This vague definition allows for applications to define what data is contained in a single object in a way that is most reasonable for the particular use case. For example, a B-Tree could contain all nodes in the same object given that the nodes likely have the same permissions and lifetime. However, another tree with different permissions for children could separate these nodes into different objects. For this second example, managing their lifetime can be done with <a href="./Lifetime.html#Ties">ties</a>.</p>
