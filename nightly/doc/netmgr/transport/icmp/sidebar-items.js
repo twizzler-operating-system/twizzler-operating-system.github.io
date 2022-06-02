@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["handle_icmp_packet",""],["init",""],["send_packet",""]],"struct":[["Icmp",""],["IcmpHeader",""]]});
+initSidebarItems({"fn":[["_handle_icmp_packet",""],["_send_packet",""],["init",""]],"struct":[["Icmp",""],["IcmpHeader",""]]});

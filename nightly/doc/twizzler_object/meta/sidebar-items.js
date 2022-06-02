@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["FotEntry","An entry in the FOT."]]});

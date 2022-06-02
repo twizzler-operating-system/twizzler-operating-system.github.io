@@ -1,0 +1,5 @@
+(function() {var implementors = {};
+implementors["twizzler_abi"] = [];
+implementors["twizzler_net"] = [{"text":"impl <a class=\"trait\" href=\"twizzler_abi/marker/trait.BaseType.html\" title=\"trait twizzler_abi::marker::BaseType\">BaseType</a> for <a class=\"struct\" href=\"twizzler_net/buffer/struct.BufferBase.html\" title=\"struct twizzler_net::buffer::BufferBase\">BufferBase</a>","synthetic":false,"types":["twizzler_net::buffer::BufferBase"]}];
+implementors["twizzler_queue"] = [{"text":"impl&lt;S, C&gt; <a class=\"trait\" href=\"twizzler_abi/marker/trait.BaseType.html\" title=\"trait twizzler_abi::marker::BaseType\">BaseType</a> for <a class=\"struct\" href=\"twizzler_queue/struct.QueueBase.html\" title=\"struct twizzler_queue::QueueBase\">QueueBase</a>&lt;S, C&gt;","synthetic":false,"types":["twizzler_queue::queue::QueueBase"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

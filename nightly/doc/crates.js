@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["image_builder","initrd_gen"];
+window.ALL_CRATES = ["devmgr","init","netmgr","nettest","twizzler_abi","twizzler_async","twizzler_driver","twizzler_nando","twizzler_net","twizzler_object","twizzler_queue","twizzler_queue_raw"];
