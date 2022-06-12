@@ -42,23 +42,37 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions for handling upcalls from the kernel.</span>
+
+<span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::arch::upcall::UpcallFrame</span>;
 
+<span class="doccomment">/// Information about an exception.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExceptionInfo</span> {
-    <span class="ident">code</span>: <span class="ident">u64</span>,
-    <span class="ident">info</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// CPU-reported exception code.</span>
+    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// Arch-specific additional info.</span>
+    <span class="kw">pub</span> <span class="ident">info</span>: <span class="ident">u64</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ExceptionInfo</span> {
+    <span class="doccomment">/// Construct new exception info.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">code</span>: <span class="ident">u64</span>, <span class="ident">info</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">code</span>, <span class="ident">info</span> }
     }
 }
 
+<span class="doccomment">/// Possible upcall reasons and info.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">UpcallInfo</span> {

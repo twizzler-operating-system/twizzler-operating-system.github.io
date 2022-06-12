@@ -87,7 +87,18 @@
 <span id="87">87</span>
 <span id="88">88</span>
 <span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">kso::KactionError</span>, <span class="ident">vcell::Volatile</span>};
+<span class="doccomment">/// The base struct for an info sub-object for a PCIe device.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -97,9 +108,12 @@
     <span class="kw">pub</span> <span class="ident">seg_nr</span>: <span class="ident">u16</span>,
 }
 
+<span class="doccomment">/// PCIe-specific [crate::kso::KactionGenericCmd] values.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PcieKactionSpecific</span> {
+    <span class="doccomment">/// Register a device ID.</span>
     <span class="ident">RegisterDevice</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// Allocate an interrupt for a device.</span>
     <span class="ident">AllocateInterrupt</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
@@ -116,6 +130,8 @@
 }
 
 <span class="comment">//TODO: can we move this out of this crate?</span>
+<span class="doccomment">/// The standard PCIe function header.</span>
+<span class="doccomment">/// See the PCI spec for more details.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>(<span class="number">4096</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PcieFunctionHeader</span> {
@@ -133,6 +149,8 @@
     <span class="kw">pub</span> <span class="ident">bist</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// The standard PCIe device header.</span>
+<span class="doccomment">/// See the PCI spec for more details.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PcieDeviceHeader</span> {
@@ -150,6 +168,8 @@
     <span class="kw">pub</span> <span class="ident">max_latency</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// The standard PCIe bridge header.</span>
+<span class="doccomment">/// See the PCI spec for more details.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PcieBridgeHeader</span> {

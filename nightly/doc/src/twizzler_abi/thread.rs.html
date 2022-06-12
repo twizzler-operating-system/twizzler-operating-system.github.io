@@ -222,7 +222,12 @@
 <span id="222">222</span>
 <span id="223">223</span>
 <span id="224">224</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions for manipulating threads.</span>
+
+<span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">alloc::Layout</span>,
     <span class="ident">ptr</span>,
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
@@ -237,6 +242,7 @@
     <span class="ident">syscall</span>::{<span class="ident">MapFlags</span>, <span class="ident">ThreadSpawnArgs</span>, <span class="ident">ThreadSpawnFlags</span>},
 };
 
+<span class="doccomment">/// Base type for a thread object.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ThreadRepr</span> {
     <span class="ident">version</span>: <span class="ident">u32</span>,
@@ -246,6 +252,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ThreadRepr</span> {
+    <span class="doccomment">/// Wait for a thread&#39;s status to change.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ThreadSync::new_sleep</span>(<span class="ident">ThreadSyncSleep::new</span>(
@@ -255,10 +262,8 @@
                 <span class="ident">ThreadSyncFlags::empty</span>(),
             ));
             <span class="ident">sys_thread_sync</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">op</span>], <span class="ident">timeout</span>).<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">timeout</span>.<span class="ident">is_some</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
-                }
+            <span class="kw">if</span> <span class="ident">timeout</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">status</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="number">0</span> {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
         }
         <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">code</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>))
@@ -291,6 +296,7 @@
 
 <span class="kw">const</span> <span class="ident">STACK_ALIGN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
+<span class="doccomment">/// Build new thread internal tracking info.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new_thread</span>(

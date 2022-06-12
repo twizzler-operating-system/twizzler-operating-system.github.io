@@ -29,36 +29,70 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types that make up object metadata.</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::ObjID</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::marker</span>::{<span class="ident">BaseTag</span>, <span class="ident">BaseVersion</span>};
 
+<span class="doccomment">/// Flags for objects.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetaFlags</span>(<span class="ident">u32</span>);
 
+<span class="doccomment">/// A nonce for avoiding object ID collision.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Nonce</span>(<span class="ident">u128</span>);
 
+<span class="doccomment">/// The core metadata that all objects share.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetaInfo</span> {
+    <span class="doccomment">/// The ID nonce.</span>
     <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
+    <span class="doccomment">/// The object&#39;s public key ID.</span>
     <span class="kw">pub</span> <span class="ident">kuid</span>: <span class="ident">ObjID</span>,
+    <span class="doccomment">/// The object flags.</span>
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">MetaFlags</span>,
+    <span class="doccomment">/// The number of FOT entries.</span>
     <span class="kw">pub</span> <span class="ident">fotcount</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// The number of meta extensions.</span>
     <span class="kw">pub</span> <span class="ident">extcount</span>: <span class="ident">u16</span>,
+    <span class="doccomment">/// The tag of the base struct type.</span>
     <span class="kw">pub</span> <span class="ident">tag</span>: <span class="ident">BaseTag</span>,
+    <span class="doccomment">/// The version of the base struct type.</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">BaseVersion</span>,
 }
 
+<span class="doccomment">/// A tag for a meta extension entry.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetaExtTag</span>(<span class="ident">u64</span>);
+
+<span class="doccomment">/// A meta extension entry.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetaExt</span> {
-    <span class="ident">tag</span>: <span class="ident">MetaExtTag</span>,
-    <span class="ident">value</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The tag.</span>
+    <span class="kw">pub</span> <span class="ident">tag</span>: <span class="ident">MetaExtTag</span>,
+    <span class="doccomment">/// A tag-specific value.</span>
+    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">u64</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_abi" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

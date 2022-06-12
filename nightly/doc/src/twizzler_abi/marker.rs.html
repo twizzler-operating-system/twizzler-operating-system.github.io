@@ -63,7 +63,14 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Marker traits used to indicate safety for storing data in objects and using a struct as a base type.</span>
+
+<span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">cell::UnsafeCell</span>,
     <span class="ident">sync::atomic</span>::{
         <span class="ident">AtomicBool</span>, <span class="ident">AtomicI16</span>, <span class="ident">AtomicI32</span>, <span class="ident">AtomicI64</span>, <span class="ident">AtomicI8</span>, <span class="ident">AtomicIsize</span>, <span class="ident">AtomicU16</span>, <span class="ident">AtomicU32</span>,
@@ -74,6 +81,9 @@
 <span class="doccomment">/// This auto trait specifies that some type is &quot;safe&quot; to to store inside an object. This means that</span>
 <span class="doccomment">/// the type contains no non-invariant references nor any unsafe interior mutability not implemented</span>
 <span class="doccomment">/// via twizzler-nando.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Safety</span>
+<span class="doccomment">/// Manually marking type as safe requires that the programmer adhere to the rules set above.</span>
 <span class="attribute">#[<span class="ident">rustc_on_unimplemented</span>(
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;`{Self}` is not safe to be stored in an object&quot;</span>,
     <span class="ident">label</span> <span class="op">=</span> <span class="string">&quot;`{Self}` is not safe to be stored in an object&quot;</span>

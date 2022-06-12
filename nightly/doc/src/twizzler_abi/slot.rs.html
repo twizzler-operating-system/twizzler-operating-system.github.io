@@ -85,6 +85,7 @@
 <span id="85">85</span>
 <span id="86">86</span>
 <span id="87">87</span>
+<span id="88">88</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Manage slots in the address space. Currently not finished.</span>
 
 <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
@@ -122,6 +123,7 @@
     (<span class="ident">start</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>).<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
 }
 
+<span class="doccomment">/// Init slot allocation and context runtime. Called during startup.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">runtime_init</span>() {
     <span class="kw">let</span> <span class="ident">cs</span> <span class="op">=</span> <span class="ident">ObjectCreate::new</span>(
         <span class="ident"><span class="kw">crate</span>::syscall::BackingType::Normal</span>,

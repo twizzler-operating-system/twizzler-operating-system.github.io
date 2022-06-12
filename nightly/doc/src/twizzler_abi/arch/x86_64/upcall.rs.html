@@ -69,9 +69,14 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_imports</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::upcall::UpcallInfo</span>;
 
+<span class="doccomment">/// Arch-specific frame info for upcall.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UpcallFrame</span> {
     <span class="kw">pub</span> <span class="ident">rip</span>: <span class="ident">u64</span>,
@@ -95,14 +100,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UpcallFrame</span> {
+    <span class="doccomment">/// Get the instruction pointer of the frame.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">rip</span> <span class="kw">as</span> <span class="ident">usize</span>
     }
 
+    <span class="doccomment">/// Get the stack pointer of the frame.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">rsp</span> <span class="kw">as</span> <span class="ident">usize</span>
     }
 
+    <span class="doccomment">/// Get the base pointer of the frame.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">rbp</span> <span class="kw">as</span> <span class="ident">usize</span>
     }

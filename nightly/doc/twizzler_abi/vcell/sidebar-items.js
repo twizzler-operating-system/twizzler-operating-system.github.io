@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Volatile",""]]});
+initSidebarItems({"struct":[["Volatile","A value that should be accessed with volatile memory semantics."]]});

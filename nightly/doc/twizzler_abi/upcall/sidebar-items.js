@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["UpcallInfo",""]],"struct":[["ExceptionInfo",""],["UpcallFrame",""]]});
+initSidebarItems({"enum":[["UpcallInfo","Possible upcall reasons and info."]],"struct":[["ExceptionInfo","Information about an exception."],["UpcallFrame","Arch-specific frame info for upcall."]]});

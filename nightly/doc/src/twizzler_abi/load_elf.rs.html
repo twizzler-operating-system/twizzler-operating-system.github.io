@@ -345,7 +345,14 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">intrinsics::copy_nonoverlapping</span>, <span class="ident">mem::size_of</span>};
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions to start new executable programs.</span>
+
+<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">intrinsics::copy_nonoverlapping</span>, <span class="ident">mem::size_of</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">aux::AuxEntry</span>,
@@ -449,6 +456,7 @@
     }
 }
 
+<span class="doccomment">/// An object that contains an ELF file.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ElfObject</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">hdr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ElfHeader</span>,
@@ -520,6 +528,7 @@
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
+<span class="doccomment">/// Possible errors for [spawn_new_executable].</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SpawnExecutableError</span> {
     <span class="ident">ObjectCreateFailed</span>,
     <span class="ident">InvalidExecutable</span>,
@@ -527,6 +536,7 @@
     <span class="ident">ThreadSpawnFailed</span>,
 }
 
+<span class="doccomment">/// Start a new executable in a new address space.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_new_executable</span>(
     <span class="ident">exe</span>: <span class="ident">ObjID</span>,
     <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]],

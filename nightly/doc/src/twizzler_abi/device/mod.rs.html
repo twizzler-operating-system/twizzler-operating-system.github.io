@@ -208,7 +208,36 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+</pre><pre class="rust"><code><span class="doccomment">//! APIs for accessing the device tree and device representation objects.</span>
+
+<span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">fmt::Display</span>,
     <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
     <span class="ident">time::Duration</span>,
@@ -223,26 +252,38 @@
 
 <span class="kw">const</span> <span class="ident">NUM_DEVICE_INTERRUPTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
+<span class="doccomment">/// Possible high-level device types.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DeviceType</span> {
+    <span class="doccomment">/// An unknown device type. Should be ignored.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// A bus. This device has numerous children and should be enumerated.</span>
     <span class="ident">Bus</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// A traditional &quot;device&quot;. It may still have children, but their meaning is device-specific.</span>
     <span class="ident">Device</span> <span class="op">=</span> <span class="number">2</span>,
 }
 
+<span class="doccomment">/// All supported kernel-discovered bus types.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BusType</span> {
+    <span class="doccomment">/// An unknown bus. Should be ignored.</span>
     <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// The &quot;system&quot; bus. Typically comprised of devices created by the kernel.</span>
     <span class="ident">System</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="doccomment">/// PCIe.</span>
     <span class="ident">Pcie</span> <span class="op">=</span> <span class="number">2</span>,
 }
 
+<span class="doccomment">/// A device will have a number of sub-objects to present enough information and access for a</span>
+<span class="doccomment">/// userspace driver to be implemented.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SubObjectType</span> {
+    <span class="doccomment">/// An info sub-object, which is comprised of a device-specific (or bus-specific) information structure.</span>
     <span class="ident">Info</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="doccomment">/// A mapping of the MMIO registers for this device into an object.</span>
     <span class="ident">Mmio</span> <span class="op">=</span> <span class="number">1</span>,
 }
 
@@ -266,6 +307,7 @@
     }
 }
 
+<span class="doccomment">/// For MMIO registers, we may need to specify the caching type.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CacheType</span> {
@@ -275,10 +317,13 @@
     <span class="ident">Uncachable</span> <span class="op">=</span> <span class="number">3</span>,
 }
 
+<span class="doccomment">/// Info struct at the base of an mmio sub-object.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MmioInfo</span> {
+    <span class="doccomment">/// The length of this mapping.</span>
     <span class="kw">pub</span> <span class="ident">length</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The cache type.</span>
     <span class="kw">pub</span> <span class="ident">cache_type</span>: <span class="ident">CacheType</span>,
 }
 
@@ -291,16 +336,20 @@
         <span class="macro">todo!</span>()
     }
 }
+<span class="doccomment">/// An mmio object has, at its base, a [MmioInfo] struct. At this offset, the mmio mapping actually starts.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MMIO_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x2000</span>;
 
 <span class="macro">bitflags::bitflags!</span> {
+    <span class="doccomment">/// Possible flags for device interrupts.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceInterruptFlags</span>: <span class="ident">u16</span> {}
 }
 
+<span class="doccomment">/// A vector number (used by the kernel).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InterruptVector</span>(<span class="ident">u32</span>);
 
+<span class="doccomment">/// A per-bus device ID.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceId</span>(<span class="ident">u32</span>);
@@ -319,6 +368,7 @@
     <span class="ident">taken</span>: <span class="ident">u16</span>,
 }
 
+<span class="doccomment">/// The base struct for a device object.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceRepr</span> {
     <span class="ident">kso_hdr</span>: <span class="ident">KsoHdr</span>,
@@ -347,6 +397,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DeviceRepr</span> {
+    <span class="doccomment">/// Construct a new device repr.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">kso_hdr</span>: <span class="ident">KsoHdr</span>,
         <span class="ident">device_type</span>: <span class="ident">DeviceType</span>,
@@ -372,6 +423,7 @@
         }
     }
 
+    <span class="doccomment">/// Block until an interrupt fires.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_for_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
@@ -398,6 +450,7 @@
         }
     }
 
+    <span class="doccomment">/// Poll an interrupt vector to see if it has fired.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_for_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
         <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="number">0</span> {
@@ -407,6 +460,7 @@
         }
     }
 
+    <span class="doccomment">/// Register an interrupt vector with this device.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_interrupt</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">inum</span>: <span class="ident">usize</span>,

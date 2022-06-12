@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["BusType",""],["DeviceType",""]],"fn":[["get_bustree_root",""]],"struct":[["BusTreeRoot",""],["Device",""],["DeviceChildrenIterator",""],["DeviceRepr",""],["InfoObject",""],["MmioObject",""]]});
+initSidebarItems({"enum":[["BusType","All supported kernel-discovered bus types."],["DeviceType","Possible high-level device types."]],"fn":[["get_bustree_root",""]],"struct":[["BusTreeRoot",""],["Device",""],["DeviceChildrenIterator",""],["DeviceRepr","The base struct for a device object."],["InfoObject",""],["MmioObject",""]]});
