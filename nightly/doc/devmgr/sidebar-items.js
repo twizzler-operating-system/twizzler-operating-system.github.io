@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["get_pcie_offset",""],["main",""],["print_info",""],["start_pcie",""]]});
+initSidebarItems({"fn":[["get_pcie_offset",""],["main",""],["print_info",""],["start_pcie",""],["start_pcie_device",""]],"mod":[["nvme_test",""]]});

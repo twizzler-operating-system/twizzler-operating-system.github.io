@@ -235,11 +235,67 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
 </pre><pre class="rust"><code><span class="doccomment">//! APIs for accessing the device tree and device representation objects.</span>
 
 <span class="kw">use</span> <span class="ident">core</span>::{
     <span class="ident">fmt::Display</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
+    <span class="ident">num::TryFromIntError</span>,
+    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU16</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
     <span class="ident">time::Duration</span>,
 };
 
@@ -250,7 +306,7 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bus</span>;
 
-<span class="kw">const</span> <span class="ident">NUM_DEVICE_INTERRUPTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NUM_DEVICE_INTERRUPTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
 
 <span class="doccomment">/// Possible high-level device types.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
@@ -325,6 +381,8 @@
     <span class="kw">pub</span> <span class="ident">length</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The cache type.</span>
     <span class="kw">pub</span> <span class="ident">cache_type</span>: <span class="ident">CacheType</span>,
+    <span class="doccomment">/// Device-specific info.</span>
+    <span class="kw">pub</span> <span class="ident">info</span>: <span class="ident">u64</span>,
 }
 
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::marker::BaseType</span> <span class="kw">for</span> <span class="ident">MmioInfo</span> {
@@ -349,6 +407,15 @@
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InterruptVector</span>(<span class="ident">u32</span>);
 
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InterruptVector</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromIntError</span>;
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">u</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">InterruptVector</span>(<span class="ident">u</span>))
+    }
+}
+
 <span class="doccomment">/// A per-bus device ID.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
@@ -361,13 +428,34 @@
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DeviceInterrupt</span> {
-    <span class="ident">sync</span>: <span class="ident">AtomicU64</span>,
-    <span class="ident">vec</span>: <span class="ident">InterruptVector</span>,
-    <span class="ident">flags</span>: <span class="ident">DeviceInterruptFlags</span>,
-    <span class="ident">taken</span>: <span class="ident">u16</span>,
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceInterrupt</span> {
+    <span class="kw">pub</span> <span class="ident">sync</span>: <span class="ident">AtomicU64</span>,
+    <span class="kw">pub</span> <span class="ident">vec</span>: <span class="ident">InterruptVector</span>,
+    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">DeviceInterruptFlags</span>,
+    <span class="kw">pub</span> <span class="ident">taken</span>: <span class="ident">AtomicU16</span>,
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MailboxPriority</span> {
+    <span class="ident">Idle</span>,
+    <span class="ident">Low</span>,
+    <span class="ident">High</span>,
+    <span class="ident">Num</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MailboxPriority</span> {
+    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
+
+    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">value</span> {
+            <span class="number">0</span> =&gt; <span class="ident">MailboxPriority::Idle</span>,
+            <span class="number">1</span> =&gt; <span class="ident">MailboxPriority::Low</span>,
+            <span class="number">2</span> =&gt; <span class="ident">MailboxPriority::High</span>,
+            <span class="number">3</span> =&gt; <span class="ident">MailboxPriority::Num</span>,
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+        })
+    }
+}
 <span class="doccomment">/// The base struct for a device object.</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceRepr</span> {
@@ -375,7 +463,8 @@
     <span class="kw">pub</span> <span class="ident">device_type</span>: <span class="ident">DeviceType</span>,
     <span class="kw">pub</span> <span class="ident">bus_type</span>: <span class="ident">BusType</span>,
     <span class="kw">pub</span> <span class="ident">device_id</span>: <span class="ident">DeviceId</span>,
-    <span class="ident">interrupts</span>: [<span class="ident">DeviceInterrupt</span>; <span class="ident">NUM_DEVICE_INTERRUPTS</span>],
+    <span class="kw">pub</span> <span class="ident">interrupts</span>: [<span class="ident">DeviceInterrupt</span>; <span class="ident">NUM_DEVICE_INTERRUPTS</span>],
+    <span class="kw">pub</span> <span class="ident">mailboxes</span>: [<span class="ident">AtomicU64</span>; <span class="ident">MailboxPriority::Num</span> <span class="kw">as</span> <span class="ident">usize</span>],
 }
 <span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::marker::BaseType</span> <span class="kw">for</span> <span class="ident">DeviceRepr</span> {
     <span class="kw">fn</span> <span class="ident">init</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">_t</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
@@ -412,14 +501,16 @@
             <span class="ident">sync</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
             <span class="ident">vec</span>: <span class="ident">InterruptVector</span>(<span class="number">0</span>),
             <span class="ident">flags</span>: <span class="ident">DeviceInterruptFlags::empty</span>(),
-            <span class="ident">taken</span>: <span class="number">0</span>,
+            <span class="ident">taken</span>: <span class="ident">AtomicU16::new</span>(<span class="number">0</span>),
         };
+        <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
         <span class="self">Self</span> {
             <span class="ident">kso_hdr</span>,
             <span class="ident">device_type</span>,
             <span class="ident">bus_type</span>,
             <span class="ident">device_id</span>,
             <span class="ident">interrupts</span>: [<span class="ident">V</span>; <span class="ident">NUM_DEVICE_INTERRUPTS</span>],
+            <span class="ident">mailboxes</span>: [<span class="ident">M</span>; <span class="ident">MailboxPriority::Num</span> <span class="kw">as</span> <span class="ident">usize</span>],
         }
     }
 
@@ -450,9 +541,28 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_interrupt_sleep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ThreadSyncSleep</span> {
+        <span class="ident">ThreadSyncSleep</span> {
+            <span class="ident">reference</span>: <span class="ident">ThreadSyncReference::Virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>),
+            <span class="ident">value</span>: <span class="number">0</span>,
+            <span class="ident">op</span>: <span class="ident">ThreadSyncOp::Equal</span>,
+            <span class="ident">flags</span>: <span class="ident">ThreadSyncFlags::empty</span>(),
+        }
+    }
+
     <span class="doccomment">/// Poll an interrupt vector to see if it has fired.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_for_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
+        <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">val</span>)
+        }
+    }
+
+    <span class="doccomment">/// Poll an interrupt vector to see if it has fired.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_for_mailbox</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mailboxes</span>[<span class="ident">inum</span>].<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
         <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="prelude-val">None</span>
         } <span class="kw">else</span> {

@@ -251,11 +251,13 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">VecDeque</span>},
     <span class="ident">sync</span>::{
         <span class="ident">atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
-        <span class="ident">Arc</span>, <span class="ident">Mutex</span>, 
+        <span class="ident">Arc</span>, <span class="ident">Mutex</span>,
     },
     <span class="ident">task</span>::{<span class="ident">Poll</span>, <span class="ident">Waker</span>},
     <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
@@ -444,12 +446,14 @@
     }
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">struct</span> <span class="ident">SourceInner</span> {
     <span class="ident">op</span>: <span class="ident">ThreadSyncSleep</span>,
     <span class="ident">wakers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
     <span class="ident">active</span>: <span class="ident">bool</span>,
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Source</span> {
     <span class="ident">key</span>: <span class="ident">usize</span>,
     <span class="ident">inner</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">SourceInner</span><span class="op">&gt;</span>,

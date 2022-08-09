@@ -167,10 +167,7 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-<span id="170">170</span>
-</pre><pre class="rust"><code>
-
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="kw">use</span> <span class="ident">twizzler_abi::syscall::ThreadSyncSleep</span>;
 
@@ -188,6 +185,7 @@
     <span class="kw">fn</span> <span class="ident">setup_sleep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ThreadSyncSleep</span>;
 }
 
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="doccomment">/// A wrapper type around some &quot;handle&quot; that we want to perform asynchronous operations on, where</span>
 <span class="doccomment">/// that handle must implement [AsyncSetup].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Async</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {

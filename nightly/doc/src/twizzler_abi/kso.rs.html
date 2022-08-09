@@ -194,6 +194,26 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions to deal with Kernel State Objects (KSOs). These are objects created by the kernel to</span>
 <span class="doccomment">//! describe the running state of the system and expose device memory to userspace.</span>
 
@@ -283,6 +303,22 @@
             <span class="ident">KactionValue::ObjID</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>),
         }
     }
+
+    <span class="doccomment">/// If the value is a u64, return it, otherwise panic.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">KactionValue::ObjID</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;failed to unwrap ObjID&quot;</span>),
+            <span class="ident">KactionValue::U64</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
+        }
+    }
+
+    <span class="doccomment">/// If the value is a u64, return it, otherwise return None.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u64</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">KactionValue::U64</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">x</span>),
+            <span class="ident">KactionValue::ObjID</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+        }
+    }
 }
 
 <span class="doccomment">/// Possible error values for KAction.</span>
@@ -333,6 +369,8 @@
     <span class="ident">GetChild</span>(<span class="ident">u16</span>),
     <span class="doccomment">/// Get a sub-object.</span>
     <span class="ident">GetSubObject</span>(<span class="ident">u8</span>, <span class="ident">u8</span>),
+    <span class="doccomment">/// Allocate DMA memory.</span>
+    <span class="ident">AllocateDMA</span>(<span class="ident">u16</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KactionGenericCmd</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
@@ -341,6 +379,7 @@
             <span class="ident">KactionGenericCmd::GetKsoRoot</span> =&gt; (<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">KactionGenericCmd::GetChild</span>(<span class="ident">v</span>) =&gt; (<span class="number">1</span>, <span class="ident">v</span>),
             <span class="ident">KactionGenericCmd::GetSubObject</span>(<span class="ident">t</span>, <span class="ident">v</span>) =&gt; (<span class="number">2</span>, ((<span class="ident">t</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>)),
+            <span class="ident">KactionGenericCmd::AllocateDMA</span>(<span class="ident">v</span>) =&gt; (<span class="number">3</span>, <span class="ident">v</span>),
         };
         ((<span class="ident">h</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>) <span class="op">|</span> <span class="ident">l</span> <span class="kw">as</span> <span class="ident">u32</span>
     }
@@ -354,6 +393,7 @@
             <span class="number">0</span> =&gt; <span class="ident">KactionGenericCmd::GetKsoRoot</span>,
             <span class="number">1</span> =&gt; <span class="ident">KactionGenericCmd::GetChild</span>(<span class="ident">l</span>),
             <span class="number">2</span> =&gt; <span class="ident">KactionGenericCmd::GetSubObject</span>((<span class="ident">l</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">l</span> <span class="kw">as</span> <span class="ident">u8</span>),
+            <span class="number">3</span> =&gt; <span class="ident">KactionGenericCmd::AllocateDMA</span>(<span class="ident">l</span>),
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">KactionError::InvalidArgument</span>),
         };
         <span class="prelude-val">Ok</span>(<span class="ident">v</span>)

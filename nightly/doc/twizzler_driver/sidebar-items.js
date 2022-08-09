@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["bus",""],["device",""]]});
+initSidebarItems({"fn":[["get_bustree_root",""]],"mod":[["bus",""],["controller",""],["device",""],["dma",""],["request",""]],"struct":[["BusTreeRoot",""]]});
