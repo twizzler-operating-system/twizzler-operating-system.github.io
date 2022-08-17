@@ -70,12 +70,6 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">twizzler_abi::device::BusType</span>;
@@ -86,8 +80,6 @@
 <span class="kw">use</span> <span class="ident">twizzler_abi::kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>};
 <span class="kw">use</span> <span class="ident">twizzler_object::Object</span>;
 <span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">ObjectInitError</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dma::DmaAllocator</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">children</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">events</span>;
@@ -148,10 +140,6 @@
         <span class="ident">flags</span>: <span class="ident">KactionFlags</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KactionValue</span>, <span class="ident">KactionError</span><span class="op">&gt;</span> {
         <span class="ident">twizzler_abi::syscall::sys_kaction</span>(<span class="ident">action</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">id</span>()), <span class="ident">value</span>, <span class="ident">flags</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dma_allocator</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DmaAllocator</span> {
-        <span class="ident">DmaAllocator::new</span>()
     }
 }
 </code></pre></div>

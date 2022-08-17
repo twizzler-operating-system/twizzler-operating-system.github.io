@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DmaAllocationError",""]],"struct":[["DmaAllocator",""],["DmaRegion",""]]});
+initSidebarItems({"enum":[["Access",""],["SyncMode",""]],"struct":[["DmaArrayRegion",""],["DmaObject",""],["DmaOptions",""],["DmaPin",""],["DmaPool",""],["DmaRegion",""]],"trait":[["DeviceSync",""]]});
