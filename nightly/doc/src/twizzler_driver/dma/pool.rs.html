@@ -40,16 +40,17 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_object::CreateSpec</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaArrayRegion</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaPool</span> {
-    <span class="ident">opts</span>: <span class="ident">DmaOptions</span>,
+    <span class="ident">_opts</span>: <span class="ident">DmaOptions</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">DmaPool</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spec</span>: <span class="ident">CreateSpec</span>, <span class="ident">access</span>: <span class="ident">Access</span>, <span class="ident">opts</span>: <span class="ident">DmaOptions</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">_spec</span>: <span class="ident">CreateSpec</span>, <span class="ident">_access</span>: <span class="ident">Access</span>, <span class="ident">_opts</span>: <span class="ident">DmaOptions</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">todo!</span>()
     }
 
@@ -57,22 +58,23 @@
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">T</span>) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="comment">// TODO: update so these are failable</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">_init</span>: <span class="ident">T</span>) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">T</span>) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">_init</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">T</span>) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">T</span>) -&gt; <span class="ident">DmaArrayRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">_init</span>: <span class="ident">T</span>) -&gt; <span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">todo!</span>()
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">T</span>,
-    ) -&gt; <span class="ident">DmaArrayRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="ident">_init</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">T</span>,
+    ) -&gt; <span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">todo!</span>()
     }
 }

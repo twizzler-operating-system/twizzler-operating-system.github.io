@@ -44,50 +44,148 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_object::Object</span>;
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaArrayRegion</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>};
+<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
+    <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>},
+    <span class="ident">object</span>::{<span class="ident">MAX_SIZE</span>, <span class="ident">NULLPAGE_SIZE</span>},
+    <span class="ident">syscall::sys_kaction</span>,
+};
+<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">Object</span>};
 
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>};
+
+<span class="doccomment">/// A handle for an object that can be used to perform DMA, and is most useful directly as a way to</span>
+<span class="doccomment">/// perform DMA operations on a specific object. For an allocator-like DMA interface, see [crate::pool::DmaPool].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaObject</span> {
     <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">releasable_pins</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">DmaObject</span> {
+    <span class="doccomment">/// Create a [DmaSliceRegion] from the base of this object, where the region represents memory</span>
+    <span class="doccomment">/// of type `[T; len]`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice_region</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">len</span>: <span class="ident">usize</span>,
         <span class="ident">access</span>: <span class="ident">Access</span>,
         <span class="ident">options</span>: <span class="ident">DmaOptions</span>,
-    ) -&gt; <span class="ident">DmaArrayRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="macro">todo!</span>()
+    ) -&gt; <span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">nr_bytes</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
+            .<span class="ident">checked_mul</span>(<span class="ident">len</span>)
+            .<span class="ident">expect</span>(<span class="string">&quot;Value of len too large&quot;</span>);
+        <span class="macro">assert!</span>(<span class="ident">nr_bytes</span> <span class="op">&lt;</span> <span class="ident">MAX_SIZE</span> <span class="op">-</span> <span class="ident">NULLPAGE_SIZE</span> <span class="op">*</span> <span class="number">2</span>);
+        <span class="ident">DmaSliceRegion::new</span>(
+            <span class="self">self</span>,
+            <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="ident">len</span>,
+            <span class="ident">access</span>,
+            <span class="ident">options</span>,
+            <span class="ident">NULLPAGE_SIZE</span>,
+            <span class="ident">len</span>,
+        )
     }
 
+    <span class="doccomment">/// Create a [DmaRegion] from the base of this object, where the region represents memory</span>
+    <span class="doccomment">/// of type `T`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">access</span>: <span class="ident">Access</span>,
         <span class="ident">options</span>: <span class="ident">DmaOptions</span>,
     ) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="macro">todo!</span>()
+        <span class="ident">DmaRegion::new</span>(
+            <span class="self">self</span>,
+            <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
+            <span class="ident">access</span>,
+            <span class="ident">options</span>,
+            <span class="ident">NULLPAGE_SIZE</span>,
+        )
     }
 
+    <span class="doccomment">/// Get a reference to the object handle.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Object</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">todo!</span>()
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">obj</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">todo!</span>()
+    <span class="doccomment">/// Create a new [DmaObject] from an existing object handle.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">obj</span>: <span class="kw">unsafe</span> { <span class="ident">obj</span>.<span class="ident">transmute</span>() },
+            <span class="ident">releasable_pins</span>: <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>()),
+        }
     }
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">release_pin</span>(<span class="ident">id</span>: <span class="ident">ObjID</span>, <span class="ident">token</span>: <span class="ident">u32</span>) {
+    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sys_kaction</span>(
+        <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::ReleasePin</span>),
+        <span class="prelude-val">Some</span>(<span class="ident">id</span>),
+        <span class="ident">token</span> <span class="kw">as</span> <span class="ident">u64</span>,
+        <span class="number">0</span>,
+        <span class="ident">KactionFlags::empty</span>(),
+    );
 }
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DmaObject</span> {
     <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="macro">todo!</span>()
+        <span class="kw">let</span> <span class="ident">pins</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">releasable_pins</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for</span> <span class="ident">pin</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pins</span> {
+            <span class="ident">release_pin</span>(<span class="self">self</span>.<span class="ident">object</span>().<span class="ident">id</span>(), <span class="kw-2">*</span><span class="ident">pin</span>);
+        }
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DmaObject</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">todo!</span>()
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">obj</span>)
     }
 }
 </code></pre></div>

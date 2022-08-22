@@ -45,33 +45,81 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">object</span>;
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module for managing DMA memory, using objects for DMA, and creating pools of DMA memory that can</span>
+<span class="doccomment">//! be allocated from. Internally, the DMA functions will interact with the kernel to ensure</span>
+<span class="doccomment">//! stability of physical addresses for DMA memory, and will also ensure proper coherence between</span>
+<span class="doccomment">//! the host and devices.</span>
+
+<span class="kw">mod</span> <span class="ident">object</span>;
 <span class="kw">mod</span> <span class="ident">pin</span>;
 <span class="kw">mod</span> <span class="ident">pool</span>;
 <span class="kw">mod</span> <span class="ident">region</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::arch::DMA_PAGE_SIZE</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">object::DmaObject</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin::DmaPin</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin</span>::{<span class="ident">DmaPin</span>, <span class="ident">PinError</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pool::DmaPool</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">region</span>::{<span class="ident">DmaArrayRegion</span>, <span class="ident">DmaRegion</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">region</span>::{<span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// Intended access direction for DMA memory.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Access</span> {
+    <span class="doccomment">/// The memory is used for the host to write and the device to read. Device writes may not be coherent.</span>
     <span class="ident">HostToDevice</span>,
+    <span class="doccomment">/// The memory is used for the host to read and the device to write. Host writes may not be coherent.</span>
     <span class="ident">DeviceToHost</span>,
+    <span class="doccomment">/// The memory is accessed read/write by both device and host.</span>
     <span class="ident">BiDirectional</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// Mode of syncing to apply when calling `sync()`. These sync calls are unnecessary by default, and</span>
+<span class="doccomment">/// should only be used with utmost care.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SyncMode</span> {
+    <span class="doccomment">/// Ensures coherence for the host to write to the device, ensuring that the memory is coherent</span>
+    <span class="doccomment">/// from the perspective of the CPU before the host writes.</span>
     <span class="ident">PreCpuToDevice</span>,
+    <span class="doccomment">/// Ensures coherence for the host to write to the device, ensuring that the memory is coherent</span>
+    <span class="doccomment">/// after the write.</span>
     <span class="ident">PostCpuToDevice</span>,
+    <span class="doccomment">/// Ensures coherence for the device to write to the host, ensuring that the memory is coherent</span>
+    <span class="doccomment">/// before the device performs an operation.</span>
     <span class="ident">PreDeviceToCpu</span>,
+    <span class="doccomment">/// Ensures coherence for the device to write to the host, ensuring that the memory is coherent</span>
+    <span class="doccomment">/// after the device performs an operation.</span>
     <span class="ident">PostDeviceToCpu</span>,
+    <span class="doccomment">/// Ensures that memory is fully coherent.</span>
+    <span class="ident">FullCoherence</span>,
 }
 
 <span class="macro">bitflags::bitflags!</span> {
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaOptions</span> : <span class="ident">u64</span> {
+        <span class="doccomment">/// Region functions will not perform automatic coherence.</span>
         <span class="kw">const</span> <span class="ident">UNSAFE_MANUAL_COHERENCE</span> <span class="op">=</span> <span class="number">1</span>;
     }
 }
@@ -82,6 +130,8 @@
     }
 }
 
+<span class="doccomment">/// DMA types must implement this trait, which indicates that types can handle untyped updates from</span>
+<span class="doccomment">/// the device.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DeviceSync</span> {}
 
 <span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">u8</span> {}

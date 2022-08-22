@@ -214,6 +214,10 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions to deal with Kernel State Objects (KSOs). These are objects created by the kernel to</span>
 <span class="doccomment">//! describe the running state of the system and expose device memory to userspace.</span>
 
@@ -369,8 +373,10 @@
     <span class="ident">GetChild</span>(<span class="ident">u16</span>),
     <span class="doccomment">/// Get a sub-object.</span>
     <span class="ident">GetSubObject</span>(<span class="ident">u8</span>, <span class="ident">u8</span>),
-    <span class="doccomment">/// Allocate DMA memory.</span>
-    <span class="ident">AllocateDMA</span>(<span class="ident">u16</span>),
+    <span class="doccomment">/// Pin pages of object memory.</span>
+    <span class="ident">PinPages</span>(<span class="ident">u16</span>),
+    <span class="doccomment">/// Release Pin</span>
+    <span class="ident">ReleasePin</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">KactionGenericCmd</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
@@ -379,7 +385,8 @@
             <span class="ident">KactionGenericCmd::GetKsoRoot</span> =&gt; (<span class="number">0</span>, <span class="number">0</span>),
             <span class="ident">KactionGenericCmd::GetChild</span>(<span class="ident">v</span>) =&gt; (<span class="number">1</span>, <span class="ident">v</span>),
             <span class="ident">KactionGenericCmd::GetSubObject</span>(<span class="ident">t</span>, <span class="ident">v</span>) =&gt; (<span class="number">2</span>, ((<span class="ident">t</span> <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>)),
-            <span class="ident">KactionGenericCmd::AllocateDMA</span>(<span class="ident">v</span>) =&gt; (<span class="number">3</span>, <span class="ident">v</span>),
+            <span class="ident">KactionGenericCmd::PinPages</span>(<span class="ident">v</span>) =&gt; (<span class="number">3</span>, <span class="ident">v</span>),
+            <span class="ident">KactionGenericCmd::ReleasePin</span> =&gt; (<span class="number">4</span>, <span class="number">0</span>),
         };
         ((<span class="ident">h</span> <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>) <span class="op">|</span> <span class="ident">l</span> <span class="kw">as</span> <span class="ident">u32</span>
     }
@@ -393,7 +400,8 @@
             <span class="number">0</span> =&gt; <span class="ident">KactionGenericCmd::GetKsoRoot</span>,
             <span class="number">1</span> =&gt; <span class="ident">KactionGenericCmd::GetChild</span>(<span class="ident">l</span>),
             <span class="number">2</span> =&gt; <span class="ident">KactionGenericCmd::GetSubObject</span>((<span class="ident">l</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>, <span class="ident">l</span> <span class="kw">as</span> <span class="ident">u8</span>),
-            <span class="number">3</span> =&gt; <span class="ident">KactionGenericCmd::AllocateDMA</span>(<span class="ident">l</span>),
+            <span class="number">3</span> =&gt; <span class="ident">KactionGenericCmd::PinPages</span>(<span class="ident">l</span>),
+            <span class="number">4</span> =&gt; <span class="ident">KactionGenericCmd::ReleasePin</span>,
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">KactionError::InvalidArgument</span>),
         };
         <span class="prelude-val">Ok</span>(<span class="ident">v</span>)

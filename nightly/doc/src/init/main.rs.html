@@ -416,6 +416,10 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">lang_items</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">asm</span>)]</span>
@@ -569,6 +573,7 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
             )),
             <span class="prelude-val">Some</span>(<span class="ident">id</span>),
             <span class="number">0</span>,
+            <span class="number">0</span>,
             <span class="ident">KactionFlags::empty</span>(),
         );
         <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() {
@@ -588,6 +593,7 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
             )),
             <span class="prelude-val">Some</span>(<span class="ident">id</span>),
             <span class="number">0</span>,
+            <span class="number">0</span>,
             <span class="ident">KactionFlags::empty</span>(),
         );
         <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() {
@@ -606,6 +612,7 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
             <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::GetChild</span>(<span class="ident">n</span>)),
             <span class="prelude-val">Some</span>(<span class="ident">id</span>),
             <span class="number">0</span>,
+            <span class="number">0</span>,
             <span class="ident">KactionFlags::empty</span>(),
         );
         <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() {
@@ -623,6 +630,7 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
     <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">sys_kaction</span>(
         <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::GetKsoRoot</span>),
         <span class="prelude-val">None</span>,
+        <span class="number">0</span>,
         <span class="number">0</span>,
         <span class="ident">KactionFlags::empty</span>(),
     );

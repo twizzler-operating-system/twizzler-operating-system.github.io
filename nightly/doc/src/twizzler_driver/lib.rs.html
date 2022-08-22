@@ -40,6 +40,7 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">option_result_unwrap_unchecked</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">generic_associated_types</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">vec_into_raw_parts</span>)]</span>
@@ -47,6 +48,7 @@
 <span class="kw">use</span> <span class="ident">twizzler_abi::kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>};
 <span class="kw">use</span> <span class="ident">twizzler_object::ObjID</span>;
 
+<span class="kw">mod</span> <span class="ident">arch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bus</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">controller</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">device</span>;
@@ -68,7 +70,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_bustree_root</span>() -&gt; <span class="ident">BusTreeRoot</span> {
     <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::GetKsoRoot</span>);
-    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">twizzler_abi::syscall::sys_kaction</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="number">0</span>, <span class="ident">KactionFlags::empty</span>())
+    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">twizzler_abi::syscall::sys_kaction</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="ident">KactionFlags::empty</span>())
         .<span class="ident">expect</span>(<span class="string">&quot;failed to get device root&quot;</span>)
         .<span class="ident">unwrap_objid</span>();
     <span class="ident">BusTreeRoot</span> { <span class="ident">root_id</span>: <span class="ident">id</span> }
