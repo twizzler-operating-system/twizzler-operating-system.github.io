@@ -318,11 +318,17 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">core::ops::Range</span>;
 
 <span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
-    <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>},
+    <span class="ident">kso</span>::{
+        <span class="ident">pack_kaction_pin_start_and_len</span>, <span class="ident">unpack_kaction_pin_token_and_len</span>, <span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>,
+        <span class="ident">KactionGenericCmd</span>,
+    },
     <span class="ident">syscall</span>::{<span class="ident">sys_kaction</span>, <span class="ident">PinnedPage</span>},
 };
 
@@ -394,15 +400,15 @@
             <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::PinPages</span>(<span class="number">0</span>)),
             <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">dma</span>.<span class="ident">object</span>().<span class="ident">id</span>()),
             <span class="ident">ptr</span>,
-            <span class="ident">start</span> <span class="op">|</span> ((<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>),
+            <span class="ident">pack_kaction_pin_start_and_len</span>(<span class="ident">start</span>, <span class="ident">len</span>).<span class="ident">ok_or</span>(<span class="ident">PinError::InternalError</span>)<span class="question-mark">?</span>,
             <span class="ident">KactionFlags::empty</span>(),
         )
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">PinError::InternalError</span>)<span class="question-mark">?</span>
         .<span class="ident">u64</span>()
         .<span class="ident">ok_or</span>(<span class="ident">PinError::InternalError</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">retlen</span> <span class="op">=</span> (<span class="ident">res</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> (<span class="ident">res</span> <span class="op">&amp;</span> <span class="number">0xffffffff</span>) <span class="kw">as</span> <span class="ident">u32</span>;
+        <span class="kw">let</span> (<span class="ident">token</span>, <span class="ident">retlen</span>) <span class="op">=</span>
+            <span class="ident">unpack_kaction_pin_token_and_len</span>(<span class="ident">res</span>).<span class="ident">ok_or</span>(<span class="ident">PinError::InternalError</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">retlen</span> <span class="op">&lt;</span> <span class="ident">len</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PinError::Exhausted</span>);
