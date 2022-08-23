@@ -70,6 +70,7 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Module for managing DMA memory, using objects for DMA, and creating pools of DMA memory that can</span>
 <span class="doccomment">//! be allocated from. Internally, the DMA functions will interact with the kernel to ensure</span>
 <span class="doccomment">//! stability of physical addresses for DMA memory, and will also ensure proper coherence between</span>
@@ -118,6 +119,7 @@
 }
 
 <span class="macro">bitflags::bitflags!</span> {
+    <span class="doccomment">/// Options for DMA regions.</span>
     <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaOptions</span> : <span class="ident">u64</span> {
         <span class="doccomment">/// Region functions will not perform automatic coherence.</span>
         <span class="kw">const</span> <span class="ident">UNSAFE_MANUAL_COHERENCE</span> <span class="op">=</span> <span class="number">1</span>;

@@ -93,6 +93,8 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
 
 <span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
@@ -105,7 +107,7 @@
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>};
 
 <span class="doccomment">/// A handle for an object that can be used to perform DMA, and is most useful directly as a way to</span>
-<span class="doccomment">/// perform DMA operations on a specific object. For an allocator-like DMA interface, see [crate::pool::DmaPool].</span>
+<span class="doccomment">/// perform DMA operations on a specific object. For an allocator-like DMA interface, see [crate::dma::DmaPool].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaObject</span> {
     <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">releasable_pins</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -125,12 +127,13 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Value of len too large&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">nr_bytes</span> <span class="op">&lt;</span> <span class="ident">MAX_SIZE</span> <span class="op">-</span> <span class="ident">NULLPAGE_SIZE</span> <span class="op">*</span> <span class="number">2</span>);
         <span class="ident">DmaSliceRegion::new</span>(
-            <span class="self">self</span>,
+            <span class="prelude-val">Some</span>(<span class="self">self</span>),
             <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="ident">len</span>,
             <span class="ident">access</span>,
             <span class="ident">options</span>,
             <span class="ident">NULLPAGE_SIZE</span>,
             <span class="ident">len</span>,
+            <span class="prelude-val">None</span>,
         )
     }
 
@@ -142,11 +145,12 @@
         <span class="ident">options</span>: <span class="ident">DmaOptions</span>,
     ) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">DmaRegion::new</span>(
-            <span class="self">self</span>,
+            <span class="prelude-val">Some</span>(<span class="self">self</span>),
             <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
             <span class="ident">access</span>,
             <span class="ident">options</span>,
             <span class="ident">NULLPAGE_SIZE</span>,
+            <span class="prelude-val">None</span>,
         )
     }
 
