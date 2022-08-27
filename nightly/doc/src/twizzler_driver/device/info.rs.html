@@ -29,11 +29,14 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi::device::SubObjectType</span>;
-<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">Object</span>, <span class="ident">ObjectInitError</span>, <span class="ident">Protections</span>, <span class="ident">ObjectInitFlags</span>};
+<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">Object</span>, <span class="ident">ObjectInitError</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Device</span>;
 
+<span class="doccomment">/// A handle to an info subobject.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InfoObject</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
 }
@@ -45,6 +48,7 @@
         })
     }
 
+    <span class="doccomment">/// Get a reference to the data contained within an info type subobject.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
         <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">base_unchecked</span>() }
     }

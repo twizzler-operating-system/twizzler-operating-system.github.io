@@ -88,6 +88,7 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
+<span id="91">91</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync</span>::{
         <span class="ident">atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
@@ -139,7 +140,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsyncIdAllocator</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">num</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">if</span> <span class="ident">num</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;cannot set num IDs as 0&quot;</span>);
         }
@@ -151,7 +152,8 @@
             },
         }
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">try_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">count</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span> {
             <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
             <span class="kw">if</span> <span class="ident">id</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">max</span> {
@@ -163,14 +165,14 @@
         <span class="ident">inner</span>.<span class="ident">ids</span>.<span class="ident">pop</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_next</span>() {
             <span class="kw">return</span> <span class="ident">id</span>;
         }
         <span class="self">self</span>.<span class="ident">bag</span>.<span class="ident">clone</span>().<span class="kw">await</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">release_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">release_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u64</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bag</span>.<span class="ident">bag_inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
         <span class="ident">inner</span>.<span class="ident">ids</span>.<span class="ident">push</span>(<span class="ident">id</span>);
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">wakers</span>.<span class="ident">pop</span>() {

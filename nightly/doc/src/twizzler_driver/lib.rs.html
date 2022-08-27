@@ -41,25 +41,34 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">option_result_unwrap_unchecked</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">generic_associated_types</span>)]</span>
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">vec_into_raw_parts</span>)]</span>
-<span class="kw">use</span> <span class="ident">device::children::DeviceChildrenIterator</span>;
+<span class="kw">use</span> <span class="ident">device::DeviceChildrenIterator</span>;
 <span class="kw">use</span> <span class="ident">twizzler_abi::kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>};
 <span class="kw">use</span> <span class="ident">twizzler_object::ObjID</span>;
 
 <span class="kw">mod</span> <span class="ident">arch</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bus</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">controller</span>;
+<span class="kw">mod</span> <span class="ident">controller</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">device</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dma</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">request</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">controller::DeviceController</span>;
+
+<span class="doccomment">/// A handle for the root of the bus tree.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BusTreeRoot</span> {
     <span class="ident">root_id</span>: <span class="ident">ObjID</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">BusTreeRoot</span> {
+    <span class="doccomment">/// Get the children of the bus tree.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">children</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DeviceChildrenIterator</span> {
         <span class="ident">DeviceChildrenIterator</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">root_id</span>,
@@ -68,6 +77,7 @@
     }
 }
 
+<span class="doccomment">/// Get a handle to the root of the bus tree.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_bustree_root</span>() -&gt; <span class="ident">BusTreeRoot</span> {
     <span class="kw">let</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::GetKsoRoot</span>);
     <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">twizzler_abi::syscall::sys_kaction</span>(<span class="ident">cmd</span>, <span class="prelude-val">None</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="ident">KactionFlags::empty</span>())

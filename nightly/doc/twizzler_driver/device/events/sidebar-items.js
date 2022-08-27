@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["InterruptAllocationError",""]],"struct":[["DeviceEventStream",""],["InterruptInfo",""]]});
+initSidebarItems({"enum":[["InterruptAllocationError","Possible errors for interrupt allocation."]],"struct":[["DeviceEventStream","A manager for device events, including interrupt handling."],["InterruptInfo","A handle for an allocated interrupt on a device."]]});

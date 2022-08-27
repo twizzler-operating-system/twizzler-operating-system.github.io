@@ -188,6 +188,10 @@
 <span id="188">188</span>
 <span id="189">189</span>
 <span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::HashMap</span>,
     <span class="ident">mem::MaybeUninit</span>,
@@ -283,7 +287,7 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InFlight</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InFlight</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="ident">len</span>: <span class="ident">usize</span>,
     <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">InFlightInner</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -324,6 +328,8 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="doccomment">/// A future for a set of in-flight requests for which we are uninterested in any responses from the device,</span>
+<span class="doccomment">/// we only care if the responses were completed successfully or not. On await, returns a [SubmitSummary].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InFlightFuture</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="ident">inflight</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InFlight</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -358,6 +364,8 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="doccomment">/// A future for a set of in-flight requests for which we are interested in all responses from the device.</span>
+<span class="doccomment">/// On await, returns a [SubmitSummaryWithResponses].</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InFlightFutureWithResponses</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="ident">inflight</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InFlight</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }

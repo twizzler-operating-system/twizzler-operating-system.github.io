@@ -75,7 +75,21 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions and types for managing a device.</span>
+
+<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">twizzler_abi::device::BusType</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">twizzler_abi::device::DeviceRepr</span>;
@@ -86,11 +100,16 @@
 <span class="kw">use</span> <span class="ident">twizzler_object::Object</span>;
 <span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">ObjectInitError</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">children</span>;
+<span class="kw">mod</span> <span class="ident">children</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">events</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">info</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mmio</span>;
+<span class="kw">mod</span> <span class="ident">info</span>;
+<span class="kw">mod</span> <span class="ident">mmio</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">children::DeviceChildrenIterator</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">info::InfoObject</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mmio::MmioObject</span>;
+
+<span class="doccomment">/// A handle for a device.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Device</span> {
     <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">DeviceRepr</span><span class="op">&gt;</span>,
 }
@@ -126,23 +145,28 @@
         <span class="ident">result</span>.<span class="ident">objid</span>()
     }
 
+    <span class="doccomment">/// Get a reference to a device&#39;s representation data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DeviceRepr</span> {
         <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">base</span>().<span class="ident">unwrap</span>()
     }
 
+    <span class="doccomment">/// Get a mutable reference to a device&#39;s representation data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">repr_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">DeviceRepr</span> {
         <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">base_mut_unchecked</span>() }
     }
 
+    <span class="doccomment">/// Is this device a bus?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_bus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">repr</span>();
         <span class="ident">repr</span>.<span class="ident">device_type</span> <span class="op">==</span> <span class="ident">DeviceType::Bus</span>
     }
 
+    <span class="doccomment">/// Get the bus type of this device.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bus_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BusType</span> {
         <span class="self">self</span>.<span class="ident">repr</span>().<span class="ident">bus_type</span>
     }
 
+    <span class="doccomment">/// Execute a kaction operation on a device.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kaction</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">action</span>: <span class="ident">KactionCmd</span>,

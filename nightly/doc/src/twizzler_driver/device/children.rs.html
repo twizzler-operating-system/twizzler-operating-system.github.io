@@ -28,11 +28,14 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi::kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>};
 <span class="kw">use</span> <span class="ident">twizzler_object::ObjID</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Device</span>;
 
+<span class="doccomment">/// An iterator over the children of a device.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceChildrenIterator</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">id</span>: <span class="ident">ObjID</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pos</span>: <span class="ident">u16</span>,
@@ -51,6 +54,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Device</span> {
+    <span class="doccomment">/// Get an iterator over the children of this device.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">children</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DeviceChildrenIterator</span> {
         <span class="ident">DeviceChildrenIterator</span> {
             <span class="ident">id</span>: <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">id</span>(),

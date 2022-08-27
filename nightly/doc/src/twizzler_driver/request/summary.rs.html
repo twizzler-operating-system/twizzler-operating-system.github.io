@@ -41,10 +41,25 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// A summary of the result of submitting a collection of requests to the request manager and having</span>
+<span class="doccomment">/// the device respond. Contains responses.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SubmitSummaryWithResponses</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// A vector of responses in the same order as the submitted requests.</span>
     <span class="ident">Responses</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// At least one error occurred. The usize value is the index of the first error.</span>
     <span class="ident">Errors</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// The request engine was shutdown while the requests were inflight.</span>
     <span class="ident">Shutdown</span>,
 }
 
@@ -57,9 +72,14 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// A summary of the result of submitting a collection of requests to the request manager and having</span>
+<span class="doccomment">/// the device respond. Does not contain responses.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SubmitSummary</span> {
+    <span class="doccomment">/// All requests completed successfully.</span>
     <span class="ident">Done</span>,
+    <span class="doccomment">/// At least one error occurred. The usize value is the index of the first error.</span>
     <span class="ident">Errors</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// The request engine was shutdown while the requests were inflight.</span>
     <span class="ident">Shutdown</span>,
 }
 

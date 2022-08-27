@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["pcie",""]]});
+initSidebarItems({"mod":[["pcie","PCIe-specific functionality."]]});

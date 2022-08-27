@@ -41,11 +41,14 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi::device</span>::{<span class="ident">MmioInfo</span>, <span class="ident">MMIO_OFFSET</span>, <span class="ident">SubObjectType</span>};
-<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjectInitError</span>, <span class="ident">Object</span>, <span class="ident">Protections</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">ObjID</span>};
+<span id="44">44</span>
+<span id="45">45</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">twizzler_abi::device</span>::{<span class="ident">MmioInfo</span>, <span class="ident">SubObjectType</span>, <span class="ident">MMIO_OFFSET</span>};
+<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">Object</span>, <span class="ident">ObjectInitError</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Device</span>;
 
+<span class="doccomment">/// A handle to an MMIO subobject.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MmioObject</span> {
     <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">MmioInfo</span><span class="op">&gt;</span>,
 }
@@ -61,7 +64,7 @@
         })
     }
 
-    <span class="comment">// TODO: no unwrap</span>
+    <span class="doccomment">/// Get a reference to an MMIO subobject&#39;s info data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">MmioInfo</span> {
         <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">base</span>().<span class="ident">unwrap</span>()
     }
@@ -79,6 +82,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Device</span> {
+    <span class="doccomment">/// Get a handle to a MMIO type subobject.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mmio</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MmioObject</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_subobj</span>(<span class="ident">SubObjectType::Mmio</span>.<span class="ident">into</span>(), <span class="ident">idx</span>)<span class="question-mark">?</span>;
         <span class="ident">MmioObject::new</span>(<span class="ident">id</span>).<span class="ident">ok</span>()

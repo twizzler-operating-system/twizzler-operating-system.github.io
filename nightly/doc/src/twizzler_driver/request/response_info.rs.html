@@ -26,7 +26,14 @@
 <span id="26">26</span>
 <span id="27">27</span>
 <span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// Information about a response from the driver. Sent by the driver back to the request manager.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResponseInfo</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="ident">resp</span>: <span class="ident">R</span>,
     <span class="ident">is_err</span>: <span class="ident">bool</span>,
@@ -34,22 +41,27 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">ResponseInfo</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Construct a new ResponseInfo.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">resp</span>: <span class="ident">R</span>, <span class="ident">id</span>: <span class="ident">u64</span>, <span class="ident">is_err</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">resp</span>, <span class="ident">is_err</span>, <span class="ident">id</span> }
     }
 
+    <span class="doccomment">/// Is this response an error?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">is_err</span>
     }
 
+    <span class="doccomment">/// Get a reference to the response data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">R</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">resp</span>
     }
 
+    <span class="doccomment">/// Convert this ResponseInfo into the inner response data.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">R</span> {
         <span class="self">self</span>.<span class="ident">resp</span>
     }
 
+    <span class="doccomment">/// Get the ID of the response (and thus the request with which it is paired).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="ident">id</span>
     }
