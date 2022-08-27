@@ -107,6 +107,8 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Wrapper functions around for raw_syscall, providing a typed and safer way to interact with the kernel.</span>
 
 <span class="kw">mod</span> <span class="ident">console</span>;
@@ -146,6 +148,8 @@
     <span class="ident">Spawn</span>,
     <span class="doccomment">/// Read clock information.</span>
     <span class="ident">ReadClockInfo</span>,
+    <span class="doccomment">/// List clock sources.</span>
+    <span class="ident">ReadClockList</span>,
     <span class="doccomment">/// Apply a kernel action to an object (used for device drivers).</span>
     <span class="ident">Kaction</span>,
     <span class="doccomment">/// New Handle.</span>

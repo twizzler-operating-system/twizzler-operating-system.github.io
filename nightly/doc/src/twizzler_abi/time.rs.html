@@ -27,16 +27,16 @@
 
 <span class="doccomment">/// Return a Duration representing an instant in monotonic time.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_monotonic</span>() -&gt; <span class="ident">Duration</span> {
-    <span class="kw">let</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">sys_read_clock_info</span>(<span class="ident">ClockSource::Monotonic</span>, <span class="ident">ReadClockFlags::empty</span>())
+    <span class="kw">let</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">sys_read_clock_info</span>(<span class="ident">ClockSource::BestMonotonic</span>, <span class="ident">ReadClockFlags::empty</span>())
         .<span class="ident">expect</span>(<span class="string">&quot;failed to get monotonic time from kernel&quot;</span>);
-    <span class="ident">clock_info</span>.<span class="ident">current_value</span>()
+    <span class="ident">Duration::from</span>(<span class="ident">clock_info</span>.<span class="ident">current_value</span>())
 }
 
 <span class="doccomment">/// Return a Duration representing the time since the unix epoch.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_systemtime</span>() -&gt; <span class="ident">Duration</span> {
-    <span class="kw">let</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">sys_read_clock_info</span>(<span class="ident">ClockSource::RealTime</span>, <span class="ident">ReadClockFlags::empty</span>())
+    <span class="kw">let</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">sys_read_clock_info</span>(<span class="ident">ClockSource::BestRealTime</span>, <span class="ident">ReadClockFlags::empty</span>())
         .<span class="ident">expect</span>(<span class="string">&quot;failed to get monotonic time from kernel&quot;</span>);
-    <span class="ident">clock_info</span>.<span class="ident">current_value</span>()
+    <span class="ident">Duration::from</span>(<span class="ident">clock_info</span>.<span class="ident">current_value</span>())
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_abi" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
