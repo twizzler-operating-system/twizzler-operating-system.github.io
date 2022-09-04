@@ -290,6 +290,31 @@
 <span id="290">290</span>
 <span id="291">291</span>
 <span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
 </pre><pre class="rust"><code><span class="doccomment">//! APIs for accessing the device tree and device representation objects.</span>
 
 <span class="kw">use</span> <span class="ident">core</span>::{
@@ -301,7 +326,10 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">kso::KsoHdr</span>,
-    <span class="ident">syscall</span>::{<span class="ident">ThreadSync</span>, <span class="ident">ThreadSyncFlags</span>, <span class="ident">ThreadSyncOp</span>, <span class="ident">ThreadSyncReference</span>, <span class="ident">ThreadSyncSleep</span>},
+    <span class="ident">syscall</span>::{
+        <span class="ident">sys_thread_sync</span>, <span class="ident">ThreadSync</span>, <span class="ident">ThreadSyncFlags</span>, <span class="ident">ThreadSyncOp</span>, <span class="ident">ThreadSyncReference</span>,
+        <span class="ident">ThreadSyncSleep</span>, <span class="ident">ThreadSyncWake</span>,
+    },
 };
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bus</span>;
@@ -413,6 +441,12 @@
     <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">u</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">InterruptVector</span>(<span class="ident">u</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InterruptVector</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">iv</span>: <span class="ident">InterruptVector</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">iv</span>.<span class="number">0</span>
     }
 }
 
@@ -548,6 +582,22 @@
             <span class="ident">op</span>: <span class="ident">ThreadSyncOp::Equal</span>,
             <span class="ident">flags</span>: <span class="ident">ThreadSyncFlags::empty</span>(),
         }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">submit_mailbox_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mb</span>: <span class="ident">MailboxPriority</span>, <span class="ident">msg</span>: <span class="ident">u64</span>) {
+        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">mailboxes</span>[<span class="ident">mb</span> <span class="kw">as</span> <span class="ident">usize</span>]
+            .<span class="ident">compare_exchange</span>(<span class="number">0</span>, <span class="ident">msg</span>, <span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::SeqCst</span>)
+            .<span class="ident">is_err</span>()
+        {
+            <span class="ident">core::hint::spin_loop</span>()
+        }
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sys_thread_sync</span>(
+            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">ThreadSync::new_wake</span>(<span class="ident">ThreadSyncWake::new</span>(
+                <span class="ident">ThreadSyncReference::Virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mailboxes</span>[<span class="ident">mb</span> <span class="kw">as</span> <span class="ident">usize</span>]),
+                <span class="ident">usize::MAX</span>,
+            ))],
+            <span class="prelude-val">None</span>,
+        );
     }
 
     <span class="doccomment">/// Poll an interrupt vector to see if it has fired.</span>

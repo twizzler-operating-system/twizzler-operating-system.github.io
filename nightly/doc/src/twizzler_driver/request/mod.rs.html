@@ -55,6 +55,9 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A system for handling requests and organizing inflight requests while waiting for responses.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The general structure of this system is that software implements the [RequestDriver] trait with</span>
@@ -96,7 +99,10 @@
     <span class="kw">type</span> <span class="ident">SubmitError</span>;
     <span class="doccomment">/// The actual submit function. The driver should perform whatever device-specific submission</span>
     <span class="doccomment">/// procedure it needs to to submit all requests.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">submit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reqs</span>: <span class="kw-2">&amp;</span>[<span class="ident">SubmitRequest</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Request</span><span class="op">&gt;</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::SubmitError</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">submit</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">reqs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">SubmitRequest</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Request</span><span class="op">&gt;</span>],
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::SubmitError</span><span class="op">&gt;</span>;
     <span class="doccomment">/// Manually flush any internal driver submission queue.</span>
     <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
     <span class="doccomment">/// The number of IDs to have in-flight at a time.</span>

@@ -37,6 +37,10 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
 <span class="doccomment">/// Error that can arise from submitting a set of requests.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SubmitError</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
@@ -66,6 +70,10 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
     }
 
+    <span class="doccomment">/// Get a mutable reference to the data.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>
+    }
     <span class="doccomment">/// Get the ID of the request. Note that this number is only meaningful after the request has</span>
     <span class="doccomment">/// been submitted.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {

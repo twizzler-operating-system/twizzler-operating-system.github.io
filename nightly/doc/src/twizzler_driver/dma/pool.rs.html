@@ -388,6 +388,8 @@
 <span id="388">388</span>
 <span id="389">389</span>
 <span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
 
 <span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
@@ -554,7 +556,7 @@
     <span class="ident">opts</span>: <span class="ident">DmaOptions</span>,
     <span class="ident">spec</span>: <span class="ident">CreateSpec</span>,
     <span class="ident">access</span>: <span class="ident">Access</span>,
-    <span class="ident">objects</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">objects</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="doccomment">/// Possible errors that can arise from a DMA pool allocation.</span>
@@ -664,7 +666,7 @@
             <span class="ident">opts</span>,
             <span class="ident">spec</span>,
             <span class="ident">access</span>,
-            <span class="ident">objects</span>: <span class="macro">vec!</span>[],
+            <span class="ident">objects</span>: <span class="ident">Mutex::new</span>(<span class="macro">vec!</span>[]),
         }
     }
 
@@ -674,32 +676,34 @@
         <span class="ident">CreateSpec::new</span>(<span class="ident">LifetimeType::Volatile</span>, <span class="ident">BackingType::Normal</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_object</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">AllocationError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AllocatableDmaObject::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spec</span>)<span class="question-mark">?</span>);
-        <span class="self">self</span>.<span class="ident">objects</span>.<span class="ident">push</span>(<span class="ident">obj</span>);
-        <span class="prelude-val">Ok</span>(())
+        <span class="prelude-val">Ok</span>(<span class="ident">obj</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">do_allocate</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">len</span>: <span class="ident">usize</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span>, <span class="ident">SplitPageRange</span>), <span class="ident">AllocationError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">MAX_SIZE</span> <span class="op">-</span> <span class="ident">NULLPAGE_SIZE</span> <span class="op">*</span> <span class="number">2</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AllocationError::TooBig</span>);
         }
-        <span class="kw">for</span> <span class="ident">obj</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">objects</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objects</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">objects</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="kw">for</span> <span class="ident">obj</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">objects</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pagerange</span>) <span class="op">=</span> <span class="ident">obj</span>.<span class="ident">allocate</span>(<span class="ident">len</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">obj</span>.<span class="ident">clone</span>(), <span class="ident">pagerange</span>));
             }
         }
-        <span class="self">self</span>.<span class="ident">new_object</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">new_object</span>()<span class="question-mark">?</span>;
+        <span class="ident">objects</span>.<span class="ident">push</span>(<span class="ident">obj</span>);
+        <span class="ident">drop</span>(<span class="ident">objects</span>);
         <span class="self">self</span>.<span class="ident">do_allocate</span>(<span class="ident">len</span>)
     }
 
     <span class="doccomment">/// Allocate a new [DmaRegion&lt;T&gt;] from the pool. The region will be initialized with the</span>
     <span class="doccomment">/// provided initial value.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">init</span>: <span class="ident">T</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
@@ -719,7 +723,7 @@
     <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region&#39;s slice will</span>
     <span class="doccomment">/// be initialized with the provided initial value.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">count</span>: <span class="ident">usize</span>,
         <span class="ident">init</span>: <span class="ident">T</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
@@ -741,7 +745,7 @@
     <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region&#39;s slice will</span>
     <span class="doccomment">/// be initialized by running the provided closure.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
         <span class="ident">count</span>: <span class="ident">usize</span>,
         <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">T</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
@@ -769,7 +773,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">allocate</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">DmaPool::new</span>(
+        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">DmaPool::new</span>(
             <span class="ident">DmaPool::default_spec</span>(),
             <span class="ident">Access::BiDirectional</span>,
             <span class="ident">DmaOptions::empty</span>(),

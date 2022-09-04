@@ -1,5 +1,5 @@
 var N = null;var sourcesIndex = {};
-sourcesIndex["devmgr"] = {"name":"","files":["main.rs","nvme_test.rs"]};
+sourcesIndex["devmgr"] = {"name":"","files":["main.rs"]};
 sourcesIndex["init"] = {"name":"","files":["main.rs"]};
 sourcesIndex["netmgr"] = {"name":"","dirs":[{"name":"link","files":["ethernet.rs","mod.rs","nic.rs"]},{"name":"network","files":["ipv4.rs","mod.rs"]},{"name":"nics","files":["loopback.rs","mod.rs"]},{"name":"transport","files":["icmp.rs","mod.rs","tcp.rs","udp.rs"]}],"files":["arp.rs","client_request.rs","endpoint.rs","header.rs","listen.rs","main.rs","route.rs","send.rs"]};
 sourcesIndex["nettest"] = {"name":"","files":["main.rs"]};

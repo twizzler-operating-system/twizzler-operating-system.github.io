@@ -123,7 +123,12 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::env::args</span>;
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">int_log</span>)]</span>
+
+<span class="kw">use</span> <span class="ident">std::env::args</span>;
 
 <span class="kw">use</span> <span class="ident">pci_ids::FromId</span>;
 <span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
@@ -136,7 +141,7 @@
 };
 <span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">Object</span>, <span class="ident">ObjectInitFlags</span>, <span class="ident">Protections</span>};
 
-<span class="kw">mod</span> <span class="ident">nvme_test</span>;
+<span class="comment">//mod nvme_test;</span>
 
 <span class="kw">fn</span> <span class="ident">get_pcie_offset</span>(<span class="ident">bus</span>: <span class="ident">u8</span>, <span class="ident">device</span>: <span class="ident">u8</span>, <span class="ident">function</span>: <span class="ident">u8</span>) -&gt; <span class="ident">usize</span> {
     ((<span class="ident">bus</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">256</span>) <span class="op">+</span> (<span class="ident">device</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="number">8</span>) <span class="op">+</span> <span class="ident">function</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">*</span> <span class="number">4096</span>
@@ -178,6 +183,7 @@
         <span class="ident">KactionCmd::Specific</span>(<span class="ident">PcieKactionSpecific::RegisterDevice</span>.<span class="ident">into</span>()),
         ((<span class="ident">bus</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>) <span class="op">|</span> ((<span class="ident">device</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">function</span> <span class="kw">as</span> <span class="ident">u64</span>),
         <span class="ident">KactionFlags::empty</span>(),
+        <span class="number">0</span>,
     );
     <span class="kw">match</span> <span class="ident">kr</span> {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
@@ -235,7 +241,7 @@
         }
     }
 
-   <span class="comment">// nvme_test::start();</span>
+    <span class="comment">//nvme_test::start();</span>
 
     <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">obj</span>.<span class="ident">base_unchecked</span>() };
     <span class="ident">base</span>.<span class="ident">store</span>(<span class="number">1</span>, <span class="ident">std::sync::atomic::Ordering::SeqCst</span>);
