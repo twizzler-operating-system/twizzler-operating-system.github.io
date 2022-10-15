@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["SendableBuffer",""]],"struct":[["NicBuffer",""]],"trait":[["NetworkInterface",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["SendableBuffer",""]],"struct":[["NicBuffer",""]],"trait":[["NetworkInterface",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["send_raw_packet",""]],"mod":[["ipv4",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["send_raw_packet",""]],"mod":[["ipv4",""]]};

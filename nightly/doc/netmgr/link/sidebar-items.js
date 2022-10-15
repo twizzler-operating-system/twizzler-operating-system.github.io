@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["ethernet",""],["nic",""]],"struct":[["IncomingPacketInfo",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["ethernet",""],["nic",""]],"struct":[["IncomingPacketInfo",""]]};

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Loopback",""],["LoopbackInner",""]]});
+window.SIDEBAR_ITEMS = {"struct":[["Loopback",""],["LoopbackInner",""]]};

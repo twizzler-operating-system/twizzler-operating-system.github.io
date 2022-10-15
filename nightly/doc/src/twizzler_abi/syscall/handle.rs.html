@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-abi&#x2F;src&#x2F;syscall&#x2F;handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handle.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_abi/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/syscall/handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -97,106 +97,104 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
-<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
+<span class="kw">use </span>bitflags::bitflags;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">arch::syscall::raw_syscall</span>, <span class="ident">object::ObjID</span>};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">convert_codes_to_result</span>, <span class="ident">justval</span>, <span class="ident">Syscall</span>};
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="doccomment">/// Possible error values for [sys_new_handle].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NewHandleError</span> {
-    <span class="doccomment">/// An unknown error occurred.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// One of the arguments was invalid.   </span>
-    <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// The specified object is already a handle.</span>
-    <span class="ident">AlreadyHandle</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// The specified object was not found.</span>
-    <span class="ident">NotFound</span> <span class="op">=</span> <span class="number">3</span>,
+<span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
+<span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[repr(u32)]
+</span><span class="doccomment">/// Possible error values for [sys_new_handle].
+</span><span class="kw">pub enum </span>NewHandleError {
+    <span class="doccomment">/// An unknown error occurred.
+    </span>Unknown = <span class="number">0</span>,
+    <span class="doccomment">/// One of the arguments was invalid.   
+    </span>InvalidArgument = <span class="number">1</span>,
+    <span class="doccomment">/// The specified object is already a handle.
+    </span>AlreadyHandle = <span class="number">2</span>,
+    <span class="doccomment">/// The specified object was not found.
+    </span>NotFound = <span class="number">3</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">NewHandleError</span> {
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InvalidArgument</span> =&gt; <span class="string">&quot;invalid argument&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::AlreadyHandle</span> =&gt; <span class="string">&quot;object is already a handle&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::NotFound</span> =&gt; <span class="string">&quot;object was not found&quot;</span>,
+<span class="kw">impl </span>NewHandleError {
+    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
+            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;invalid argument&quot;</span>,
+            <span class="self">Self</span>::AlreadyHandle =&gt; <span class="string">&quot;object is already a handle&quot;</span>,
+            <span class="self">Self</span>::NotFound =&gt; <span class="string">&quot;object was not found&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">NewHandleError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">NewHandleError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl </span>From&lt;NewHandleError&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(x: NewHandleError) -&gt; <span class="self">Self </span>{
+        x <span class="kw">as </span>u64
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NewHandleError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidArgument</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>NewHandleError {
+    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>x {
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NewHandleError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">as_str</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>NewHandleError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">NewHandleError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>NewHandleError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.as_str()
     }
 }
 
-<span class="doccomment">/// Possible kernel handle types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u64</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">HandleType</span> {
-    <span class="ident">VmContext</span> <span class="op">=</span> <span class="number">0</span>,
+<span class="doccomment">/// Possible kernel handle types.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[repr(u64)]
+</span><span class="kw">pub enum </span>HandleType {
+    VmContext = <span class="number">0</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandleType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">NewHandleError</span>;
+<span class="kw">impl </span>TryFrom&lt;u64&gt; <span class="kw">for </span>HandleType {
+    <span class="kw">type </span>Error = NewHandleError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::VmContext</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">NewHandleError::InvalidArgument</span>),
+    <span class="kw">fn </span>try_from(value: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::VmContext),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(NewHandleError::InvalidArgument),
         }
     }
 }
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// Flags to pass to [sys_new_handle].</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NewHandleFlags</span>: <span class="ident">u64</span> {
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Flags to pass to [sys_new_handle].
+    </span><span class="kw">pub struct </span>NewHandleFlags: u64 {
     }
 }
 
-<span class="doccomment">/// Make a new handle object.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_new_handle</span>(
-    <span class="ident">objid</span>: <span class="ident">ObjID</span>,
-    <span class="ident">handle_type</span>: <span class="ident">HandleType</span>,
-    <span class="ident">flags</span>: <span class="ident">NewHandleFlags</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">NewHandleError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">objid</span>.<span class="ident">split</span>();
-    <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">raw_syscall</span>(
-            <span class="ident">Syscall::NewHandle</span>,
-            <span class="kw-2">&amp;</span>[<span class="ident">hi</span>, <span class="ident">lo</span>, <span class="ident">handle_type</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">flags</span>.<span class="ident">bits</span>()],
+<span class="doccomment">/// Make a new handle object.
+</span><span class="kw">pub fn </span>sys_new_handle(
+    objid: ObjID,
+    handle_type: HandleType,
+    flags: NewHandleFlags,
+) -&gt; <span class="prelude-ty">Result</span>&lt;u64, NewHandleError&gt; {
+    <span class="kw">let </span>(hi, lo) = objid.split();
+    <span class="kw">let </span>(code, val) = <span class="kw">unsafe </span>{
+        raw_syscall(
+            Syscall::NewHandle,
+            <span class="kw-2">&amp;</span>[hi, lo, handle_type <span class="kw">as </span>u64, flags.bits()],
         )
     };
-    <span class="ident">convert_codes_to_result</span>(<span class="ident">code</span>, <span class="ident">val</span>, <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">justval</span>)
+    convert_codes_to_result(code, val, |c, <span class="kw">_</span>| c != <span class="number">0</span>, |<span class="kw">_</span>, v| v <span class="kw">as </span>u64, justval)
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["main",""]],"mod":[["arp",""],["client_request",""],["endpoint",""],["header",""],["link",""],["listen",""],["network",""],["nics",""],["route",""],["send",""],["transport",""]],"struct":[["HandleData",""]],"type":[["Handle",""],["HandleRef",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["main",""]],"mod":[["arp",""],["client_request",""],["endpoint",""],["header",""],["link",""],["listen",""],["network",""],["nics",""],["route",""],["send",""],["transport",""]],"struct":[["HandleData",""]],"type":[["Handle",""],["HandleRef",""]]};

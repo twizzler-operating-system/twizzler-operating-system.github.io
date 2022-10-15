@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["syscall",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["syscall",""]]};

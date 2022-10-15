@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["add_endpoint",""],["foreach_endpoint",""]],"struct":[["ENDPOINTS",""],["EndPoint",""],["EndPointKey",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["add_endpoint",""],["foreach_endpoint",""]],"struct":[["ENDPOINTS",""],["EndPoint",""],["EndPointKey",""]]};

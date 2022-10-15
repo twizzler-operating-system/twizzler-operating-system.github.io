@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["RawSupport",""]],"fn":[["handle_packet",""],["send_packet",""]],"mod":[["icmp",""],["tcp",""],["udp",""]],"struct":[["PROTOS",""]],"trait":[["TransportProto",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["RawSupport",""]],"fn":[["handle_packet",""],["send_packet",""]],"mod":[["icmp",""],["tcp",""],["udp",""]],"struct":[["PROTOS",""]],"trait":[["TransportProto",""]]};

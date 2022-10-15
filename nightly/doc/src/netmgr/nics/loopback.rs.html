@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;bin&#x2F;netmgr&#x2F;src&#x2F;nics&#x2F;loopback.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>loopback.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../netmgr/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bin/netmgr/src/nics/loopback.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>loopback.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../netmgr/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../netmgr/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../netmgr/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -77,86 +77,84 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::VecDeque</span>,
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    collections::VecDeque,
+    sync::{Arc, Mutex},
 };
 
-<span class="kw">use</span> <span class="ident">twizzler_async::FlagBlock</span>;
+<span class="kw">use </span>twizzler_async::FlagBlock;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">link::ethernet</span>::{<span class="ident">EthernetAddr</span>, <span class="ident">EthernetError</span>},
-    <span class="ident">link::nic</span>::{<span class="ident">NetworkInterface</span>, <span class="ident">NicBuffer</span>, <span class="ident">SendableBuffer</span>},
+<span class="kw">use crate</span>::{
+    link::ethernet::{EthernetAddr, EthernetError},
+    link::nic::{NetworkInterface, NicBuffer, SendableBuffer},
 };
 
-<span class="kw">struct</span> <span class="ident">LoopbackInner</span> {
-    <span class="ident">buffer</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">NicBuffer</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>LoopbackInner {
+    buffer: VecDeque&lt;Arc&lt;NicBuffer&gt;&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Loopback</span> {
-    <span class="ident">inner</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">LoopbackInner</span><span class="op">&gt;</span>,
-    <span class="ident">flag</span>: <span class="ident">FlagBlock</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Loopback {
+    inner: Mutex&lt;LoopbackInner&gt;,
+    flag: FlagBlock,
 }
 
-<span class="kw">impl</span> <span class="ident">Loopback</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Mutex::new</span>(<span class="ident">LoopbackInner</span> {
-                <span class="ident">buffer</span>: <span class="ident">VecDeque::new</span>(),
+<span class="kw">impl </span>Loopback {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: Mutex::new(LoopbackInner {
+                buffer: VecDeque::new(),
             }),
-            <span class="ident">flag</span>: <span class="ident">FlagBlock::new</span>(),
+            flag: FlagBlock::new(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">NetworkInterface</span> <span class="kw">for</span> <span class="ident">Loopback</span> {
-    <span class="kw">fn</span> <span class="ident">get_ethernet_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EthernetAddr</span> {
-        <span class="ident">EthernetAddr::from</span>([<span class="number">0</span>; <span class="number">6</span>])
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">impl </span>NetworkInterface <span class="kw">for </span>Loopback {
+    <span class="kw">fn </span>get_ethernet_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EthernetAddr {
+        EthernetAddr::from([<span class="number">0</span>; <span class="number">6</span>])
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_ethernet</span>(
+    <span class="kw">async fn </span>send_ethernet(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">header_buffer</span>: <span class="ident">NicBuffer</span>,
-        <span class="ident">buffers</span>: <span class="kw-2">&amp;</span>[<span class="ident">SendableBuffer</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">EthernetError</span><span class="op">&gt;</span> {
-        <span class="comment">// yeah i know this is really slow</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">header_buffer</span>.<span class="ident">as_bytes</span>();
-        <span class="kw">let</span> <span class="ident">total_len</span> <span class="op">=</span> <span class="ident">buffers</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0usize</span>, <span class="op">|</span><span class="ident">t</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">t</span> <span class="op">+</span> <span class="ident">b</span>.<span class="ident">as_bytes</span>().<span class="ident">len</span>()) <span class="op">+</span> <span class="ident">slice</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nb</span> <span class="op">=</span> <span class="ident">NicBuffer::allocate</span>(<span class="ident">total_len</span>);
-        <span class="kw">let</span> <span class="ident">nb_bytes</span> <span class="op">=</span> <span class="ident">nb</span>.<span class="ident">as_bytes_mut</span>();
-        <span class="ident">nb_bytes</span>[<span class="number">0</span>..<span class="ident">slice</span>.<span class="ident">len</span>()].<span class="ident">copy_from_slice</span>(<span class="ident">slice</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">off</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
-        <span class="kw">for</span> <span class="ident">buffer</span> <span class="kw">in</span> <span class="ident">buffers</span> {
-            <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">nb_bytes</span>[<span class="ident">off</span>..(<span class="ident">off</span> <span class="op">+</span> <span class="ident">slice</span>.<span class="ident">len</span>())].<span class="ident">copy_from_slice</span>(<span class="ident">slice</span>);
-            <span class="ident">off</span> <span class="op">+</span><span class="op">=</span> <span class="ident">slice</span>.<span class="ident">len</span>();
+        header_buffer: NicBuffer,
+        buffers: <span class="kw-2">&amp;</span>[SendableBuffer],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), EthernetError&gt; {
+        <span class="comment">// yeah i know this is really slow
+        </span><span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
+        <span class="kw">let </span>slice = header_buffer.as_bytes();
+        <span class="kw">let </span>total_len = buffers.iter().fold(<span class="number">0usize</span>, |t, b| t + b.as_bytes().len()) + slice.len();
+        <span class="kw">let </span><span class="kw-2">mut </span>nb = NicBuffer::allocate(total_len);
+        <span class="kw">let </span>nb_bytes = nb.as_bytes_mut();
+        nb_bytes[<span class="number">0</span>..slice.len()].copy_from_slice(slice);
+        <span class="kw">let </span><span class="kw-2">mut </span>off = slice.len();
+        <span class="kw">for </span>buffer <span class="kw">in </span>buffers {
+            <span class="kw">let </span>slice = buffer.as_bytes();
+            nb_bytes[off..(off + slice.len())].copy_from_slice(slice);
+            off += slice.len();
         }
-        <span class="ident">inner</span>.<span class="ident">buffer</span>.<span class="ident">push_back</span>(<span class="ident">Arc::new</span>(<span class="ident">nb</span>));
-        <span class="self">self</span>.<span class="ident">flag</span>.<span class="ident">signal_all</span>();
+        inner.buffer.push_back(Arc::new(nb));
+        <span class="self">self</span>.flag.signal_all();
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv_ethernet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">NicBuffer</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">EthernetError</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-                    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">buf</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">buffer</span>.<span class="ident">pop_front</span>() {
-                        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">buf</span>);
+    <span class="kw">async fn </span>recv_ethernet(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Arc&lt;NicBuffer&gt;&gt;, EthernetError&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>fut = {
+                <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
+                <span class="kw">if </span>!inner.buffer.is_empty() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>v = <span class="macro">vec!</span>[];
+                    <span class="kw">while let </span><span class="prelude-val">Some</span>(buf) = inner.buffer.pop_front() {
+                        v.push(buf);
                     }
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">v</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(v);
                 }
 
-                <span class="self">self</span>.<span class="ident">flag</span>.<span class="ident">wait</span>()
+                <span class="self">self</span>.flag.wait()
             };
-            <span class="ident">fut</span>.<span class="kw">await</span>;
+            fut.<span class="kw">await</span>;
         }
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="netmgr" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="netmgr" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

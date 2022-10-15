@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-driver&#x2F;src&#x2F;dma&#x2F;pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pool.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_driver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-driver/src/dma/pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pool.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_driver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -390,399 +390,397 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::{Arc, Mutex};
 
-<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
-    <span class="ident">marker::BaseType</span>,
-    <span class="ident">object</span>::{<span class="ident">MAX_SIZE</span>, <span class="ident">NULLPAGE_SIZE</span>},
-    <span class="ident">syscall</span>::{<span class="ident">BackingType</span>, <span class="ident">LifetimeType</span>},
+<span class="kw">use </span>twizzler_abi::{
+    marker::BaseType,
+    object::{MAX_SIZE, NULLPAGE_SIZE},
+    syscall::{BackingType, LifetimeType},
 };
-<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">CreateSpec</span>, <span class="ident">Object</span>};
+<span class="kw">use </span>twizzler_object::{CreateSpec, Object};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaObject</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>, <span class="ident">DMA_PAGE_SIZE</span>};
+<span class="kw">use super</span>::{Access, DeviceSync, DmaObject, DmaOptions, DmaRegion, DmaSliceRegion, DMA_PAGE_SIZE};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">SplitPageRange</span> {
-    <span class="ident">start</span>: <span class="ident">usize</span>,
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>SplitPageRange {
+    start: usize,
+    len: usize,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">Split</span> {
-    <span class="ident">Single</span>(<span class="ident">SplitPageRange</span>),
-    <span class="ident">Multiple</span>(<span class="ident">SplitPageRange</span>, <span class="ident">SplitPageRange</span>),
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>Split {
+    Single(SplitPageRange),
+    Multiple(SplitPageRange, SplitPageRange),
 }
 
-<span class="kw">impl</span> <span class="ident">SplitPageRange</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">start</span>, <span class="ident">len</span> }
+<span class="kw">impl </span>SplitPageRange {
+    <span class="kw">fn </span>new(start: usize, len: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ start, len }
     }
 
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>, <span class="ident">newlen</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Split</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start</span>;
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>;
-        <span class="kw">if</span> <span class="ident">newlen</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">newlen</span> <span class="op">==</span> <span class="ident">len</span> {
-            <span class="kw">return</span> <span class="ident">Split::Single</span>(<span class="self">Self</span> { <span class="ident">start</span>, <span class="ident">len</span> });
+    <span class="kw">fn </span>split(<span class="self">self</span>, newlen: usize) -&gt; Split {
+        <span class="kw">let </span>start = <span class="self">self</span>.start;
+        <span class="kw">let </span>len = <span class="self">self</span>.len;
+        <span class="kw">if </span>newlen == <span class="number">0 </span>|| newlen == len {
+            <span class="kw">return </span>Split::Single(<span class="self">Self </span>{ start, len });
         }
-        <span class="ident">Split::Multiple</span>(
-            <span class="self">Self</span> { <span class="ident">start</span>, <span class="ident">len</span>: <span class="ident">newlen</span> },
-            <span class="self">Self</span> {
-                <span class="ident">start</span>: <span class="ident">start</span> <span class="op">+</span> <span class="ident">newlen</span>,
-                <span class="ident">len</span>: <span class="ident">len</span> <span class="op">-</span> <span class="ident">newlen</span>,
+        Split::Multiple(
+            <span class="self">Self </span>{ start, len: newlen },
+            <span class="self">Self </span>{
+                start: start + newlen,
+                len: len - newlen,
             },
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">merge</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">first</span>, <span class="ident">second</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">other</span>.<span class="ident">start</span> {
-            (<span class="self">self</span>, <span class="ident">other</span>)
-        } <span class="kw">else</span> {
-            (<span class="ident">other</span>, <span class="self">self</span>)
+    <span class="kw">fn </span>merge(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(first, second) = <span class="kw">if </span><span class="self">self</span>.start &lt; other.start {
+            (<span class="self">self</span>, other)
+        } <span class="kw">else </span>{
+            (other, <span class="self">self</span>)
         };
-        <span class="macro">assert!</span>(<span class="ident">first</span>.<span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="ident">second</span>));
+        <span class="macro">assert!</span>(first.adjacent_before(<span class="kw-2">&amp;</span>second));
 
-        <span class="self">Self</span> {
-            <span class="ident">start</span>: <span class="ident">first</span>.<span class="ident">start</span>,
-            <span class="ident">len</span>: <span class="ident">first</span>.<span class="ident">len</span> <span class="op">+</span> <span class="ident">second</span>.<span class="ident">len</span>,
+        <span class="self">Self </span>{
+            start: first.start,
+            len: first.len + second.len,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">other</span>.<span class="ident">start</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">start</span>
+    <span class="kw">fn </span>adjacent_before(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.start &lt; other.start &amp;&amp; <span class="self">self</span>.start + <span class="self">self</span>.len == other.start
     }
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">len</span>
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.len
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">start</span>
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.start
     }
 
-    <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">start</span> <span class="op">*</span> <span class="ident">DMA_PAGE_SIZE</span>
+    <span class="kw">fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.start * DMA_PAGE_SIZE
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tests_split_page_range</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dma::pool::compact_range_list</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub mod </span>tests_split_page_range {
+    <span class="kw">use </span><span class="kw">crate</span>::dma::pool::compact_range_list;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SplitPageRange</span>;
+    <span class="kw">use </span><span class="kw">super</span>::SplitPageRange;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spr_split_multiple</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">7</span>);
-        <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">split</span>(<span class="number">4</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">super</span>::Split::Multiple</span>(<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="ident">split</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="number">4</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">start</span>(), <span class="number">2</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">3</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">start</span>(), <span class="number">6</span>);
-        } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spr_split_multiple() {
+        <span class="kw">let </span>r = SplitPageRange::new(<span class="number">2</span>, <span class="number">7</span>);
+        <span class="kw">let </span>split = r.split(<span class="number">4</span>);
+        <span class="kw">if let </span><span class="kw">super</span>::Split::Multiple(a, b) = split {
+            <span class="macro">assert_eq!</span>(a.len(), <span class="number">4</span>);
+            <span class="macro">assert_eq!</span>(a.start(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(b.len(), <span class="number">3</span>);
+            <span class="macro">assert_eq!</span>(b.start(), <span class="number">6</span>);
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;split broken&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spr_split_single1</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">7</span>);
-        <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">split</span>(<span class="number">7</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">super</span>::Split::Single</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">split</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="number">7</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">start</span>(), <span class="number">2</span>);
-        } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spr_split_single1() {
+        <span class="kw">let </span>r = SplitPageRange::new(<span class="number">2</span>, <span class="number">7</span>);
+        <span class="kw">let </span>split = r.split(<span class="number">7</span>);
+        <span class="kw">if let </span><span class="kw">super</span>::Split::Single(r) = split {
+            <span class="macro">assert_eq!</span>(r.len(), <span class="number">7</span>);
+            <span class="macro">assert_eq!</span>(r.start(), <span class="number">2</span>);
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;split broken&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spr_split_single2</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">7</span>);
-        <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">split</span>(<span class="number">0</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">super</span>::Split::Single</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">split</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="number">7</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">start</span>(), <span class="number">2</span>);
-        } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spr_split_single2() {
+        <span class="kw">let </span>r = SplitPageRange::new(<span class="number">2</span>, <span class="number">7</span>);
+        <span class="kw">let </span>split = r.split(<span class="number">0</span>);
+        <span class="kw">if let </span><span class="kw">super</span>::Split::Single(r) = split {
+            <span class="macro">assert_eq!</span>(r.len(), <span class="number">7</span>);
+            <span class="macro">assert_eq!</span>(r.start(), <span class="number">2</span>);
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;split broken&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spr_merge</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">6</span>, <span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">merge</span>(<span class="ident">b</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">start</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="number">7</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spr_merge() {
+        <span class="kw">let </span>a = SplitPageRange::new(<span class="number">2</span>, <span class="number">4</span>);
+        <span class="kw">let </span>b = SplitPageRange::new(<span class="number">6</span>, <span class="number">3</span>);
+        <span class="kw">let </span>r = a.merge(b);
+        <span class="macro">assert_eq!</span>(r.start(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(r.len(), <span class="number">7</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spr_adj</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">1</span>, <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">6</span>, <span class="number">4</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spr_adj() {
+        <span class="kw">let </span>a = SplitPageRange::new(<span class="number">2</span>, <span class="number">4</span>);
+        <span class="kw">let </span>b = SplitPageRange::new(<span class="number">1</span>, <span class="number">1</span>);
+        <span class="kw">let </span>c = SplitPageRange::new(<span class="number">6</span>, <span class="number">4</span>);
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">a</span>.<span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>));
-        <span class="macro">assert!</span>(<span class="ident">b</span>.<span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">a</span>.<span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>));
-        <span class="macro">assert!</span>(<span class="ident">a</span>.<span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>));
+        <span class="macro">assert!</span>(!a.adjacent_before(<span class="kw-2">&amp;</span>b));
+        <span class="macro">assert!</span>(b.adjacent_before(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert!</span>(!a.adjacent_before(<span class="kw-2">&amp;</span>a));
+        <span class="macro">assert!</span>(a.adjacent_before(<span class="kw-2">&amp;</span>c));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">spr_merge_alg</span>() {
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">0</span>, <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">6</span>, <span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">SplitPageRange::new</span>(<span class="number">2</span>, <span class="number">8</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">a</span>.<span class="ident">clone</span>(), <span class="ident">b</span>.<span class="ident">clone</span>(), <span class="ident">c</span>.<span class="ident">clone</span>()];
-        <span class="kw">let</span> <span class="ident">single_list</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">a</span>.<span class="ident">clone</span>()];
-        <span class="kw">let</span> <span class="ident">slw</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">single_list</span>.<span class="ident">windows</span>(<span class="number">2</span>).<span class="ident">collect</span>();
-        <span class="macro">assert!</span>(<span class="ident">slw</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>spr_merge_alg() {
+        <span class="kw">let </span>a = SplitPageRange::new(<span class="number">2</span>, <span class="number">4</span>);
+        <span class="kw">let </span>b = SplitPageRange::new(<span class="number">0</span>, <span class="number">1</span>);
+        <span class="kw">let </span>c = SplitPageRange::new(<span class="number">6</span>, <span class="number">4</span>);
+        <span class="kw">let </span>x = SplitPageRange::new(<span class="number">2</span>, <span class="number">8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>list = <span class="macro">vec!</span>[a.clone(), b.clone(), c.clone()];
+        <span class="kw">let </span>single_list = <span class="macro">vec!</span>[a.clone()];
+        <span class="kw">let </span>slw: Vec&lt;<span class="kw">_</span>&gt; = single_list.windows(<span class="number">2</span>).collect();
+        <span class="macro">assert!</span>(slw.is_empty());
 
-        <span class="ident">compact_range_list</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">list</span>);
+        compact_range_list(<span class="kw-2">&amp;mut </span>list);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">list</span>, <span class="macro">vec!</span>[<span class="ident">b</span>, <span class="ident">x</span>]);
+        <span class="macro">assert_eq!</span>(list, <span class="macro">vec!</span>[b, x]);
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">AllocatableDmaObject</span> {
-    <span class="ident">dma</span>: <span class="ident">DmaObject</span>,
-    <span class="ident">freelist</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SplitPageRange</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>AllocatableDmaObject {
+    dma: DmaObject,
+    freelist: Mutex&lt;Vec&lt;SplitPageRange&gt;&gt;,
 }
 
-<span class="doccomment">/// A pool for allocating DMA regions that all share a common access type and DMA options.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaPool</span> {
-    <span class="ident">opts</span>: <span class="ident">DmaOptions</span>,
-    <span class="ident">spec</span>: <span class="ident">CreateSpec</span>,
-    <span class="ident">access</span>: <span class="ident">Access</span>,
-    <span class="ident">objects</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A pool for allocating DMA regions that all share a common access type and DMA options.
+</span><span class="kw">pub struct </span>DmaPool {
+    opts: DmaOptions,
+    spec: CreateSpec,
+    access: Access,
+    objects: Mutex&lt;Vec&lt;Arc&lt;AllocatableDmaObject&gt;&gt;&gt;,
 }
 
-<span class="doccomment">/// Possible errors that can arise from a DMA pool allocation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AllocationError</span> {
-    <span class="doccomment">/// The requested region size was too large.</span>
-    <span class="ident">TooBig</span>,
-    <span class="doccomment">/// An internal error occurred.</span>
-    <span class="ident">InternalError</span>,
+<span class="doccomment">/// Possible errors that can arise from a DMA pool allocation.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub enum </span>AllocationError {
+    <span class="doccomment">/// The requested region size was too large.
+    </span>TooBig,
+    <span class="doccomment">/// An internal error occurred.
+    </span>InternalError,
 }
 
-<span class="kw">struct</span> <span class="ident">EmptyBase</span>;
+<span class="kw">struct </span>EmptyBase;
 
-<span class="kw">impl</span> <span class="ident">BaseType</span> <span class="kw">for</span> <span class="ident">EmptyBase</span> {
-    <span class="kw">fn</span> <span class="ident">init</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">_t</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>
-    }
+<span class="kw">impl </span>BaseType <span class="kw">for </span>EmptyBase {
+    <span class="kw">fn </span>init&lt;T&gt;(_t: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">tags</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(
-        <span class="ident">twizzler_abi::marker::BaseVersion</span>,
-        <span class="ident">twizzler_abi::marker::BaseTag</span>,
+    <span class="kw">fn </span>tags() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(
+        twizzler_abi::marker::BaseVersion,
+        twizzler_abi::marker::BaseTag,
     )] {
         <span class="kw-2">&amp;</span>[]
     }
 }
 
-<span class="comment">// Merge adjacent regions by sorting, comparing pairs, and merging if they are adjacent.</span>
-<span class="comment">// Keep going until we cannot merge anymore.</span>
-<span class="kw">fn</span> <span class="ident">compact_range_list</span>(<span class="ident">list</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SplitPageRange</span><span class="op">&gt;</span>) {
-    <span class="ident">list</span>.<span class="ident">sort</span>();
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">list</span>
-            .<span class="ident">windows</span>(<span class="number">2</span>)
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">ranges</span>)<span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">ranges</span>[<span class="number">0</span>].<span class="ident">adjacent_before</span>(<span class="kw-2">&amp;</span><span class="ident">ranges</span>[<span class="number">1</span>]) {
-                    <span class="prelude-val">Some</span>(<span class="ident">idx</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+<span class="comment">// Merge adjacent regions by sorting, comparing pairs, and merging if they are adjacent.
+// Keep going until we cannot merge anymore.
+</span><span class="kw">fn </span>compact_range_list(list: <span class="kw-2">&amp;mut </span>Vec&lt;SplitPageRange&gt;) {
+    list.sort();
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>pairs: Vec&lt;<span class="kw">_</span>&gt; = list
+            .windows(<span class="number">2</span>)
+            .enumerate()
+            .filter_map(|(idx, ranges)| {
+                <span class="kw">if </span>ranges[<span class="number">0</span>].adjacent_before(<span class="kw-2">&amp;</span>ranges[<span class="number">1</span>]) {
+                    <span class="prelude-val">Some</span>(idx)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">if</span> <span class="ident">pairs</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">if </span>pairs.is_empty() {
             <span class="kw">break</span>;
         }
 
-        <span class="comment">// Iterate in reverse to compact from top, so as to not mess up indices.</span>
-        <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">pairs</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-            <span class="comment">// Grab the second item first to not mess up indices.</span>
-            <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">remove</span>(<span class="ident">pair</span> <span class="op">+</span> <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">list</span>[<span class="kw-2">*</span><span class="ident">pair</span>].<span class="ident">clone</span>().<span class="ident">merge</span>(<span class="ident">second</span>);
-            <span class="ident">list</span>[<span class="kw-2">*</span><span class="ident">pair</span>] <span class="op">=</span> <span class="ident">new</span>;
+        <span class="comment">// Iterate in reverse to compact from top, so as to not mess up indices.
+        </span><span class="kw">for </span>pair <span class="kw">in </span>pairs.iter().rev() {
+            <span class="comment">// Grab the second item first to not mess up indices.
+            </span><span class="kw">let </span>second = list.remove(pair + <span class="number">1</span>);
+            <span class="kw">let </span>new = list[<span class="kw-2">*</span>pair].clone().merge(second);
+            list[<span class="kw-2">*</span>pair] = new;
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AllocatableDmaObject</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">dma_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">DmaObject</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dma</span>
+<span class="kw">impl </span>AllocatableDmaObject {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>dma_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DmaObject {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.dma
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">free</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">SplitPageRange</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freelist</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">freelist</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">freelist</span>.<span class="ident">push</span>(<span class="ident">range</span>);
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>free(<span class="kw-2">&amp;</span><span class="self">self</span>, range: SplitPageRange) {
+        <span class="kw">let </span><span class="kw-2">mut </span>freelist = <span class="self">self</span>.freelist.lock().unwrap();
+        freelist.push(range);
 
-        <span class="ident">compact_range_list</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">freelist</span>);
-        <span class="comment">// TODO: consider that, if the entire object get free&#39;d, we could delete the object.</span>
-    }
+        compact_range_list(<span class="kw-2">&amp;mut </span>freelist);
+        <span class="comment">// TODO: consider that, if the entire object get free&#39;d, we could delete the object.
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">allocate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SplitPageRange</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">freelist</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">freelist</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">nr_pages</span> <span class="op">=</span> (<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="ident">DMA_PAGE_SIZE</span> <span class="op">+</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">freelist</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> <span class="ident">range</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">nr_pages</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>allocate(<span class="kw-2">&amp;</span><span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;SplitPageRange&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>freelist = <span class="self">self</span>.freelist.lock().unwrap();
+        <span class="kw">let </span>nr_pages = (len - <span class="number">1</span>) / DMA_PAGE_SIZE + <span class="number">1</span>;
+        <span class="kw">let </span>index = freelist.iter().position(|range| range.len() &gt;= nr_pages)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">freelist</span>.<span class="ident">remove</span>(<span class="ident">index</span>);
-        <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">range</span>.<span class="ident">split</span>(<span class="ident">nr_pages</span>) {
-            <span class="ident">Split::Single</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
-            <span class="ident">Split::Multiple</span>(<span class="ident">alloc</span>, <span class="ident">extra</span>) =&gt; {
-                <span class="ident">freelist</span>.<span class="ident">push</span>(<span class="ident">extra</span>);
-                <span class="ident">alloc</span>
+        <span class="kw">let </span>range = freelist.remove(index);
+        <span class="prelude-val">Some</span>(<span class="kw">match </span>range.split(nr_pages) {
+            Split::Single(r) =&gt; r,
+            Split::Multiple(alloc, extra) =&gt; {
+                freelist.push(extra);
+                alloc
             }
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">CreateSpec</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">AllocatableDmaObject</span> {
-            <span class="comment">// TODO: automatic object deletion.</span>
-            <span class="ident">dma</span>: <span class="ident">DmaObject::new</span>::<span class="op">&lt;</span><span class="ident">EmptyBase</span><span class="op">&gt;</span>(
-                <span class="ident">Object::create</span>::<span class="op">&lt;</span><span class="ident">EmptyBase</span><span class="op">&gt;</span>(<span class="ident">spec</span>, <span class="ident">EmptyBase</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">AllocationError::InternalError</span>)<span class="question-mark">?</span>,
+    <span class="kw">fn </span>new(spec: <span class="kw-2">&amp;</span>CreateSpec) -&gt; <span class="prelude-ty">Result</span>&lt;AllocatableDmaObject, AllocationError&gt; {
+        <span class="prelude-val">Ok</span>(AllocatableDmaObject {
+            <span class="comment">// TODO: automatic object deletion.
+            </span>dma: DmaObject::new::&lt;EmptyBase&gt;(
+                Object::create::&lt;EmptyBase&gt;(spec, EmptyBase)
+                    .map_err(|<span class="kw">_</span>| AllocationError::InternalError)<span class="question-mark">?</span>,
             ),
-            <span class="ident">freelist</span>: <span class="ident">Mutex::new</span>(<span class="macro">vec!</span>[<span class="ident">SplitPageRange::new</span>(
+            freelist: Mutex::new(<span class="macro">vec!</span>[SplitPageRange::new(
                 <span class="number">1</span>,
-                (<span class="ident">MAX_SIZE</span> <span class="op">-</span> <span class="ident">NULLPAGE_SIZE</span> <span class="op">*</span> <span class="number">2</span>) <span class="op">/</span> <span class="ident">DMA_PAGE_SIZE</span>,
+                (MAX_SIZE - NULLPAGE_SIZE * <span class="number">2</span>) / DMA_PAGE_SIZE,
             )]),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DmaPool</span> {
-    <span class="doccomment">/// Create a new DmaPool with access and DMA options, where each created underlying Twizzler</span>
-    <span class="doccomment">/// object is created using the provided [CreateSpec]. If default (volatile) options are</span>
-    <span class="doccomment">/// acceptable for the create spec, use the [crate::dma::DmaPool::default_spec] function.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">spec</span>: <span class="ident">CreateSpec</span>, <span class="ident">access</span>: <span class="ident">Access</span>, <span class="ident">opts</span>: <span class="ident">DmaOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">opts</span>,
-            <span class="ident">spec</span>,
-            <span class="ident">access</span>,
-            <span class="ident">objects</span>: <span class="ident">Mutex::new</span>(<span class="macro">vec!</span>[]),
+<span class="kw">impl </span>DmaPool {
+    <span class="doccomment">/// Create a new DmaPool with access and DMA options, where each created underlying Twizzler
+    /// object is created using the provided [CreateSpec]. If default (volatile) options are
+    /// acceptable for the create spec, use the [crate::dma::DmaPool::default_spec] function.
+    </span><span class="kw">pub fn </span>new(spec: CreateSpec, access: Access, opts: DmaOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            opts,
+            spec,
+            access,
+            objects: Mutex::new(<span class="macro">vec!</span>[]),
         }
     }
 
-    <span class="doccomment">/// Generate a default [CreateSpec] for use in creating Twizzler DMA objects. By default,</span>
-    <span class="doccomment">/// Twizzler objects for DMA are placed in volatile memory with a volatile lifetime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_spec</span>() -&gt; <span class="ident">CreateSpec</span> {
-        <span class="ident">CreateSpec::new</span>(<span class="ident">LifetimeType::Volatile</span>, <span class="ident">BackingType::Normal</span>)
+    <span class="doccomment">/// Generate a default [CreateSpec] for use in creating Twizzler DMA objects. By default,
+    /// Twizzler objects for DMA are placed in volatile memory with a volatile lifetime.
+    </span><span class="kw">pub fn </span>default_spec() -&gt; CreateSpec {
+        CreateSpec::new(LifetimeType::Volatile, BackingType::Normal)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AllocatableDmaObject::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">spec</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">obj</span>)
+    <span class="kw">fn </span>new_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;AllocatableDmaObject&gt;, AllocationError&gt; {
+        <span class="kw">let </span>obj = Arc::new(AllocatableDmaObject::new(<span class="kw-2">&amp;</span><span class="self">self</span>.spec)<span class="question-mark">?</span>);
+        <span class="prelude-val">Ok</span>(obj)
     }
 
-    <span class="kw">fn</span> <span class="ident">do_allocate</span>(
+    <span class="kw">fn </span>do_allocate(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AllocatableDmaObject</span><span class="op">&gt;</span>, <span class="ident">SplitPageRange</span>), <span class="ident">AllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">MAX_SIZE</span> <span class="op">-</span> <span class="ident">NULLPAGE_SIZE</span> <span class="op">*</span> <span class="number">2</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">AllocationError::TooBig</span>);
+        len: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(Arc&lt;AllocatableDmaObject&gt;, SplitPageRange), AllocationError&gt; {
+        <span class="kw">if </span>len &gt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(AllocationError::TooBig);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objects</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">objects</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">for</span> <span class="ident">obj</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">objects</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pagerange</span>) <span class="op">=</span> <span class="ident">obj</span>.<span class="ident">allocate</span>(<span class="ident">len</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">obj</span>.<span class="ident">clone</span>(), <span class="ident">pagerange</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>objects = <span class="self">self</span>.objects.lock().unwrap();
+        <span class="kw">for </span>obj <span class="kw">in </span><span class="kw-2">&amp;*</span>objects {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(pagerange) = obj.allocate(len) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>((obj.clone(), pagerange));
             }
         }
-        <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">new_object</span>()<span class="question-mark">?</span>;
-        <span class="ident">objects</span>.<span class="ident">push</span>(<span class="ident">obj</span>);
-        <span class="ident">drop</span>(<span class="ident">objects</span>);
-        <span class="self">self</span>.<span class="ident">do_allocate</span>(<span class="ident">len</span>)
+        <span class="kw">let </span>obj = <span class="self">self</span>.new_object()<span class="question-mark">?</span>;
+        objects.push(obj);
+        drop(objects);
+        <span class="self">self</span>.do_allocate(len)
     }
 
-    <span class="doccomment">/// Allocate a new [DmaRegion&lt;T&gt;] from the pool. The region will be initialized with the</span>
-    <span class="doccomment">/// provided initial value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">init</span>: <span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> (<span class="ident">ado</span>, <span class="ident">range</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">do_allocate</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reg</span> <span class="op">=</span> <span class="ident">DmaRegion::new</span>(
+    <span class="doccomment">/// Allocate a new [DmaRegion&lt;T&gt;] from the pool. The region will be initialized with the
+    /// provided initial value.
+    </span><span class="kw">pub fn </span>allocate&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        init: T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;, AllocationError&gt; {
+        <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;();
+        <span class="kw">let </span>(ado, range) = <span class="self">self</span>.do_allocate(len)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>reg = DmaRegion::new(
             <span class="prelude-val">None</span>,
-            <span class="ident">len</span>,
-            <span class="self">self</span>.<span class="ident">access</span>,
-            <span class="self">self</span>.<span class="ident">opts</span>,
-            <span class="ident">range</span>.<span class="ident">offset</span>(),
-            <span class="prelude-val">Some</span>((<span class="ident">ado</span>.<span class="ident">clone</span>(), <span class="ident">range</span>)),
+            len,
+            <span class="self">self</span>.access,
+            <span class="self">self</span>.opts,
+            range.offset(),
+            <span class="prelude-val">Some</span>((ado.clone(), range)),
         );
-        <span class="ident">reg</span>.<span class="ident">fill</span>(<span class="ident">init</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">reg</span>)
+        reg.fill(init);
+        <span class="prelude-val">Ok</span>(reg)
     }
 
-    <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region&#39;s slice will</span>
-    <span class="doccomment">/// be initialized with the provided initial value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">count</span>: <span class="ident">usize</span>,
-        <span class="ident">init</span>: <span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="ident">count</span>;
-        <span class="kw">let</span> (<span class="ident">ado</span>, <span class="ident">range</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">do_allocate</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reg</span> <span class="op">=</span> <span class="ident">DmaSliceRegion::new</span>(
+    <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region&#39;s slice will
+    /// be initialized with the provided initial value.
+    </span><span class="kw">pub fn </span>allocate_array&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync + Clone&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        count: usize,
+        init: T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;, AllocationError&gt; {
+        <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;() * count;
+        <span class="kw">let </span>(ado, range) = <span class="self">self</span>.do_allocate(len)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>reg = DmaSliceRegion::new(
             <span class="prelude-val">None</span>,
-            <span class="ident">len</span>,
-            <span class="self">self</span>.<span class="ident">access</span>,
-            <span class="self">self</span>.<span class="ident">opts</span>,
-            <span class="ident">range</span>.<span class="ident">offset</span>(),
-            <span class="ident">count</span>,
-            <span class="prelude-val">Some</span>((<span class="ident">ado</span>.<span class="ident">clone</span>(), <span class="ident">range</span>)),
+            len,
+            <span class="self">self</span>.access,
+            <span class="self">self</span>.opts,
+            range.offset(),
+            count,
+            <span class="prelude-val">Some</span>((ado.clone(), range)),
         );
-        <span class="ident">reg</span>.<span class="ident">fill</span>(<span class="ident">init</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">reg</span>)
+        reg.fill(init);
+        <span class="prelude-val">Ok</span>(reg)
     }
 
-    <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region&#39;s slice will</span>
-    <span class="doccomment">/// be initialized by running the provided closure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_array_with</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">count</span>: <span class="ident">usize</span>,
-        <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">Fn</span>() -&gt; <span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">AllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="ident">count</span>;
-        <span class="kw">let</span> (<span class="ident">ado</span>, <span class="ident">range</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">do_allocate</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reg</span> <span class="op">=</span> <span class="ident">DmaSliceRegion::new</span>(
+    <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region&#39;s slice will
+    /// be initialized by running the provided closure.
+    </span><span class="kw">pub fn </span>allocate_array_with&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        count: usize,
+        init: <span class="kw">impl </span>Fn() -&gt; T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;, AllocationError&gt; {
+        <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;() * count;
+        <span class="kw">let </span>(ado, range) = <span class="self">self</span>.do_allocate(len)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>reg = DmaSliceRegion::new(
             <span class="prelude-val">None</span>,
-            <span class="ident">len</span>,
-            <span class="self">self</span>.<span class="ident">access</span>,
-            <span class="self">self</span>.<span class="ident">opts</span>,
-            <span class="ident">range</span>.<span class="ident">offset</span>(),
-            <span class="ident">count</span>,
-            <span class="prelude-val">Some</span>((<span class="ident">ado</span>.<span class="ident">clone</span>(), <span class="ident">range</span>)),
+            len,
+            <span class="self">self</span>.access,
+            <span class="self">self</span>.opts,
+            range.offset(),
+            count,
+            <span class="prelude-val">Some</span>((ado.clone(), range)),
         );
-        <span class="ident">reg</span>.<span class="ident">fill_with</span>(<span class="ident">init</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">reg</span>)
+        reg.fill_with(init);
+        <span class="prelude-val">Ok</span>(reg)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dma</span>::{<span class="ident">Access</span>, <span class="ident">DmaOptions</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::dma::{Access, DmaOptions};
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::DmaPool</span>;
+    <span class="kw">use </span><span class="kw">super</span>::DmaPool;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">allocate</span>() {
-        <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">DmaPool::new</span>(
-            <span class="ident">DmaPool::default_spec</span>(),
-            <span class="ident">Access::BiDirectional</span>,
-            <span class="ident">DmaOptions::empty</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>allocate() {
+        <span class="kw">let </span>pool = DmaPool::new(
+            DmaPool::default_spec(),
+            Access::BiDirectional,
+            DmaOptions::empty(),
         );
 
-        <span class="kw">let</span> <span class="ident">_res</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">allocate</span>(<span class="ident">u32::MAX</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>_res = pool.allocate(u32::MAX).unwrap();
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

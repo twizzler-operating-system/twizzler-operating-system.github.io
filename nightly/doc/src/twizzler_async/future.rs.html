@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-async&#x2F;src&#x2F;future.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>future.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../twizzler_async/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-async/src/future.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>future.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../twizzler_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../twizzler_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../twizzler_async/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -195,204 +195,202 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>},
-    <span class="ident">task</span>::{<span class="ident">Poll</span>, <span class="ident">Waker</span>},
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    future::Future,
+    sync::{Arc, Mutex},
+    task::{Poll, Waker},
+    time::{Duration, Instant},
 };
 
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
+<span class="kw">use </span>futures_util::FutureExt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Timer</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Timer;
 
-<span class="doccomment">/// A future that waits on two sub-futures until the first completes.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WaitForFirst</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span><span class="op">&gt;</span> {
-    <span class="ident">one</span>: <span class="ident">FutOne</span>,
-    <span class="ident">two</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FutTwo</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A future that waits on two sub-futures until the first completes.
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+</span><span class="kw">pub struct </span>WaitForFirst&lt;FutOne, FutTwo&gt; {
+    one: FutOne,
+    two: <span class="prelude-ty">Option</span>&lt;FutTwo&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">FutOne</span>: <span class="ident">Unpin</span>, <span class="ident">FutTwo</span>: <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">WaitForFirst</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;FutOne: Unpin, FutTwo: Unpin&gt; Unpin <span class="kw">for </span>WaitForFirst&lt;FutOne, FutTwo&gt; {}
 
-<span class="doccomment">/// A future that waits on two sub-futures until the first one completes. If the second one</span>
-<span class="doccomment">/// completes first, this future will continue awaiting on the first future. If the first one</span>
-<span class="doccomment">/// completes first, this future returns immediately without continuing to wait on the second future.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_for_first</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span>, <span class="ident">T</span>, <span class="ident">R</span><span class="op">&gt;</span>(
-    <span class="ident">one</span>: <span class="ident">FutOne</span>,
-    <span class="ident">two</span>: <span class="ident">FutTwo</span>,
-) -&gt; <span class="ident">WaitForFirst</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">FutOne</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">FutTwo</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">R</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A future that waits on two sub-futures until the first one completes. If the second one
+/// completes first, this future will continue awaiting on the first future. If the first one
+/// completes first, this future returns immediately without continuing to wait on the second future.
+</span><span class="kw">pub fn </span>wait_for_first&lt;FutOne, FutTwo, T, R&gt;(
+    one: FutOne,
+    two: FutTwo,
+) -&gt; WaitForFirst&lt;FutOne, FutTwo&gt;
+<span class="kw">where
+    </span>FutOne: Future&lt;Output = T&gt;,
+    FutTwo: Future&lt;Output = R&gt;,
 {
-    <span class="ident">WaitForFirst</span> {
-        <span class="ident">one</span>,
-        <span class="ident">two</span>: <span class="prelude-val">Some</span>(<span class="ident">two</span>),
+    WaitForFirst {
+        one,
+        two: <span class="prelude-val">Some</span>(two),
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span><span class="op">&gt;</span> <span class="ident">WaitForFirst</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">FutOne</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FutTwo</span><span class="op">&gt;</span>) {
-        (<span class="self">self</span>.<span class="ident">one</span>, <span class="self">self</span>.<span class="ident">two</span>)
+<span class="kw">impl</span>&lt;FutOne, FutTwo&gt; WaitForFirst&lt;FutOne, FutTwo&gt; {
+    <span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; (FutOne, <span class="prelude-ty">Option</span>&lt;FutTwo&gt;) {
+        (<span class="self">self</span>.one, <span class="self">self</span>.two)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">FutOne</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Unpin</span>, <span class="ident">FutTwo</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">WaitForFirst</span><span class="op">&lt;</span><span class="ident">FutOne</span>, <span class="ident">FutTwo</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">FutOne::Output</span>;
+<span class="kw">impl</span>&lt;FutOne: Future + Unpin, FutTwo: Future + Unpin&gt; Future <span class="kw">for </span>WaitForFirst&lt;FutOne, FutTwo&gt; {
+    <span class="kw">type </span>Output = FutOne::Output;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">std::task::Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">one</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>) {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">e</span>);
+    <span class="kw">fn </span>poll(
+        <span class="kw-2">mut </span><span class="self">self</span>: std::pin::Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>std::task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; std::task::Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">if let </span>Poll::Ready(e) = <span class="self">self</span>.one.poll_unpin(cx) {
+            <span class="kw">return </span>Poll::Ready(e);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">two</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">two</span> {
-            <span class="kw">if</span> <span class="ident">two</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>).<span class="ident">is_ready</span>() {
-                <span class="self">self</span>.<span class="ident">two</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(two) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.two {
+            <span class="kw">if </span>two.poll_unpin(cx).is_ready() {
+                <span class="self">self</span>.two = <span class="prelude-val">None</span>;
             }
         }
 
-        <span class="ident">Poll::Pending</span>
+        Poll::Pending
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FlagBlockInner</span> {
-    <span class="ident">wakers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
-    <span class="ident">epoch</span>: <span class="ident">u64</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>FlagBlockInner {
+    wakers: Vec&lt;Waker&gt;,
+    epoch: u64,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="doccomment">/// A basic condition variable for async tasks. If you call wait() you get back a future that you</span>
-<span class="doccomment">/// can await on, which will complete once another tasks calls signal_all(). But there&#39;s a gotcha here.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Okay so you know the rule with mutexes and condition variables? Like, you have some predicate</span>
-<span class="doccomment">/// that tells you &quot;ready&quot; or not, and this is tested with the mutex held, followed by waiting on</span>
-<span class="doccomment">/// the condition variable (which automatically releases and reaquires the lock).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We have something similar. You need to call wait() with that mutex held, and then _after_ you</span>
-<span class="doccomment">/// release the lock, you call await on the future returned by wait().</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FlagBlock</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">FlagBlockInner</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="doccomment">/// A basic condition variable for async tasks. If you call wait() you get back a future that you
+/// can await on, which will complete once another tasks calls signal_all(). But there&#39;s a gotcha here.
+///
+/// Okay so you know the rule with mutexes and condition variables? Like, you have some predicate
+/// that tells you &quot;ready&quot; or not, and this is tested with the mutex held, followed by waiting on
+/// the condition variable (which automatically releases and reaquires the lock).
+///
+/// We have something similar. You need to call wait() with that mutex held, and then _after_ you
+/// release the lock, you call await on the future returned by wait().
+</span><span class="kw">pub struct </span>FlagBlock {
+    inner: Arc&lt;Mutex&lt;FlagBlockInner&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FlagBlockFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FlagBlock</span>,
-    <span class="ident">val</span>: <span class="ident">u64</span>,
-    <span class="ident">added</span>: <span class="ident">bool</span>,
+<span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+</span><span class="kw">pub struct </span>FlagBlockFuture&lt;<span class="lifetime">&#39;a</span>&gt; {
+    state: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FlagBlock,
+    val: u64,
+    added: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">FlagBlock</span> {
-    <span class="doccomment">/// Construct a new FlagBlock.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">FlagBlockInner</span> {
-                <span class="ident">wakers</span>: <span class="macro">vec!</span>[],
-                <span class="ident">epoch</span>: <span class="number">0</span>,
+<span class="kw">impl </span>FlagBlock {
+    <span class="doccomment">/// Construct a new FlagBlock.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: Arc::new(Mutex::new(FlagBlockInner {
+                wakers: <span class="macro">vec!</span>[],
+                epoch: <span class="number">0</span>,
             })),
         }
     }
 
-    <span class="doccomment">/// Signal anyone waiting.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signal_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">inner</span>.<span class="ident">epoch</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">w</span>) <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">wakers</span>.<span class="ident">pop</span>() {
-            <span class="ident">w</span>.<span class="ident">wake</span>();
+    <span class="doccomment">/// Signal anyone waiting.
+    </span><span class="kw">pub fn </span>signal_all(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock().unwrap();
+        inner.epoch += <span class="number">1</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(w) = inner.wakers.pop() {
+            w.wake();
         }
     }
 
-    <span class="doccomment">/// Return an awaitable future for the &quot;readiness&quot; of this condition variable.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FlagBlockFuture</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="ident">FlagBlockFuture</span> {
-            <span class="ident">state</span>: <span class="self">self</span>,
-            <span class="ident">added</span>: <span class="bool-val">false</span>,
-            <span class="ident">val</span>: <span class="ident">inner</span>.<span class="ident">epoch</span>,
+    <span class="doccomment">/// Return an awaitable future for the &quot;readiness&quot; of this condition variable.
+    </span><span class="kw">pub fn </span>wait(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FlagBlockFuture {
+        <span class="kw">let </span>inner = <span class="self">self</span>.inner.lock().unwrap();
+        FlagBlockFuture {
+            state: <span class="self">self</span>,
+            added: <span class="bool-val">false</span>,
+            val: inner.epoch,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">FlagBlockFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Future <span class="kw">for </span>FlagBlockFuture&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">epoch</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">val</span> {
-            <span class="ident">Poll::Ready</span>(())
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">added</span> {
-                <span class="ident">inner</span>.<span class="ident">wakers</span>.<span class="ident">push</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-                <span class="ident">drop</span>(<span class="ident">inner</span>);
-                <span class="self">self</span>.<span class="ident">added</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>poll(
+        <span class="kw-2">mut </span><span class="self">self</span>: std::pin::Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>std::task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.state.inner.lock().unwrap();
+        <span class="kw">if </span>inner.epoch != <span class="self">self</span>.val {
+            Poll::Ready(())
+        } <span class="kw">else </span>{
+            <span class="kw">if </span>!<span class="self">self</span>.added {
+                inner.wakers.push(cx.waker().clone());
+                drop(inner);
+                <span class="self">self</span>.added = <span class="bool-val">true</span>;
             }
-            <span class="ident">Poll::Pending</span>
+            Poll::Pending
         }
     }
 }
 
-<span class="doccomment">/// A future that awaits a sub-future until a timeout occurs.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timeout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="ident">T</span>,
-    <span class="ident">delay</span>: <span class="ident">Timer</span>,
+<span class="doccomment">/// A future that awaits a sub-future until a timeout occurs.
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+</span><span class="kw">pub struct </span>Timeout&lt;T&gt; {
+    value: T,
+    delay: Timer,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Timeout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">after</span>(<span class="ident">f</span>: <span class="ident">T</span>, <span class="ident">dur</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">value</span>: <span class="ident">f</span>,
-            <span class="ident">delay</span>: <span class="ident">Timer::after</span>(<span class="ident">dur</span>),
+<span class="kw">impl</span>&lt;T&gt; Timeout&lt;T&gt; {
+    <span class="kw">pub fn </span>after(f: T, dur: Duration) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            value: f,
+            delay: Timer::after(dur),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">at</span>(<span class="ident">f</span>: <span class="ident">T</span>, <span class="ident">at</span>: <span class="ident">Instant</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">value</span>: <span class="ident">f</span>,
-            <span class="ident">delay</span>: <span class="ident">Timer::at</span>(<span class="ident">at</span>),
+    <span class="kw">pub fn </span>at(f: T, at: Instant) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            value: f,
+            delay: Timer::at(at),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Timeout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T: Future + Unpin&gt; Future <span class="kw">for </span>Timeout&lt;T&gt; {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Option</span>&lt;T::Output&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="ident">res</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>)),
-            <span class="ident">Poll::Pending</span> =&gt; {}
+    <span class="kw">fn </span>poll(
+        <span class="kw-2">mut </span><span class="self">self</span>: std::pin::Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>std::task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">match </span><span class="self">self</span>.value.poll_unpin(cx) {
+            Poll::Ready(res) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(res)),
+            Poll::Pending =&gt; {}
         }
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">delay</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="ident">Poll::Pending</span> =&gt; {}
+        <span class="kw">match </span><span class="self">self</span>.delay.poll_unpin(cx) {
+            Poll::Ready(<span class="kw">_</span>) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
+            Poll::Pending =&gt; {}
         }
-        <span class="ident">Poll::Pending</span>
+        Poll::Pending
     }
 }
 
-<span class="doccomment">/// Await a future until a timeout occurs (or that future completes). If the timeout happens, return</span>
-<span class="doccomment">/// None, otherwise return Some of the result of the future. This timeout expires after a duration.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout_after</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>, <span class="ident">dur</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span> {
-    <span class="ident">Timeout::after</span>(<span class="ident">Box::pin</span>(<span class="ident">f</span>), <span class="ident">dur</span>).<span class="kw">await</span>
-}
+<span class="doccomment">/// Await a future until a timeout occurs (or that future completes). If the timeout happens, return
+/// None, otherwise return Some of the result of the future. This timeout expires after a duration.
+</span><span class="kw">pub async fn </span>timeout_after&lt;F: Future&gt;(f: F, dur: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;F::Output&gt; {
+    Timeout::after(Box::pin(f), dur).<span class="kw">await
+</span>}
 
-<span class="doccomment">/// Await a future until a timeout occurs (or that future completes). If the timeout happens, return</span>
-<span class="doccomment">/// None, otherwise return Some of the result of the future. This timeout expires at an instant in time.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout_at</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>, <span class="ident">at</span>: <span class="ident">Instant</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span> {
-    <span class="ident">Timeout::at</span>(<span class="ident">Box::pin</span>(<span class="ident">f</span>), <span class="ident">at</span>).<span class="kw">await</span>
-}
+<span class="doccomment">/// Await a future until a timeout occurs (or that future completes). If the timeout happens, return
+/// None, otherwise return Some of the result of the future. This timeout expires at an instant in time.
+</span><span class="kw">pub async fn </span>timeout_at&lt;F: Future&gt;(f: F, at: Instant) -&gt; <span class="prelude-ty">Option</span>&lt;F::Output&gt; {
+    Timeout::at(Box::pin(f), at).<span class="kw">await
+</span>}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_async" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

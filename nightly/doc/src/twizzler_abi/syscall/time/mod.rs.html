@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-abi&#x2F;src&#x2F;syscall&#x2F;time&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../twizzler_abi/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/syscall/time/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -230,239 +230,237 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">clock</span>;
-<span class="kw">mod</span> <span class="ident">time</span>;
-<span class="kw">mod</span> <span class="ident">units</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>clock;
+<span class="kw">mod </span>time;
+<span class="kw">mod </span>units;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">clock</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">units</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>clock::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>time::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>units::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">mem::MaybeUninit</span>};
-<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
+<span class="kw">use </span>core::{fmt, mem::MaybeUninit};
+<span class="kw">use </span>bitflags::bitflags;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::arch::syscall::raw_syscall</span>;
+<span class="kw">use </span><span class="kw">crate</span>::arch::syscall::raw_syscall;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">convert_codes_to_result</span>, <span class="ident">Syscall</span>};
+<span class="kw">use super</span>::{convert_codes_to_result, Syscall};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="doccomment">/// Possible error values for [sys_read_clock_info].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReadClockInfoError</span> {
-    <span class="doccomment">/// An unknown error occurred.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// One of the arguments was invalid.   </span>
-    <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[repr(u32)]
+</span><span class="doccomment">/// Possible error values for [sys_read_clock_info].
+</span><span class="kw">pub enum </span>ReadClockInfoError {
+    <span class="doccomment">/// An unknown error occurred.
+    </span>Unknown = <span class="number">0</span>,
+    <span class="doccomment">/// One of the arguments was invalid.   
+    </span>InvalidArgument = <span class="number">1</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">ReadClockInfoError</span> {
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InvalidArgument</span> =&gt; <span class="string">&quot;invalid argument&quot;</span>,
+<span class="kw">impl </span>ReadClockInfoError {
+    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
+            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;invalid argument&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ReadClockInfoError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ReadClockInfoError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl </span>From&lt;ReadClockInfoError&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(x: ReadClockInfoError) -&gt; <span class="self">Self </span>{
+        x <span class="kw">as </span>u64
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReadClockInfoError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidArgument</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ReadClockInfoError {
+    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>x {
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ReadClockInfoError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">as_str</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ReadClockInfoError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">ReadClockInfoError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>ReadClockInfoError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.as_str()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="doccomment">/// Possible error values for [sys_read_clock_list].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReadClockListError</span> {
-    <span class="doccomment">/// An unknown error occurred.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// One of the arguments was invalid.   </span>
-    <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone)]
+#[repr(u32)]
+</span><span class="doccomment">/// Possible error values for [sys_read_clock_list].
+</span><span class="kw">pub enum </span>ReadClockListError {
+    <span class="doccomment">/// An unknown error occurred.
+    </span>Unknown = <span class="number">0</span>,
+    <span class="doccomment">/// One of the arguments was invalid.   
+    </span>InvalidArgument = <span class="number">1</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">ReadClockListError</span> {
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InvalidArgument</span> =&gt; <span class="string">&quot;invalid argument&quot;</span>,
+<span class="kw">impl </span>ReadClockListError {
+    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
+            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;invalid argument&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ReadClockListError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ReadClockListError</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">e</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl </span>From&lt;ReadClockListError&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(e: ReadClockListError) -&gt; <span class="self">Self </span>{
+        e <span class="kw">as </span>u64
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReadClockListError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidArgument</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ReadClockListError {
+    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>x {
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ReadClockListError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">as_str</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ReadClockListError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">ReadClockListError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>ReadClockListError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.as_str()
     }
 }
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// Flags to pass to [`sys_read_clock_info`].</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadClockFlags</span>: <span class="ident">u32</span> {
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Flags to pass to [`sys_read_clock_info`].
+    </span><span class="kw">pub struct </span>ReadClockFlags: u32 {
 
     }
 
-    <span class="doccomment">/// Flags to pass to [`sys_read_clock_list`].</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadClockListFlags</span>: <span class="ident">u32</span> {
-        <span class="doccomment">/// Fill the buffer with all clocks from the clock list, for every `ClockKind`.</span>
-        <span class="kw">const</span> <span class="ident">ALL_CLOCKS</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">0</span>;
-        <span class="doccomment">/// Fill the buffer with only clocks from a given `ClockKind` list.</span>
-        <span class="kw">const</span> <span class="ident">ONLY_KIND</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="doccomment">/// Fill the buffer with the first clock in the `ClockKind` list.</span>
-        <span class="kw">const</span> <span class="ident">FIRST_KIND</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
+    <span class="doccomment">/// Flags to pass to [`sys_read_clock_list`].
+    </span><span class="kw">pub struct </span>ReadClockListFlags: u32 {
+        <span class="doccomment">/// Fill the buffer with all clocks from the clock list, for every `ClockKind`.
+        </span><span class="kw">const </span>ALL_CLOCKS = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;
+        <span class="doccomment">/// Fill the buffer with only clocks from a given `ClockKind` list.
+        </span><span class="kw">const </span>ONLY_KIND = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="doccomment">/// Fill the buffer with the first clock in the `ClockKind` list.
+        </span><span class="kw">const </span>FIRST_KIND = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
     }
 }
 
-<span class="doccomment">/// Possible clock sources.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ClockSource</span> {
-    <span class="ident">BestMonotonic</span>,
-    <span class="ident">BestRealTime</span>,
-    <span class="ident">ID</span>(<span class="ident">ClockID</span>)
+<span class="doccomment">/// Possible clock sources.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+#[repr(C)]
+</span><span class="kw">pub enum </span>ClockSource {
+    BestMonotonic,
+    BestRealTime,
+    ID(ClockID)
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClockSource</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::BestMonotonic</span>,
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::BestRealTime</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::ID</span>(<span class="ident">ClockID</span>(<span class="ident">value</span>)),
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ClockSource {
+    <span class="kw">fn </span>from(value: u64) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::BestMonotonic,
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::BestRealTime,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::ID(ClockID(value)),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ClockSource</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">source</span>: <span class="ident">ClockSource</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">source</span> {
-            <span class="ident">ClockSource::BestMonotonic</span> =&gt; <span class="number">0</span>,
-            <span class="ident">ClockSource::BestRealTime</span> =&gt; <span class="number">1</span>,
-            <span class="ident">ClockSource::ID</span>(<span class="ident">clk</span>) =&gt; <span class="ident">clk</span>.<span class="number">0</span>
-        }
+<span class="kw">impl </span>From&lt;ClockSource&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(source: ClockSource) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>source {
+            ClockSource::BestMonotonic =&gt; <span class="number">0</span>,
+            ClockSource::BestRealTime =&gt; <span class="number">1</span>,
+            ClockSource::ID(clk) =&gt; clk.<span class="number">0
+        </span>}
     }
 }
 
-<span class="doccomment">/// Read information about a give clock, as specified by clock source.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_read_clock_info</span>(
-    <span class="ident">clock_source</span>: <span class="ident">ClockSource</span>,
-    <span class="ident">flags</span>: <span class="ident">ReadClockFlags</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClockInfo</span>, <span class="ident">ReadClockInfoError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">clock_info</span> <span class="op">=</span> <span class="ident">MaybeUninit::uninit</span>();
-    <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">raw_syscall</span>(
-            <span class="ident">Syscall::ReadClockInfo</span>,
+<span class="doccomment">/// Read information about a give clock, as specified by clock source.
+</span><span class="kw">pub fn </span>sys_read_clock_info(
+    clock_source: ClockSource,
+    flags: ReadClockFlags,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ClockInfo, ReadClockInfoError&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>clock_info = MaybeUninit::uninit();
+    <span class="kw">let </span>(code, val) = <span class="kw">unsafe </span>{
+        raw_syscall(
+            Syscall::ReadClockInfo,
             <span class="kw-2">&amp;</span>[
-                <span class="ident">clock_source</span>.<span class="ident">into</span>(),
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">clock_info</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">ClockInfo</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="kw">as</span> <span class="ident">u64</span>,
-                <span class="ident">flags</span>.<span class="ident">bits</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+                clock_source.into(),
+                <span class="kw-2">&amp;mut </span>clock_info <span class="kw">as </span><span class="kw-2">*mut </span>MaybeUninit&lt;ClockInfo&gt; <span class="kw">as </span>usize <span class="kw">as </span>u64,
+                flags.bits() <span class="kw">as </span>u64,
             ],
         )
     };
-    <span class="ident">convert_codes_to_result</span>(
-        <span class="ident">code</span>,
-        <span class="ident">val</span>,
-        <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
-        <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">clock_info</span>.<span class="ident">assume_init</span>() },
-        <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into</span>(),
+    convert_codes_to_result(
+        code,
+        val,
+        |c, <span class="kw">_</span>| c != <span class="number">0</span>,
+        |<span class="kw">_</span>, <span class="kw">_</span>| <span class="kw">unsafe </span>{ clock_info.assume_init() },
+        |<span class="kw">_</span>, v| v.into(),
     )
 }
 
-<span class="doccomment">/// Discover a list of clock sources exposed by the kernel.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This returns a list of clocks stored in `clocks` and the number of</span>
-<span class="doccomment">/// entries filled. By default, one clock from every type of clock</span>
-<span class="doccomment">/// exposed ([`ClockKind`]), is returned. All information in [`ClockInfo`]</span>
-<span class="doccomment">/// except the current value is also returned. For each type of clock with more</span>
-<span class="doccomment">/// than one clock source, the first one is returned. Users can get a list of</span>
-<span class="doccomment">/// all clocks, and thus all clock sources, for a particular type by</span>
-<span class="doccomment">/// specifying the [`ClockKind`] and setting the appropriate flag.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Users are expected to provide a slice, `clocks`, to be filled by the kernel.</span>
-<span class="doccomment">/// `start` indicates what offset into the list of clocks the kernel should fill</span>
-<span class="doccomment">/// the `clocks` buffer from. When there are no more clocks to read from a given</span>
-<span class="doccomment">/// `start` offset, then the value 0 is returned.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// let mut clocks = [Clock::ZERO; 4];</span>
-<span class="doccomment">/// let result = sys_read_clock_list(ClockKind::Monotonic, &amp;mut clocks, 0, ReadClockListFlags::FIRST_KIND);</span>
-<span class="doccomment">/// if let Some(filled) = result {</span>
-<span class="doccomment">///     if filled &gt; 0 {</span>
-<span class="doccomment">///         println!(&quot;time now: {}&quot;, clock[0].read().as_nanos());</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_read_clock_list</span>(
-    <span class="ident">clock</span>: <span class="ident">ClockKind</span>,
-    <span class="ident">clocks</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Clock</span>],
-    <span class="ident">start</span>: <span class="ident">u64</span>,
-    <span class="ident">flags</span>: <span class="ident">ReadClockListFlags</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">ReadClockListError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">raw_syscall</span>(
-            <span class="ident">Syscall::ReadClockList</span>,
+<span class="doccomment">/// Discover a list of clock sources exposed by the kernel.
+///
+/// This returns a list of clocks stored in `clocks` and the number of
+/// entries filled. By default, one clock from every type of clock
+/// exposed ([`ClockKind`]), is returned. All information in [`ClockInfo`]
+/// except the current value is also returned. For each type of clock with more
+/// than one clock source, the first one is returned. Users can get a list of
+/// all clocks, and thus all clock sources, for a particular type by
+/// specifying the [`ClockKind`] and setting the appropriate flag.
+///
+/// Users are expected to provide a slice, `clocks`, to be filled by the kernel.
+/// `start` indicates what offset into the list of clocks the kernel should fill
+/// the `clocks` buffer from. When there are no more clocks to read from a given
+/// `start` offset, then the value 0 is returned.
+///
+/// # Examples
+///
+/// ```no_run
+/// let mut clocks = [Clock::ZERO; 4];
+/// let result = sys_read_clock_list(ClockKind::Monotonic, &amp;mut clocks, 0, ReadClockListFlags::FIRST_KIND);
+/// if let Some(filled) = result {
+///     if filled &gt; 0 {
+///         println!(&quot;time now: {}&quot;, clock[0].read().as_nanos());
+///     }
+/// }
+/// ```
+</span><span class="kw">pub fn </span>sys_read_clock_list(
+    clock: ClockKind,
+    clocks: <span class="kw-2">&amp;mut </span>[Clock],
+    start: u64,
+    flags: ReadClockListFlags,
+) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ReadClockListError&gt; {
+    <span class="kw">let </span>(code, val) = <span class="kw">unsafe </span>{
+        raw_syscall(
+            Syscall::ReadClockList,
             <span class="kw-2">&amp;</span>[
-                <span class="ident">clock</span>.<span class="ident">into</span>(),
-                <span class="ident">clocks</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="ident">u64</span>,
-                <span class="ident">clocks</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>,
-                <span class="ident">start</span>,
-                <span class="ident">flags</span>.<span class="ident">bits</span>() <span class="kw">as</span> <span class="ident">u64</span>,
+                clock.into(),
+                clocks.as_mut_ptr() <span class="kw">as </span>u64,
+                clocks.len() <span class="kw">as </span>u64,
+                start,
+                flags.bits() <span class="kw">as </span>u64,
             ],
         )
     };
-    <span class="ident">convert_codes_to_result</span>(
-        <span class="ident">code</span>,
-        <span class="ident">val</span>,
-        <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
-        <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="kw">as</span> <span class="ident">usize</span>,
-        <span class="op">|</span><span class="kw">_</span>, <span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into</span>(),
+    convert_codes_to_result(
+        code,
+        val,
+        |c, <span class="kw">_</span>| c != <span class="number">0</span>,
+        |<span class="kw">_</span>, v| v <span class="kw">as </span>usize,
+        |<span class="kw">_</span>, v| v.into(),
     )
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_abi" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

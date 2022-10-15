@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Volatile","A value that should be accessed with volatile memory semantics."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Volatile","A value that should be accessed with volatile memory semantics."]]};

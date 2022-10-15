@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["SpawnExecutableError","Possible errors for [spawn_new_executable]."]],"fn":[["spawn_new_executable","Start a new executable in a new address space."]],"struct":[["ElfObject","An object that contains an ELF file."]]});
+window.SIDEBAR_ITEMS = {"enum":[["SpawnExecutableError","Possible errors for [spawn_new_executable]."]],"fn":[["spawn_new_executable","Start a new executable in a new address space."]],"struct":[["ElfObject","An object that contains an ELF file."]]};

@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-driver&#x2F;src&#x2F;dma&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_driver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-driver/src/dma/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_driver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -80,89 +80,87 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module for managing DMA memory, using objects for DMA, and creating pools of DMA memory that can</span>
-<span class="doccomment">//! be allocated from. Internally, the DMA functions will interact with the kernel to ensure</span>
-<span class="doccomment">//! stability of physical addresses for DMA memory, and will also ensure proper coherence between</span>
-<span class="doccomment">//! the host and devices.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module for managing DMA memory, using objects for DMA, and creating pools of DMA memory that can
+//! be allocated from. Internally, the DMA functions will interact with the kernel to ensure
+//! stability of physical addresses for DMA memory, and will also ensure proper coherence between
+//! the host and devices.
 
-<span class="kw">mod</span> <span class="ident">object</span>;
-<span class="kw">mod</span> <span class="ident">pin</span>;
-<span class="kw">mod</span> <span class="ident">pool</span>;
-<span class="kw">mod</span> <span class="ident">region</span>;
+</span><span class="kw">mod </span>object;
+<span class="kw">mod </span>pin;
+<span class="kw">mod </span>pool;
+<span class="kw">mod </span>region;
 
-<span class="kw">use</span> <span class="ident">std::cell::UnsafeCell</span>;
+<span class="kw">use </span>std::cell::UnsafeCell;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::arch::DMA_PAGE_SIZE</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">object::DmaObject</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pin</span>::{<span class="ident">DmaPin</span>, <span class="ident">PinError</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pool::DmaPool</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">region</span>::{<span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>};
+<span class="kw">pub use </span><span class="kw">super</span>::arch::DMA_PAGE_SIZE;
+<span class="kw">pub use </span>object::DmaObject;
+<span class="kw">pub use </span>pin::{DmaPin, PinError};
+<span class="kw">pub use </span>pool::DmaPool;
+<span class="kw">pub use </span>region::{DmaRegion, DmaSliceRegion};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="doccomment">/// Intended access direction for DMA memory.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Access</span> {
-    <span class="doccomment">/// The memory is used for the host to write and the device to read. Device writes may not be coherent.</span>
-    <span class="ident">HostToDevice</span>,
-    <span class="doccomment">/// The memory is used for the host to read and the device to write. Host writes may not be coherent.</span>
-    <span class="ident">DeviceToHost</span>,
-    <span class="doccomment">/// The memory is accessed read/write by both device and host.</span>
-    <span class="ident">BiDirectional</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash)]
+</span><span class="doccomment">/// Intended access direction for DMA memory.
+</span><span class="kw">pub enum </span>Access {
+    <span class="doccomment">/// The memory is used for the host to write and the device to read. Device writes may not be coherent.
+    </span>HostToDevice,
+    <span class="doccomment">/// The memory is used for the host to read and the device to write. Host writes may not be coherent.
+    </span>DeviceToHost,
+    <span class="doccomment">/// The memory is accessed read/write by both device and host.
+    </span>BiDirectional,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="doccomment">/// Mode of syncing to apply when calling `sync()`. These sync calls are unnecessary by default, and</span>
-<span class="doccomment">/// should only be used with utmost care.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SyncMode</span> {
-    <span class="doccomment">/// Ensures coherence for the host to write to the device, ensuring that the memory is coherent</span>
-    <span class="doccomment">/// from the perspective of the CPU before the host writes.</span>
-    <span class="ident">PreCpuToDevice</span>,
-    <span class="doccomment">/// Ensures coherence for the host to write to the device, ensuring that the memory is coherent</span>
-    <span class="doccomment">/// after the write.</span>
-    <span class="ident">PostCpuToDevice</span>,
-    <span class="doccomment">/// Ensures coherence for the device to write to the host, ensuring that the memory is coherent</span>
-    <span class="doccomment">/// before the device performs an operation.</span>
-    <span class="ident">PreDeviceToCpu</span>,
-    <span class="doccomment">/// Ensures coherence for the device to write to the host, ensuring that the memory is coherent</span>
-    <span class="doccomment">/// after the device performs an operation.</span>
-    <span class="ident">PostDeviceToCpu</span>,
-    <span class="doccomment">/// Ensures that memory is fully coherent.</span>
-    <span class="ident">FullCoherence</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash)]
+</span><span class="doccomment">/// Mode of syncing to apply when calling `sync()`. These sync calls are unnecessary by default, and
+/// should only be used with utmost care.
+</span><span class="kw">pub enum </span>SyncMode {
+    <span class="doccomment">/// Ensures coherence for the host to write to the device, ensuring that the memory is coherent
+    /// from the perspective of the CPU before the host writes.
+    </span>PreCpuToDevice,
+    <span class="doccomment">/// Ensures coherence for the host to write to the device, ensuring that the memory is coherent
+    /// after the write.
+    </span>PostCpuToDevice,
+    <span class="doccomment">/// Ensures coherence for the device to write to the host, ensuring that the memory is coherent
+    /// before the device performs an operation.
+    </span>PreDeviceToCpu,
+    <span class="doccomment">/// Ensures coherence for the device to write to the host, ensuring that the memory is coherent
+    /// after the device performs an operation.
+    </span>PostDeviceToCpu,
+    <span class="doccomment">/// Ensures that memory is fully coherent.
+    </span>FullCoherence,
 }
 
-<span class="macro">bitflags::bitflags!</span> {
-    <span class="doccomment">/// Options for DMA regions.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaOptions</span> : <span class="ident">u64</span> {
-        <span class="doccomment">/// Region functions will not perform automatic coherence.</span>
-        <span class="kw">const</span> <span class="ident">UNSAFE_MANUAL_COHERENCE</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="macro">bitflags::bitflags! </span>{
+    <span class="doccomment">/// Options for DMA regions.
+    </span><span class="kw">pub struct </span>DmaOptions : u64 {
+        <span class="doccomment">/// Region functions will not perform automatic coherence.
+        </span><span class="kw">const </span>UNSAFE_MANUAL_COHERENCE = <span class="number">1</span>;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">DmaOptions</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::empty</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>DmaOptions {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::empty()
     }
 }
 
-<span class="doccomment">/// DMA types must implement this trait, which indicates that types can handle untyped updates from</span>
-<span class="doccomment">/// the device.</span>
-<span class="kw">pub</span> <span class="ident">auto</span> <span class="kw">trait</span> <span class="ident">DeviceSync</span> {}
+<span class="doccomment">/// DMA types must implement this trait, which indicates that types can handle untyped updates from
+/// the device.
+</span><span class="kw">pub </span>auto <span class="kw">trait </span>DeviceSync {}
 
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">u8</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">u16</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">u32</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">u64</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">i8</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">i16</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">i32</span> {}
-<span class="kw">impl</span> <span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">i64</span> {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>u8 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>u16 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>u32 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>u64 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>i8 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>i16 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>i32 {}
+<span class="kw">impl </span>DeviceSync <span class="kw">for </span>i64 {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">T</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">T</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">DeviceSync</span> <span class="kw">for</span> <span class="ident">std::cell::Cell</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T&gt; !DeviceSync <span class="kw">for </span><span class="kw-2">*const </span>T {}
+<span class="kw">impl</span>&lt;T&gt; !DeviceSync <span class="kw">for </span><span class="kw-2">*mut </span>T {}
+<span class="kw">impl</span>&lt;T&gt; !DeviceSync <span class="kw">for </span><span class="kw-2">&amp;</span>T {}
+<span class="kw">impl</span>&lt;T&gt; !DeviceSync <span class="kw">for </span><span class="kw-2">&amp;mut </span>T {}
+<span class="kw">impl</span>&lt;T&gt; !DeviceSync <span class="kw">for </span>UnsafeCell&lt;T&gt; {}
+<span class="kw">impl</span>&lt;T&gt; !DeviceSync <span class="kw">for </span>std::cell::Cell&lt;T&gt; {}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

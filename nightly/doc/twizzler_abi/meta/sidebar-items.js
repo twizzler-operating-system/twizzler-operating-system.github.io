@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["MetaExt","A meta extension entry."],["MetaExtTag","A tag for a meta extension entry."],["MetaFlags","Flags for objects."],["MetaInfo","The core metadata that all objects share."],["Nonce","A nonce for avoiding object ID collision."]]});
+window.SIDEBAR_ITEMS = {"struct":[["MetaExt","A meta extension entry."],["MetaExtTag","A tag for a meta extension entry."],["MetaFlags","Flags for objects."],["MetaInfo","The core metadata that all objects share."],["Nonce","A nonce for avoiding object ID collision."]]};

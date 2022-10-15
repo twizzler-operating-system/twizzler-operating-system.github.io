@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-queue&#x2F;src&#x2F;callback_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>callback_queue.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../twizzler_queue/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-queue/src/callback_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>callback_queue.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../twizzler_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../twizzler_queue/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../twizzler_queue/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -69,78 +69,76 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::future::Future</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::future::Future;
 
-<span class="kw">use</span> <span class="ident">twizzler_async</span>::{<span class="ident">AsyncDuplex</span>, <span class="ident">AsyncDuplexSetup</span>};
-<span class="kw">use</span> <span class="ident">twizzler_queue_raw</span>::{<span class="ident">QueueError</span>, <span class="ident">ReceiveFlags</span>, <span class="ident">SubmissionFlags</span>};
+<span class="kw">use </span>twizzler_async::{AsyncDuplex, AsyncDuplexSetup};
+<span class="kw">use </span>twizzler_queue_raw::{QueueError, ReceiveFlags, SubmissionFlags};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Queue</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Queue;
 
-<span class="kw">struct</span> <span class="ident">CallbackQueueReceiverInner</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="ident">queue</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>CallbackQueueReceiverInner&lt;S, C&gt; {
+    queue: Queue&lt;S, C&gt;,
 }
 
-<span class="doccomment">/// A receiver-side async-enabled queue abstraction.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CallbackQueueReceiver</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">AsyncDuplex</span><span class="op">&lt;</span><span class="ident">CallbackQueueReceiverInner</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A receiver-side async-enabled queue abstraction.
+</span><span class="kw">pub struct </span>CallbackQueueReceiver&lt;S, C&gt; {
+    inner: AsyncDuplex&lt;CallbackQueueReceiverInner&lt;S, C&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Copy</span>, <span class="ident">C</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">AsyncDuplexSetup</span> <span class="kw">for</span> <span class="ident">CallbackQueueReceiverInner</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">ReadError</span> <span class="op">=</span> <span class="ident">QueueError</span>;
-    <span class="kw">type</span> <span class="ident">WriteError</span> <span class="op">=</span> <span class="ident">QueueError</span>;
+<span class="kw">impl</span>&lt;S: Copy, C: Copy&gt; AsyncDuplexSetup <span class="kw">for </span>CallbackQueueReceiverInner&lt;S, C&gt; {
+    <span class="kw">type </span>ReadError = QueueError;
+    <span class="kw">type </span>WriteError = QueueError;
 
-    <span class="kw">const</span> <span class="ident">READ_WOULD_BLOCK</span>: <span class="ident"><span class="self">Self</span>::ReadError</span> <span class="op">=</span> <span class="ident">QueueError::WouldBlock</span>;
-    <span class="kw">const</span> <span class="ident">WRITE_WOULD_BLOCK</span>: <span class="ident"><span class="self">Self</span>::WriteError</span> <span class="op">=</span> <span class="ident">QueueError::WouldBlock</span>;
+    <span class="kw">const </span>READ_WOULD_BLOCK: <span class="self">Self</span>::ReadError = QueueError::WouldBlock;
+    <span class="kw">const </span>WRITE_WOULD_BLOCK: <span class="self">Self</span>::WriteError = QueueError::WouldBlock;
 
-    <span class="kw">fn</span> <span class="ident">setup_read_sleep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">twizzler_abi::syscall::ThreadSyncSleep</span> {
-        <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">setup_read_sub_sleep</span>()
+    <span class="kw">fn </span>setup_read_sleep(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; twizzler_abi::syscall::ThreadSyncSleep {
+        <span class="self">self</span>.queue.setup_read_sub_sleep()
     }
 
-    <span class="kw">fn</span> <span class="ident">setup_write_sleep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">twizzler_abi::syscall::ThreadSyncSleep</span> {
-        <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">setup_write_com_sleep</span>()
+    <span class="kw">fn </span>setup_write_sleep(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; twizzler_abi::syscall::ThreadSyncSleep {
+        <span class="self">self</span>.queue.setup_write_com_sleep()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Copy</span>, <span class="ident">C</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">CallbackQueueReceiver</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new CallbackQueueReceiver from a [Queue].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">queue</span>: <span class="ident">Queue</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">AsyncDuplex::new</span>(<span class="ident">CallbackQueueReceiverInner</span> { <span class="ident">queue</span> }),
+<span class="kw">impl</span>&lt;S: Copy, C: Copy&gt; CallbackQueueReceiver&lt;S, C&gt; {
+    <span class="doccomment">/// Create a new CallbackQueueReceiver from a [Queue].
+    </span><span class="kw">pub fn </span>new(queue: Queue&lt;S, C&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: AsyncDuplex::new(CallbackQueueReceiverInner { queue }),
         }
     }
 
-    <span class="doccomment">/// Handle a request in a closure that returns a completion.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">Fut</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">QueueError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">u32</span>, <span class="ident">S</span>) -&gt; <span class="ident">Fut</span>,
-        <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Handle a request in a closure that returns a completion.
+    </span><span class="kw">pub async fn </span>handle&lt;F, Fut&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Result</span>&lt;(), QueueError&gt;
+    <span class="kw">where
+        </span>F: FnOnce(u32, S) -&gt; Fut,
+        Fut: Future&lt;Output = C&gt;,
     {
-        <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">item</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">inner</span>
-            .<span class="ident">read_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">receive</span>(<span class="ident">ReceiveFlags::NON_BLOCK</span>))
+        <span class="kw">let </span>(id, item) = <span class="self">self
+            </span>.inner
+            .read_with(|inner| inner.queue.receive(ReceiveFlags::NON_BLOCK))
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">reply</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">id</span>, <span class="ident">item</span>).<span class="kw">await</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">write_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">complete</span>(<span class="ident">id</span>, <span class="ident">reply</span>, <span class="ident">SubmissionFlags::NON_BLOCK</span>))
+        <span class="kw">let </span>reply = f(id, item).<span class="kw">await</span>;
+        <span class="self">self</span>.inner
+            .write_with(|inner| inner.queue.complete(id, reply, SubmissionFlags::NON_BLOCK))
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Receive a request without immediately returning a completion.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">receive</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">S</span>), <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">read_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">receive</span>(<span class="ident">ReceiveFlags::NON_BLOCK</span>))
-            .<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Receive a request without immediately returning a completion.
+    </span><span class="kw">pub async fn </span>receive(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(u32, S), QueueError&gt; {
+        <span class="self">self</span>.inner
+            .read_with(|inner| inner.queue.receive(ReceiveFlags::NON_BLOCK))
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Send a completion back to the sender.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">complete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">u32</span>, <span class="ident">reply</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">write_with</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">inner</span>.<span class="ident">queue</span>.<span class="ident">complete</span>(<span class="ident">id</span>, <span class="ident">reply</span>, <span class="ident">SubmissionFlags::NON_BLOCK</span>))
-            .<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Send a completion back to the sender.
+    </span><span class="kw">pub async fn </span>complete(<span class="kw-2">&amp;</span><span class="self">self</span>, id: u32, reply: C) -&gt; <span class="prelude-ty">Result</span>&lt;(), QueueError&gt; {
+        <span class="self">self</span>.inner
+            .write_with(|inner| inner.queue.complete(id, reply, SubmissionFlags::NON_BLOCK))
+            .<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_queue" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_queue" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["pcie",""]]});
+window.SIDEBAR_ITEMS = {"mod":[["pcie",""]]};

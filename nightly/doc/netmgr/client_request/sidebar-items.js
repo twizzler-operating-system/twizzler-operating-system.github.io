@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["handle_client_request",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["handle_client_request",""]]};

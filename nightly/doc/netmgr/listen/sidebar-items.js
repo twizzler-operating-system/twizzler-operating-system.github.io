@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["setup_listen",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["setup_listen",""]]};

@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-abi&#x2F;src&#x2F;llalloc&#x2F;hole.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hole.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_abi/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/llalloc/hole.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hole.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -385,394 +385,392 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::alloc::Layout</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>::{<span class="ident">align_of</span>, <span class="ident">size_of</span>};
-<span class="kw">use</span> <span class="ident">core::ptr::NonNull</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::alloc::Layout;
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::mem::{align_of, size_of};
+<span class="kw">use </span>core::ptr::NonNull;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::align_up</span>;
+<span class="kw">use </span><span class="kw">super</span>::align_up;
 
-<span class="doccomment">/// A sorted list of holes. It uses the the holes itself to store its nodes.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HoleList</span> {
-    <span class="ident">first</span>: <span class="ident">Hole</span>, <span class="comment">// dummy</span>
-}
+<span class="doccomment">/// A sorted list of holes. It uses the the holes itself to store its nodes.
+</span><span class="kw">pub struct </span>HoleList {
+    first: Hole, <span class="comment">// dummy
+</span>}
 
-<span class="kw">impl</span> <span class="ident">HoleList</span> {
-    <span class="doccomment">/// Creates an empty `HoleList`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;const_mut_refs&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="ident">HoleList</span> {
-        <span class="ident">HoleList</span> {
-            <span class="ident">first</span>: <span class="ident">Hole</span> {
-                <span class="ident">size</span>: <span class="number">0</span>,
-                <span class="ident">next</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>HoleList {
+    <span class="doccomment">/// Creates an empty `HoleList`.
+    </span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;const_mut_refs&quot;</span>))]
+    </span><span class="kw">pub fn </span>empty() -&gt; HoleList {
+        HoleList {
+            first: Hole {
+                size: <span class="number">0</span>,
+                next: <span class="prelude-val">None</span>,
             },
         }
     }
 
-    <span class="doccomment">/// Creates an empty `HoleList`.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;const_mut_refs&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="ident">HoleList</span> {
-        <span class="ident">HoleList</span> {
-            <span class="ident">first</span>: <span class="ident">Hole</span> {
-                <span class="ident">size</span>: <span class="number">0</span>,
-                <span class="ident">next</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Creates an empty `HoleList`.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;const_mut_refs&quot;</span>)]
+    </span><span class="kw">pub const fn </span>empty() -&gt; HoleList {
+        HoleList {
+            first: Hole {
+                size: <span class="number">0</span>,
+                next: <span class="prelude-val">None</span>,
             },
         }
     }
 
-    <span class="doccomment">/// Creates a `HoleList` that contains the given hole.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is unsafe because it</span>
-    <span class="doccomment">/// creates a hole at the given `hole_addr`. This can cause undefined behavior if this address</span>
-    <span class="doccomment">/// is invalid or if memory from the `[hole_addr, hole_addr+size)` range is used somewhere else.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The pointer to `hole_addr` is automatically aligned.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">hole_addr</span>: <span class="ident">usize</span>, <span class="ident">hole_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">HoleList</span> {
-        <span class="macro">assert_eq!</span>(<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">Hole</span><span class="op">&gt;</span>(), <span class="ident"><span class="self">Self</span>::min_size</span>());
+    <span class="doccomment">/// Creates a `HoleList` that contains the given hole.
+    ///
+    /// ## Safety
+    ///
+    /// This function is unsafe because it
+    /// creates a hole at the given `hole_addr`. This can cause undefined behavior if this address
+    /// is invalid or if memory from the `[hole_addr, hole_addr+size)` range is used somewhere else.
+    ///
+    /// The pointer to `hole_addr` is automatically aligned.
+    </span><span class="kw">pub unsafe fn </span>new(hole_addr: usize, hole_size: usize) -&gt; HoleList {
+        <span class="macro">assert_eq!</span>(size_of::&lt;Hole&gt;(), <span class="self">Self</span>::min_size());
 
-        <span class="kw">let</span> <span class="ident">aligned_hole_addr</span> <span class="op">=</span> <span class="ident">align_up</span>(<span class="ident">hole_addr</span>, <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">Hole</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">aligned_hole_addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Hole</span>;
-        <span class="ident">ptr</span>.<span class="ident">write</span>(<span class="ident">Hole</span> {
-            <span class="ident">size</span>: <span class="ident">hole_size</span>.<span class="ident">saturating_sub</span>(<span class="ident">aligned_hole_addr</span> <span class="op">-</span> <span class="ident">hole_addr</span>),
-            <span class="ident">next</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>aligned_hole_addr = align_up(hole_addr, align_of::&lt;Hole&gt;());
+        <span class="kw">let </span>ptr = aligned_hole_addr <span class="kw">as </span><span class="kw-2">*mut </span>Hole;
+        ptr.write(Hole {
+            size: hole_size.saturating_sub(aligned_hole_addr - hole_addr),
+            next: <span class="prelude-val">None</span>,
         });
 
-        <span class="ident">HoleList</span> {
-            <span class="ident">first</span>: <span class="ident">Hole</span> {
-                <span class="ident">size</span>: <span class="number">0</span>,
-                <span class="ident">next</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>),
+        HoleList {
+            first: Hole {
+                size: <span class="number">0</span>,
+                next: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>ptr),
             },
         }
     }
 
-    <span class="doccomment">/// Aligns the given layout for use with `HoleList`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a layout with size increased to fit at least `HoleList::min_size` and proper</span>
-    <span class="doccomment">/// alignment of a `Hole`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`allocate_first_fit`][HoleList::allocate_first_fit] and</span>
-    <span class="doccomment">/// [`deallocate`][HoleList::deallocate] methods perform the required alignment</span>
-    <span class="doccomment">/// themselves, so calling this function manually is not necessary.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">align_layout</span>(<span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="ident">Layout</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">layout</span>.<span class="ident">size</span>();
-        <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::min_size</span>() {
-            <span class="ident">size</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::min_size</span>();
+    <span class="doccomment">/// Aligns the given layout for use with `HoleList`.
+    ///
+    /// Returns a layout with size increased to fit at least `HoleList::min_size` and proper
+    /// alignment of a `Hole`.
+    ///
+    /// The [`allocate_first_fit`][HoleList::allocate_first_fit] and
+    /// [`deallocate`][HoleList::deallocate] methods perform the required alignment
+    /// themselves, so calling this function manually is not necessary.
+    </span><span class="kw">pub fn </span>align_layout(layout: Layout) -&gt; Layout {
+        <span class="kw">let </span><span class="kw-2">mut </span>size = layout.size();
+        <span class="kw">if </span>size &lt; <span class="self">Self</span>::min_size() {
+            size = <span class="self">Self</span>::min_size();
         }
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">align_up</span>(<span class="ident">size</span>, <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">Hole</span><span class="op">&gt;</span>());
-        <span class="ident">Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">layout</span>.<span class="ident">align</span>()).<span class="ident">unwrap</span>()
+        <span class="kw">let </span>size = align_up(size, mem::align_of::&lt;Hole&gt;());
+        Layout::from_size_align(size, layout.align()).unwrap()
     }
 
-    <span class="doccomment">/// Searches the list for a big enough hole.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A hole is big enough if it can hold an allocation of `layout.size()` bytes with</span>
-    <span class="doccomment">/// the given `layout.align()`. If such a hole is found in the list, a block of the</span>
-    <span class="doccomment">/// required size is allocated from it. Then the start address of that</span>
-    <span class="doccomment">/// block and the aligned layout are returned. The automatic layout alignment is required</span>
-    <span class="doccomment">/// because the `HoleList` has some additional layout requirements for each memory block.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function uses the “first fit” strategy, so it uses the first hole that is big</span>
-    <span class="doccomment">/// enough. Thus the runtime is in O(n) but it should be reasonably fast for small allocations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allocate_first_fit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Layout</span>), ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">aligned_layout</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::align_layout</span>(<span class="ident">layout</span>);
+    <span class="doccomment">/// Searches the list for a big enough hole.
+    ///
+    /// A hole is big enough if it can hold an allocation of `layout.size()` bytes with
+    /// the given `layout.align()`. If such a hole is found in the list, a block of the
+    /// required size is allocated from it. Then the start address of that
+    /// block and the aligned layout are returned. The automatic layout alignment is required
+    /// because the `HoleList` has some additional layout requirements for each memory block.
+    ///
+    /// This function uses the “first fit” strategy, so it uses the first hole that is big
+    /// enough. Thus the runtime is in O(n) but it should be reasonably fast for small allocations.
+    </span><span class="kw">pub fn </span>allocate_first_fit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;(NonNull&lt;u8&gt;, Layout), ()&gt; {
+        <span class="kw">let </span>aligned_layout = <span class="self">Self</span>::align_layout(layout);
 
-        <span class="ident">allocate_first_fit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">first</span>, <span class="ident">aligned_layout</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">holeinfo</span><span class="op">|</span> {
+        allocate_first_fit(<span class="kw-2">&amp;mut </span><span class="self">self</span>.first, aligned_layout).map(|holeinfo| {
             (
-                <span class="ident">NonNull::new</span>(<span class="ident">holeinfo</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">aligned_layout</span>,
+                NonNull::new(holeinfo.addr <span class="kw">as </span><span class="kw-2">*mut </span>u8).unwrap(),
+                aligned_layout,
             )
         })
     }
 
-    <span class="doccomment">/// Frees the allocation given by `ptr` and `layout`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `ptr` must be a pointer returned by a call to the [`allocate_first_fit`] function with</span>
-    <span class="doccomment">/// identical layout. Undefined behavior may occur for invalid arguments.</span>
-    <span class="doccomment">/// The function performs exactly the same layout adjustments as [`allocate_first_fit`] and</span>
-    <span class="doccomment">/// returns the aligned layout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function walks the list and inserts the given block at the correct place. If the freed</span>
-    <span class="doccomment">/// block is adjacent to another free block, the blocks are merged again.</span>
-    <span class="doccomment">/// This operation is in `O(n)` since the list needs to be sorted by address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`allocate_first_fit`]: HoleList::allocate_first_fit</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="ident">Layout</span> {
-        <span class="kw">let</span> <span class="ident">aligned_layout</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::align_layout</span>(<span class="ident">layout</span>);
-        <span class="ident">deallocate</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">first</span>,
-            <span class="ident">ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">aligned_layout</span>.<span class="ident">size</span>(),
+    <span class="doccomment">/// Frees the allocation given by `ptr` and `layout`.
+    ///
+    /// `ptr` must be a pointer returned by a call to the [`allocate_first_fit`] function with
+    /// identical layout. Undefined behavior may occur for invalid arguments.
+    /// The function performs exactly the same layout adjustments as [`allocate_first_fit`] and
+    /// returns the aligned layout.
+    ///
+    /// This function walks the list and inserts the given block at the correct place. If the freed
+    /// block is adjacent to another free block, the blocks are merged again.
+    /// This operation is in `O(n)` since the list needs to be sorted by address.
+    ///
+    /// [`allocate_first_fit`]: HoleList::allocate_first_fit
+    </span><span class="kw">pub unsafe fn </span>deallocate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ptr: NonNull&lt;u8&gt;, layout: Layout) -&gt; Layout {
+        <span class="kw">let </span>aligned_layout = <span class="self">Self</span>::align_layout(layout);
+        deallocate(
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.first,
+            ptr.as_ptr() <span class="kw">as </span>usize,
+            aligned_layout.size(),
         );
-        <span class="ident">aligned_layout</span>
+        aligned_layout
     }
 
-    <span class="doccomment">/// Returns the minimal allocation size. Smaller allocations or deallocations are not allowed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_size</span>() -&gt; <span class="ident">usize</span> {
-        <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="number">2</span>
-    }
+    <span class="doccomment">/// Returns the minimal allocation size. Smaller allocations or deallocations are not allowed.
+    </span><span class="kw">pub fn </span>min_size() -&gt; usize {
+        size_of::&lt;usize&gt;() * <span class="number">2
+    </span>}
 
-    <span class="doccomment">/// Returns information about the first hole for test purposes.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_hole</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">first</span>
-            .<span class="ident">next</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">hole</span><span class="op">|</span> ((<span class="kw-2">*</span><span class="ident">hole</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Hole</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">hole</span>.<span class="ident">size</span>))
+    <span class="doccomment">/// Returns information about the first hole for test purposes.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub fn </span>first_hole(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt; {
+        <span class="self">self</span>.first
+            .next
+            .as_ref()
+            .map(|hole| ((<span class="kw-2">*</span>hole) <span class="kw">as </span><span class="kw-2">*const </span>Hole <span class="kw">as </span>usize, hole.size))
     }
 }
 
-<span class="doccomment">/// A block containing free memory. It points to the next hole and thus forms a linked list.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-<span class="kw">struct</span> <span class="ident">Hole</span> {
-    <span class="ident">size</span>: <span class="ident">usize</span>,
-    <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">Hole</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A block containing free memory. It points to the next hole and thus forms a linked list.
+</span><span class="attribute">#[cfg(not(test))]
+</span><span class="kw">struct </span>Hole {
+    size: usize,
+    next: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>Hole&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hole</span> {
-    <span class="kw">pub</span> <span class="ident">size</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw-2">mut</span> <span class="ident">Hole</span><span class="op">&gt;</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub struct </span>Hole {
+    <span class="kw">pub </span>size: usize,
+    <span class="kw">pub </span>next: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>Hole&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Hole</span> {
-    <span class="doccomment">/// Returns basic information about the hole.</span>
-    <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HoleInfo</span> {
-        <span class="ident">HoleInfo</span> {
-            <span class="ident">addr</span>: <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">size</span>: <span class="self">self</span>.<span class="ident">size</span>,
+<span class="kw">impl </span>Hole {
+    <span class="doccomment">/// Returns basic information about the hole.
+    </span><span class="kw">fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HoleInfo {
+        HoleInfo {
+            addr: <span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize,
+            size: <span class="self">self</span>.size,
         }
     }
 }
 
-<span class="doccomment">/// Basic information about a hole.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">struct</span> <span class="ident">HoleInfo</span> {
-    <span class="ident">addr</span>: <span class="ident">usize</span>,
-    <span class="ident">size</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Basic information about a hole.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">struct </span>HoleInfo {
+    addr: usize,
+    size: usize,
 }
 
-<span class="doccomment">/// The result returned by `split_hole` and `allocate_first_fit`. Contains the address and size of</span>
-<span class="doccomment">/// the allocation (in the `info` field), and the front and back padding.</span>
-<span class="kw">struct</span> <span class="ident">Allocation</span> {
-    <span class="ident">info</span>: <span class="ident">HoleInfo</span>,
-    <span class="ident">front_padding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HoleInfo</span><span class="op">&gt;</span>,
-    <span class="ident">back_padding</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HoleInfo</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The result returned by `split_hole` and `allocate_first_fit`. Contains the address and size of
+/// the allocation (in the `info` field), and the front and back padding.
+</span><span class="kw">struct </span>Allocation {
+    info: HoleInfo,
+    front_padding: <span class="prelude-ty">Option</span>&lt;HoleInfo&gt;,
+    back_padding: <span class="prelude-ty">Option</span>&lt;HoleInfo&gt;,
 }
 
-<span class="doccomment">/// Splits the given hole into `(front_padding, hole, back_padding)` if it&#39;s big enough to allocate</span>
-<span class="doccomment">/// `required_layout.size()` bytes with the `required_layout.align()`. Else `None` is returned.</span>
-<span class="doccomment">/// Front padding occurs if the required alignment is higher than the hole&#39;s alignment. Back</span>
-<span class="doccomment">/// padding occurs if the required size is smaller than the size of the aligned hole. All padding</span>
-<span class="doccomment">/// must be at least `HoleList::min_size()` big or the hole is unusable.</span>
-<span class="kw">fn</span> <span class="ident">split_hole</span>(<span class="ident">hole</span>: <span class="ident">HoleInfo</span>, <span class="ident">required_layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Allocation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">required_size</span> <span class="op">=</span> <span class="ident">required_layout</span>.<span class="ident">size</span>();
-    <span class="kw">let</span> <span class="ident">required_align</span> <span class="op">=</span> <span class="ident">required_layout</span>.<span class="ident">align</span>();
+<span class="doccomment">/// Splits the given hole into `(front_padding, hole, back_padding)` if it&#39;s big enough to allocate
+/// `required_layout.size()` bytes with the `required_layout.align()`. Else `None` is returned.
+/// Front padding occurs if the required alignment is higher than the hole&#39;s alignment. Back
+/// padding occurs if the required size is smaller than the size of the aligned hole. All padding
+/// must be at least `HoleList::min_size()` big or the hole is unusable.
+</span><span class="kw">fn </span>split_hole(hole: HoleInfo, required_layout: Layout) -&gt; <span class="prelude-ty">Option</span>&lt;Allocation&gt; {
+    <span class="kw">let </span>required_size = required_layout.size();
+    <span class="kw">let </span>required_align = required_layout.align();
 
-    <span class="kw">let</span> (<span class="ident">aligned_addr</span>, <span class="ident">front_padding</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">hole</span>.<span class="ident">addr</span> <span class="op">==</span> <span class="ident">align_up</span>(<span class="ident">hole</span>.<span class="ident">addr</span>, <span class="ident">required_align</span>) {
-        <span class="comment">// hole has already the required alignment</span>
-        (<span class="ident">hole</span>.<span class="ident">addr</span>, <span class="prelude-val">None</span>)
-    } <span class="kw">else</span> {
-        <span class="comment">// the required alignment causes some padding before the allocation</span>
-        <span class="kw">let</span> <span class="ident">aligned_addr</span> <span class="op">=</span> <span class="ident">align_up</span>(<span class="ident">hole</span>.<span class="ident">addr</span> <span class="op">+</span> <span class="ident">HoleList::min_size</span>(), <span class="ident">required_align</span>);
+    <span class="kw">let </span>(aligned_addr, front_padding) = <span class="kw">if </span>hole.addr == align_up(hole.addr, required_align) {
+        <span class="comment">// hole has already the required alignment
+        </span>(hole.addr, <span class="prelude-val">None</span>)
+    } <span class="kw">else </span>{
+        <span class="comment">// the required alignment causes some padding before the allocation
+        </span><span class="kw">let </span>aligned_addr = align_up(hole.addr + HoleList::min_size(), required_align);
         (
-            <span class="ident">aligned_addr</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">HoleInfo</span> {
-                <span class="ident">addr</span>: <span class="ident">hole</span>.<span class="ident">addr</span>,
-                <span class="ident">size</span>: <span class="ident">aligned_addr</span> <span class="op">-</span> <span class="ident">hole</span>.<span class="ident">addr</span>,
+            aligned_addr,
+            <span class="prelude-val">Some</span>(HoleInfo {
+                addr: hole.addr,
+                size: aligned_addr - hole.addr,
             }),
         )
     };
 
-    <span class="kw">let</span> <span class="ident">aligned_hole</span> <span class="op">=</span> {
-        <span class="kw">if</span> <span class="ident">aligned_addr</span> <span class="op">+</span> <span class="ident">required_size</span> <span class="op">&gt;</span> <span class="ident">hole</span>.<span class="ident">addr</span> <span class="op">+</span> <span class="ident">hole</span>.<span class="ident">size</span> {
-            <span class="comment">// hole is too small</span>
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">let </span>aligned_hole = {
+        <span class="kw">if </span>aligned_addr + required_size &gt; hole.addr + hole.size {
+            <span class="comment">// hole is too small
+            </span><span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="ident">HoleInfo</span> {
-            <span class="ident">addr</span>: <span class="ident">aligned_addr</span>,
-            <span class="ident">size</span>: <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">-</span> (<span class="ident">aligned_addr</span> <span class="op">-</span> <span class="ident">hole</span>.<span class="ident">addr</span>),
+        HoleInfo {
+            addr: aligned_addr,
+            size: hole.size - (aligned_addr - hole.addr),
         }
     };
 
-    <span class="kw">let</span> <span class="ident">back_padding</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">aligned_hole</span>.<span class="ident">size</span> <span class="op">==</span> <span class="ident">required_size</span> {
-        <span class="comment">// the aligned hole has exactly the size that&#39;s needed, no padding accrues</span>
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">aligned_hole</span>.<span class="ident">size</span> <span class="op">-</span> <span class="ident">required_size</span> <span class="op">&lt;</span> <span class="ident">HoleList::min_size</span>() {
-        <span class="comment">// we can&#39;t use this hole since its remains would form a new, too small hole</span>
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
-    } <span class="kw">else</span> {
-        <span class="comment">// the hole is bigger than necessary, so there is some padding behind the allocation</span>
-        <span class="prelude-val">Some</span>(<span class="ident">HoleInfo</span> {
-            <span class="ident">addr</span>: <span class="ident">aligned_hole</span>.<span class="ident">addr</span> <span class="op">+</span> <span class="ident">required_size</span>,
-            <span class="ident">size</span>: <span class="ident">aligned_hole</span>.<span class="ident">size</span> <span class="op">-</span> <span class="ident">required_size</span>,
+    <span class="kw">let </span>back_padding = <span class="kw">if </span>aligned_hole.size == required_size {
+        <span class="comment">// the aligned hole has exactly the size that&#39;s needed, no padding accrues
+        </span><span class="prelude-val">None
+    </span>} <span class="kw">else if </span>aligned_hole.size - required_size &lt; HoleList::min_size() {
+        <span class="comment">// we can&#39;t use this hole since its remains would form a new, too small hole
+        </span><span class="kw">return </span><span class="prelude-val">None</span>;
+    } <span class="kw">else </span>{
+        <span class="comment">// the hole is bigger than necessary, so there is some padding behind the allocation
+        </span><span class="prelude-val">Some</span>(HoleInfo {
+            addr: aligned_hole.addr + required_size,
+            size: aligned_hole.size - required_size,
         })
     };
 
-    <span class="prelude-val">Some</span>(<span class="ident">Allocation</span> {
-        <span class="ident">info</span>: <span class="ident">HoleInfo</span> {
-            <span class="ident">addr</span>: <span class="ident">aligned_hole</span>.<span class="ident">addr</span>,
-            <span class="ident">size</span>: <span class="ident">required_size</span>,
+    <span class="prelude-val">Some</span>(Allocation {
+        info: HoleInfo {
+            addr: aligned_hole.addr,
+            size: required_size,
         },
-        <span class="ident">front_padding</span>,
-        <span class="ident">back_padding</span>,
+        front_padding,
+        back_padding,
     })
 }
 
-<span class="doccomment">/// Searches the list starting at the next hole of `previous` for a big enough hole. A hole is big</span>
-<span class="doccomment">/// enough if it can hold an allocation of `layout.size()` bytes with the given `layout.align()`.</span>
-<span class="doccomment">/// When a hole is used for an allocation, there may be some needed padding before and/or after</span>
-<span class="doccomment">/// the allocation. The padding will then merge back to linked-list</span>
-<span class="doccomment">/// This function uses the “first fit” strategy, so it breaks as soon as a big enough hole is</span>
-<span class="doccomment">/// found (and returns it).</span>
-<span class="kw">fn</span> <span class="ident">allocate_first_fit</span>(<span class="kw-2">mut</span> <span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Hole</span>, <span class="ident">layout</span>: <span class="ident">Layout</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HoleInfo</span>, ()<span class="op">&gt;</span> {
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">allocation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Allocation</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">previous</span>
-            .<span class="ident">next</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">current</span><span class="op">|</span> <span class="ident">split_hole</span>(<span class="ident">current</span>.<span class="ident">info</span>(), <span class="ident">layout</span>));
-        <span class="kw">match</span> <span class="ident">allocation</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">allocation</span>) =&gt; {
-                <span class="comment">// link the front/back padding</span>
-                <span class="comment">// Note that there must be no hole between following pair:</span>
-                <span class="comment">// previous - front_padding</span>
-                <span class="comment">// front_padding - back_padding</span>
-                <span class="comment">// back_padding - previous.next</span>
-                <span class="ident">previous</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">previous</span>.<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">next</span>.<span class="ident">take</span>();
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">padding</span>) <span class="op">=</span> <span class="ident">allocation</span>.<span class="ident">front_padding</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">padding</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Hole</span>;
-                    <span class="kw">unsafe</span> {
-                        <span class="ident">ptr</span>.<span class="ident">write</span>(<span class="ident">Hole</span> {
-                            <span class="ident">size</span>: <span class="ident">padding</span>.<span class="ident">size</span>,
-                            <span class="ident">next</span>: <span class="ident">previous</span>.<span class="ident">next</span>.<span class="ident">take</span>(),
+<span class="doccomment">/// Searches the list starting at the next hole of `previous` for a big enough hole. A hole is big
+/// enough if it can hold an allocation of `layout.size()` bytes with the given `layout.align()`.
+/// When a hole is used for an allocation, there may be some needed padding before and/or after
+/// the allocation. The padding will then merge back to linked-list
+/// This function uses the “first fit” strategy, so it breaks as soon as a big enough hole is
+/// found (and returns it).
+</span><span class="kw">fn </span>allocate_first_fit(<span class="kw-2">mut </span>previous: <span class="kw-2">&amp;mut </span>Hole, layout: Layout) -&gt; <span class="prelude-ty">Result</span>&lt;HoleInfo, ()&gt; {
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>allocation: <span class="prelude-ty">Option</span>&lt;Allocation&gt; = previous
+            .next
+            .as_mut()
+            .and_then(|current| split_hole(current.info(), layout));
+        <span class="kw">match </span>allocation {
+            <span class="prelude-val">Some</span>(allocation) =&gt; {
+                <span class="comment">// link the front/back padding
+                // Note that there must be no hole between following pair:
+                // previous - front_padding
+                // front_padding - back_padding
+                // back_padding - previous.next
+                </span>previous.next = previous.next.as_mut().unwrap().next.take();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(padding) = allocation.front_padding {
+                    <span class="kw">let </span>ptr = padding.addr <span class="kw">as </span><span class="kw-2">*mut </span>Hole;
+                    <span class="kw">unsafe </span>{
+                        ptr.write(Hole {
+                            size: padding.size,
+                            next: previous.next.take(),
                         })
                     }
-                    <span class="ident">previous</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> });
-                    <span class="ident">previous</span> <span class="op">=</span> <span class="ident">move_helper</span>(<span class="ident">previous</span>).<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>();
+                    previous.next = <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr });
+                    previous = move_helper(previous).next.as_mut().unwrap();
                 }
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">padding</span>) <span class="op">=</span> <span class="ident">allocation</span>.<span class="ident">back_padding</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">padding</span>.<span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Hole</span>;
-                    <span class="kw">unsafe</span> {
-                        <span class="ident">ptr</span>.<span class="ident">write</span>(<span class="ident">Hole</span> {
-                            <span class="ident">size</span>: <span class="ident">padding</span>.<span class="ident">size</span>,
-                            <span class="ident">next</span>: <span class="ident">previous</span>.<span class="ident">next</span>.<span class="ident">take</span>(),
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(padding) = allocation.back_padding {
+                    <span class="kw">let </span>ptr = padding.addr <span class="kw">as </span><span class="kw-2">*mut </span>Hole;
+                    <span class="kw">unsafe </span>{
+                        ptr.write(Hole {
+                            size: padding.size,
+                            next: previous.next.take(),
                         })
                     }
-                    <span class="ident">previous</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> });
+                    previous.next = <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr });
                 }
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">allocation</span>.<span class="ident">info</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(allocation.info);
             }
-            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">previous</span>.<span class="ident">next</span>.<span class="ident">is_some</span>() =&gt; {
-                <span class="comment">// try next hole</span>
-                <span class="ident">previous</span> <span class="op">=</span> <span class="ident">move_helper</span>(<span class="ident">previous</span>).<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>();
+            <span class="prelude-val">None </span><span class="kw">if </span>previous.next.is_some() =&gt; {
+                <span class="comment">// try next hole
+                </span>previous = move_helper(previous).next.as_mut().unwrap();
             }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// this was the last hole, so no hole is big enough -&gt; allocation not possible</span>
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="comment">// this was the last hole, so no hole is big enough -&gt; allocation not possible
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(());
             }
         }
     }
 }
 
-<span class="doccomment">/// Frees the allocation given by `(addr, size)`. It starts at the given hole and walks the list to</span>
-<span class="doccomment">/// find the correct place (the list is sorted by address).</span>
-<span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="kw-2">mut</span> <span class="ident">hole</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Hole</span>, <span class="ident">addr</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">size</span>: <span class="ident">usize</span>) {
-    <span class="kw">loop</span> {
-        <span class="macro">assert!</span>(<span class="ident">size</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">HoleList::min_size</span>());
+<span class="doccomment">/// Frees the allocation given by `(addr, size)`. It starts at the given hole and walks the list to
+/// find the correct place (the list is sorted by address).
+</span><span class="kw">fn </span>deallocate(<span class="kw-2">mut </span>hole: <span class="kw-2">&amp;mut </span>Hole, addr: usize, <span class="kw-2">mut </span>size: usize) {
+    <span class="kw">loop </span>{
+        <span class="macro">assert!</span>(size &gt;= HoleList::min_size());
 
-        <span class="kw">let</span> <span class="ident">hole_addr</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// It&#39;s the dummy hole, which is the head of the HoleList. It&#39;s somewhere on the stack,</span>
-            <span class="comment">// so it&#39;s address is not the address of the hole. We set the addr to 0 as it&#39;s always</span>
-            <span class="comment">// the first hole.</span>
-            <span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// tt&#39;s a real hole in memory and its address is the address of the hole</span>
-            <span class="ident">hole</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>
+        <span class="kw">let </span>hole_addr = <span class="kw">if </span>hole.size == <span class="number">0 </span>{
+            <span class="comment">// It&#39;s the dummy hole, which is the head of the HoleList. It&#39;s somewhere on the stack,
+            // so it&#39;s address is not the address of the hole. We set the addr to 0 as it&#39;s always
+            // the first hole.
+            </span><span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// tt&#39;s a real hole in memory and its address is the address of the hole
+            </span>hole <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as </span>usize
         };
 
-        <span class="comment">// Each freed block must be handled by the previous hole in memory. Thus the freed</span>
-        <span class="comment">// address must be always behind the current hole.</span>
-        <span class="macro">assert!</span>(
-            <span class="ident">hole_addr</span> <span class="op">+</span> <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">addr</span>,
-            <span class="string">&quot;invalid deallocation (probably a double free)&quot;</span>
-        );
+        <span class="comment">// Each freed block must be handled by the previous hole in memory. Thus the freed
+        // address must be always behind the current hole.
+        </span><span class="macro">assert!</span>(
+            hole_addr + hole.size &lt;= addr,
+            <span class="string">&quot;invalid deallocation (probably a double free)&quot;
+        </span>);
 
-        <span class="comment">// get information about the next block</span>
-        <span class="kw">let</span> <span class="ident">next_hole_info</span> <span class="op">=</span> <span class="ident">hole</span>.<span class="ident">next</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> <span class="ident">next</span>.<span class="ident">info</span>());
+        <span class="comment">// get information about the next block
+        </span><span class="kw">let </span>next_hole_info = hole.next.as_ref().map(|next| next.info());
 
-        <span class="kw">match</span> <span class="ident">next_hole_info</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="kw">if</span> <span class="ident">hole_addr</span> <span class="op">+</span> <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">==</span> <span class="ident">addr</span> <span class="op">&amp;&amp;</span> <span class="ident">addr</span> <span class="op">+</span> <span class="ident">size</span> <span class="op">==</span> <span class="ident">next</span>.<span class="ident">addr</span> =&gt; {
-                <span class="comment">// block fills the gap between this hole and the next hole</span>
-                <span class="comment">// before:  ___XXX____YYYYY____    where X is this hole and Y the next hole</span>
-                <span class="comment">// after:   ___XXXFFFFYYYYY____    where F is the freed block</span>
+        <span class="kw">match </span>next_hole_info {
+            <span class="prelude-val">Some</span>(next) <span class="kw">if </span>hole_addr + hole.size == addr &amp;&amp; addr + size == next.addr =&gt; {
+                <span class="comment">// block fills the gap between this hole and the next hole
+                // before:  ___XXX____YYYYY____    where X is this hole and Y the next hole
+                // after:   ___XXXFFFFYYYYY____    where F is the freed block
 
-                <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">size</span> <span class="op">+</span> <span class="ident">next</span>.<span class="ident">size</span>; <span class="comment">// merge the F and Y blocks to this X block</span>
-                <span class="ident">hole</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">hole</span>.<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">next</span>.<span class="ident">take</span>(); <span class="comment">// remove the Y block</span>
+                </span>hole.size += size + next.size; <span class="comment">// merge the F and Y blocks to this X block
+                </span>hole.next = hole.next.as_mut().unwrap().next.take(); <span class="comment">// remove the Y block
+            </span>}
+            <span class="kw">_ if </span>hole_addr + hole.size == addr =&gt; {
+                <span class="comment">// block is right behind this hole but there is used memory after it
+                // before:  ___XXX______YYYYY____    where X is this hole and Y the next hole
+                // after:   ___XXXFFFF__YYYYY____    where F is the freed block
+
+                // or: block is right behind this hole and this is the last hole
+                // before:  ___XXX_______________    where X is this hole and Y the next hole
+                // after:   ___XXXFFFF___________    where F is the freed block
+
+                </span>hole.size += size; <span class="comment">// merge the F block to this X block
+            </span>}
+            <span class="prelude-val">Some</span>(next) <span class="kw">if </span>addr + size == next.addr =&gt; {
+                <span class="comment">// block is right before the next hole but there is used memory before it
+                // before:  ___XXX______YYYYY____    where X is this hole and Y the next hole
+                // after:   ___XXX__FFFFYYYYY____    where F is the freed block
+
+                </span>hole.next = hole.next.as_mut().unwrap().next.take(); <span class="comment">// remove the Y block
+                </span>size += next.size; <span class="comment">// free the merged F/Y block in next iteration
+                </span><span class="kw">continue</span>;
             }
-            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">hole_addr</span> <span class="op">+</span> <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">==</span> <span class="ident">addr</span> =&gt; {
-                <span class="comment">// block is right behind this hole but there is used memory after it</span>
-                <span class="comment">// before:  ___XXX______YYYYY____    where X is this hole and Y the next hole</span>
-                <span class="comment">// after:   ___XXXFFFF__YYYYY____    where F is the freed block</span>
+            <span class="prelude-val">Some</span>(next) <span class="kw">if </span>next.addr &lt;= addr =&gt; {
+                <span class="comment">// block is behind the next hole, so we delegate it to the next hole
+                // before:  ___XXX__YYYYY________    where X is this hole and Y the next hole
+                // after:   ___XXX__YYYYY__FFFF__    where F is the freed block
 
-                <span class="comment">// or: block is right behind this hole and this is the last hole</span>
-                <span class="comment">// before:  ___XXX_______________    where X is this hole and Y the next hole</span>
-                <span class="comment">// after:   ___XXXFFFF___________    where F is the freed block</span>
-
-                <span class="ident">hole</span>.<span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">size</span>; <span class="comment">// merge the F block to this X block</span>
+                </span>hole = move_helper(hole).next.as_mut().unwrap(); <span class="comment">// start next iteration at next hole
+                </span><span class="kw">continue</span>;
             }
-            <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="kw">if</span> <span class="ident">addr</span> <span class="op">+</span> <span class="ident">size</span> <span class="op">==</span> <span class="ident">next</span>.<span class="ident">addr</span> =&gt; {
-                <span class="comment">// block is right before the next hole but there is used memory before it</span>
-                <span class="comment">// before:  ___XXX______YYYYY____    where X is this hole and Y the next hole</span>
-                <span class="comment">// after:   ___XXX__FFFFYYYYY____    where F is the freed block</span>
+            <span class="kw">_ </span>=&gt; {
+                <span class="comment">// block is between this and the next hole
+                // before:  ___XXX________YYYYY_    where X is this hole and Y the next hole
+                // after:   ___XXX__FFFF__YYYYY_    where F is the freed block
 
-                <span class="ident">hole</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">hole</span>.<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">next</span>.<span class="ident">take</span>(); <span class="comment">// remove the Y block</span>
-                <span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">size</span>; <span class="comment">// free the merged F/Y block in next iteration</span>
-                <span class="kw">continue</span>;
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="kw">if</span> <span class="ident">next</span>.<span class="ident">addr</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">addr</span> =&gt; {
-                <span class="comment">// block is behind the next hole, so we delegate it to the next hole</span>
-                <span class="comment">// before:  ___XXX__YYYYY________    where X is this hole and Y the next hole</span>
-                <span class="comment">// after:   ___XXX__YYYYY__FFFF__    where F is the freed block</span>
+                // or: this is the last hole
+                // before:  ___XXX_________    where X is this hole
+                // after:   ___XXX__FFFF___    where F is the freed block
 
-                <span class="ident">hole</span> <span class="op">=</span> <span class="ident">move_helper</span>(<span class="ident">hole</span>).<span class="ident">next</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>(); <span class="comment">// start next iteration at next hole</span>
-                <span class="kw">continue</span>;
-            }
-            <span class="kw">_</span> =&gt; {
-                <span class="comment">// block is between this and the next hole</span>
-                <span class="comment">// before:  ___XXX________YYYYY_    where X is this hole and Y the next hole</span>
-                <span class="comment">// after:   ___XXX__FFFF__YYYYY_    where F is the freed block</span>
-
-                <span class="comment">// or: this is the last hole</span>
-                <span class="comment">// before:  ___XXX_________    where X is this hole</span>
-                <span class="comment">// after:   ___XXX__FFFF___    where F is the freed block</span>
-
-                <span class="kw">let</span> <span class="ident">new_hole</span> <span class="op">=</span> <span class="ident">Hole</span> {
-                    <span class="ident">size</span>,
-                    <span class="ident">next</span>: <span class="ident">hole</span>.<span class="ident">next</span>.<span class="ident">take</span>(), <span class="comment">// the reference to the Y block (if it exists)</span>
-                };
-                <span class="comment">// write the new hole to the freed memory</span>
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">addr</span> <span class="op">%</span> <span class="ident">align_of</span>::<span class="op">&lt;</span><span class="ident">Hole</span><span class="op">&gt;</span>(), <span class="number">0</span>);
-                <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">addr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Hole</span>;
-                <span class="kw">unsafe</span> { <span class="ident">ptr</span>.<span class="ident">write</span>(<span class="ident">new_hole</span>) };
-                <span class="comment">// add the F block as the next block of the X block</span>
-                <span class="ident">hole</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> });
+                </span><span class="kw">let </span>new_hole = Hole {
+                    size,
+                    next: hole.next.take(), <span class="comment">// the reference to the Y block (if it exists)
+                </span>};
+                <span class="comment">// write the new hole to the freed memory
+                </span><span class="macro">debug_assert_eq!</span>(addr % align_of::&lt;Hole&gt;(), <span class="number">0</span>);
+                <span class="kw">let </span>ptr = addr <span class="kw">as </span><span class="kw-2">*mut </span>Hole;
+                <span class="kw">unsafe </span>{ ptr.write(new_hole) };
+                <span class="comment">// add the F block as the next block of the X block
+                </span>hole.next = <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr });
             }
         }
         <span class="kw">break</span>;
     }
 }
 
-<span class="doccomment">/// Identity function to ease moving of references.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default, references are reborrowed instead of moved (equivalent to `&amp;mut *reference`). This</span>
-<span class="doccomment">/// function forces a move.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for more information, see section “id Forces References To Move” in:</span>
-<span class="doccomment">/// https://bluss.github.io/rust/fun/2015/10/11/stuff-the-identity-function-does/</span>
-<span class="kw">fn</span> <span class="ident">move_helper</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-    <span class="ident">x</span>
+<span class="doccomment">/// Identity function to ease moving of references.
+///
+/// By default, references are reborrowed instead of moved (equivalent to `&amp;mut *reference`). This
+/// function forces a move.
+///
+/// for more information, see section “id Forces References To Move” in:
+/// https://bluss.github.io/rust/fun/2015/10/11/stuff-the-identity-function-does/
+</span><span class="kw">fn </span>move_helper&lt;T&gt;(x: T) -&gt; T {
+    x
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

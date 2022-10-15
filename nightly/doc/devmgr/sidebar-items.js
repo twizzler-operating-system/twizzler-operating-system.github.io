@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["get_pcie_offset",""],["main",""],["print_info",""],["start_pcie",""],["start_pcie_device",""]]});
+window.SIDEBAR_ITEMS = {"fn":[["get_pcie_offset",""],["main",""],["print_info",""],["start_pcie",""],["start_pcie_device",""]]};

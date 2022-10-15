@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-queue-raw&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../twizzler_queue_raw/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-queue-raw/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../twizzler_queue_raw/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../twizzler_queue_raw/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../twizzler_queue_raw/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -703,671 +703,669 @@
 <span id="703">703</span>
 <span id="704">704</span>
 <span id="705">705</span>
-<span id="706">706</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A raw queue interface for Twizzler, making no assumptions about where the underlying headers and</span>
-<span class="doccomment">//! circular buffers are located. This means you probably don&#39;t want to use this --- instead, I</span>
-<span class="doccomment">//! suggest you use the wrapped version of this library, twizzler-queue, since that actually</span>
-<span class="doccomment">//! interacts with the object system.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This library exists to provide an underlying implementation of the concurrent data structure for</span>
-<span class="doccomment">//! each individual raw queue so that this complex code can be reused in both userspace and the kernel.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The basic design of a raw queue is two parts:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!   1. A header, which contains things like head pointers, tail pointers, etc.</span>
-<span class="doccomment">//!   2. A buffer, which contains the items that are enqueued.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The queue is an MPSC lock-free blocking data structure. Any thread may submit to a queue, but</span>
-<span class="doccomment">//! only one thread may receive on that queue at a time. The queue is implemented with a head</span>
-<span class="doccomment">//! pointer, a tail pointer, a doorbell, and a waiters counter. Additionally, the queue is</span>
-<span class="doccomment">//! maintained in terms of &quot;turns&quot;, that indicate which &quot;go around&quot; of the queue we are on (mod 2).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Let&#39;s look at an insert</span>
-<span class="doccomment">//! Here&#39;s what the queue looks like to start with. The 0_ indicates that it&#39;s empty, and turn is</span>
-<span class="doccomment">//! set to 0.</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!  b</span>
-<span class="doccomment">//!  t</span>
-<span class="doccomment">//!  h</span>
-<span class="doccomment">//! [0_, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! When inserting, the thread first reserves space:</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!  b</span>
-<span class="doccomment">//!  t</span>
-<span class="doccomment">//!      h</span>
-<span class="doccomment">//! [0_, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! Then it fills out the data:</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!  b</span>
-<span class="doccomment">//!  t</span>
-<span class="doccomment">//!      h</span>
-<span class="doccomment">//! [0X, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! Then it toggles the turn bit:</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!  b</span>
-<span class="doccomment">//!  t</span>
-<span class="doccomment">//!      h</span>
-<span class="doccomment">//! [1X, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! Next, it bumps the doorbell (and maybe wakes up a waiting consumer):</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!      b</span>
-<span class="doccomment">//!  t</span>
-<span class="doccomment">//!      h</span>
-<span class="doccomment">//! [1X, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Now, let&#39;s say the consumer comes along and dequeues. First, it checks if it&#39;s empty by</span>
-<span class="doccomment">//! comparing tail and bell, and finds it&#39;s not empty. Then it checks if it&#39;s the correct turn. This</span>
-<span class="doccomment">//! turn is 1, so yes. Next, it remove the data from the queue:</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!      b</span>
-<span class="doccomment">//!  t</span>
-<span class="doccomment">//!      h</span>
-<span class="doccomment">//! [1_, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! And then finally it increments the tail counter:</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!      b</span>
-<span class="doccomment">//!      t</span>
-<span class="doccomment">//!      h</span>
-<span class="doccomment">//! [1_, 0_, 0_]</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A raw queue interface for Twizzler, making no assumptions about where the underlying headers and
+//! circular buffers are located. This means you probably don&#39;t want to use this --- instead, I
+//! suggest you use the wrapped version of this library, twizzler-queue, since that actually
+//! interacts with the object system.
+//!
+//! This library exists to provide an underlying implementation of the concurrent data structure for
+//! each individual raw queue so that this complex code can be reused in both userspace and the kernel.
+//!
+//! The basic design of a raw queue is two parts:
+//!
+//!   1. A header, which contains things like head pointers, tail pointers, etc.
+//!   2. A buffer, which contains the items that are enqueued.
+//!
+//! The queue is an MPSC lock-free blocking data structure. Any thread may submit to a queue, but
+//! only one thread may receive on that queue at a time. The queue is implemented with a head
+//! pointer, a tail pointer, a doorbell, and a waiters counter. Additionally, the queue is
+//! maintained in terms of &quot;turns&quot;, that indicate which &quot;go around&quot; of the queue we are on (mod 2).
+//!
+//! # Let&#39;s look at an insert
+//! Here&#39;s what the queue looks like to start with. The 0_ indicates that it&#39;s empty, and turn is
+//! set to 0.
+//! ```text
+//!  b
+//!  t
+//!  h
+//! [0_, 0_, 0_]
+//! ```
+//! When inserting, the thread first reserves space:
+//! ```text
+//!  b
+//!  t
+//!      h
+//! [0_, 0_, 0_]
+//! ```
+//! Then it fills out the data:
+//! ```text
+//!  b
+//!  t
+//!      h
+//! [0X, 0_, 0_]
+//! ```
+//! Then it toggles the turn bit:
+//! ```text
+//!  b
+//!  t
+//!      h
+//! [1X, 0_, 0_]
+//! ```
+//! Next, it bumps the doorbell (and maybe wakes up a waiting consumer):
+//! ```text
+//!      b
+//!  t
+//!      h
+//! [1X, 0_, 0_]
+//! ```
+//!
+//! Now, let&#39;s say the consumer comes along and dequeues. First, it checks if it&#39;s empty by
+//! comparing tail and bell, and finds it&#39;s not empty. Then it checks if it&#39;s the correct turn. This
+//! turn is 1, so yes. Next, it remove the data from the queue:
+//! ```text
+//!      b
+//!  t
+//!      h
+//! [1_, 0_, 0_]
+//! ```
+//! And then finally it increments the tail counter:
+//! ```text
+//!      b
+//!      t
+//!      h
+//! [1_, 0_, 0_]
+//! ```
 
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">feature</span>(<span class="ident">termination_trait_lib</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>)), <span class="ident">no_std</span>)]</span>
+</span><span class="attribute">#![cfg_attr(test, feature(test))]
+#![cfg_attr(not(any(feature = <span class="string">&quot;std&quot;</span>, test)), no_std)]
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">cell::UnsafeCell</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU32</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
+</span><span class="kw">use </span>core::{
+    cell::UnsafeCell,
+    sync::atomic::{AtomicU32, AtomicU64, Ordering},
 };
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="doccomment">/// A queue entry. All queues must be formed of these, as the queue algorithm uses data inside this</span>
-<span class="doccomment">/// struct as part of its operation. The cmd_slot is used internally to track turn, and the info is</span>
-<span class="doccomment">/// used by the full queue structure to manage completion. The data T is user data passed around the queue.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">cmd_slot</span>: <span class="ident">u32</span>,
-    <span class="ident">info</span>: <span class="ident">u32</span>,
-    <span class="ident">data</span>: <span class="ident">T</span>,
+<span class="attribute">#[derive(Clone, Copy, Default, Debug)]
+#[repr(C)]
+</span><span class="doccomment">/// A queue entry. All queues must be formed of these, as the queue algorithm uses data inside this
+/// struct as part of its operation. The cmd_slot is used internally to track turn, and the info is
+/// used by the full queue structure to manage completion. The data T is user data passed around the queue.
+</span><span class="kw">pub struct </span>QueueEntry&lt;T&gt; {
+    cmd_slot: u32,
+    info: u32,
+    data: T,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_cmd_slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">unsafe</span> { <span class="ident">core::mem::transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">AtomicU32</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cmd_slot</span>).<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) }
+<span class="kw">impl</span>&lt;T&gt; QueueEntry&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get_cmd_slot(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">unsafe </span>{ core::mem::transmute::&lt;<span class="kw-2">&amp;</span>u32, <span class="kw-2">&amp;</span>AtomicU32&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.cmd_slot).load(Ordering::SeqCst) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_cmd_slot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u32</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">core::mem::transmute</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">AtomicU32</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cmd_slot</span>).<span class="ident">store</span>(<span class="ident">v</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>set_cmd_slot(<span class="kw-2">&amp;</span><span class="self">self</span>, v: u32) {
+        <span class="kw">unsafe </span>{
+            core::mem::transmute::&lt;<span class="kw-2">&amp;</span>u32, <span class="kw-2">&amp;</span>AtomicU32&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>.cmd_slot).store(v, Ordering::SeqCst);
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="doccomment">/// Get the data item of a QueueEntry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">item</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">data</span>
+    <span class="attribute">#[inline]
+    </span><span class="doccomment">/// Get the data item of a QueueEntry.
+    </span><span class="kw">pub fn </span>item(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.data
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="doccomment">/// Get the info tag of a QueueEntry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">info</span>
+    <span class="attribute">#[inline]
+    </span><span class="doccomment">/// Get the info tag of a QueueEntry.
+    </span><span class="kw">pub fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.info
     }
 
-    <span class="doccomment">/// Construct a new QueueEntry. The `info` tag should be used to inform completion events in the</span>
-    <span class="doccomment">/// full queue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">info</span>: <span class="ident">u32</span>, <span class="ident">item</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cmd_slot</span>: <span class="number">0</span>,
-            <span class="ident">info</span>,
-            <span class="ident">data</span>: <span class="ident">item</span>,
+    <span class="doccomment">/// Construct a new QueueEntry. The `info` tag should be used to inform completion events in the
+    /// full queue.
+    </span><span class="kw">pub fn </span>new(info: u32, item: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cmd_slot: <span class="number">0</span>,
+            info,
+            data: item,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="doccomment">/// A raw queue header. This contains all the necessary counters and info to run the queue algorithm.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawQueueHdr</span> {
-    <span class="ident">l2len</span>: <span class="ident">usize</span>,
-    <span class="ident">stride</span>: <span class="ident">usize</span>,
-    <span class="ident">head</span>: <span class="ident">AtomicU32</span>,
-    <span class="ident">waiters</span>: <span class="ident">AtomicU32</span>,
-    <span class="ident">bell</span>: <span class="ident">AtomicU64</span>,
-    <span class="ident">tail</span>: <span class="ident">AtomicU64</span>,
+<span class="attribute">#[repr(C)]
+</span><span class="doccomment">/// A raw queue header. This contains all the necessary counters and info to run the queue algorithm.
+</span><span class="kw">pub struct </span>RawQueueHdr {
+    l2len: usize,
+    stride: usize,
+    head: AtomicU32,
+    waiters: AtomicU32,
+    bell: AtomicU64,
+    tail: AtomicU64,
 }
 
-<span class="kw">impl</span> <span class="ident">RawQueueHdr</span> {
-    <span class="doccomment">/// Construct a new raw queue header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">l2len</span>: <span class="ident">usize</span>, <span class="ident">stride</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">l2len</span>,
-            <span class="ident">stride</span>,
-            <span class="ident">head</span>: <span class="ident">AtomicU32::new</span>(<span class="number">0</span>),
-            <span class="ident">waiters</span>: <span class="ident">AtomicU32::new</span>(<span class="number">0</span>),
-            <span class="ident">bell</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-            <span class="ident">tail</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+<span class="kw">impl </span>RawQueueHdr {
+    <span class="doccomment">/// Construct a new raw queue header.
+    </span><span class="kw">pub fn </span>new(l2len: usize, stride: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            l2len,
+            stride,
+            head: AtomicU32::new(<span class="number">0</span>),
+            waiters: AtomicU32::new(<span class="number">0</span>),
+            bell: AtomicU64::new(<span class="number">0</span>),
+            tail: AtomicU64::new(<span class="number">0</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">l2len</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">1 </span>&lt;&lt; <span class="self">self</span>.l2len
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">h</span>: <span class="ident">u32</span>, <span class="ident">t</span>: <span class="ident">u64</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="ident">h</span> <span class="op">&amp;</span> <span class="number">0x7fffffff</span>) <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> (<span class="ident">t</span> <span class="op">&amp;</span> <span class="number">0x7fffffff</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>, h: u32, t: u64) -&gt; bool {
+        (h &amp; <span class="number">0x7fffffff</span>) <span class="kw">as </span>u64 - (t &amp; <span class="number">0x7fffffff</span>) &gt;= <span class="self">self</span>.len() <span class="kw">as </span>u64
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bell</span>: <span class="ident">u64</span>, <span class="ident">tail</span>: <span class="ident">u64</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="ident">bell</span> <span class="op">&amp;</span> <span class="number">0x7fffffff</span>) <span class="op">==</span> (<span class="ident">tail</span> <span class="op">&amp;</span> <span class="number">0x7fffffff</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>, bell: u64, tail: u64) -&gt; bool {
+        (bell &amp; <span class="number">0x7fffffff</span>) == (tail &amp; <span class="number">0x7fffffff</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_turn</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="ident">u64</span>, <span class="ident">item</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">turn</span> <span class="op">=</span> (<span class="ident">t</span> <span class="op">/</span> (<span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>)) <span class="op">%</span> <span class="number">2</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">item</span> }.<span class="ident">get_cmd_slot</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">31</span>;
-        (<span class="ident">val</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">==</span> (<span class="ident">turn</span> <span class="op">==</span> <span class="number">1</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_turn&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, t: u64, item: <span class="kw-2">*const </span>QueueEntry&lt;T&gt;) -&gt; bool {
+        <span class="kw">let </span>turn = (t / (<span class="self">self</span>.len() <span class="kw">as </span>u64)) % <span class="number">2</span>;
+        <span class="kw">let </span>val = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>item }.get_cmd_slot() &gt;&gt; <span class="number">31</span>;
+        (val == <span class="number">0</span>) == (turn == <span class="number">1</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">consumer_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>)) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>consumer_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        (<span class="self">self</span>.tail.load(Ordering::SeqCst) &amp; (<span class="number">1 </span>&lt;&lt; <span class="number">31</span>)) != <span class="number">0
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">submitter_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">waiters</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&gt;</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>submitter_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.waiters.load(Ordering::SeqCst) &gt; <span class="number">0
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">consumer_set_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">waiting</span>: <span class="ident">bool</span>) {
-        <span class="kw">if</span> <span class="ident">waiting</span> {
-            <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">fetch_or</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>, <span class="ident">Ordering::SeqCst</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">fetch_and</span>(<span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>), <span class="ident">Ordering::SeqCst</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>consumer_set_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>, waiting: bool) {
+        <span class="kw">if </span>waiting {
+            <span class="self">self</span>.tail.fetch_or(<span class="number">1 </span>&lt;&lt; <span class="number">31</span>, Ordering::SeqCst);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.tail.fetch_and(!(<span class="number">1 </span>&lt;&lt; <span class="number">31</span>), Ordering::SeqCst);
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inc_submit_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">waiters</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>inc_submit_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.waiters.fetch_add(<span class="number">1</span>, Ordering::SeqCst);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dec_submit_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">waiters</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>dec_submit_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.waiters.fetch_sub(<span class="number">1</span>, Ordering::SeqCst);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reserve_slot</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reserve_slot&lt;W: Fn(<span class="kw-2">&amp;</span>AtomicU64, u64)&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">flags</span>: <span class="ident">SubmissionFlags</span>,
-        <span class="ident">wait</span>: <span class="ident">W</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">waiter</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attempts</span> <span class="op">=</span> <span class="number">1000</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_full</span>(<span class="ident">h</span>, <span class="ident">t</span>) {
+        flags: SubmissionFlags,
+        wait: W,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u32, QueueError&gt; {
+        <span class="kw">let </span>h = <span class="self">self</span>.head.fetch_add(<span class="number">1</span>, Ordering::SeqCst);
+        <span class="kw">let </span><span class="kw-2">mut </span>waiter = <span class="bool-val">false</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>attempts = <span class="number">1000</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+            <span class="kw">if </span>!<span class="self">self</span>.is_full(h, t) {
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">SubmissionFlags::NON_BLOCK</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueueError::WouldBlock</span>);
+            <span class="kw">if </span>flags.contains(SubmissionFlags::NON_BLOCK) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(QueueError::WouldBlock);
             }
 
-            <span class="kw">if</span> <span class="ident">attempts</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">attempts</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">core::hint::spin_loop</span>();
+            <span class="kw">if </span>attempts != <span class="number">0 </span>{
+                attempts -= <span class="number">1</span>;
+                core::hint::spin_loop();
                 <span class="kw">continue</span>;
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">waiter</span> {
-                <span class="ident">waiter</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="self">self</span>.<span class="ident">inc_submit_waiting</span>();
+            <span class="kw">if </span>!waiter {
+                waiter = <span class="bool-val">true</span>;
+                <span class="self">self</span>.inc_submit_waiting();
             }
 
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_full</span>(<span class="ident">h</span>, <span class="ident">t</span>) {
-                <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tail</span>, <span class="ident">t</span>);
+            <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+            <span class="kw">if </span><span class="self">self</span>.is_full(h, t) {
+                wait(<span class="kw-2">&amp;</span><span class="self">self</span>.tail, t);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">waiter</span> {
-            <span class="self">self</span>.<span class="ident">dec_submit_waiting</span>();
+        <span class="kw">if </span>waiter {
+            <span class="self">self</span>.dec_submit_waiting();
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">h</span> <span class="op">&amp;</span> <span class="number">0x7fffffff</span>)
+        <span class="prelude-val">Ok</span>(h &amp; <span class="number">0x7fffffff</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_turn</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">h</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="ident">h</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get_turn(<span class="kw-2">&amp;</span><span class="self">self</span>, h: u32) -&gt; bool {
+        (h / <span class="self">self</span>.len() <span class="kw">as </span>u32) % <span class="number">2 </span>== <span class="number">0
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ring</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ring</span>: <span class="ident">R</span>) {
-        <span class="self">self</span>.<span class="ident">bell</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">consumer_waiting</span>() {
-            <span class="ident">ring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bell</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ring&lt;R: Fn(<span class="kw-2">&amp;</span>AtomicU64)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ring: R) {
+        <span class="self">self</span>.bell.fetch_add(<span class="number">1</span>, Ordering::SeqCst);
+        <span class="kw">if </span><span class="self">self</span>.consumer_waiting() {
+            ring(<span class="kw-2">&amp;</span><span class="self">self</span>.bell)
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_next_ready</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>), <span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>get_next_ready&lt;W: Fn(<span class="kw-2">&amp;</span>AtomicU64, u64), T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">wait</span>: <span class="ident">W</span>,
-        <span class="ident">flags</span>: <span class="ident">ReceiveFlags</span>,
-        <span class="ident">raw_buf</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attempts</span> <span class="op">=</span> <span class="number">1000</span>;
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&amp;</span> <span class="number">0x7fffffff</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bell</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">raw_buf</span>.<span class="ident">add</span>((<span class="ident">t</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)) };
+        wait: W,
+        flags: ReceiveFlags,
+        raw_buf: <span class="kw-2">*const </span>QueueEntry&lt;T&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u64, QueueError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>attempts = <span class="number">1000</span>;
+        <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst) &amp; <span class="number">0x7fffffff</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>b = <span class="self">self</span>.bell.load(Ordering::SeqCst);
+            <span class="kw">let </span>item = <span class="kw">unsafe </span>{ raw_buf.add((t <span class="kw">as </span>usize) &amp; (<span class="self">self</span>.len() - <span class="number">1</span>)) };
 
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>(<span class="ident">b</span>, <span class="ident">t</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_turn</span>(<span class="ident">t</span>, <span class="ident">item</span>) {
+            <span class="kw">if </span>!<span class="self">self</span>.is_empty(b, t) &amp;&amp; <span class="self">self</span>.is_turn(t, item) {
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">ReceiveFlags::NON_BLOCK</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueueError::WouldBlock</span>);
+            <span class="kw">if </span>flags.contains(ReceiveFlags::NON_BLOCK) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(QueueError::WouldBlock);
             }
 
-            <span class="kw">if</span> <span class="ident">attempts</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">attempts</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">core::hint::spin_loop</span>();
+            <span class="kw">if </span>attempts != <span class="number">0 </span>{
+                attempts -= <span class="number">1</span>;
+                core::hint::spin_loop();
                 <span class="kw">continue</span>;
             }
 
-            <span class="self">self</span>.<span class="ident">consumer_set_waiting</span>(<span class="bool-val">true</span>);
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bell</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>(<span class="ident">b</span>, <span class="ident">t</span>) <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_turn</span>(<span class="ident">t</span>, <span class="ident">item</span>) {
-                <span class="ident">wait</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bell</span>, <span class="ident">b</span>);
+            <span class="self">self</span>.consumer_set_waiting(<span class="bool-val">true</span>);
+            <span class="kw">let </span>b = <span class="self">self</span>.bell.load(Ordering::SeqCst);
+            <span class="kw">if </span><span class="self">self</span>.is_empty(b, t) || !<span class="self">self</span>.is_turn(t, item) {
+                wait(<span class="kw-2">&amp;</span><span class="self">self</span>.bell, b);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">attempts</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">consumer_set_waiting</span>(<span class="bool-val">false</span>);
+        <span class="kw">if </span>attempts == <span class="number">0 </span>{
+            <span class="self">self</span>.consumer_set_waiting(<span class="bool-val">false</span>);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">t</span>)
+        <span class="prelude-val">Ok</span>(t)
     }
 
-    <span class="kw">fn</span> <span class="ident">setup_rec_sleep_simple</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>) {
-        <span class="comment">// TODO: an interface that undoes this.</span>
-        <span class="self">self</span>.<span class="ident">consumer_set_waiting</span>(<span class="bool-val">true</span>);
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bell</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bell</span>, <span class="ident">b</span>)
+    <span class="kw">fn </span>setup_rec_sleep_simple(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>AtomicU64, u64) {
+        <span class="comment">// TODO: an interface that undoes this.
+        </span><span class="self">self</span>.consumer_set_waiting(<span class="bool-val">true</span>);
+        <span class="kw">let </span>b = <span class="self">self</span>.bell.load(Ordering::SeqCst);
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.bell, b)
     }
 
-    <span class="kw">fn</span> <span class="ident">setup_send_sleep_simple</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>) {
-        <span class="comment">// TODO: an interface that undoes this.</span>
-        <span class="self">self</span>.<span class="ident">submitter_waiting</span>();
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tail</span>, <span class="ident">t</span>)
+    <span class="kw">fn </span>setup_send_sleep_simple(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>AtomicU64, u64) {
+        <span class="comment">// TODO: an interface that undoes this.
+        </span><span class="self">self</span>.submitter_waiting();
+        <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.tail, t)
     }
 
-    <span class="kw">fn</span> <span class="ident">setup_rec_sleep</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">sleep</span>: <span class="ident">bool</span>,
-        <span class="ident">raw_buf</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">waiter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AtomicU64</span><span class="op">&gt;</span>, <span class="ident">u64</span>),
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">&amp;</span> <span class="number">0x7fffffff</span>;
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bell</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">raw_buf</span>.<span class="ident">add</span>((<span class="ident">t</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)) };
-        <span class="kw-2">*</span><span class="ident">waiter</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bell</span>), <span class="ident">b</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>(<span class="ident">b</span>, <span class="ident">t</span>) <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_turn</span>(<span class="ident">t</span>, <span class="ident">item</span>) {
-            <span class="kw">if</span> <span class="ident">sleep</span> {
-                <span class="self">self</span>.<span class="ident">consumer_set_waiting</span>(<span class="bool-val">true</span>);
-                <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bell</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw-2">*</span><span class="ident">waiter</span> <span class="op">=</span> (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bell</span>), <span class="ident">b</span>);
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_empty</span>(<span class="ident">b</span>, <span class="ident">t</span>) <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">is_turn</span>(<span class="ident">t</span>, <span class="ident">item</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">t</span>);
+    <span class="kw">fn </span>setup_rec_sleep&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        sleep: bool,
+        raw_buf: <span class="kw-2">*const </span>QueueEntry&lt;T&gt;,
+        waiter: <span class="kw-2">&amp;mut </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;, u64),
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u64, QueueError&gt; {
+        <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst) &amp; <span class="number">0x7fffffff</span>;
+        <span class="kw">let </span>b = <span class="self">self</span>.bell.load(Ordering::SeqCst);
+        <span class="kw">let </span>item = <span class="kw">unsafe </span>{ raw_buf.add((t <span class="kw">as </span>usize) &amp; (<span class="self">self</span>.len() - <span class="number">1</span>)) };
+        <span class="kw-2">*</span>waiter = (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.bell), b);
+        <span class="kw">if </span><span class="self">self</span>.is_empty(b, t) || !<span class="self">self</span>.is_turn(t, item) {
+            <span class="kw">if </span>sleep {
+                <span class="self">self</span>.consumer_set_waiting(<span class="bool-val">true</span>);
+                <span class="kw">let </span>b = <span class="self">self</span>.bell.load(Ordering::SeqCst);
+                <span class="kw-2">*</span>waiter = (<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.bell), b);
+                <span class="kw">if </span>!<span class="self">self</span>.is_empty(b, t) &amp;&amp; <span class="self">self</span>.is_turn(t, item) {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(t);
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">QueueError::WouldBlock</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">t</span>)
+            <span class="prelude-val">Err</span>(QueueError::WouldBlock)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(t)
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance_tail</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ring</span>: <span class="ident">R</span>) {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">store</span>((<span class="ident">t</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="number">0x7fffffff</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">submitter_waiting</span>() {
-            <span class="ident">ring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tail</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance_tail&lt;R: Fn(<span class="kw-2">&amp;</span>AtomicU64)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ring: R) {
+        <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+        <span class="self">self</span>.tail.store((t + <span class="number">1</span>) &amp; <span class="number">0x7fffffff</span>, Ordering::SeqCst);
+        <span class="kw">if </span><span class="self">self</span>.submitter_waiting() {
+            ring(<span class="kw-2">&amp;</span><span class="self">self</span>.tail);
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance_tail_setup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">ringer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AtomicU64</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-        <span class="self">self</span>.<span class="ident">tail</span>.<span class="ident">store</span>((<span class="ident">t</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="number">0x7fffffff</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">submitter_waiting</span>() {
-            <span class="kw-2">*</span><span class="ident">ringer</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tail</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance_tail_setup&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, ringer: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;) {
+        <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst);
+        <span class="self">self</span>.tail.store((t + <span class="number">1</span>) &amp; <span class="number">0x7fffffff</span>, Ordering::SeqCst);
+        <span class="kw">if </span><span class="self">self</span>.submitter_waiting() {
+            <span class="kw-2">*</span>ringer = <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.tail);
         }
     }
 }
 
-<span class="doccomment">/// A raw queue, comprising of a header to track the algorithm and a buffer to hold queue entries.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">hdr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">RawQueueHdr</span>,
-    <span class="ident">buf</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A raw queue, comprising of a header to track the algorithm and a buffer to hold queue entries.
+</span><span class="kw">pub struct </span>RawQueue&lt;T&gt; {
+    hdr: <span class="kw-2">*const </span>RawQueueHdr,
+    buf: UnsafeCell&lt;<span class="kw-2">*mut </span>QueueEntry&lt;T&gt;&gt;,
 }
 
-<span class="macro">bitflags::bitflags!</span> {
-    <span class="doccomment">/// Flags to control how queue submission works.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SubmissionFlags</span>: <span class="ident">u32</span> {
-        <span class="doccomment">/// If the request would block, return Err([SubmissionError::WouldBlock]) instead.</span>
-        <span class="kw">const</span> <span class="ident">NON_BLOCK</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="macro">bitflags::bitflags! </span>{
+    <span class="doccomment">/// Flags to control how queue submission works.
+    </span><span class="kw">pub struct </span>SubmissionFlags: u32 {
+        <span class="doccomment">/// If the request would block, return Err([SubmissionError::WouldBlock]) instead.
+        </span><span class="kw">const </span>NON_BLOCK = <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Flags to control how queue receive works.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReceiveFlags</span>: <span class="ident">u32</span> {
-        <span class="doccomment">/// If the request would block, return Err([ReceiveError::WouldBlock]) instead.</span>
-        <span class="kw">const</span> <span class="ident">NON_BLOCK</span> <span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Flags to control how queue receive works.
+    </span><span class="kw">pub struct </span>ReceiveFlags: u32 {
+        <span class="doccomment">/// If the request would block, return Err([ReceiveError::WouldBlock]) instead.
+        </span><span class="kw">const </span>NON_BLOCK = <span class="number">1</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="doccomment">/// Possible errors for submitting to a queue.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueueError</span> {
-    <span class="doccomment">/// An unknown error.</span>
-    <span class="ident">Unknown</span>,
-    <span class="doccomment">/// The operation would have blocked, and non-blocking operation was specified.</span>
-    <span class="ident">WouldBlock</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="doccomment">/// Possible errors for submitting to a queue.
+</span><span class="kw">pub enum </span>QueueError {
+    <span class="doccomment">/// An unknown error.
+    </span>Unknown,
+    <span class="doccomment">/// The operation would have blocked, and non-blocking operation was specified.
+    </span>WouldBlock,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span><span class="op">&gt;</span> <span class="ident">RawQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new raw queue out of a header reference and a buffer pointer.</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">/// The caller must ensure that hdr and buf point to valid objects, and that the lifetime of the</span>
-    <span class="doccomment">/// RawQueue is exceeded by the objects pointed to.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">hdr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">RawQueueHdr</span>, <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">hdr</span>,
-            <span class="ident">buf</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">buf</span>),
+<span class="kw">impl</span>&lt;T: Copy&gt; RawQueue&lt;T&gt; {
+    <span class="doccomment">/// Construct a new raw queue out of a header reference and a buffer pointer.
+    /// # Safety
+    /// The caller must ensure that hdr and buf point to valid objects, and that the lifetime of the
+    /// RawQueue is exceeded by the objects pointed to.
+    </span><span class="kw">pub unsafe fn </span>new(hdr: <span class="kw-2">*const </span>RawQueueHdr, buf: <span class="kw-2">*mut </span>QueueEntry&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            hdr,
+            buf: UnsafeCell::new(buf),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hdr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">RawQueueHdr</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">hdr</span> }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>hdr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>RawQueueHdr {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span><span class="self">self</span>.hdr }
     }
 
-    <span class="comment">// This is a bit unsafe, but it&#39;s because we&#39;re managing concurrency ourselves.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mut_from_ref</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">get_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">off</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get</span>())
-                .<span class="ident">add</span>(<span class="ident">off</span> <span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>))
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">unwrap</span>()
+    <span class="comment">// This is a bit unsafe, but it&#39;s because we&#39;re managing concurrency ourselves.
+    </span><span class="attribute">#[allow(clippy::mut_from_ref)]
+    #[inline]
+    </span><span class="kw">fn </span>get_buf(<span class="kw-2">&amp;</span><span class="self">self</span>, off: usize) -&gt; <span class="kw-2">&amp;mut </span>QueueEntry&lt;T&gt; {
+        <span class="kw">unsafe </span>{
+            (<span class="kw-2">*</span><span class="self">self</span>.buf.get())
+                .add(off &amp; (<span class="self">self</span>.hdr().len() - <span class="number">1</span>))
+                .as_mut()
+                .unwrap()
         }
     }
 
-    <span class="doccomment">/// Submit a data item of type T, wrapped in a QueueEntry, to the queue. The two callbacks,</span>
-    <span class="doccomment">/// wait, and ring, are for implementing a rudimentary condvar, wherein if the queue needs to</span>
-    <span class="doccomment">/// block, we&#39;ll call wait(x, y), where we are supposed to wait until *x != y. Once we are done</span>
-    <span class="doccomment">/// inserting, if we need to wake up a consumer, we will call ring, which should wake up anyone</span>
-    <span class="doccomment">/// waiting on that word of memory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">submit</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>), <span class="ident">R</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>)<span class="op">&gt;</span>(
+    <span class="doccomment">/// Submit a data item of type T, wrapped in a QueueEntry, to the queue. The two callbacks,
+    /// wait, and ring, are for implementing a rudimentary condvar, wherein if the queue needs to
+    /// block, we&#39;ll call wait(x, y), where we are supposed to wait until *x != y. Once we are done
+    /// inserting, if we need to wake up a consumer, we will call ring, which should wake up anyone
+    /// waiting on that word of memory.
+    </span><span class="kw">pub fn </span>submit&lt;W: Fn(<span class="kw-2">&amp;</span>AtomicU64, u64), R: Fn(<span class="kw-2">&amp;</span>AtomicU64)&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">item</span>: <span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">wait</span>: <span class="ident">W</span>,
-        <span class="ident">ring</span>: <span class="ident">R</span>,
-        <span class="ident">flags</span>: <span class="ident">SubmissionFlags</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">reserve_slot</span>(<span class="ident">flags</span>, <span class="ident">wait</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">buf_item</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_buf</span>(<span class="ident">h</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw-2">*</span><span class="ident">buf_item</span> <span class="op">=</span> <span class="ident">item</span>;
-        <span class="kw">let</span> <span class="ident">turn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">get_turn</span>(<span class="ident">h</span>);
-        <span class="ident">buf_item</span>.<span class="ident">set_cmd_slot</span>(<span class="ident">h</span> <span class="op">|</span> <span class="kw">if</span> <span class="ident">turn</span> { <span class="number">1u32</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span> } <span class="kw">else</span> { <span class="number">0</span> });
+        item: QueueEntry&lt;T&gt;,
+        wait: W,
+        ring: R,
+        flags: SubmissionFlags,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), QueueError&gt; {
+        <span class="kw">let </span>h = <span class="self">self</span>.hdr().reserve_slot(flags, wait)<span class="question-mark">?</span>;
+        <span class="kw">let </span>buf_item = <span class="self">self</span>.get_buf(h <span class="kw">as </span>usize);
+        <span class="kw-2">*</span>buf_item = item;
+        <span class="kw">let </span>turn = <span class="self">self</span>.hdr().get_turn(h);
+        buf_item.set_cmd_slot(h | <span class="kw">if </span>turn { <span class="number">1u32 </span>&lt;&lt; <span class="number">31 </span>} <span class="kw">else </span>{ <span class="number">0 </span>});
 
-        <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">ring</span>(<span class="ident">ring</span>);
+        <span class="self">self</span>.hdr().ring(ring);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Receive data from the queue, returning either that data or an error. The wait and ring</span>
-    <span class="doccomment">/// callbacks work similar to [RawQueue::submit].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">receive</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>), <span class="ident">R</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>)<span class="op">&gt;</span>(
+    <span class="doccomment">/// Receive data from the queue, returning either that data or an error. The wait and ring
+    /// callbacks work similar to [RawQueue::submit].
+    </span><span class="kw">pub fn </span>receive&lt;W: Fn(<span class="kw-2">&amp;</span>AtomicU64, u64), R: Fn(<span class="kw-2">&amp;</span>AtomicU64)&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">wait</span>: <span class="ident">W</span>,
-        <span class="ident">ring</span>: <span class="ident">R</span>,
-        <span class="ident">flags</span>: <span class="ident">ReceiveFlags</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">hdr</span>()
-            .<span class="ident">get_next_ready</span>(<span class="ident">wait</span>, <span class="ident">flags</span>, <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get</span>() })<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">buf_item</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_buf</span>(<span class="ident">t</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">buf_item</span>;
-        <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">advance_tail</span>(<span class="ident">ring</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">item</span>)
+        wait: W,
+        ring: R,
+        flags: ReceiveFlags,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;QueueEntry&lt;T&gt;, QueueError&gt; {
+        <span class="kw">let </span>t = <span class="self">self
+            </span>.hdr()
+            .get_next_ready(wait, flags, <span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.buf.get() })<span class="question-mark">?</span>;
+        <span class="kw">let </span>buf_item = <span class="self">self</span>.get_buf(t <span class="kw">as </span>usize);
+        <span class="kw">let </span>item = <span class="kw-2">*</span>buf_item;
+        <span class="self">self</span>.hdr().advance_tail(ring);
+        <span class="prelude-val">Ok</span>(item)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_sleep</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">sleep</span>: <span class="ident">bool</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">waiter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AtomicU64</span><span class="op">&gt;</span>, <span class="ident">u64</span>),
-        <span class="ident">ringer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">AtomicU64</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">QueueError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">hdr</span>()
-            .<span class="ident">setup_rec_sleep</span>(<span class="ident">sleep</span>, <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">get</span>() }, <span class="ident">waiter</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">buf_item</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_buf</span>(<span class="ident">t</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">buf_item</span>;
-        <span class="kw-2">*</span><span class="ident">output</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>);
-        <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">advance_tail_setup</span>(<span class="ident">ringer</span>);
+    <span class="kw">pub fn </span>setup_sleep&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        sleep: bool,
+        output: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;QueueEntry&lt;T&gt;&gt;,
+        waiter: <span class="kw-2">&amp;mut </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;, u64),
+        ringer: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), QueueError&gt; {
+        <span class="kw">let </span>t = <span class="self">self
+            </span>.hdr()
+            .setup_rec_sleep(sleep, <span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.buf.get() }, waiter)<span class="question-mark">?</span>;
+        <span class="kw">let </span>buf_item = <span class="self">self</span>.get_buf(t <span class="kw">as </span>usize);
+        <span class="kw">let </span>item = <span class="kw-2">*</span>buf_item;
+        <span class="kw-2">*</span>output = <span class="prelude-val">Some</span>(item);
+        <span class="self">self</span>.hdr().advance_tail_setup(ringer);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_sleep_simple</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">setup_rec_sleep_simple</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>setup_sleep_simple(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>AtomicU64, u64) {
+        <span class="self">self</span>.hdr().setup_rec_sleep_simple()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_send_sleep_simple</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">hdr</span>().<span class="ident">setup_send_sleep_simple</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>setup_send_sleep_simple(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>AtomicU64, u64) {
+        <span class="self">self</span>.hdr().setup_send_sleep_simple()
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">RawQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">RawQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>RawQueue&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>RawQueue&lt;T&gt; {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="doccomment">/// Wait for receiving on multiple raw queues. If any of the passed raw queues can return data, they</span>
-<span class="doccomment">/// will do so by writing it into the output array at the same index that they are in the `queues`</span>
-<span class="doccomment">/// variable. The queues and output arrays must be the same length. If no data is available in any</span>
-<span class="doccomment">/// queues, then the function will call back on multi_wait, which it expects to wait until **any** of</span>
-<span class="doccomment">/// the pairs (&amp;x, y) meet the condition that *x != y. Before returning any data, the function will</span>
-<span class="doccomment">/// callback on multi_ring, to inform multiple queues that data was taken from them. It expects the</span>
-<span class="doccomment">/// multi_ring function to wake up any waiting threads on the supplied words of memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that both call backs specify the pointers as Option. In the case that an entry is None,</span>
-<span class="doccomment">/// there was no requested wait or wake operation for that queue, and that entry should be ignored.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If flags specifies [ReceiveFlags::NON_BLOCK], then if no data is available, the function returns</span>
-<span class="doccomment">/// immediately with Err([QueueError::WouldBlock]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Rationale</span>
-<span class="doccomment">/// This function is here to implement poll or select like functionality, wherein a given thread or</span>
-<span class="doccomment">/// program wants to wait on multiple incoming request channels and handle them itself, thus cutting</span>
-<span class="doccomment">/// down on the number of threads required. The maximum number of queues to use here is a trade-off</span>
-<span class="doccomment">/// --- more means fewer threads, but since this function is linear in the number of queues, each</span>
-<span class="doccomment">/// thread could take longer to service requests.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The complexity of the multi_wait and multi_ring callbacks is present to avoid calling into the</span>
-<span class="doccomment">/// kernel often for high-contention queues.</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">multi_receive</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Copy</span>, <span class="ident">W</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span>[(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span>, <span class="ident">u64</span>)]), <span class="ident">R</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span>[<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AtomicU64</span><span class="op">&gt;</span>])<span class="op">&gt;</span>(
-    <span class="ident">queues</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">RawQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>],
-    <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>],
-    <span class="ident">multi_wait</span>: <span class="ident">W</span>,
-    <span class="ident">multi_ring</span>: <span class="ident">R</span>,
-    <span class="ident">flags</span>: <span class="ident">ReceiveFlags</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">QueueError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">output</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">queues</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueueError::Unknown</span>);
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="doccomment">/// Wait for receiving on multiple raw queues. If any of the passed raw queues can return data, they
+/// will do so by writing it into the output array at the same index that they are in the `queues`
+/// variable. The queues and output arrays must be the same length. If no data is available in any
+/// queues, then the function will call back on multi_wait, which it expects to wait until **any** of
+/// the pairs (&amp;x, y) meet the condition that *x != y. Before returning any data, the function will
+/// callback on multi_ring, to inform multiple queues that data was taken from them. It expects the
+/// multi_ring function to wake up any waiting threads on the supplied words of memory.
+///
+/// Note that both call backs specify the pointers as Option. In the case that an entry is None,
+/// there was no requested wait or wake operation for that queue, and that entry should be ignored.
+///
+/// If flags specifies [ReceiveFlags::NON_BLOCK], then if no data is available, the function returns
+/// immediately with Err([QueueError::WouldBlock]).
+///
+/// # Rationale
+/// This function is here to implement poll or select like functionality, wherein a given thread or
+/// program wants to wait on multiple incoming request channels and handle them itself, thus cutting
+/// down on the number of threads required. The maximum number of queues to use here is a trade-off
+/// --- more means fewer threads, but since this function is linear in the number of queues, each
+/// thread could take longer to service requests.
+///
+/// The complexity of the multi_wait and multi_ring callbacks is present to avoid calling into the
+/// kernel often for high-contention queues.
+///
+</span><span class="kw">pub fn </span>multi_receive&lt;T: Copy, W: Fn(<span class="kw-2">&amp;</span>[(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AtomicU64&gt;, u64)]), R: Fn(<span class="kw-2">&amp;</span>[<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AtomicU64&gt;])&gt;(
+    queues: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>RawQueue&lt;T&gt;],
+    output: <span class="kw-2">&amp;mut </span>[<span class="prelude-ty">Option</span>&lt;QueueEntry&lt;T&gt;&gt;],
+    multi_wait: W,
+    multi_ring: R,
+    flags: ReceiveFlags,
+) -&gt; <span class="prelude-ty">Result</span>&lt;usize, QueueError&gt; {
+    <span class="kw">if </span>output.len() != queues.len() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(QueueError::Unknown);
     }
-    <span class="comment">/* TODO (opt): avoid this allocation until we have to sleep */</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">waiters</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">waiters</span>.<span class="ident">resize</span>(<span class="ident">queues</span>.<span class="ident">len</span>(), <span class="ident">Default::default</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ringers</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">ringers</span>.<span class="ident">resize</span>(<span class="ident">queues</span>.<span class="ident">len</span>(), <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attempts</span> <span class="op">=</span> <span class="number">100</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">q</span>) <span class="kw">in</span> <span class="ident">queues</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">setup_sleep</span>(
-                <span class="ident">attempts</span> <span class="op">==</span> <span class="number">0</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>[<span class="ident">i</span>],
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">waiters</span>[<span class="ident">i</span>],
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ringers</span>[<span class="ident">i</span>],
+    <span class="comment">/* TODO (opt): avoid this allocation until we have to sleep */
+    </span><span class="kw">let </span><span class="kw-2">mut </span>waiters = Vec::new();
+    waiters.resize(queues.len(), Default::default());
+    <span class="kw">let </span><span class="kw-2">mut </span>ringers = Vec::new();
+    ringers.resize(queues.len(), <span class="prelude-val">None</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>attempts = <span class="number">100</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+        <span class="kw">for </span>(i, q) <span class="kw">in </span>queues.iter().enumerate() {
+            <span class="kw">let </span>res = q.setup_sleep(
+                attempts == <span class="number">0</span>,
+                <span class="kw-2">&amp;mut </span>output[i],
+                <span class="kw-2">&amp;mut </span>waiters[i],
+                <span class="kw-2">&amp;mut </span>ringers[i],
             );
-            <span class="kw">if</span> <span class="ident">res</span> <span class="op">==</span> <span class="prelude-val">Ok</span>(()) {
-                <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">if </span>res == <span class="prelude-val">Ok</span>(()) {
+                count += <span class="number">1</span>;
             }
         }
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">multi_ring</span>(<span class="kw-2">&amp;</span><span class="ident">ringers</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">count</span>);
+        <span class="kw">if </span>count &gt; <span class="number">0 </span>{
+            multi_ring(<span class="kw-2">&amp;</span>ringers);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(count);
         }
-        <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">ReceiveFlags::NON_BLOCK</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueueError::WouldBlock</span>);
+        <span class="kw">if </span>flags.contains(ReceiveFlags::NON_BLOCK) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(QueueError::WouldBlock);
         }
-        <span class="kw">if</span> <span class="ident">attempts</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">attempts</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        } <span class="kw">else</span> {
-            <span class="ident">multi_wait</span>(<span class="kw-2">&amp;</span><span class="ident">waiters</span>);
+        <span class="kw">if </span>attempts &gt; <span class="number">0 </span>{
+            attempts -= <span class="number">1</span>;
+        } <span class="kw">else </span>{
+            multi_wait(<span class="kw-2">&amp;</span>waiters);
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">soft_unstable</span>)]</span>
-    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(soft_unstable)]
+    </span><span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 
-    <span class="comment">//   use syscalls::SyscallArgs;</span>
+    <span class="comment">//   use syscalls::SyscallArgs;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::multi_receive</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::QueueError</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">QueueEntry</span>, <span class="ident">RawQueue</span>, <span class="ident">RawQueueHdr</span>, <span class="ident">ReceiveFlags</span>, <span class="ident">SubmissionFlags</span>};
+    </span><span class="kw">use </span><span class="kw">crate</span>::multi_receive;
+    <span class="kw">use </span><span class="kw">crate</span>::QueueError;
+    <span class="kw">use crate</span>::{QueueEntry, RawQueue, RawQueueHdr, ReceiveFlags, SubmissionFlags};
 
-    <span class="kw">fn</span> <span class="ident">wait</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>, <span class="ident">v</span>: <span class="ident">u64</span>) {
-        <span class="comment">// println!(&quot;wait&quot;);</span>
-        <span class="kw">while</span> <span class="ident">x</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>) <span class="op">==</span> <span class="ident">v</span> {
-            <span class="ident">core::hint::spin_loop</span>();
+    <span class="kw">fn </span>wait(x: <span class="kw-2">&amp;</span>AtomicU64, v: u64) {
+        <span class="comment">// println!(&quot;wait&quot;);
+        </span><span class="kw">while </span>x.load(Ordering::SeqCst) == v {
+            core::hint::spin_loop();
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">wake</span>(<span class="ident">_x</span>: <span class="kw-2">&amp;</span><span class="ident">AtomicU64</span>) {
-        <span class="comment">//   println!(&quot;wake&quot;);</span>
-    }
+    <span class="kw">fn </span>wake(_x: <span class="kw-2">&amp;</span>AtomicU64) {
+        <span class="comment">//   println!(&quot;wake&quot;);
+    </span>}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">it_transmits</span>() {
-        <span class="kw">let</span> <span class="ident">qh</span> <span class="op">=</span> <span class="ident">RawQueueHdr::new</span>(<span class="number">4</span>, <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="ident">QueueEntry</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::default</span>(); <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>];
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">RawQueue::new</span>(<span class="kw-2">&amp;</span><span class="ident">qh</span>, <span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>()) };
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>it_transmits() {
+        <span class="kw">let </span>qh = RawQueueHdr::new(<span class="number">4</span>, std::mem::size_of::&lt;QueueEntry&lt;u32&gt;&gt;());
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = [QueueEntry::&lt;i32&gt;::default(); <span class="number">1 </span>&lt;&lt; <span class="number">4</span>];
+        <span class="kw">let </span>q = <span class="kw">unsafe </span>{ RawQueue::new(<span class="kw-2">&amp;</span>qh, buffer.as_mut_ptr()) };
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(
-                <span class="ident">QueueEntry::new</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">i</span> <span class="op">*</span> <span class="number">10</span>),
-                <span class="ident">wait</span>,
-                <span class="ident">wake</span>,
-                <span class="ident">SubmissionFlags::empty</span>(),
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
+            <span class="kw">let </span>res = q.submit(
+                QueueEntry::new(i <span class="kw">as </span>u32, i * <span class="number">10</span>),
+                wait,
+                wake,
+                SubmissionFlags::empty(),
             );
-            <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">receive</span>(<span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">ReceiveFlags::empty</span>());
-            <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">info</span>(), <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">item</span>(), <span class="ident">i</span> <span class="op">*</span> <span class="number">10</span>);
+            <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+            <span class="kw">let </span>res = q.receive(wait, wake, ReceiveFlags::empty());
+            <span class="macro">assert!</span>(res.is_ok());
+            <span class="macro">assert_eq!</span>(res.unwrap().info(), i <span class="kw">as </span>u32);
+            <span class="macro">assert_eq!</span>(res.unwrap().item(), i * <span class="number">10</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">it_fills</span>() {
-        <span class="kw">let</span> <span class="ident">qh</span> <span class="op">=</span> <span class="ident">RawQueueHdr::new</span>(<span class="number">2</span>, <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="ident">QueueEntry</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::default</span>(); <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>];
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">RawQueue::new</span>(<span class="kw-2">&amp;</span><span class="ident">qh</span>, <span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>()) };
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>it_fills() {
+        <span class="kw">let </span>qh = RawQueueHdr::new(<span class="number">2</span>, std::mem::size_of::&lt;QueueEntry&lt;u32&gt;&gt;());
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = [QueueEntry::&lt;i32&gt;::default(); <span class="number">1 </span>&lt;&lt; <span class="number">2</span>];
+        <span class="kw">let </span>q = <span class="kw">unsafe </span>{ RawQueue::new(<span class="kw-2">&amp;</span>qh, buffer.as_mut_ptr()) };
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">1</span>, <span class="number">7</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">2</span>, <span class="number">7</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">3</span>, <span class="number">7</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">4</span>, <span class="number">7</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(
-            <span class="ident">QueueEntry::new</span>(<span class="number">1</span>, <span class="number">7</span>),
-            <span class="ident">wait</span>,
-            <span class="ident">wake</span>,
-            <span class="ident">SubmissionFlags::NON_BLOCK</span>,
+        <span class="kw">let </span>res = q.submit(QueueEntry::new(<span class="number">1</span>, <span class="number">7</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q.submit(QueueEntry::new(<span class="number">2</span>, <span class="number">7</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q.submit(QueueEntry::new(<span class="number">3</span>, <span class="number">7</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q.submit(QueueEntry::new(<span class="number">4</span>, <span class="number">7</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q.submit(
+            QueueEntry::new(<span class="number">1</span>, <span class="number">7</span>),
+            wait,
+            wake,
+            SubmissionFlags::NON_BLOCK,
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="ident">QueueError::WouldBlock</span>));
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Err</span>(QueueError::WouldBlock));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">it_nonblock_receives</span>() {
-        <span class="kw">let</span> <span class="ident">qh</span> <span class="op">=</span> <span class="ident">RawQueueHdr::new</span>(<span class="number">4</span>, <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> [<span class="ident">QueueEntry</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::default</span>(); <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>];
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">RawQueue::new</span>(<span class="kw-2">&amp;</span><span class="ident">qh</span>, <span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>()) };
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>it_nonblock_receives() {
+        <span class="kw">let </span>qh = RawQueueHdr::new(<span class="number">4</span>, std::mem::size_of::&lt;QueueEntry&lt;u32&gt;&gt;());
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = [QueueEntry::&lt;i32&gt;::default(); <span class="number">1 </span>&lt;&lt; <span class="number">4</span>];
+        <span class="kw">let </span>q = <span class="kw">unsafe </span>{ RawQueue::new(<span class="kw-2">&amp;</span>qh, buffer.as_mut_ptr()) };
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">1</span>, <span class="number">7</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">receive</span>(<span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">ReceiveFlags::empty</span>());
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_ok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">info</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">unwrap</span>().<span class="ident">item</span>(), <span class="number">7</span>);
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q</span>.<span class="ident">receive</span>(<span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">ReceiveFlags::NON_BLOCK</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="ident">unwrap_err</span>(), <span class="ident">QueueError::WouldBlock</span>);
+        <span class="kw">let </span>res = q.submit(QueueEntry::new(<span class="number">1</span>, <span class="number">7</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q.receive(wait, wake, ReceiveFlags::empty());
+        <span class="macro">assert!</span>(res.is_ok());
+        <span class="macro">assert_eq!</span>(res.unwrap().info(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(res.unwrap().item(), <span class="number">7</span>);
+        <span class="kw">let </span>res = q.receive(wait, wake, ReceiveFlags::NON_BLOCK);
+        <span class="macro">assert_eq!</span>(res.unwrap_err(), QueueError::WouldBlock);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">it_multi_receives</span>() {
-        <span class="kw">let</span> <span class="ident">qh1</span> <span class="op">=</span> <span class="ident">RawQueueHdr::new</span>(<span class="number">4</span>, <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer1</span> <span class="op">=</span> [<span class="ident">QueueEntry</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::default</span>(); <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>];
-        <span class="kw">let</span> <span class="ident">q1</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">RawQueue::new</span>(<span class="kw-2">&amp;</span><span class="ident">qh1</span>, <span class="ident">buffer1</span>.<span class="ident">as_mut_ptr</span>()) };
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>it_multi_receives() {
+        <span class="kw">let </span>qh1 = RawQueueHdr::new(<span class="number">4</span>, std::mem::size_of::&lt;QueueEntry&lt;u32&gt;&gt;());
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer1 = [QueueEntry::&lt;i32&gt;::default(); <span class="number">1 </span>&lt;&lt; <span class="number">4</span>];
+        <span class="kw">let </span>q1 = <span class="kw">unsafe </span>{ RawQueue::new(<span class="kw-2">&amp;</span>qh1, buffer1.as_mut_ptr()) };
 
-        <span class="kw">let</span> <span class="ident">qh2</span> <span class="op">=</span> <span class="ident">RawQueueHdr::new</span>(<span class="number">4</span>, <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">QueueEntry</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer2</span> <span class="op">=</span> [<span class="ident">QueueEntry</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::default</span>(); <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>];
-        <span class="kw">let</span> <span class="ident">q2</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">RawQueue::new</span>(<span class="kw-2">&amp;</span><span class="ident">qh2</span>, <span class="ident">buffer2</span>.<span class="ident">as_mut_ptr</span>()) };
+        <span class="kw">let </span>qh2 = RawQueueHdr::new(<span class="number">4</span>, std::mem::size_of::&lt;QueueEntry&lt;u32&gt;&gt;());
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer2 = [QueueEntry::&lt;i32&gt;::default(); <span class="number">1 </span>&lt;&lt; <span class="number">4</span>];
+        <span class="kw">let </span>q2 = <span class="kw">unsafe </span>{ RawQueue::new(<span class="kw-2">&amp;</span>qh2, buffer2.as_mut_ptr()) };
 
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q1</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">1</span>, <span class="number">7</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">q2</span>.<span class="ident">submit</span>(<span class="ident">QueueEntry::new</span>(<span class="number">2</span>, <span class="number">8</span>), <span class="ident">wait</span>, <span class="ident">wake</span>, <span class="ident">SubmissionFlags::empty</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q1.submit(QueueEntry::new(<span class="number">1</span>, <span class="number">7</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
+        <span class="kw">let </span>res = q2.submit(QueueEntry::new(<span class="number">2</span>, <span class="number">8</span>), wait, wake, SubmissionFlags::empty());
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(()));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="prelude-val">None</span>, <span class="prelude-val">None</span>];
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">multi_receive</span>(
-            <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">q1</span>, <span class="kw-2">&amp;</span><span class="ident">q2</span>],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>,
-            <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {},
-            <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {},
-            <span class="ident">ReceiveFlags::empty</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>output = [<span class="prelude-val">None</span>, <span class="prelude-val">None</span>];
+        <span class="kw">let </span>res = multi_receive(
+            <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>q1, <span class="kw-2">&amp;</span>q2],
+            <span class="kw-2">&amp;mut </span>output,
+            |<span class="kw">_</span>| {},
+            |<span class="kw">_</span>| {},
+            ReceiveFlags::empty(),
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>[<span class="number">0</span>].<span class="ident">unwrap</span>().<span class="ident">info</span>(), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>[<span class="number">0</span>].<span class="ident">unwrap</span>().<span class="ident">item</span>(), <span class="number">7</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>[<span class="number">1</span>].<span class="ident">unwrap</span>().<span class="ident">info</span>(), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">output</span>[<span class="number">1</span>].<span class="ident">unwrap</span>().<span class="ident">item</span>(), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(output[<span class="number">0</span>].unwrap().info(), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(output[<span class="number">0</span>].unwrap().item(), <span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(output[<span class="number">1</span>].unwrap().info(), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(output[<span class="number">1</span>].unwrap().item(), <span class="number">8</span>);
     }
 
     <span class="comment">/*
@@ -1408,9 +1406,7 @@
 
             x.unwrap();
         }
-    */</span>
-}
+    */
+</span>}
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_queue_raw" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_queue_raw" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["FotEntry","An entry in the FOT."]]});
+window.SIDEBAR_ITEMS = {"struct":[["FotEntry","An entry in the FOT."]]};

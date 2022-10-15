@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-abi&#x2F;src&#x2F;device&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_abi/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/device/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -315,324 +315,322 @@
 <span id="315">315</span>
 <span id="316">316</span>
 <span id="317">317</span>
-</pre><pre class="rust"><code><span class="doccomment">//! APIs for accessing the device tree and device representation objects.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! APIs for accessing the device tree and device representation objects.
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-    <span class="ident">fmt::Display</span>,
-    <span class="ident">num::TryFromIntError</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicU16</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
-    <span class="ident">time::Duration</span>,
+</span><span class="kw">use </span>core::{
+    fmt::Display,
+    num::TryFromIntError,
+    sync::atomic::{AtomicU16, AtomicU64, Ordering},
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">kso::KsoHdr</span>,
-    <span class="ident">syscall</span>::{
-        <span class="ident">sys_thread_sync</span>, <span class="ident">ThreadSync</span>, <span class="ident">ThreadSyncFlags</span>, <span class="ident">ThreadSyncOp</span>, <span class="ident">ThreadSyncReference</span>,
-        <span class="ident">ThreadSyncSleep</span>, <span class="ident">ThreadSyncWake</span>,
+<span class="kw">use crate</span>::{
+    kso::KsoHdr,
+    syscall::{
+        sys_thread_sync, ThreadSync, ThreadSyncFlags, ThreadSyncOp, ThreadSyncReference,
+        ThreadSyncSleep, ThreadSyncWake,
     },
 };
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bus</span>;
+<span class="kw">pub mod </span>bus;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NUM_DEVICE_INTERRUPTS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">pub const </span>NUM_DEVICE_INTERRUPTS: usize = <span class="number">32</span>;
 
-<span class="doccomment">/// Possible high-level device types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DeviceType</span> {
-    <span class="doccomment">/// An unknown device type. Should be ignored.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// A bus. This device has numerous children and should be enumerated.</span>
-    <span class="ident">Bus</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// A traditional &quot;device&quot;. It may still have children, but their meaning is device-specific.</span>
-    <span class="ident">Device</span> <span class="op">=</span> <span class="number">2</span>,
+<span class="doccomment">/// Possible high-level device types.
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Debug)]
+#[repr(u32)]
+</span><span class="kw">pub enum </span>DeviceType {
+    <span class="doccomment">/// An unknown device type. Should be ignored.
+    </span>Unknown = <span class="number">0</span>,
+    <span class="doccomment">/// A bus. This device has numerous children and should be enumerated.
+    </span>Bus = <span class="number">1</span>,
+    <span class="doccomment">/// A traditional &quot;device&quot;. It may still have children, but their meaning is device-specific.
+    </span>Device = <span class="number">2</span>,
 }
 
-<span class="doccomment">/// All supported kernel-discovered bus types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BusType</span> {
-    <span class="doccomment">/// An unknown bus. Should be ignored.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// The &quot;system&quot; bus. Typically comprised of devices created by the kernel.</span>
-    <span class="ident">System</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// PCIe.</span>
-    <span class="ident">Pcie</span> <span class="op">=</span> <span class="number">2</span>,
+<span class="doccomment">/// All supported kernel-discovered bus types.
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Debug)]
+#[repr(u32)]
+</span><span class="kw">pub enum </span>BusType {
+    <span class="doccomment">/// An unknown bus. Should be ignored.
+    </span>Unknown = <span class="number">0</span>,
+    <span class="doccomment">/// The &quot;system&quot; bus. Typically comprised of devices created by the kernel.
+    </span>System = <span class="number">1</span>,
+    <span class="doccomment">/// PCIe.
+    </span>Pcie = <span class="number">2</span>,
 }
 
-<span class="doccomment">/// A device will have a number of sub-objects to present enough information and access for a</span>
-<span class="doccomment">/// userspace driver to be implemented.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SubObjectType</span> {
-    <span class="doccomment">/// An info sub-object, which is comprised of a device-specific (or bus-specific) information structure.</span>
-    <span class="ident">Info</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// A mapping of the MMIO registers for this device into an object.</span>
-    <span class="ident">Mmio</span> <span class="op">=</span> <span class="number">1</span>,
+<span class="doccomment">/// A device will have a number of sub-objects to present enough information and access for a
+/// userspace driver to be implemented.
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Debug)]
+#[repr(u32)]
+</span><span class="kw">pub enum </span>SubObjectType {
+    <span class="doccomment">/// An info sub-object, which is comprised of a device-specific (or bus-specific) information structure.
+    </span>Info = <span class="number">0</span>,
+    <span class="doccomment">/// A mapping of the MMIO registers for this device into an object.
+    </span>Mmio = <span class="number">1</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SubObjectType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">SubObjectType</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="ident">SubObjectType::Info</span> =&gt; <span class="number">0</span>,
-            <span class="ident">SubObjectType::Mmio</span> =&gt; <span class="number">1</span>,
+<span class="kw">impl </span>From&lt;SubObjectType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: SubObjectType) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>x {
+            SubObjectType::Info =&gt; <span class="number">0</span>,
+            SubObjectType::Mmio =&gt; <span class="number">1</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SubObjectType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">x</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, ()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">0</span> =&gt; <span class="ident">SubObjectType::Info</span>,
-            <span class="number">1</span> =&gt; <span class="ident">SubObjectType::Mmio</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>SubObjectType {
+    <span class="kw">type </span>Error = ();
+    <span class="kw">fn </span>try_from(x: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ()&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>x {
+            <span class="number">0 </span>=&gt; SubObjectType::Info,
+            <span class="number">1 </span>=&gt; SubObjectType::Mmio,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(()),
         })
     }
 }
 
-<span class="doccomment">/// For MMIO registers, we may need to specify the caching type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CacheType</span> {
-    <span class="ident">WriteBack</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="ident">WriteCombining</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">WriteThrough</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">Uncachable</span> <span class="op">=</span> <span class="number">3</span>,
+<span class="doccomment">/// For MMIO registers, we may need to specify the caching type.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+#[repr(u32)]
+</span><span class="kw">pub enum </span>CacheType {
+    WriteBack = <span class="number">0</span>,
+    WriteCombining = <span class="number">1</span>,
+    WriteThrough = <span class="number">2</span>,
+    Uncachable = <span class="number">3</span>,
 }
 
-<span class="doccomment">/// Info struct at the base of an mmio sub-object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MmioInfo</span> {
-    <span class="doccomment">/// The length of this mapping.</span>
-    <span class="kw">pub</span> <span class="ident">length</span>: <span class="ident">u64</span>,
-    <span class="doccomment">/// The cache type.</span>
-    <span class="kw">pub</span> <span class="ident">cache_type</span>: <span class="ident">CacheType</span>,
-    <span class="doccomment">/// Device-specific info.</span>
-    <span class="kw">pub</span> <span class="ident">info</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// Info struct at the base of an mmio sub-object.
+</span><span class="attribute">#[derive(Debug)]
+#[repr(C)]
+</span><span class="kw">pub struct </span>MmioInfo {
+    <span class="doccomment">/// The length of this mapping.
+    </span><span class="kw">pub </span>length: u64,
+    <span class="doccomment">/// The cache type.
+    </span><span class="kw">pub </span>cache_type: CacheType,
+    <span class="doccomment">/// Device-specific info.
+    </span><span class="kw">pub </span>info: u64,
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::marker::BaseType</span> <span class="kw">for</span> <span class="ident">MmioInfo</span> {
-    <span class="kw">fn</span> <span class="ident">init</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">_t</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl </span><span class="kw">crate</span>::marker::BaseType <span class="kw">for </span>MmioInfo {
+    <span class="kw">fn </span>init&lt;T&gt;(_t: T) -&gt; <span class="self">Self </span>{
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">tags</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident"><span class="kw">crate</span>::marker::BaseVersion</span>, <span class="ident"><span class="kw">crate</span>::marker::BaseTag</span>)] {
+    <span class="kw">fn </span>tags() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(<span class="kw">crate</span>::marker::BaseVersion, <span class="kw">crate</span>::marker::BaseTag)] {
         <span class="macro">todo!</span>()
     }
 }
-<span class="doccomment">/// An mmio object has, at its base, a [MmioInfo] struct. At this offset, the mmio mapping actually starts.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MMIO_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0x2000</span>;
+<span class="doccomment">/// An mmio object has, at its base, a [MmioInfo] struct. At this offset, the mmio mapping actually starts.
+</span><span class="kw">pub const </span>MMIO_OFFSET: usize = <span class="number">0x2000</span>;
 
-<span class="macro">bitflags::bitflags!</span> {
-    <span class="doccomment">/// Possible flags for device interrupts.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceInterruptFlags</span>: <span class="ident">u16</span> {}
+<span class="macro">bitflags::bitflags! </span>{
+    <span class="doccomment">/// Possible flags for device interrupts.
+    </span><span class="kw">pub struct </span>DeviceInterruptFlags: u16 {}
 }
 
-<span class="doccomment">/// A vector number (used by the kernel).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InterruptVector</span>(<span class="ident">u32</span>);
+<span class="doccomment">/// A vector number (used by the kernel).
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Debug)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>InterruptVector(u32);
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InterruptVector</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromIntError</span>;
+<span class="kw">impl </span>TryFrom&lt;u64&gt; <span class="kw">for </span>InterruptVector {
+    <span class="kw">type </span>Error = TryFromIntError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">u</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">InterruptVector</span>(<span class="ident">u</span>))
+    <span class="kw">fn </span>try_from(value: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>u: u32 = value.try_into()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(InterruptVector(u))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InterruptVector</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">iv</span>: <span class="ident">InterruptVector</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">iv</span>.<span class="number">0</span>
+<span class="kw">impl </span>From&lt;InterruptVector&gt; <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>from(iv: InterruptVector) -&gt; <span class="self">Self </span>{
+        iv.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// A per-bus device ID.
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Debug)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>DeviceId(u32);
+
+<span class="kw">impl </span>DeviceId {
+    <span class="kw">pub fn </span>new(v: u32) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(v)
     }
 }
 
-<span class="doccomment">/// A per-bus device ID.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceId</span>(<span class="ident">u32</span>);
-
-<span class="kw">impl</span> <span class="ident">DeviceId</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">v</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">v</span>)
-    }
+<span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>DeviceInterrupt {
+    <span class="kw">pub </span>sync: AtomicU64,
+    <span class="kw">pub </span>vec: InterruptVector,
+    <span class="kw">pub </span>flags: DeviceInterruptFlags,
+    <span class="kw">pub </span>taken: AtomicU16,
 }
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceInterrupt</span> {
-    <span class="kw">pub</span> <span class="ident">sync</span>: <span class="ident">AtomicU64</span>,
-    <span class="kw">pub</span> <span class="ident">vec</span>: <span class="ident">InterruptVector</span>,
-    <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">DeviceInterruptFlags</span>,
-    <span class="kw">pub</span> <span class="ident">taken</span>: <span class="ident">AtomicU16</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>MailboxPriority {
+    Idle,
+    Low,
+    High,
+    Num,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MailboxPriority</span> {
-    <span class="ident">Idle</span>,
-    <span class="ident">Low</span>,
-    <span class="ident">High</span>,
-    <span class="ident">Num</span>,
-}
+<span class="kw">impl </span>TryFrom&lt;usize&gt; <span class="kw">for </span>MailboxPriority {
+    <span class="kw">type </span>Error = ();
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MailboxPriority</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0</span> =&gt; <span class="ident">MailboxPriority::Idle</span>,
-            <span class="number">1</span> =&gt; <span class="ident">MailboxPriority::Low</span>,
-            <span class="number">2</span> =&gt; <span class="ident">MailboxPriority::High</span>,
-            <span class="number">3</span> =&gt; <span class="ident">MailboxPriority::Num</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(()),
+    <span class="kw">fn </span>try_from(value: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">match </span>value {
+            <span class="number">0 </span>=&gt; MailboxPriority::Idle,
+            <span class="number">1 </span>=&gt; MailboxPriority::Low,
+            <span class="number">2 </span>=&gt; MailboxPriority::High,
+            <span class="number">3 </span>=&gt; MailboxPriority::Num,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(()),
         })
     }
 }
-<span class="doccomment">/// The base struct for a device object.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeviceRepr</span> {
-    <span class="ident">kso_hdr</span>: <span class="ident">KsoHdr</span>,
-    <span class="kw">pub</span> <span class="ident">device_type</span>: <span class="ident">DeviceType</span>,
-    <span class="kw">pub</span> <span class="ident">bus_type</span>: <span class="ident">BusType</span>,
-    <span class="kw">pub</span> <span class="ident">device_id</span>: <span class="ident">DeviceId</span>,
-    <span class="kw">pub</span> <span class="ident">interrupts</span>: [<span class="ident">DeviceInterrupt</span>; <span class="ident">NUM_DEVICE_INTERRUPTS</span>],
-    <span class="kw">pub</span> <span class="ident">mailboxes</span>: [<span class="ident">AtomicU64</span>; <span class="ident">MailboxPriority::Num</span> <span class="kw">as</span> <span class="ident">usize</span>],
+<span class="doccomment">/// The base struct for a device object.
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>DeviceRepr {
+    kso_hdr: KsoHdr,
+    <span class="kw">pub </span>device_type: DeviceType,
+    <span class="kw">pub </span>bus_type: BusType,
+    <span class="kw">pub </span>device_id: DeviceId,
+    <span class="kw">pub </span>interrupts: [DeviceInterrupt; NUM_DEVICE_INTERRUPTS],
+    <span class="kw">pub </span>mailboxes: [AtomicU64; MailboxPriority::Num <span class="kw">as </span>usize],
 }
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::marker::BaseType</span> <span class="kw">for</span> <span class="ident">DeviceRepr</span> {
-    <span class="kw">fn</span> <span class="ident">init</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">_t</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl </span><span class="kw">crate</span>::marker::BaseType <span class="kw">for </span>DeviceRepr {
+    <span class="kw">fn </span>init&lt;T&gt;(_t: T) -&gt; <span class="self">Self </span>{
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">tags</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident"><span class="kw">crate</span>::marker::BaseVersion</span>, <span class="ident"><span class="kw">crate</span>::marker::BaseTag</span>)] {
+    <span class="kw">fn </span>tags() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(<span class="kw">crate</span>::marker::BaseVersion, <span class="kw">crate</span>::marker::BaseTag)] {
         <span class="macro">todo!</span>()
     }
 }
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">DeviceRepr</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">core::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">core::fmt::Result</span> {
+<span class="kw">impl </span>Display <span class="kw">for </span>DeviceRepr {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;Device::{{{:?}, {:?}, {:?}}}({})&quot;</span>,
-            <span class="self">self</span>.<span class="ident">device_type</span>, <span class="self">self</span>.<span class="ident">bus_type</span>, <span class="self">self</span>.<span class="ident">device_id</span>, <span class="self">self</span>.<span class="ident">kso_hdr</span>
+            <span class="self">self</span>.device_type, <span class="self">self</span>.bus_type, <span class="self">self</span>.device_id, <span class="self">self</span>.kso_hdr
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DeviceRepr</span> {
-    <span class="doccomment">/// Construct a new device repr.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">kso_hdr</span>: <span class="ident">KsoHdr</span>,
-        <span class="ident">device_type</span>: <span class="ident">DeviceType</span>,
-        <span class="ident">bus_type</span>: <span class="ident">BusType</span>,
-        <span class="ident">device_id</span>: <span class="ident">DeviceId</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="comment">// Clippy complains about this, but I don&#39;t know another way to do it cleanly.</span>
-        <span class="comment">// There probably is one, but I don&#39;t know it. Anyways, this is fine because we&#39;re</span>
-        <span class="comment">// never writing to V.</span>
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::declare_interior_mutable_const</span>)]</span>
-        <span class="kw">const</span> <span class="ident">V</span>: <span class="ident">DeviceInterrupt</span> <span class="op">=</span> <span class="ident">DeviceInterrupt</span> {
-            <span class="ident">sync</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
-            <span class="ident">vec</span>: <span class="ident">InterruptVector</span>(<span class="number">0</span>),
-            <span class="ident">flags</span>: <span class="ident">DeviceInterruptFlags::empty</span>(),
-            <span class="ident">taken</span>: <span class="ident">AtomicU16::new</span>(<span class="number">0</span>),
+<span class="kw">impl </span>DeviceRepr {
+    <span class="doccomment">/// Construct a new device repr.
+    </span><span class="kw">pub fn </span>new(
+        kso_hdr: KsoHdr,
+        device_type: DeviceType,
+        bus_type: BusType,
+        device_id: DeviceId,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Clippy complains about this, but I don&#39;t know another way to do it cleanly.
+        // There probably is one, but I don&#39;t know it. Anyways, this is fine because we&#39;re
+        // never writing to V.
+        </span><span class="attribute">#[allow(clippy::declare_interior_mutable_const)]
+        </span><span class="kw">const </span>V: DeviceInterrupt = DeviceInterrupt {
+            sync: AtomicU64::new(<span class="number">0</span>),
+            vec: InterruptVector(<span class="number">0</span>),
+            flags: DeviceInterruptFlags::empty(),
+            taken: AtomicU16::new(<span class="number">0</span>),
         };
-        <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">AtomicU64</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
-        <span class="self">Self</span> {
-            <span class="ident">kso_hdr</span>,
-            <span class="ident">device_type</span>,
-            <span class="ident">bus_type</span>,
-            <span class="ident">device_id</span>,
-            <span class="ident">interrupts</span>: [<span class="ident">V</span>; <span class="ident">NUM_DEVICE_INTERRUPTS</span>],
-            <span class="ident">mailboxes</span>: [<span class="ident">M</span>; <span class="ident">MailboxPriority::Num</span> <span class="kw">as</span> <span class="ident">usize</span>],
+        <span class="kw">const </span>M: AtomicU64 = AtomicU64::new(<span class="number">0</span>);
+        <span class="self">Self </span>{
+            kso_hdr,
+            device_type,
+            bus_type,
+            device_id,
+            interrupts: [V; NUM_DEVICE_INTERRUPTS],
+            mailboxes: [M; MailboxPriority::Num <span class="kw">as </span>usize],
         }
     }
 
-    <span class="doccomment">/// Block until an interrupt fires.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_for_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>, <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
-            <span class="kw">if</span> <span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="ident">val</span>;
+    <span class="doccomment">/// Block until an interrupt fires.
+    </span><span class="kw">pub fn </span>wait_for_interrupt(<span class="kw-2">&amp;</span><span class="self">self</span>, inum: usize, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; u64 {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>val = <span class="self">self</span>.interrupts[inum].sync.swap(<span class="number">0</span>, Ordering::SeqCst);
+            <span class="kw">if </span>val != <span class="number">0 </span>{
+                <span class="kw">return </span>val;
             }
-            <span class="comment">// Spin for a bit</span>
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-                <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>);
-                <span class="kw">if</span> <span class="ident">val</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
+            <span class="comment">// Spin for a bit
+            </span><span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+                <span class="kw">let </span>val = <span class="self">self</span>.interrupts[inum].sync.load(Ordering::SeqCst);
+                <span class="kw">if </span>val != <span class="number">0 </span>{
+                    <span class="kw">return </span><span class="self">self</span>.interrupts[inum].sync.swap(<span class="number">0</span>, Ordering::SeqCst);
                 }
             }
-            <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ThreadSync::new_sleep</span>(<span class="ident">ThreadSyncSleep::new</span>(
-                <span class="ident">ThreadSyncReference::Virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">AtomicU64</span>),
+            <span class="kw">let </span>op = ThreadSync::new_sleep(ThreadSyncSleep::new(
+                ThreadSyncReference::Virtual(<span class="kw-2">&amp;</span><span class="self">self</span>.interrupts[inum].sync <span class="kw">as </span><span class="kw-2">*const </span>AtomicU64),
                 <span class="number">0</span>,
-                <span class="ident">ThreadSyncOp::Equal</span>,
-                <span class="ident">ThreadSyncFlags::empty</span>(),
+                ThreadSyncOp::Equal,
+                ThreadSyncFlags::empty(),
             ));
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::syscall::sys_thread_sync</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">op</span>], <span class="ident">timeout</span>);
-            <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="number">0</span>;
+            <span class="kw">let </span>res = <span class="kw">crate</span>::syscall::sys_thread_sync(<span class="kw-2">&amp;mut </span>[op], timeout);
+            <span class="kw">if </span>res.is_err() {
+                <span class="kw">return </span><span class="number">0</span>;
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_interrupt_sleep</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ThreadSyncSleep</span> {
-        <span class="ident">ThreadSyncSleep</span> {
-            <span class="ident">reference</span>: <span class="ident">ThreadSyncReference::Virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>),
-            <span class="ident">value</span>: <span class="number">0</span>,
-            <span class="ident">op</span>: <span class="ident">ThreadSyncOp::Equal</span>,
-            <span class="ident">flags</span>: <span class="ident">ThreadSyncFlags::empty</span>(),
+    <span class="kw">pub fn </span>setup_interrupt_sleep(<span class="kw-2">&amp;</span><span class="self">self</span>, inum: usize) -&gt; ThreadSyncSleep {
+        ThreadSyncSleep {
+            reference: ThreadSyncReference::Virtual(<span class="kw-2">&amp;</span><span class="self">self</span>.interrupts[inum].sync),
+            value: <span class="number">0</span>,
+            op: ThreadSyncOp::Equal,
+            flags: ThreadSyncFlags::empty(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">submit_mailbox_msg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mb</span>: <span class="ident">MailboxPriority</span>, <span class="ident">msg</span>: <span class="ident">u64</span>) {
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">mailboxes</span>[<span class="ident">mb</span> <span class="kw">as</span> <span class="ident">usize</span>]
-            .<span class="ident">compare_exchange</span>(<span class="number">0</span>, <span class="ident">msg</span>, <span class="ident">Ordering::SeqCst</span>, <span class="ident">Ordering::SeqCst</span>)
-            .<span class="ident">is_err</span>()
+    <span class="kw">pub fn </span>submit_mailbox_msg(<span class="kw-2">&amp;</span><span class="self">self</span>, mb: MailboxPriority, msg: u64) {
+        <span class="kw">while </span><span class="self">self</span>.mailboxes[mb <span class="kw">as </span>usize]
+            .compare_exchange(<span class="number">0</span>, msg, Ordering::SeqCst, Ordering::SeqCst)
+            .is_err()
         {
-            <span class="ident">core::hint::spin_loop</span>()
+            core::hint::spin_loop()
         }
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sys_thread_sync</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">ThreadSync::new_wake</span>(<span class="ident">ThreadSyncWake::new</span>(
-                <span class="ident">ThreadSyncReference::Virtual</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">mailboxes</span>[<span class="ident">mb</span> <span class="kw">as</span> <span class="ident">usize</span>]),
-                <span class="ident">usize::MAX</span>,
+        <span class="kw">let _ </span>= sys_thread_sync(
+            <span class="kw-2">&amp;mut </span>[ThreadSync::new_wake(ThreadSyncWake::new(
+                ThreadSyncReference::Virtual(<span class="kw-2">&amp;</span><span class="self">self</span>.mailboxes[mb <span class="kw">as </span>usize]),
+                usize::MAX,
             ))],
             <span class="prelude-val">None</span>,
         );
     }
 
-    <span class="doccomment">/// Poll an interrupt vector to see if it has fired.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_for_interrupt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>)
+    <span class="doccomment">/// Poll an interrupt vector to see if it has fired.
+    </span><span class="kw">pub fn </span>check_for_interrupt(<span class="kw-2">&amp;</span><span class="self">self</span>, inum: usize) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="kw">let </span>val = <span class="self">self</span>.interrupts[inum].sync.swap(<span class="number">0</span>, Ordering::SeqCst);
+        <span class="kw">if </span>val == <span class="number">0 </span>{
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(val)
         }
     }
 
-    <span class="doccomment">/// Poll an interrupt vector to see if it has fired.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_for_mailbox</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inum</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mailboxes</span>[<span class="ident">inum</span>].<span class="ident">swap</span>(<span class="number">0</span>, <span class="ident">Ordering::SeqCst</span>);
-        <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>)
+    <span class="doccomment">/// Poll an interrupt vector to see if it has fired.
+    </span><span class="kw">pub fn </span>check_for_mailbox(<span class="kw-2">&amp;</span><span class="self">self</span>, inum: usize) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="kw">let </span>val = <span class="self">self</span>.mailboxes[inum].swap(<span class="number">0</span>, Ordering::SeqCst);
+        <span class="kw">if </span>val == <span class="number">0 </span>{
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(val)
         }
     }
 
-    <span class="doccomment">/// Register an interrupt vector with this device.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">register_interrupt</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">inum</span>: <span class="ident">usize</span>,
-        <span class="ident">vec</span>: <span class="ident">InterruptVector</span>,
-        <span class="ident">flags</span>: <span class="ident">DeviceInterruptFlags</span>,
+    <span class="doccomment">/// Register an interrupt vector with this device.
+    </span><span class="kw">pub fn </span>register_interrupt(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        inum: usize,
+        vec: InterruptVector,
+        flags: DeviceInterruptFlags,
     ) {
-        <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">vec</span> <span class="op">=</span> <span class="ident">vec</span>;
-        <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">flags</span> <span class="op">=</span> <span class="ident">flags</span>;
-        <span class="self">self</span>.<span class="ident">interrupts</span>[<span class="ident">inum</span>].<span class="ident">sync</span> <span class="op">=</span> <span class="ident">AtomicU64::new</span>(<span class="number">0</span>);
+        <span class="self">self</span>.interrupts[inum].vec = vec;
+        <span class="self">self</span>.interrupts[inum].flags = flags;
+        <span class="self">self</span>.interrupts[inum].sync = AtomicU64::new(<span class="number">0</span>);
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

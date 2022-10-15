@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-driver&#x2F;src&#x2F;request&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_driver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-driver/src/request/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_driver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -58,67 +58,65 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A system for handling requests and organizing inflight requests while waiting for responses.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The general structure of this system is that software implements the [RequestDriver] trait with</span>
-<span class="doccomment">//! some struct that we&#39;ll call &quot;the request driver&quot; or just &quot;the driver&quot;. The driver is then</span>
-<span class="doccomment">//! wrapped by a [Requester], which internally manages the asynchrony of talking to devices.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A user of the requester can call the [Requester::submit] or [Requester::submit_for_response]</span>
-<span class="doccomment">//! functions to submit a set a requests depending on if the caller wants the responses or just</span>
-<span class="doccomment">//! wants to know if the requests succeeded. The reason this distinction is maintained is that</span>
-<span class="doccomment">//! collecting responses has an overhead. The requester interacts with the driver to submit the requests.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Internally, the requester assigns IDs to requests for use in communicating with the driver.</span>
-<span class="doccomment">//! These IDs are not necessarily allocated sequentially and can only be relied upon to be unique</span>
-<span class="doccomment">//! while a given request is inflight.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Once a request is completed by the driver, the driver should send the response data and ID of</span>
-<span class="doccomment">//! the request that completed back to the requester with the [Requester::finish] function. The</span>
-<span class="doccomment">//! request manager will then collate the responses for matching with the requests and any errors</span>
-<span class="doccomment">//! are tracked. Once all requests in a submitted set have been completed, that set of requests is</span>
-<span class="doccomment">//! finished and awaiting on it will return a [SubmitSummary] or a [SubmitSummaryWithResponses].</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A system for handling requests and organizing inflight requests while waiting for responses.
+//!
+//! The general structure of this system is that software implements the [RequestDriver] trait with
+//! some struct that we&#39;ll call &quot;the request driver&quot; or just &quot;the driver&quot;. The driver is then
+//! wrapped by a [Requester], which internally manages the asynchrony of talking to devices.
+//!
+//! A user of the requester can call the [Requester::submit] or [Requester::submit_for_response]
+//! functions to submit a set a requests depending on if the caller wants the responses or just
+//! wants to know if the requests succeeded. The reason this distinction is maintained is that
+//! collecting responses has an overhead. The requester interacts with the driver to submit the requests.
+//!
+//! Internally, the requester assigns IDs to requests for use in communicating with the driver.
+//! These IDs are not necessarily allocated sequentially and can only be relied upon to be unique
+//! while a given request is inflight.
+//!
+//! Once a request is completed by the driver, the driver should send the response data and ID of
+//! the request that completed back to the requester with the [Requester::finish] function. The
+//! request manager will then collate the responses for matching with the requests and any errors
+//! are tracked. Once all requests in a submitted set have been completed, that set of requests is
+//! finished and awaiting on it will return a [SubmitSummary] or a [SubmitSummaryWithResponses].
 
-<span class="kw">mod</span> <span class="ident">async_ids</span>;
-<span class="kw">mod</span> <span class="ident">inflight</span>;
-<span class="kw">mod</span> <span class="ident">requester</span>;
-<span class="kw">mod</span> <span class="ident">response_info</span>;
-<span class="kw">mod</span> <span class="ident">submit</span>;
-<span class="kw">mod</span> <span class="ident">summary</span>;
+</span><span class="kw">mod </span>async_ids;
+<span class="kw">mod </span>inflight;
+<span class="kw">mod </span>requester;
+<span class="kw">mod </span>response_info;
+<span class="kw">mod </span>submit;
+<span class="kw">mod </span>summary;
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="doccomment">/// A trait implemented by a particular driver that can the be used by a [requester::Requester].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RequestDriver</span> {
-    <span class="doccomment">/// The type of a request that will be used by the SubmitRequest wrapper to submit requests to</span>
-    <span class="doccomment">/// the driver.</span>
-    <span class="kw">type</span> <span class="ident">Request</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Send</span>;
-    <span class="doccomment">/// The type of a response to a request that we will use to send back to the Requester via the</span>
-    <span class="doccomment">/// [requester::Requester::finish] function.</span>
-    <span class="kw">type</span> <span class="ident">Response</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Send</span>;
-    <span class="doccomment">/// The type of a submit error in case submission fails.</span>
-    <span class="kw">type</span> <span class="ident">SubmitError</span>;
-    <span class="doccomment">/// The actual submit function. The driver should perform whatever device-specific submission</span>
-    <span class="doccomment">/// procedure it needs to to submit all requests.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">submit</span>(
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="doccomment">/// A trait implemented by a particular driver that can the be used by a [requester::Requester].
+</span><span class="kw">pub trait </span>RequestDriver {
+    <span class="doccomment">/// The type of a request that will be used by the SubmitRequest wrapper to submit requests to
+    /// the driver.
+    </span><span class="kw">type </span>Request: Copy + Send;
+    <span class="doccomment">/// The type of a response to a request that we will use to send back to the Requester via the
+    /// [requester::Requester::finish] function.
+    </span><span class="kw">type </span>Response: Copy + Send;
+    <span class="doccomment">/// The type of a submit error in case submission fails.
+    </span><span class="kw">type </span>SubmitError;
+    <span class="doccomment">/// The actual submit function. The driver should perform whatever device-specific submission
+    /// procedure it needs to to submit all requests.
+    </span><span class="kw">async fn </span>submit(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">reqs</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">SubmitRequest</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Request</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::SubmitError</span><span class="op">&gt;</span>;
-    <span class="doccomment">/// Manually flush any internal driver submission queue.</span>
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
-    <span class="doccomment">/// The number of IDs to have in-flight at a time.</span>
-    <span class="kw">const</span> <span class="ident">NUM_IDS</span>: <span class="ident">usize</span>;
+        reqs: <span class="kw-2">&amp;mut </span>[SubmitRequest&lt;<span class="self">Self</span>::Request&gt;],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::SubmitError&gt;;
+    <span class="doccomment">/// Manually flush any internal driver submission queue.
+    </span><span class="kw">fn </span>flush(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="doccomment">/// The number of IDs to have in-flight at a time.
+    </span><span class="kw">const </span>NUM_IDS: usize;
 }
 
-<span class="comment">// TODO: drop for inflight tracker, so we can remove it to save work?</span>
+<span class="comment">// TODO: drop for inflight tracker, so we can remove it to save work?
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">inflight::InFlightFuture</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">inflight::InFlightFutureWithResponses</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">requester::Requester</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">response_info::ResponseInfo</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">submit::SubmitRequest</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">summary::SubmitSummary</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">summary::SubmitSummaryWithResponses</span>;
+</span><span class="kw">pub use </span>inflight::InFlightFuture;
+<span class="kw">pub use </span>inflight::InFlightFutureWithResponses;
+<span class="kw">pub use </span>requester::Requester;
+<span class="kw">pub use </span>response_info::ResponseInfo;
+<span class="kw">pub use </span>submit::SubmitRequest;
+<span class="kw">pub use </span>summary::SubmitSummary;
+<span class="kw">pub use </span>summary::SubmitSummaryWithResponses;
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

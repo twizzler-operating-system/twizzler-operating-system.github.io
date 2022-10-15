@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-driver&#x2F;src&#x2F;dma&#x2F;object.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>object.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_driver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-driver/src/dma/object.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>object.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_driver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -95,104 +95,102 @@
 <span id="95">95</span>
 <span id="96">96</span>
 <span id="97">97</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Mutex;
 
-<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
-    <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionFlags</span>, <span class="ident">KactionGenericCmd</span>},
-    <span class="ident">object</span>::{<span class="ident">MAX_SIZE</span>, <span class="ident">NULLPAGE_SIZE</span>},
-    <span class="ident">syscall::sys_kaction</span>,
+<span class="kw">use </span>twizzler_abi::{
+    kso::{KactionCmd, KactionFlags, KactionGenericCmd},
+    object::{MAX_SIZE, NULLPAGE_SIZE},
+    syscall::sys_kaction,
 };
-<span class="kw">use</span> <span class="ident">twizzler_object</span>::{<span class="ident">ObjID</span>, <span class="ident">Object</span>};
+<span class="kw">use </span>twizzler_object::{ObjID, Object};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Access</span>, <span class="ident">DeviceSync</span>, <span class="ident">DmaOptions</span>, <span class="ident">DmaRegion</span>, <span class="ident">DmaSliceRegion</span>};
+<span class="kw">use super</span>::{Access, DeviceSync, DmaOptions, DmaRegion, DmaSliceRegion};
 
-<span class="doccomment">/// A handle for an object that can be used to perform DMA, and is most useful directly as a way to</span>
-<span class="doccomment">/// perform DMA operations on a specific object. For an allocator-like DMA interface, see [crate::dma::DmaPool].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmaObject</span> {
-    <span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">releasable_pins</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A handle for an object that can be used to perform DMA, and is most useful directly as a way to
+/// perform DMA operations on a specific object. For an allocator-like DMA interface, see [crate::dma::DmaPool].
+</span><span class="kw">pub struct </span>DmaObject {
+    obj: Object&lt;()&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) releasable_pins: Mutex&lt;Vec&lt;u32&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DmaObject</span> {
-    <span class="doccomment">/// Create a [DmaSliceRegion] from the base of this object, where the region represents memory</span>
-    <span class="doccomment">/// of type `[T; len]`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slice_region</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">len</span>: <span class="ident">usize</span>,
-        <span class="ident">access</span>: <span class="ident">Access</span>,
-        <span class="ident">options</span>: <span class="ident">DmaOptions</span>,
-    ) -&gt; <span class="ident">DmaSliceRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">nr_bytes</span> <span class="op">=</span> <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
-            .<span class="ident">checked_mul</span>(<span class="ident">len</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Value of len too large&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">nr_bytes</span> <span class="op">&lt;</span> <span class="ident">MAX_SIZE</span> <span class="op">-</span> <span class="ident">NULLPAGE_SIZE</span> <span class="op">*</span> <span class="number">2</span>);
-        <span class="ident">DmaSliceRegion::new</span>(
+<span class="kw">impl </span>DmaObject {
+    <span class="doccomment">/// Create a [DmaSliceRegion] from the base of this object, where the region represents memory
+    /// of type `[T; len]`.
+    </span><span class="kw">pub fn </span>slice_region&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        len: usize,
+        access: Access,
+        options: DmaOptions,
+    ) -&gt; DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        <span class="kw">let </span>nr_bytes = core::mem::size_of::&lt;T&gt;()
+            .checked_mul(len)
+            .expect(<span class="string">&quot;Value of len too large&quot;</span>);
+        <span class="macro">assert!</span>(nr_bytes &lt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2</span>);
+        DmaSliceRegion::new(
             <span class="prelude-val">Some</span>(<span class="self">self</span>),
-            <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="ident">len</span>,
-            <span class="ident">access</span>,
-            <span class="ident">options</span>,
-            <span class="ident">NULLPAGE_SIZE</span>,
-            <span class="ident">len</span>,
+            core::mem::size_of::&lt;T&gt;() * len,
+            access,
+            options,
+            NULLPAGE_SIZE,
+            len,
             <span class="prelude-val">None</span>,
         )
     }
 
-    <span class="doccomment">/// Create a [DmaRegion] from the base of this object, where the region represents memory</span>
-    <span class="doccomment">/// of type `T`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">DeviceSync</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">access</span>: <span class="ident">Access</span>,
-        <span class="ident">options</span>: <span class="ident">DmaOptions</span>,
-    ) -&gt; <span class="ident">DmaRegion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">DmaRegion::new</span>(
+    <span class="doccomment">/// Create a [DmaRegion] from the base of this object, where the region represents memory
+    /// of type `T`.
+    </span><span class="kw">pub fn </span>region&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        access: Access,
+        options: DmaOptions,
+    ) -&gt; DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        DmaRegion::new(
             <span class="prelude-val">Some</span>(<span class="self">self</span>),
-            <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(),
-            <span class="ident">access</span>,
-            <span class="ident">options</span>,
-            <span class="ident">NULLPAGE_SIZE</span>,
+            core::mem::size_of::&lt;T&gt;(),
+            access,
+            options,
+            NULLPAGE_SIZE,
             <span class="prelude-val">None</span>,
         )
     }
 
-    <span class="doccomment">/// Get a reference to the object handle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Object</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">obj</span>
+    <span class="doccomment">/// Get a reference to the object handle.
+    </span><span class="kw">pub fn </span>object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Object&lt;()&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.obj
     }
 
-    <span class="doccomment">/// Create a new [DmaObject] from an existing object handle.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">obj</span>: <span class="kw">unsafe</span> { <span class="ident">obj</span>.<span class="ident">transmute</span>() },
-            <span class="ident">releasable_pins</span>: <span class="ident">Mutex::new</span>(<span class="ident">Vec::new</span>()),
+    <span class="doccomment">/// Create a new [DmaObject] from an existing object handle.
+    </span><span class="kw">pub fn </span>new&lt;T&gt;(obj: Object&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            obj: <span class="kw">unsafe </span>{ obj.transmute() },
+            releasable_pins: Mutex::new(Vec::new()),
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">release_pin</span>(<span class="ident">id</span>: <span class="ident">ObjID</span>, <span class="ident">token</span>: <span class="ident">u32</span>) {
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sys_kaction</span>(
-        <span class="ident">KactionCmd::Generic</span>(<span class="ident">KactionGenericCmd::ReleasePin</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">id</span>),
-        <span class="ident">token</span> <span class="kw">as</span> <span class="ident">u64</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>release_pin(id: ObjID, token: u32) {
+    <span class="kw">let _ </span>= sys_kaction(
+        KactionCmd::Generic(KactionGenericCmd::ReleasePin),
+        <span class="prelude-val">Some</span>(id),
+        token <span class="kw">as </span>u64,
         <span class="number">0</span>,
-        <span class="ident">KactionFlags::empty</span>(),
+        KactionFlags::empty(),
     );
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DmaObject</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">pins</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">releasable_pins</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">for</span> <span class="ident">pin</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pins</span> {
-            <span class="ident">release_pin</span>(<span class="self">self</span>.<span class="ident">object</span>().<span class="ident">id</span>(), <span class="kw-2">*</span><span class="ident">pin</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>DmaObject {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>pins = <span class="self">self</span>.releasable_pins.lock().unwrap();
+        <span class="kw">for </span>pin <span class="kw">in </span><span class="kw-2">&amp;*</span>pins {
+            release_pin(<span class="self">self</span>.object().id(), <span class="kw-2">*</span>pin);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DmaObject</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">obj</span>: <span class="ident">Object</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">obj</span>)
+<span class="kw">impl</span>&lt;T&gt; From&lt;Object&lt;T&gt;&gt; <span class="kw">for </span>DmaObject {
+    <span class="kw">fn </span>from(obj: Object&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(obj)
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

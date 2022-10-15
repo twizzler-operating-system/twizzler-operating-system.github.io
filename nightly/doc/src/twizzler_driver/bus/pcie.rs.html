@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-driver&#x2F;src&#x2F;bus&#x2F;pcie.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pcie.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_driver/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-driver/src/bus/pcie.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pcie.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_driver/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_driver/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -215,224 +215,222 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-</pre><pre class="rust"><code><span class="doccomment">//! PCIe-specific functionality.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! PCIe-specific functionality.
 
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
+</span><span class="kw">use </span>std::ptr::NonNull;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">twizzler_abi::device::bus::pcie</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">twizzler_abi</span>::{
-    <span class="ident">device::InterruptVector</span>,
-    <span class="ident">kso</span>::{<span class="ident">KactionCmd</span>, <span class="ident">KactionError</span>, <span class="ident">KactionFlags</span>},
-    <span class="ident">vcell::Volatile</span>,
+<span class="kw">pub use </span>twizzler_abi::device::bus::pcie::<span class="kw-2">*</span>;
+<span class="kw">use </span>twizzler_abi::{
+    device::InterruptVector,
+    kso::{KactionCmd, KactionError, KactionFlags},
+    vcell::Volatile,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::device</span>::{<span class="ident">events::InterruptAllocationError</span>, <span class="ident">Device</span>, <span class="ident">MmioObject</span>};
+<span class="kw">use </span><span class="kw">crate</span>::device::{events::InterruptAllocationError, Device, MmioObject};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PcieCapabilityIterator</span> {
-    <span class="ident">cfg</span>: <span class="ident">MmioObject</span>,
-    <span class="ident">off</span>: <span class="ident">usize</span>,
+<span class="kw">pub struct </span>PcieCapabilityIterator {
+    cfg: MmioObject,
+    off: usize,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PcieCapabilityHeader</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u8</span>,
-    <span class="kw">pub</span> <span class="ident">next</span>: <span class="ident">u8</span>,
+<span class="attribute">#[derive(Debug)]
+#[allow(dead_code)]
+#[repr(packed)]
+</span><span class="kw">pub struct </span>PcieCapabilityHeader {
+    <span class="kw">pub </span>id: u8,
+    <span class="kw">pub </span>next: u8,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MsiCapability</span> {
-    <span class="kw">pub</span> <span class="ident">header</span>: <span class="ident">PcieCapabilityHeader</span>,
-    <span class="kw">pub</span> <span class="ident">msg_ctrl</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">msg_addr_low</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">msg_addr_hi</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">msg_data</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">resv</span>: <span class="ident">u16</span>,
-    <span class="kw">pub</span> <span class="ident">mask</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">pending</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(unaligned_references)]
+#[derive(Debug)]
+#[repr(packed)]
+</span><span class="kw">pub struct </span>MsiCapability {
+    <span class="kw">pub </span>header: PcieCapabilityHeader,
+    <span class="kw">pub </span>msg_ctrl: Volatile&lt;u16&gt;,
+    <span class="kw">pub </span>msg_addr_low: Volatile&lt;u32&gt;,
+    <span class="kw">pub </span>msg_addr_hi: Volatile&lt;u32&gt;,
+    <span class="kw">pub </span>msg_data: Volatile&lt;u16&gt;,
+    <span class="kw">pub </span>resv: u16,
+    <span class="kw">pub </span>mask: Volatile&lt;u32&gt;,
+    <span class="kw">pub </span>pending: Volatile&lt;u32&gt;,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MsixCapability</span> {
-    <span class="kw">pub</span> <span class="ident">header</span>: <span class="ident">PcieCapabilityHeader</span>,
-    <span class="kw">pub</span> <span class="ident">msg_ctrl</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">table_offset_and_bir</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">pending_offset_and_bir</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(unaligned_references)]
+#[derive(Debug)]
+#[repr(packed)]
+</span><span class="kw">pub struct </span>MsixCapability {
+    <span class="kw">pub </span>header: PcieCapabilityHeader,
+    <span class="kw">pub </span>msg_ctrl: Volatile&lt;u16&gt;,
+    <span class="kw">pub </span>table_offset_and_bir: Volatile&lt;u32&gt;,
+    <span class="kw">pub </span>pending_offset_and_bir: Volatile&lt;u32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">MsixCapability</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">get_table_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">u8</span>, <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_offset_and_bir</span>.<span class="ident">get</span>();
-        ((<span class="ident">info</span> <span class="op">&amp;</span> <span class="number">0x7</span>) <span class="kw">as</span> <span class="ident">u8</span>, (<span class="ident">info</span> <span class="op">&amp;</span> <span class="op">!</span><span class="number">0x7</span>) <span class="kw">as</span> <span class="ident">usize</span>)
+<span class="kw">impl </span>MsixCapability {
+    <span class="attribute">#[allow(unaligned_references)]
+    </span><span class="kw">fn </span>get_table_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u8, usize) {
+        <span class="kw">let </span>info = <span class="self">self</span>.table_offset_and_bir.get();
+        ((info &amp; <span class="number">0x7</span>) <span class="kw">as </span>u8, (info &amp; !<span class="number">0x7</span>) <span class="kw">as </span>usize)
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">table_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        (<span class="self">self</span>.<span class="ident">msg_ctrl</span>.<span class="ident">get</span>() <span class="op">&amp;</span> <span class="number">0x7ff</span>) <span class="kw">as</span> <span class="ident">usize</span>
+    <span class="attribute">#[allow(unaligned_references)]
+    </span><span class="kw">fn </span>table_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        (<span class="self">self</span>.msg_ctrl.get() &amp; <span class="number">0x7ff</span>) <span class="kw">as </span>usize
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">packed</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MsixTableEntry</span> {
-    <span class="ident">msg_addr_lo</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">msg_addr_hi</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">msg_data</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">vec_ctrl</span>: <span class="ident">Volatile</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(unaligned_references)]
+#[derive(Debug)]
+#[repr(packed)]
+</span><span class="kw">pub struct </span>MsixTableEntry {
+    msg_addr_lo: Volatile&lt;u32&gt;,
+    msg_addr_hi: Volatile&lt;u32&gt;,
+    msg_data: Volatile&lt;u32&gt;,
+    vec_ctrl: Volatile&lt;u32&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PcieCapability</span> {
-    <span class="ident">Unknown</span>(<span class="ident">u8</span>),
-    <span class="ident">Msi</span>(<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">MsiCapability</span><span class="op">&gt;</span>),
-    <span class="ident">MsiX</span>(<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">MsixCapability</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>PcieCapability {
+    Unknown(u8),
+    Msi(NonNull&lt;MsiCapability&gt;),
+    MsiX(NonNull&lt;MsixCapability&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">PcieCapabilityIterator</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">PcieCapability</span>;
+<span class="kw">impl </span>Iterator <span class="kw">for </span>PcieCapabilityIterator {
+    <span class="kw">type </span>Item = PcieCapability;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">off</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.off == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">get_mmio_offset</span>::<span class="op">&lt;</span><span class="ident">PcieCapabilityHeader</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">off</span>);
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">cap</span>.<span class="ident">id</span> {
-                <span class="number">5</span> =&gt; {
-                    <span class="ident">PcieCapability::Msi</span>(<span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">get_mmio_offset</span>::<span class="op">&lt;</span><span class="ident">MsiCapability</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">off</span>).<span class="ident">into</span>())
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>cap = <span class="self">self</span>.cfg.get_mmio_offset::&lt;PcieCapabilityHeader&gt;(<span class="self">self</span>.off);
+            <span class="kw">let </span>ret = <span class="kw">match </span>cap.id {
+                <span class="number">5 </span>=&gt; {
+                    PcieCapability::Msi(<span class="self">self</span>.cfg.get_mmio_offset::&lt;MsiCapability&gt;(<span class="self">self</span>.off).into())
                 }
-                <span class="number">0x11</span> =&gt; <span class="ident">PcieCapability::MsiX</span>(
-                    <span class="self">self</span>.<span class="ident">cfg</span>.<span class="ident">get_mmio_offset</span>::<span class="op">&lt;</span><span class="ident">MsixCapability</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">off</span>).<span class="ident">into</span>(),
+                <span class="number">0x11 </span>=&gt; PcieCapability::MsiX(
+                    <span class="self">self</span>.cfg.get_mmio_offset::&lt;MsixCapability&gt;(<span class="self">self</span>.off).into(),
                 ),
-                <span class="ident">x</span> =&gt; <span class="ident">PcieCapability::Unknown</span>(<span class="ident">x</span>),
+                x =&gt; PcieCapability::Unknown(x),
             };
-            <span class="self">self</span>.<span class="ident">off</span> <span class="op">=</span> (<span class="ident">cap</span>.<span class="ident">next</span> <span class="op">&amp;</span> <span class="number">0xfc</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">ret</span>)
+            <span class="self">self</span>.off = (cap.next &amp; <span class="number">0xfc</span>) <span class="kw">as </span>usize;
+            <span class="prelude-val">Some</span>(ret)
         }
     }
 }
 
-<span class="comment">// TODO: allow for dest-ID and other options, and propegate all this stuff through the API.</span>
-<span class="kw">fn</span> <span class="ident">calc_msg_info</span>(<span class="ident">vec</span>: <span class="ident">InterruptVector</span>, <span class="ident">level</span>: <span class="ident">bool</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u32</span>) {
-    <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> (<span class="number">0xfee</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>) <span class="op">|</span> (<span class="number">0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>);
-    <span class="kw">let</span> <span class="ident">data</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">vec</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span> <span class="op">|</span> <span class="kw">if</span> <span class="ident">level</span> { <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span> } <span class="kw">else</span> { <span class="number">0</span> };
-    (<span class="ident">addr</span>, <span class="ident">data</span>)
+<span class="comment">// TODO: allow for dest-ID and other options, and propegate all this stuff through the API.
+</span><span class="kw">fn </span>calc_msg_info(vec: InterruptVector, level: bool) -&gt; (u64, u32) {
+    <span class="kw">let </span>addr = (<span class="number">0xfee </span>&lt;&lt; <span class="number">20</span>) | (<span class="number">0 </span>&lt;&lt; <span class="number">12</span>);
+    <span class="kw">let </span>data: u32 = vec.into();
+    <span class="kw">let </span>data = data | <span class="kw">if </span>level { <span class="number">1 </span>&lt;&lt; <span class="number">15 </span>} <span class="kw">else </span>{ <span class="number">0 </span>};
+    (addr, data)
 }
 
-<span class="kw">impl</span> <span class="ident">Device</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">pcie_capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PcieCapabilityIterator</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mmio</span>(<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">mm</span>.<span class="ident">get_mmio_offset</span>::<span class="op">&lt;</span><span class="ident">PcieDeviceHeader</span><span class="op">&gt;</span>(<span class="number">0</span>) };
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">cfg</span>.<span class="ident">cap_ptr</span>.<span class="ident">get</span>() <span class="op">&amp;</span> <span class="number">0xfc</span>;
-        <span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">fnheader</span>.<span class="ident">status</span>.<span class="ident">get</span>() <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>) <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>Device {
+    <span class="attribute">#[allow(unaligned_references)]
+    </span><span class="kw">fn </span>pcie_capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PcieCapabilityIterator&gt; {
+        <span class="kw">let </span>mm = <span class="self">self</span>.get_mmio(<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cfg = <span class="kw">unsafe </span>{ mm.get_mmio_offset::&lt;PcieDeviceHeader&gt;(<span class="number">0</span>) };
+        <span class="kw">let </span>ptr = cfg.cap_ptr.get() &amp; <span class="number">0xfc</span>;
+        <span class="kw">if </span>cfg.fnheader.status.get() &amp; (<span class="number">1 </span>&lt;&lt; <span class="number">4</span>) == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">PcieCapabilityIterator</span> {
-            <span class="ident">cfg</span>: <span class="ident">mm</span>,
-            <span class="ident">off</span>: <span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        <span class="prelude-val">Some</span>(PcieCapabilityIterator {
+            cfg: mm,
+            off: ptr <span class="kw">as </span>usize,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">find_mmio_bar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bar</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MmioObject</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mm</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mmio</span>(<span class="ident">idx</span>) {
-            <span class="kw">if</span> <span class="ident">mm</span>.<span class="ident">get_info</span>().<span class="ident">info</span> <span class="op">==</span> <span class="ident">bar</span> <span class="kw">as</span> <span class="ident">u64</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">mm</span>);
+    <span class="kw">fn </span>find_mmio_bar(<span class="kw-2">&amp;</span><span class="self">self</span>, bar: usize) -&gt; <span class="prelude-ty">Option</span>&lt;MmioObject&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>idx = <span class="number">0</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(mm) = <span class="self">self</span>.get_mmio(idx) {
+            <span class="kw">if </span>mm.get_info().info == bar <span class="kw">as </span>u64 {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(mm);
             }
-            <span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            idx += <span class="number">1</span>;
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unaligned_references</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">allocate_msix_interrupt</span>(
+    <span class="attribute">#[allow(unaligned_references)]
+    </span><span class="kw">fn </span>allocate_msix_interrupt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">msix</span>: <span class="kw-2">&amp;</span><span class="ident">MsixCapability</span>,
-        <span class="ident">vec</span>: <span class="ident">InterruptVector</span>,
-        <span class="ident">inum</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">InterruptAllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">bar</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="ident">msix</span>.<span class="ident">get_table_info</span>();
-        <span class="ident">msix</span>.<span class="ident">msg_ctrl</span>.<span class="ident">set</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>);
-        <span class="kw">let</span> <span class="ident">mmio</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">find_mmio_bar</span>(<span class="ident">bar</span>.<span class="ident">into</span>())
-            .<span class="ident">ok_or</span>(<span class="ident">InterruptAllocationError::Unsupported</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">mmio</span>.<span class="ident">get_mmio_offset</span>::<span class="op">&lt;</span><span class="ident">MsixTableEntry</span><span class="op">&gt;</span>(<span class="ident">offset</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">MsixTableEntry</span>
-                <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MsixTableEntry</span>;
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">msix</span>.<span class="ident">table_len</span>();
-            <span class="ident">core::slice::from_raw_parts_mut</span>(<span class="ident">start</span>, <span class="ident">len</span>)
+        msix: <span class="kw-2">&amp;</span>MsixCapability,
+        vec: InterruptVector,
+        inum: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u32, InterruptAllocationError&gt; {
+        <span class="kw">let </span>(bar, offset) = msix.get_table_info();
+        msix.msg_ctrl.set(<span class="number">1 </span>&lt;&lt; <span class="number">15</span>);
+        <span class="kw">let </span>mmio = <span class="self">self
+            </span>.find_mmio_bar(bar.into())
+            .ok_or(InterruptAllocationError::Unsupported)<span class="question-mark">?</span>;
+        <span class="kw">let </span>table = <span class="kw">unsafe </span>{
+            <span class="kw">let </span>start = mmio.get_mmio_offset::&lt;MsixTableEntry&gt;(offset) <span class="kw">as </span><span class="kw-2">*const </span>MsixTableEntry
+                <span class="kw">as </span><span class="kw-2">*mut </span>MsixTableEntry;
+            <span class="kw">let </span>len = msix.table_len();
+            core::slice::from_raw_parts_mut(start, len)
         };
-        <span class="kw">let</span> (<span class="ident">msg_addr</span>, <span class="ident">msg_data</span>) <span class="op">=</span> <span class="ident">calc_msg_info</span>(<span class="ident">vec</span>, <span class="bool-val">false</span>);
-        <span class="ident">table</span>[<span class="ident">inum</span>].<span class="ident">msg_addr_lo</span>.<span class="ident">set</span>(<span class="ident">msg_addr</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">table</span>[<span class="ident">inum</span>].<span class="ident">msg_addr_hi</span>.<span class="ident">set</span>((<span class="ident">msg_addr</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="ident">table</span>[<span class="ident">inum</span>].<span class="ident">msg_data</span>.<span class="ident">set</span>(<span class="ident">msg_data</span>);
-        <span class="ident">table</span>[<span class="ident">inum</span>].<span class="ident">vec_ctrl</span>.<span class="ident">set</span>(<span class="number">0</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">inum</span> <span class="kw">as</span> <span class="ident">u32</span>)
+        <span class="kw">let </span>(msg_addr, msg_data) = calc_msg_info(vec, <span class="bool-val">false</span>);
+        table[inum].msg_addr_lo.set(msg_addr <span class="kw">as </span>u32);
+        table[inum].msg_addr_hi.set((msg_addr &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32);
+        table[inum].msg_data.set(msg_data);
+        table[inum].vec_ctrl.set(<span class="number">0</span>);
+        <span class="prelude-val">Ok</span>(inum <span class="kw">as </span>u32)
     }
 
-    <span class="kw">fn</span> <span class="ident">allocate_msi_interrupt</span>(
+    <span class="kw">fn </span>allocate_msi_interrupt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_msi</span>: <span class="kw-2">&amp;</span><span class="ident">MsiCapability</span>,
-        <span class="ident">_vec</span>: <span class="ident">InterruptVector</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">InterruptAllocationError</span><span class="op">&gt;</span> {
+        _msi: <span class="kw-2">&amp;</span>MsiCapability,
+        _vec: InterruptVector,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u32, InterruptAllocationError&gt; {
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">allocate_pcie_interrupt</span>(
+    <span class="kw">fn </span>allocate_pcie_interrupt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">vec</span>: <span class="ident">InterruptVector</span>,
-        <span class="ident">inum</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">InterruptAllocationError</span><span class="op">&gt;</span> {
-        <span class="comment">// Prefer MSI-X</span>
-        <span class="kw">for</span> <span class="ident">cap</span> <span class="kw">in</span> <span class="self">self</span>
-            .<span class="ident">pcie_capabilities</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">InterruptAllocationError::Unsupported</span>)<span class="question-mark">?</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PcieCapability::MsiX</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">cap</span> {
-                <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">allocate_msix_interrupt</span>(<span class="ident">m</span>.<span class="ident">as_ref</span>(), <span class="ident">vec</span>, <span class="ident">inum</span>) };
+        vec: InterruptVector,
+        inum: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;u32, InterruptAllocationError&gt; {
+        <span class="comment">// Prefer MSI-X
+        </span><span class="kw">for </span>cap <span class="kw">in </span><span class="self">self
+            </span>.pcie_capabilities()
+            .ok_or(InterruptAllocationError::Unsupported)<span class="question-mark">?
+        </span>{
+            <span class="kw">if let </span>PcieCapability::MsiX(m) = cap {
+                <span class="kw">return unsafe </span>{ <span class="self">self</span>.allocate_msix_interrupt(m.as_ref(), vec, inum) };
             }
         }
-        <span class="kw">for</span> <span class="ident">cap</span> <span class="kw">in</span> <span class="self">self</span>
-            .<span class="ident">pcie_capabilities</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">InterruptAllocationError::Unsupported</span>)<span class="question-mark">?</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PcieCapability::Msi</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">cap</span> {
-                <span class="kw">return</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">allocate_msi_interrupt</span>(<span class="ident">m</span>.<span class="ident">as_ref</span>(), <span class="ident">vec</span>) };
+        <span class="kw">for </span>cap <span class="kw">in </span><span class="self">self
+            </span>.pcie_capabilities()
+            .ok_or(InterruptAllocationError::Unsupported)<span class="question-mark">?
+        </span>{
+            <span class="kw">if let </span>PcieCapability::Msi(m) = cap {
+                <span class="kw">return unsafe </span>{ <span class="self">self</span>.allocate_msi_interrupt(m.as_ref(), vec) };
             }
         }
-        <span class="prelude-val">Err</span>(<span class="ident">InterruptAllocationError::Unsupported</span>)
+        <span class="prelude-val">Err</span>(InterruptAllocationError::Unsupported)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">allocate_interrupt</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>allocate_interrupt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">inum</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">InterruptVector</span>, <span class="ident">u32</span>), <span class="ident">InterruptAllocationError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">kaction</span>(
-                <span class="ident">KactionCmd::Specific</span>(<span class="ident">PcieKactionSpecific::AllocateInterrupt</span>.<span class="ident">into</span>()),
+        inum: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(InterruptVector, u32), InterruptAllocationError&gt; {
+        <span class="kw">let </span>vec = <span class="self">self
+            </span>.kaction(
+                KactionCmd::Specific(PcieKactionSpecific::AllocateInterrupt.into()),
                 <span class="number">0</span>,
-                <span class="ident">KactionFlags::empty</span>(),
-                <span class="ident">inum</span> <span class="kw">as</span> <span class="ident">u64</span>,
+                KactionFlags::empty(),
+                inum <span class="kw">as </span>u64,
             )
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">InterruptAllocationError::KernelError</span>(<span class="ident">e</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">vec</span>
-            .<span class="ident">unwrap_u64</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">InterruptAllocationError::KernelError</span>(<span class="ident">KactionError::Unknown</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">int</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">allocate_pcie_interrupt</span>(<span class="ident">vec</span>, <span class="ident">inum</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>((<span class="ident">vec</span>, <span class="ident">int</span>))
+            .map_err(|e| InterruptAllocationError::KernelError(e))<span class="question-mark">?</span>;
+        <span class="kw">let </span>vec = vec
+            .unwrap_u64()
+            .try_into()
+            .map_err(|<span class="kw">_</span>| InterruptAllocationError::KernelError(KactionError::Unknown))<span class="question-mark">?</span>;
+        <span class="kw">let </span>int = <span class="self">self</span>.allocate_pcie_interrupt(vec, inum)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((vec, int))
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_driver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

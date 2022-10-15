@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Ipv4Prot",""],["Ipv4SendError",""]],"fn":[["build_ipv4_header",""],["handle_incoming_ipv4_packet",""],["send_to",""],["setup_ipv4_listen",""]],"struct":[["GlobalListener",""],["Ipv4Header",""],["LISTEN",""],["Listener",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["Ipv4Prot",""],["Ipv4SendError",""]],"fn":[["build_ipv4_header",""],["handle_incoming_ipv4_packet",""],["send_to",""],["setup_ipv4_listen",""]],"struct":[["GlobalListener",""],["Ipv4Header",""],["LISTEN",""],["Listener",""]]};

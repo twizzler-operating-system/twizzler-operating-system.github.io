@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["EtherType",""],["EthernetError",""]],"fn":[["handle_incoming_ethernet_packets",""]],"struct":[["EthernetAddr",""],["EthernetHeader",""]]});
+window.SIDEBAR_ITEMS = {"enum":[["EtherType",""],["EthernetError",""]],"fn":[["handle_incoming_ethernet_packets",""]],"struct":[["EthernetAddr",""],["EthernetHeader",""]]};

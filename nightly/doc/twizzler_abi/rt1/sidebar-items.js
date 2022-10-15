@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["twz_runtime_start","Called from _start to initialize the runtime and pass control to the Rust stdlib."]]});
+window.SIDEBAR_ITEMS = {"fn":[["twz_runtime_start","Called from _start to initialize the runtime and pass control to the Rust stdlib."]]};

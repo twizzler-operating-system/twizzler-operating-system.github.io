@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-abi&#x2F;src&#x2F;syscall&#x2F;object_stat.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>object_stat.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../twizzler_abi/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/syscall/object_stat.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>object_stat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -91,100 +91,98 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">mem::MaybeUninit</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>core::{fmt, mem::MaybeUninit};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">arch::syscall::raw_syscall</span>, <span class="ident">object::ObjID</span>};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">convert_codes_to_result</span>, <span class="ident">justval</span>, <span class="ident">BackingType</span>, <span class="ident">LifetimeType</span>, <span class="ident">Syscall</span>};
+<span class="kw">use super</span>::{convert_codes_to_result, justval, BackingType, LifetimeType, Syscall};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
-<span class="doccomment">/// Possible error values for [sys_object_stat].</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ObjectStatError</span> {
-    <span class="doccomment">/// An unknown error occurred.</span>
-    <span class="ident">Unknown</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// The specified ID was invalid.</span>
-    <span class="ident">InvalidID</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// An argument was invalid.</span>
-    <span class="ident">InvalidArgument</span> <span class="op">=</span> <span class="number">2</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[repr(u32)]
+</span><span class="doccomment">/// Possible error values for [sys_object_stat].
+</span><span class="kw">pub enum </span>ObjectStatError {
+    <span class="doccomment">/// An unknown error occurred.
+    </span>Unknown = <span class="number">0</span>,
+    <span class="doccomment">/// The specified ID was invalid.
+    </span>InvalidID = <span class="number">1</span>,
+    <span class="doccomment">/// An argument was invalid.
+    </span>InvalidArgument = <span class="number">2</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">ObjectStatError</span> {
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Unknown</span> =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InvalidID</span> =&gt; <span class="string">&quot;invalid ID&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::InvalidArgument</span> =&gt; <span class="string">&quot;invalid argument&quot;</span>,
+<span class="kw">impl </span>ObjectStatError {
+    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
+            <span class="self">Self</span>::InvalidID =&gt; <span class="string">&quot;invalid ID&quot;</span>,
+            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;invalid argument&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ObjectStatError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">ObjectStatError</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="kw">impl </span>From&lt;ObjectStatError&gt; <span class="kw">for </span>u64 {
+    <span class="kw">fn </span>from(x: ObjectStatError) -&gt; u64 {
+        x <span class="kw">as </span>u64
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectStatError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">x</span> {
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidID</span>,
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::InvalidArgument</span>,
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Unknown</span>,
+<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ObjectStatError {
+    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>x {
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidID,
+            <span class="number">2 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ObjectStatError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">as_str</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ObjectStatError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">ObjectStatError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>ObjectStatError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.as_str()
     }
 }
 
-<span class="doccomment">/// Information about an object, according to the local kernel.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectInfo</span> {
-    <span class="doccomment">/// The ID of this object.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ObjID</span>,
-    <span class="doccomment">/// The number of mappings in which this object participates.</span>
-    <span class="kw">pub</span> <span class="ident">maps</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The number of ties to this object.</span>
-    <span class="kw">pub</span> <span class="ident">ties_to</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The number of ties from this object.</span>
-    <span class="kw">pub</span> <span class="ident">ties_from</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The lifetime type of this object.</span>
-    <span class="kw">pub</span> <span class="ident">life</span>: <span class="ident">LifetimeType</span>,
-    <span class="doccomment">/// The backing type of this object.</span>
-    <span class="kw">pub</span> <span class="ident">backing</span>: <span class="ident">BackingType</span>,
+<span class="doccomment">/// Information about an object, according to the local kernel.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(C)]
+</span><span class="kw">pub struct </span>ObjectInfo {
+    <span class="doccomment">/// The ID of this object.
+    </span><span class="kw">pub </span>id: ObjID,
+    <span class="doccomment">/// The number of mappings in which this object participates.
+    </span><span class="kw">pub </span>maps: usize,
+    <span class="doccomment">/// The number of ties to this object.
+    </span><span class="kw">pub </span>ties_to: usize,
+    <span class="doccomment">/// The number of ties from this object.
+    </span><span class="kw">pub </span>ties_from: usize,
+    <span class="doccomment">/// The lifetime type of this object.
+    </span><span class="kw">pub </span>life: LifetimeType,
+    <span class="doccomment">/// The backing type of this object.
+    </span><span class="kw">pub </span>backing: BackingType,
 }
 
-<span class="doccomment">/// Read information about a given object.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sys_object_stat</span>(<span class="ident">id</span>: <span class="ident">ObjID</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectInfo</span>, <span class="ident">ObjectStatError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">lo</span>) <span class="op">=</span> <span class="ident">id</span>.<span class="ident">split</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj_info</span> <span class="op">=</span> <span class="ident">MaybeUninit</span>::<span class="op">&lt;</span><span class="ident">ObjectInfo</span><span class="op">&gt;</span><span class="ident">::uninit</span>();
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> [
-        <span class="ident">hi</span>,
-        <span class="ident">lo</span>,
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">obj_info</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">ObjectInfo</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="kw">as</span> <span class="ident">u64</span>,
+<span class="doccomment">/// Read information about a given object.
+</span><span class="kw">pub fn </span>sys_object_stat(id: ObjID) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectInfo, ObjectStatError&gt; {
+    <span class="kw">let </span>(hi, lo) = id.split();
+    <span class="kw">let </span><span class="kw-2">mut </span>obj_info = MaybeUninit::&lt;ObjectInfo&gt;::uninit();
+    <span class="kw">let </span>args = [
+        hi,
+        lo,
+        <span class="kw-2">&amp;mut </span>obj_info <span class="kw">as </span><span class="kw-2">*mut </span>MaybeUninit&lt;ObjectInfo&gt; <span class="kw">as </span>usize <span class="kw">as </span>u64,
     ];
-    <span class="kw">let</span> (<span class="ident">code</span>, <span class="ident">val</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">raw_syscall</span>(<span class="ident">Syscall::ObjectStat</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>) };
-    <span class="ident">convert_codes_to_result</span>(
-        <span class="ident">code</span>,
-        <span class="ident">val</span>,
-        <span class="op">|</span><span class="ident">c</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
-        <span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">obj_info</span>.<span class="ident">assume_init</span>() },
-        <span class="ident">justval</span>,
+    <span class="kw">let </span>(code, val) = <span class="kw">unsafe </span>{ raw_syscall(Syscall::ObjectStat, <span class="kw-2">&amp;</span>args) };
+    convert_codes_to_result(
+        code,
+        val,
+        |c, <span class="kw">_</span>| c != <span class="number">0</span>,
+        |<span class="kw">_</span>, <span class="kw">_</span>| <span class="kw">unsafe </span>{ obj_info.assume_init() },
+        justval,
     )
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

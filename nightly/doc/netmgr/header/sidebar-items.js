@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["Header",""]]});
+window.SIDEBAR_ITEMS = {"trait":[["Header",""]]};

@@ -1,12 +1,12 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-object&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../twizzler_object/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
-<span id="2"> 2</span>
-<span id="3"> 3</span>
-<span id="4"> 4</span>
-<span id="5"> 5</span>
-<span id="6"> 6</span>
-<span id="7"> 7</span>
-<span id="8"> 8</span>
-<span id="9"> 9</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-object/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../twizzler_object/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../twizzler_object/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../twizzler_object/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
 <span id="10">10</span>
 <span id="11">11</span>
 <span id="12">12</span>
@@ -45,56 +45,52 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
-<span id="48">48</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The twizzler-object crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The purpose of this crate is to provide:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!  - Object creation and access through handles.</span>
-<span class="doccomment">//!  - Access to the base of an object.</span>
-<span class="doccomment">//!  - Whole-object lifetime control and deletion.</span>
-<span class="doccomment">//!  - Basic types for invariant pointers and metadata.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate is also designed to create a base to implement higher-level object access crates</span>
-<span class="doccomment">//! (such as twizzler-nando), and thus provides unsafe functions to access possibly shared object</span>
-<span class="doccomment">//! memory. Additionally, this crate provides a low-level management of mapping objects and tracking</span>
-<span class="doccomment">//! memory slots.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Isolation Safety</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In general, this crate cannot prove isolation safety (that is, single-writer XOR</span>
-<span class="doccomment">//! multiple-readers). The twizzler-nando crate can, however, so we defer to that crate for any</span>
-<span class="doccomment">//! operations on objects that access memory that could mutate. This limits this crate to only</span>
-<span class="doccomment">//! safely providing access to certain parts of objects, such as the base (which we expect to mutate</span>
-<span class="doccomment">//! only via interior mutability), and immutable parts of the object metadata. Access to other</span>
-<span class="doccomment">//! things in the object is provided via unsafe functions, like raw FOT entries or the meta info</span>
-<span class="doccomment">//! struct as a whole.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Thus we expect programmers to use the twizzler-nando crate to operate on object data most of the</span>
-<span class="doccomment">//! time. The unsafe functions in this crate are provided mostly for the implementation of the</span>
-<span class="doccomment">//! twizzler-nando crate.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The twizzler-object crate.
+//!
+//! The purpose of this crate is to provide:
+//!
+//!  - Object creation and access through handles.
+//!  - Access to the base of an object.
+//!  - Whole-object lifetime control and deletion.
+//!  - Basic types for invariant pointers and metadata.
+//!
+//! This crate is also designed to create a base to implement higher-level object access crates
+//! (such as twizzler-nando), and thus provides unsafe functions to access possibly shared object
+//! memory. Additionally, this crate provides a low-level management of mapping objects and tracking
+//! memory slots.
+//!
+//! # Isolation Safety
+//!
+//! In general, this crate cannot prove isolation safety (that is, single-writer XOR
+//! multiple-readers). The twizzler-nando crate can, however, so we defer to that crate for any
+//! operations on objects that access memory that could mutate. This limits this crate to only
+//! safely providing access to certain parts of objects, such as the base (which we expect to mutate
+//! only via interior mutability), and immutable parts of the object metadata. Access to other
+//! things in the object is provided via unsafe functions, like raw FOT entries or the meta info
+//! struct as a whole.
+//!
+//! Thus we expect programmers to use the twizzler-nando crate to operate on object data most of the
+//! time. The unsafe functions in this crate are provided mostly for the implementation of the
+//! twizzler-nando crate.
 
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">auto_traits</span>)]</span>
-<span class="comment">//#![feature(specialization)]</span>
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">rustc_attrs</span>)]</span>
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">negative_impls</span>)]</span>
-<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">option_result_unwrap_unchecked</span>)]</span>
+</span><span class="attribute">#![feature(auto_traits)]
+</span><span class="comment">//#![feature(specialization)]
+</span><span class="attribute">#![feature(rustc_attrs)]
+#![feature(negative_impls)]
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">twizzler_abi::object::ObjID</span>;
+</span><span class="kw">pub use </span>twizzler_abi::object::ObjID;
 
-<span class="kw">mod</span> <span class="ident">base</span>;
-<span class="kw">mod</span> <span class="ident">create</span>;
-<span class="kw">mod</span> <span class="ident">init</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">marker</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">meta</span>;
-<span class="kw">mod</span> <span class="ident">object</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ptr</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">slot</span>;
+<span class="kw">mod </span>base;
+<span class="kw">mod </span>create;
+<span class="kw">mod </span>init;
+<span class="kw">pub mod </span>marker;
+<span class="kw">pub mod </span>meta;
+<span class="kw">mod </span>object;
+<span class="kw">pub mod </span>ptr;
+<span class="kw">pub mod </span>slot;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">create</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">init</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">object</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>create::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>init::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>object::<span class="kw-2">*</span>;
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_object" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

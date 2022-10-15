@@ -1,102 +1,102 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src&#x2F;lib&#x2F;twizzler-abi&#x2F;src&#x2F;syscall&#x2F;time&#x2F;units.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>units.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../twizzler_abi/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
-<span id="2">  2</span>
-<span id="3">  3</span>
-<span id="4">  4</span>
-<span id="5">  5</span>
-<span id="6">  6</span>
-<span id="7">  7</span>
-<span id="8">  8</span>
-<span id="9">  9</span>
-<span id="10"> 10</span>
-<span id="11"> 11</span>
-<span id="12"> 12</span>
-<span id="13"> 13</span>
-<span id="14"> 14</span>
-<span id="15"> 15</span>
-<span id="16"> 16</span>
-<span id="17"> 17</span>
-<span id="18"> 18</span>
-<span id="19"> 19</span>
-<span id="20"> 20</span>
-<span id="21"> 21</span>
-<span id="22"> 22</span>
-<span id="23"> 23</span>
-<span id="24"> 24</span>
-<span id="25"> 25</span>
-<span id="26"> 26</span>
-<span id="27"> 27</span>
-<span id="28"> 28</span>
-<span id="29"> 29</span>
-<span id="30"> 30</span>
-<span id="31"> 31</span>
-<span id="32"> 32</span>
-<span id="33"> 33</span>
-<span id="34"> 34</span>
-<span id="35"> 35</span>
-<span id="36"> 36</span>
-<span id="37"> 37</span>
-<span id="38"> 38</span>
-<span id="39"> 39</span>
-<span id="40"> 40</span>
-<span id="41"> 41</span>
-<span id="42"> 42</span>
-<span id="43"> 43</span>
-<span id="44"> 44</span>
-<span id="45"> 45</span>
-<span id="46"> 46</span>
-<span id="47"> 47</span>
-<span id="48"> 48</span>
-<span id="49"> 49</span>
-<span id="50"> 50</span>
-<span id="51"> 51</span>
-<span id="52"> 52</span>
-<span id="53"> 53</span>
-<span id="54"> 54</span>
-<span id="55"> 55</span>
-<span id="56"> 56</span>
-<span id="57"> 57</span>
-<span id="58"> 58</span>
-<span id="59"> 59</span>
-<span id="60"> 60</span>
-<span id="61"> 61</span>
-<span id="62"> 62</span>
-<span id="63"> 63</span>
-<span id="64"> 64</span>
-<span id="65"> 65</span>
-<span id="66"> 66</span>
-<span id="67"> 67</span>
-<span id="68"> 68</span>
-<span id="69"> 69</span>
-<span id="70"> 70</span>
-<span id="71"> 71</span>
-<span id="72"> 72</span>
-<span id="73"> 73</span>
-<span id="74"> 74</span>
-<span id="75"> 75</span>
-<span id="76"> 76</span>
-<span id="77"> 77</span>
-<span id="78"> 78</span>
-<span id="79"> 79</span>
-<span id="80"> 80</span>
-<span id="81"> 81</span>
-<span id="82"> 82</span>
-<span id="83"> 83</span>
-<span id="84"> 84</span>
-<span id="85"> 85</span>
-<span id="86"> 86</span>
-<span id="87"> 87</span>
-<span id="88"> 88</span>
-<span id="89"> 89</span>
-<span id="90"> 90</span>
-<span id="91"> 91</span>
-<span id="92"> 92</span>
-<span id="93"> 93</span>
-<span id="94"> 94</span>
-<span id="95"> 95</span>
-<span id="96"> 96</span>
-<span id="97"> 97</span>
-<span id="98"> 98</span>
-<span id="99"> 99</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/syscall/time/units.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>units.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../twizzler_abi/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="src-line-numbers"><span id="1">1</span>
+<span id="2">2</span>
+<span id="3">3</span>
+<span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
@@ -171,180 +171,178 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">core::ops::Mul</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>core::ops::Mul;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::time::TimeSpan</span>;
+<span class="kw">use </span><span class="kw">super</span>::time::TimeSpan;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FEMTOS_PER_SEC</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_000_000_000_000_000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">FEMTOS_PER_NANO</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_000_000</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NANOS_PER_SEC</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1_000_000_000</span>;
+<span class="kw">pub const </span>FEMTOS_PER_SEC: u64 = <span class="number">1_000_000_000_000_000</span>;
+<span class="kw">pub const </span>FEMTOS_PER_NANO: u64 = <span class="number">1_000_000</span>;
+<span class="kw">pub const </span>NANOS_PER_SEC: u64 = <span class="number">1_000_000_000</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TimeUnitError</span> {
-    <span class="ident">ConversionOverflow</span>
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>TimeUnitError {
+    ConversionOverflow
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Seconds</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>Seconds(<span class="kw">pub </span>u64);
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">Seconds</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">TimeSpan</span>;
+<span class="kw">impl </span>Mul&lt;Seconds&gt; <span class="kw">for </span>u64 {
+    <span class="kw">type </span>Output = TimeSpan;
  
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">Seconds</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">TimeSpan::from_secs</span>(<span class="self">self</span> <span class="op">*</span> <span class="ident">rhs</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: Seconds) -&gt; <span class="self">Self</span>::Output {
+        TimeSpan::from_secs(<span class="self">self </span>* rhs.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Seconds</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">TimeSpan</span>;
+<span class="kw">impl </span>Mul&lt;u64&gt; <span class="kw">for </span>Seconds {
+    <span class="kw">type </span>Output = TimeSpan;
 
-    <span class="comment">// apply reflexive property</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u64</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">rhs</span> <span class="op">*</span> <span class="self">self</span>
-    }
+    <span class="comment">// apply reflexive property
+    </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: u64) -&gt; <span class="self">Self</span>::Output {
+        rhs * <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MilliSeconds</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>MilliSeconds(<span class="kw">pub </span>u64);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MicroSeconds</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>MicroSeconds(<span class="kw">pub </span>u64);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NanoSeconds</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>NanoSeconds(<span class="kw">pub </span>u64);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PicoSeconds</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>PicoSeconds(<span class="kw">pub </span>u64);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FemtoSeconds</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>FemtoSeconds(<span class="kw">pub </span>u64);
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">FemtoSeconds</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">TimeSpan</span>;
+<span class="kw">impl </span>Mul&lt;FemtoSeconds&gt; <span class="kw">for </span>u64 {
+    <span class="kw">type </span>Output = TimeSpan;
  
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FemtoSeconds</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">rhs</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u128</span>;
-        <span class="ident">TimeSpan::new</span>(
-            (<span class="ident">t</span> <span class="op">/</span> <span class="ident">FEMTOS_PER_SEC</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u64</span>,
-            (<span class="ident">t</span> <span class="op">%</span> <span class="ident">FEMTOS_PER_SEC</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u64</span>
+    <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: FemtoSeconds) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">let </span>t = <span class="self">self </span><span class="kw">as </span>u128 * rhs.<span class="number">0 </span><span class="kw">as </span>u128;
+        TimeSpan::new(
+            (t / FEMTOS_PER_SEC <span class="kw">as </span>u128) <span class="kw">as </span>u64,
+            (t % FEMTOS_PER_SEC <span class="kw">as </span>u128) <span class="kw">as </span>u64
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FemtoSeconds</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">TimeSpan</span>;
+<span class="kw">impl </span>Mul&lt;u64&gt; <span class="kw">for </span>FemtoSeconds {
+    <span class="kw">type </span>Output = TimeSpan;
 
-    <span class="comment">// apply reflexive property</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u64</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">rhs</span> <span class="op">*</span> <span class="self">self</span>
-    }
+    <span class="comment">// apply reflexive property
+    </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: u64) -&gt; <span class="self">Self</span>::Output {
+        rhs * <span class="self">self
+    </span>}
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_scalar_mul</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">unit</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conver</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">unit</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">TimeSpan</span>;
+<span class="macro">macro_rules! </span>impl_scalar_mul {
+    (<span class="macro-nonterminal">$unit</span>: ident, <span class="macro-nonterminal">$conver</span>: expr) =&gt; {
+        <span class="kw">impl </span>Mul&lt;<span class="macro-nonterminal">$unit</span>&gt; <span class="kw">for </span>u64 {
+            <span class="kw">type </span>Output = TimeSpan;
          
-            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unit</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">rhs</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">u128</span>;
-                <span class="kw">let</span> <span class="ident">f</span>: <span class="ident">FemtoSeconds</span> <span class="op">=</span> 
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unit</span>((<span class="ident">t</span> <span class="op">%</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conver</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-                <span class="ident">TimeSpan::new</span>(
-                    (<span class="ident">t</span> <span class="op">/</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conver</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="kw">as</span> <span class="ident">u64</span>,
-                    <span class="ident">f</span>.<span class="number">0</span>
-                )
+            <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="macro-nonterminal">$unit</span>) -&gt; <span class="self">Self</span>::Output {
+                <span class="kw">let </span>t = <span class="self">self </span><span class="kw">as </span>u128 * rhs.<span class="number">0 </span><span class="kw">as </span>u128;
+                <span class="kw">let </span>f: FemtoSeconds = 
+                    <span class="macro-nonterminal">$unit</span>((t % <span class="macro-nonterminal">$conver </span><span class="kw">as </span>u128) <span class="kw">as </span>u64).try_into().unwrap();
+                TimeSpan::new(
+                    (t / <span class="macro-nonterminal">$conver </span><span class="kw">as </span>u128) <span class="kw">as </span>u64,
+                    f.<span class="number">0
+                </span>)
             }
         }
         
-        <span class="kw">impl</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unit</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">TimeSpan</span>;
+        <span class="kw">impl </span>Mul&lt;u64&gt; <span class="kw">for </span><span class="macro-nonterminal">$unit </span>{
+            <span class="kw">type </span>Output = TimeSpan;
         
-            <span class="comment">// apply reflexive property</span>
-            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">u64</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                <span class="ident">rhs</span> <span class="op">*</span> <span class="self">self</span>
-            }
+            <span class="comment">// apply reflexive property
+            </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: u64) -&gt; <span class="self">Self</span>::Output {
+                rhs * <span class="self">self
+            </span>}
         }
     }
 }
 
-<span class="macro">impl_scalar_mul!</span>(<span class="ident">NanoSeconds</span>, <span class="ident">NANOS_PER_SEC</span>);
+<span class="macro">impl_scalar_mul!</span>(NanoSeconds, NANOS_PER_SEC);
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_unit_conversion</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">big</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">small</span>: <span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conver</span>: <span class="ident">expr</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">small</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">big</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">unit</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">small</span>) -&gt; <span class="self">Self</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">big</span>(<span class="ident">unit</span>.<span class="number">0</span> <span class="op">/</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">conver</span>)
+<span class="macro">macro_rules! </span>impl_unit_conversion {
+    (<span class="macro-nonterminal">$big</span>: ident, <span class="macro-nonterminal">$small</span>: ident, <span class="macro-nonterminal">$conver</span>: expr) =&gt; {
+        <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$small</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$big </span>{
+            <span class="kw">fn </span>from(unit: <span class="macro-nonterminal">$small</span>) -&gt; <span class="self">Self </span>{
+                <span class="macro-nonterminal">$big</span>(unit.<span class="number">0 </span>/ <span class="macro-nonterminal">$conver</span>)
             }
         }
         
-        <span class="comment">// conversion to a smaller unit might fail (overlfow)</span>
-        <span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">big</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">small</span> {
-            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TimeUnitError</span>;
-            <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">unit</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">big</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-                <span class="kw">match</span> <span class="ident">unit</span>.<span class="number">0</span>.<span class="ident">checked_mul</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">conver</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">small</span>(<span class="ident">t</span>)),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TimeUnitError::ConversionOverflow</span>)
+        <span class="comment">// conversion to a smaller unit might fail (overlfow)
+        </span><span class="kw">impl </span>TryFrom&lt;<span class="macro-nonterminal">$big</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$small </span>{
+            <span class="kw">type </span>Error = TimeUnitError;
+            <span class="kw">fn </span>try_from(unit: <span class="macro-nonterminal">$big</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+                <span class="kw">match </span>unit.<span class="number">0</span>.checked_mul(<span class="macro-nonterminal">$conver</span>) {
+                    <span class="prelude-val">Some</span>(t) =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$small</span>(t)),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(TimeUnitError::ConversionOverflow)
                 }
             }
         }
     }
 }
 
-<span class="macro">impl_unit_conversion!</span>(<span class="ident">Seconds</span>, <span class="ident">FemtoSeconds</span>, <span class="ident">FEMTOS_PER_SEC</span>);
-<span class="macro">impl_unit_conversion!</span>(<span class="ident">NanoSeconds</span>, <span class="ident">FemtoSeconds</span>, <span class="ident">FEMTOS_PER_NANO</span>);
+<span class="macro">impl_unit_conversion!</span>(Seconds, FemtoSeconds, FEMTOS_PER_SEC);
+<span class="macro">impl_unit_conversion!</span>(NanoSeconds, FemtoSeconds, FEMTOS_PER_NANO);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syscall</span>::{<span class="ident">Seconds</span>, <span class="ident">FemtoSeconds</span>, <span class="ident">TimeSpan</span>, <span class="ident">FEMTOS_PER_SEC</span>};
+    <span class="kw">use </span><span class="kw">crate</span>::syscall::{Seconds, FemtoSeconds, TimeSpan, FEMTOS_PER_SEC};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">secs_mult</span>() {
-        <span class="kw">let</span> <span class="ident">scalar</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">100</span>;
-        <span class="kw">let</span> <span class="ident">secs</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">5</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>secs_mult() {
+        <span class="kw">let </span>scalar: u64 = <span class="number">100</span>;
+        <span class="kw">let </span>secs: u64 = <span class="number">5</span>;
 
-        <span class="comment">// lhs is Seconds(), rhs is a scalar</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">Seconds</span>(<span class="ident">secs</span>) <span class="op">*</span> <span class="ident">scalar</span>, <span class="ident">TimeSpan::new</span>(<span class="ident">secs</span> <span class="op">*</span> <span class="ident">scalar</span>, <span class="number">0</span>));
+        <span class="comment">// lhs is Seconds(), rhs is a scalar
+        </span><span class="macro">assert_eq!</span>(Seconds(secs) * scalar, TimeSpan::new(secs * scalar, <span class="number">0</span>));
 
-        <span class="comment">// lhs is a scalar, rhs is Seconds()</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">scalar</span> <span class="op">*</span> <span class="ident">Seconds</span>(<span class="ident">secs</span>), <span class="ident">TimeSpan::new</span>(<span class="ident">secs</span> <span class="op">*</span> <span class="ident">scalar</span>, <span class="number">0</span>));
+        <span class="comment">// lhs is a scalar, rhs is Seconds()
+        </span><span class="macro">assert_eq!</span>(scalar * Seconds(secs), TimeSpan::new(secs * scalar, <span class="number">0</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">femtos_mult</span>() {
-        <span class="kw">let</span> <span class="ident">scalar</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1234</span>;
-        <span class="kw">let</span> <span class="ident">femtos</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">500</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>femtos_mult() {
+        <span class="kw">let </span>scalar: u64 = <span class="number">1234</span>;
+        <span class="kw">let </span>femtos: u64 = <span class="number">500</span>;
 
-        <span class="comment">// lhs is FemtoSeconds(), rhs is a scalar</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">FemtoSeconds</span>(<span class="ident">femtos</span>) <span class="op">*</span> <span class="ident">scalar</span>, <span class="ident">TimeSpan::new</span>(<span class="number">0</span>, <span class="ident">femtos</span> <span class="op">*</span> <span class="ident">scalar</span>));
+        <span class="comment">// lhs is FemtoSeconds(), rhs is a scalar
+        </span><span class="macro">assert_eq!</span>(FemtoSeconds(femtos) * scalar, TimeSpan::new(<span class="number">0</span>, femtos * scalar));
 
-        <span class="comment">// lhs is a scalar, rhs is FemtoSeconds()</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">scalar</span> <span class="op">*</span> <span class="ident">FemtoSeconds</span>(<span class="ident">femtos</span>), <span class="ident">TimeSpan::new</span>(<span class="number">0</span>, <span class="ident">femtos</span> <span class="op">*</span> <span class="ident">scalar</span>));
+        <span class="comment">// lhs is a scalar, rhs is FemtoSeconds()
+        </span><span class="macro">assert_eq!</span>(scalar * FemtoSeconds(femtos), TimeSpan::new(<span class="number">0</span>, femtos * scalar));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">conversion</span>() {
-        <span class="kw">let</span> <span class="ident">femtos</span> <span class="op">=</span> <span class="ident">FemtoSeconds</span>(<span class="ident">FEMTOS_PER_SEC</span> <span class="op">*</span> <span class="number">3</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">secs</span>: <span class="ident">Seconds</span> <span class="op">=</span> <span class="ident">femtos</span>.<span class="ident">into</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>conversion() {
+        <span class="kw">let </span>femtos = FemtoSeconds(FEMTOS_PER_SEC * <span class="number">3</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>secs: Seconds = femtos.into();
 
         
-        <span class="macro">assert_eq!</span>(<span class="ident">secs</span>, <span class="ident">Seconds</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(secs, Seconds(<span class="number">3</span>));
 
-        <span class="ident">secs</span> <span class="op">=</span> <span class="ident">Seconds</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">f</span>: <span class="ident">FemtoSeconds</span> <span class="op">=</span> <span class="ident">secs</span>.
-            <span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;could not convert Seconds to FemtoSeconds&quot;</span>);
+        secs = Seconds(<span class="number">3</span>);
+        <span class="kw">let </span>f: FemtoSeconds = secs.
+            try_into()
+            .expect(<span class="string">&quot;could not convert Seconds to FemtoSeconds&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">femtos</span>, <span class="ident">f</span>);
+        <span class="macro">assert_eq!</span>(femtos, f);
     }
 }
 </code></pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_abi" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>
