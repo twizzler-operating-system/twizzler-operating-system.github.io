@@ -97,6 +97,20 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
 </pre><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
 <span class="kw">use </span>bitflags::bitflags;
@@ -181,6 +195,12 @@
     }
 }
 
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Flags to pass to [sys_unbind_handle].
+    </span><span class="kw">pub struct </span>UnbindHandleFlags: u64 {
+    }
+}
+
 <span class="doccomment">/// Make a new handle object.
 </span><span class="kw">pub fn </span>sys_new_handle(
     objid: ObjID,
@@ -195,6 +215,14 @@
         )
     };
     convert_codes_to_result(code, val, |c, <span class="kw">_</span>| c != <span class="number">0</span>, |<span class="kw">_</span>, v| v <span class="kw">as </span>u64, justval)
+}
+
+<span class="doccomment">/// Unbind an object from handle status.
+</span><span class="kw">pub fn </span>sys_unbind_handle(objid: ObjID, flags: UnbindHandleFlags) {
+    <span class="kw">let </span>(hi, lo) = objid.split();
+    <span class="kw">unsafe </span>{
+        raw_syscall(Syscall::UnbindHandle, <span class="kw-2">&amp;</span>[hi, lo, flags.bits()]);
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

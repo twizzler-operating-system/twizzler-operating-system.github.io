@@ -109,6 +109,8 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Wrapper functions around for raw_syscall, providing a typed and safer way to interact with the kernel.
 
 </span><span class="kw">mod </span>console;
@@ -162,6 +164,8 @@
     </span>ObjectStat,
     <span class="doccomment">/// Read mapping information.
     </span>ObjectReadMap,
+    <span class="doccomment">/// Remove an object as a handle.
+    </span>UnbindHandle,
     NumSyscalls,
 }
 

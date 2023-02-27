@@ -350,6 +350,10 @@
 <span id="350">350</span>
 <span id="351">351</span>
 <span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions to start new executable programs.
 
 </span><span class="kw">use </span>core::{intrinsics::copy_nonoverlapping, mem::size_of};
@@ -359,8 +363,9 @@
     object::{InternalObject, ObjID, Protections, MAX_SIZE, NULLPAGE_SIZE},
     slot::{RESERVED_DATA, RESERVED_STACK, RESERVED_TEXT},
     syscall::{
-        BackingType, HandleType, LifetimeType, MapFlags, NewHandleFlags, ObjectCreate,
-        ObjectCreateFlags, ObjectSource, ThreadSpawnArgs, ThreadSpawnFlags,
+        sys_unbind_handle, BackingType, HandleType, LifetimeType, MapFlags, NewHandleFlags,
+        ObjectCreate, ObjectCreateFlags, ObjectSource, ThreadSpawnArgs, ThreadSpawnFlags,
+        UnbindHandleFlags,
     },
 };
 
@@ -698,6 +703,9 @@
     <span class="kw">let </span>thr = <span class="kw">unsafe </span>{
         <span class="kw">crate</span>::syscall::sys_spawn(ts).map_err(|<span class="kw">_</span>| SpawnExecutableError::ThreadSpawnFailed)<span class="question-mark">?
     </span>};
+
+    sys_unbind_handle(vm_handle, UnbindHandleFlags::empty());
+
     <span class="comment">//TODO: delete objects
 
     </span><span class="prelude-val">Ok</span>(thr)
