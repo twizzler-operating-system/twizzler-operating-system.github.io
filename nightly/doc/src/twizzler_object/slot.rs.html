@@ -107,6 +107,10 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     mem::size_of,
@@ -114,7 +118,7 @@
 };
 
 <span class="kw">use </span>twizzler_abi::{
-    object::{ObjID, Protections},
+    object::{ObjID, Protections, NULLPAGE_SIZE},
     syscall::MapFlags,
 };
 
@@ -171,13 +175,17 @@
     <span class="doccomment">/// Perform a raw load-effective-address for an offset into a slot.
     </span><span class="kw">pub fn </span>raw_lea&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, off: usize) -&gt; <span class="kw-2">*const </span>P {
         <span class="kw">let </span>start = <span class="self">self</span>.vaddr_start();
-        <span class="kw">unsafe </span>{ ((start + off) <span class="kw">as </span><span class="kw-2">*const </span>P).as_ref().unwrap() }
+        <span class="kw">unsafe </span>{
+            ((start + off - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*const </span>P)
+                .as_ref()
+                .unwrap()
+        }
     }
 
     <span class="doccomment">/// Perform a raw load-effective-address for an offset into a slot.
     </span><span class="kw">pub fn </span>raw_lea_mut&lt;P&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, off: usize) -&gt; <span class="kw-2">*mut </span>P {
         <span class="kw">let </span>start = <span class="self">self</span>.vaddr_start();
-        <span class="kw">unsafe </span>{ ((start + off) <span class="kw">as </span><span class="kw-2">*mut </span>P).as_mut().unwrap() }
+        <span class="kw">unsafe </span>{ ((start + off - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>P).as_mut().unwrap() }
     }
 
     <span class="doccomment">/// Get a mutable pointer to one of the slot&#39;s object&#39;s FOT entries.
