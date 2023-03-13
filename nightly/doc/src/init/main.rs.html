@@ -453,6 +453,24 @@
 <span id="453">453</span>
 <span id="454">454</span>
 <span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]
 </span><span class="attribute">#![feature(lang_items)]
 #![feature(naked_functions)]
@@ -697,6 +715,17 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
     <span class="comment">//println!(&quot;ELF: {:?}&quot;, elf);
 </span>}
 
+<span class="kw">fn </span>exec_n(name: <span class="kw-2">&amp;</span>str, id: ObjID, args: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) {
+    <span class="kw">let </span>env: Vec&lt;String&gt; = std::env::vars()
+        .map(|(n, v)| <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, n, v))
+        .collect();
+    <span class="kw">let </span>env_ref: Vec&lt;<span class="kw-2">&amp;</span>[u8]&gt; = env.iter().map(|x| x.as_str().as_bytes()).collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>fullargs = <span class="macro">vec!</span>[name.as_bytes()];
+    fullargs.extend(args.iter().map(|x| x.as_bytes()));
+    <span class="kw">let </span>_elf = twizzler_abi::load_elf::spawn_new_executable(id, <span class="kw-2">&amp;</span>fullargs, <span class="kw-2">&amp;</span>env_ref);
+    <span class="comment">//println!(&quot;ELF: {:?}&quot;, elf);
+</span>}
+
 <span class="kw">fn </span>find_init_name(name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ObjID&gt; {
     <span class="kw">let </span>init_info = twizzler_abi::aux::get_kernel_init_info();
     <span class="kw">for </span>n <span class="kw">in </span>init_info.names() {
@@ -775,7 +804,14 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
     )
     .unwrap();
     <span class="kw">if let </span><span class="prelude-val">Some</span>(id) = find_init_name(<span class="string">&quot;pager&quot;</span>) {
-        exec(<span class="string">&quot;pager&quot;</span>, id, queue.object().id());
+        exec_n(
+            <span class="string">&quot;pager&quot;</span>,
+            id,
+            <span class="kw-2">&amp;</span>[
+                <span class="kw-2">&amp;</span>queue.object().id().as_u128().to_string(),
+                <span class="kw-2">&amp;</span>queue2.object().id().as_u128().to_string(),
+            ],
+        );
     } <span class="kw">else </span>{
         <span class="macro">eprintln!</span>(<span class="string">&quot;[init] failed to start pager&quot;</span>);
     }

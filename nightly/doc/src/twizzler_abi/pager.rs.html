@@ -37,6 +37,46 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
 </pre><pre class="rust"><code><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
 </span><span class="kw">pub struct </span>RequestFromKernel {
     cmd: KernelCommand,
@@ -74,6 +114,46 @@
 
 <span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
 </span><span class="kw">pub enum </span>KernelCompletionData {
+    EchoResp,
+}
+
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub struct </span>RequestFromPager {
+    cmd: PagerRequest,
+}
+
+<span class="kw">impl </span>RequestFromPager {
+    <span class="kw">pub fn </span>new(cmd: PagerRequest) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ cmd }
+    }
+
+    <span class="kw">pub fn </span>cmd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PagerRequest {
+        <span class="self">self</span>.cmd
+    }
+}
+
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub enum </span>PagerRequest {
+    EchoReq,
+}
+
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub struct </span>CompletionToPager {
+    data: PagerCompletionData,
+}
+
+<span class="kw">impl </span>CompletionToPager {
+    <span class="kw">pub fn </span>new(data: PagerCompletionData) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ data }
+    }
+
+    <span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PagerCompletionData {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub enum </span>PagerCompletionData {
     EchoResp,
 }
 </code></pre></div>

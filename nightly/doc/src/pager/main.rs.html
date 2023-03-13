@@ -38,21 +38,70 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-</pre><pre class="rust"><code><span class="kw">use </span>twizzler_abi::pager::{CompletionToKernel, KernelCompletionData, RequestFromKernel};
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
+
+<span class="kw">use </span>twizzler_abi::pager::{
+    CompletionToKernel, CompletionToPager, KernelCompletionData, RequestFromKernel,
+    RequestFromPager,
+};
 <span class="kw">use </span>twizzler_object::{ObjID, Object, ObjectInitFlags, Protections};
 
-<span class="kw">async fn </span>handle_request(request: RequestFromKernel) -&gt; <span class="prelude-ty">Option</span>&lt;CompletionToKernel&gt; {
+<span class="kw">async fn </span>handle_request(_request: RequestFromKernel) -&gt; <span class="prelude-ty">Option</span>&lt;CompletionToKernel&gt; {
     <span class="prelude-val">Some</span>(CompletionToKernel::new(KernelCompletionData::EchoResp))
 }
 
 <span class="kw">fn </span>main() {
     <span class="kw">let </span>idstr = std::env::args().nth(<span class="number">1</span>).unwrap();
-    <span class="macro">println!</span>(<span class="string">&quot;Hello, world from pager: {}&quot;</span>, idstr);
+    <span class="kw">let </span>kidstr = std::env::args().nth(<span class="number">2</span>).unwrap();
+    <span class="macro">println!</span>(<span class="string">&quot;Hello, world from pager: {} {}&quot;</span>, idstr, kidstr);
     <span class="kw">let </span>id = idstr.parse::&lt;u128&gt;().unwrap();
+    <span class="kw">let </span>kid = kidstr.parse::&lt;u128&gt;().unwrap();
 
     <span class="kw">let </span>id = ObjID::new(id);
+    <span class="kw">let </span>kid = ObjID::new(kid);
     <span class="kw">let </span>object = Object::init_id(
         id,
+        Protections::READ | Protections::WRITE,
+        ObjectInitFlags::empty(),
+    )
+    .unwrap();
+
+    <span class="kw">let </span>kobject = Object::init_id(
+        kid,
         Protections::READ | Protections::WRITE,
         ObjectInitFlags::empty(),
     )
@@ -61,10 +110,29 @@
     <span class="kw">let </span>queue = twizzler_queue::Queue::&lt;RequestFromKernel, CompletionToKernel&gt;::from(object);
     <span class="kw">let </span>rq = twizzler_queue::CallbackQueueReceiver::new(queue);
 
+    <span class="kw">let </span>kqueue = twizzler_queue::Queue::&lt;RequestFromPager, CompletionToPager&gt;::from(kobject);
+    <span class="kw">let </span>sq = twizzler_queue::QueueSender::new(kqueue);
+
     <span class="kw">let </span>num_threads = <span class="number">1</span>;
     <span class="kw">for _ in </span><span class="number">0</span>..(num_threads - <span class="number">1</span>) {
         std::thread::spawn(|| twizzler_async::run(std::future::pending::&lt;()&gt;()));
     }
+
+    twizzler_async::Task::spawn(<span class="kw">async move </span>{
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>timeout = twizzler_async::Timer::after(Duration::from_millis(<span class="number">1000</span>));
+            <span class="macro">println!</span>(<span class="string">&quot;pager submitting request&quot;</span>);
+            <span class="kw">let </span>res = sq.submit_and_wait(RequestFromPager::new(
+                twizzler_abi::pager::PagerRequest::EchoReq,
+            ));
+            <span class="kw">let </span>x = res.<span class="kw">await</span>;
+            <span class="macro">println!</span>(<span class="string">&quot;pager got {:?} in response&quot;</span>, x);
+            timeout.<span class="kw">await</span>;
+            <span class="kw">break</span>;
+        }
+    })
+    .detach();
+
     twizzler_async::Task::spawn(<span class="kw">async move </span>{
         <span class="kw">loop </span>{
             <span class="kw">let </span>(id, request) = rq.receive().<span class="kw">await</span>.unwrap();
