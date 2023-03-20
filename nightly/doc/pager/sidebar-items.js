@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["handle_request",""],["main",""]]};
+window.SIDEBAR_ITEMS = {"fn":[["handle_request",""],["main",""],["quick_random",""]],"mod":[["nvme",""],["store",""]],"static":[["RAND_STATE",""]],"struct":[["Foo",""],["Tester",""]]};

@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"pager":[["impl&lt;'a, T:&nbsp;DeviceSync&gt; PhysicalPageCollection for &amp;'a mut <a class=\"struct\" href=\"pager/nvme/dma/struct.NvmeDmaRegion.html\" title=\"struct pager::nvme::dma::NvmeDmaRegion\">NvmeDmaRegion</a>&lt;T&gt;"],["impl&lt;'a, T:&nbsp;DeviceSync&gt; PhysicalPageCollection for &amp;'a mut <a class=\"struct\" href=\"pager/nvme/dma/struct.NvmeDmaSliceRegion.html\" title=\"struct pager::nvme::dma::NvmeDmaSliceRegion\">NvmeDmaSliceRegion</a>&lt;T&gt;"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

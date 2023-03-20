@@ -1,3 +1,3 @@
-(function() {var implementors = {};
-implementors["devmgr"] = [{"text":"impl <a class=\"trait\" href=\"twizzler_driver/request/trait.RequestDriver.html\" title=\"trait twizzler_driver::request::RequestDriver\">RequestDriver</a> for <a class=\"struct\" href=\"devmgr/nvme_test/struct.NvmeQueue.html\" title=\"struct devmgr::nvme_test::NvmeQueue\">NvmeQueue</a>","synthetic":false,"types":["devmgr::nvme_test::NvmeQueue"]}];
-if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
+(function() {var implementors = {
+"pager":[["impl RequestDriver for <a class=\"struct\" href=\"pager/nvme/requester/struct.NvmeRequester.html\" title=\"struct pager::nvme::requester::NvmeRequester\">NvmeRequester</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

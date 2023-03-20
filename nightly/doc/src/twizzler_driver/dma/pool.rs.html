@@ -387,9 +387,6 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::{Arc, Mutex};
 
 <span class="kw">use </span>twizzler_abi::{
@@ -705,11 +702,10 @@
     </span><span class="kw">pub fn </span>allocate&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         init: T,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;, AllocationError&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaRegion&lt;T&gt;, AllocationError&gt; {
         <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;();
         <span class="kw">let </span>(ado, range) = <span class="self">self</span>.do_allocate(len)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>reg = DmaRegion::new(
-            <span class="prelude-val">None</span>,
             len,
             <span class="self">self</span>.access,
             <span class="self">self</span>.opts,
@@ -726,11 +722,10 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         count: usize,
         init: T,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;, AllocationError&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaSliceRegion&lt;T&gt;, AllocationError&gt; {
         <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;() * count;
         <span class="kw">let </span>(ado, range) = <span class="self">self</span>.do_allocate(len)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>reg = DmaSliceRegion::new(
-            <span class="prelude-val">None</span>,
             len,
             <span class="self">self</span>.access,
             <span class="self">self</span>.opts,
@@ -748,11 +743,10 @@
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         count: usize,
         init: <span class="kw">impl </span>Fn() -&gt; T,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;, AllocationError&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;DmaSliceRegion&lt;T&gt;, AllocationError&gt; {
         <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;() * count;
         <span class="kw">let </span>(ado, range) = <span class="self">self</span>.do_allocate(len)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>reg = DmaSliceRegion::new(
-            <span class="prelude-val">None</span>,
             len,
             <span class="self">self</span>.access,
             <span class="self">self</span>.opts,

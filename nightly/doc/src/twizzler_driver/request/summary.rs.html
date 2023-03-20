@@ -58,7 +58,7 @@
     <span class="doccomment">/// A vector of responses in the same order as the submitted requests.
     </span>Responses(Vec&lt;R&gt;),
     <span class="doccomment">/// At least one error occurred. The usize value is the index of the first error.
-    </span>Errors(usize),
+    </span>Errors(usize, Vec&lt;R&gt;),
     <span class="doccomment">/// The request engine was shutdown while the requests were inflight.
     </span>Shutdown,
 }
@@ -67,7 +67,7 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>AnySubmitSummary&lt;R&gt; {
     Done,
     Responses(Vec&lt;R&gt;),
-    Errors(usize),
+    Errors(usize, Vec&lt;R&gt;),
     Shutdown,
 }
 
@@ -88,7 +88,7 @@
         <span class="kw">match </span>a {
             AnySubmitSummary::Done =&gt; SubmitSummary::Done,
             AnySubmitSummary::Responses(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;cannot convert&quot;</span>),
-            AnySubmitSummary::Errors(e) =&gt; SubmitSummary::Errors(e),
+            AnySubmitSummary::Errors(e, <span class="kw">_</span>) =&gt; SubmitSummary::Errors(e),
             AnySubmitSummary::Shutdown =&gt; SubmitSummary::Shutdown,
         }
     }
@@ -99,7 +99,7 @@
         <span class="kw">match </span>a {
             AnySubmitSummary::Responses(r) =&gt; SubmitSummaryWithResponses::Responses(r),
             AnySubmitSummary::Done =&gt; <span class="macro">panic!</span>(<span class="string">&quot;cannot convert&quot;</span>),
-            AnySubmitSummary::Errors(e) =&gt; SubmitSummaryWithResponses::Errors(e),
+            AnySubmitSummary::Errors(e, r) =&gt; SubmitSummaryWithResponses::Errors(e, r),
             AnySubmitSummary::Shutdown =&gt; SubmitSummaryWithResponses::Shutdown,
         }
     }

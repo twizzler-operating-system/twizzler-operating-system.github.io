@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["__get_prp_list_or_buffer",""]],"struct":[["NvmeDmaRegion",""],["NvmeDmaSliceRegion",""],["PrpMgr",""]]};

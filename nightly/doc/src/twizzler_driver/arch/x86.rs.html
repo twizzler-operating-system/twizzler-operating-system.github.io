@@ -18,8 +18,8 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::dma::{DeviceSync, DmaRegion, SyncMode};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sync&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
-    _region: <span class="kw-2">&amp;</span>DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>sync&lt;T: DeviceSync&gt;(
+    _region: <span class="kw-2">&amp;</span>DmaRegion&lt;T&gt;,
     _mode: SyncMode,
     _offset: usize,
     _len: usize,

@@ -239,18 +239,18 @@
 <span class="attribute">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>twizzler_abi::syscall::{BackingType, LifetimeType};
-    <span class="kw">use </span>twizzler_object::{CreateSpec, Object};
+    <span class="kw">use </span>twizzler_object::CreateSpec;
 
-    <span class="kw">use </span><span class="kw">crate</span>::dma::{Access, DmaObject, DmaOptions};
+    <span class="kw">use </span><span class="kw">crate</span>::dma::{Access, DmaOptions, DmaPool};
 
-    <span class="kw">fn </span>make_object() -&gt; Object&lt;()&gt; {
-        <span class="kw">let </span>spec = CreateSpec::new(LifetimeType::Volatile, BackingType::Normal);
-        Object::create_with(<span class="kw-2">&amp;</span>spec, |<span class="kw">_</span>| {}).unwrap()
-    }
     <span class="attribute">#[test]
     </span><span class="kw">fn </span>pin_kaction() {
-        <span class="kw">let </span>dma = DmaObject::new(make_object());
-        <span class="kw">let </span><span class="kw-2">mut </span>reg = dma.region::&lt;u32&gt;(Access::BiDirectional, DmaOptions::default());
+        <span class="kw">let </span>pool = DmaPool::new(
+            CreateSpec::new(LifetimeType::Volatile, BackingType::Normal),
+            Access::BiDirectional,
+            DmaOptions::default(),
+        );
+        <span class="kw">let </span><span class="kw-2">mut </span>reg = pool.allocate(<span class="number">0u32</span>).unwrap();
         <span class="kw">let </span>pin = reg.pin().unwrap();
         <span class="kw">for </span>phys <span class="kw">in </span>pin {
             <span class="kw">let </span>addr = phys.addr();

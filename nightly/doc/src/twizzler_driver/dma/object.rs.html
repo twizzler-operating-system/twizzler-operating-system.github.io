@@ -91,10 +91,6 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-<span id="94">94</span>
-<span id="95">95</span>
-<span id="96">96</span>
-<span id="97">97</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::sync::Mutex;
 
 <span class="kw">use </span>twizzler_abi::{
@@ -114,20 +110,20 @@
 }
 
 <span class="kw">impl </span>DmaObject {
-    <span class="doccomment">/// Create a [DmaSliceRegion] from the base of this object, where the region represents memory
+    <span class="doccomment">/// TODO: support
+    /// Create a [DmaSliceRegion] from the base of this object, where the region represents memory
     /// of type `[T; len]`.
-    </span><span class="kw">pub fn </span>slice_region&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+    </span><span class="kw">fn </span>_slice_region&lt;T: DeviceSync&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         len: usize,
         access: Access,
         options: DmaOptions,
-    ) -&gt; DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    ) -&gt; DmaSliceRegion&lt;T&gt; {
         <span class="kw">let </span>nr_bytes = core::mem::size_of::&lt;T&gt;()
             .checked_mul(len)
             .expect(<span class="string">&quot;Value of len too large&quot;</span>);
         <span class="macro">assert!</span>(nr_bytes &lt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2</span>);
         DmaSliceRegion::new(
-            <span class="prelude-val">Some</span>(<span class="self">self</span>),
             core::mem::size_of::&lt;T&gt;() * len,
             access,
             options,
@@ -137,15 +133,11 @@
         )
     }
 
-    <span class="doccomment">/// Create a [DmaRegion] from the base of this object, where the region represents memory
+    <span class="doccomment">/// TODO: support
+    /// Create a [DmaRegion] from the base of this object, where the region represents memory
     /// of type `T`.
-    </span><span class="kw">pub fn </span>region&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        access: Access,
-        options: DmaOptions,
-    ) -&gt; DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    </span><span class="kw">fn </span>_region&lt;T: DeviceSync&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, access: Access, options: DmaOptions) -&gt; DmaRegion&lt;T&gt; {
         DmaRegion::new(
-            <span class="prelude-val">Some</span>(<span class="self">self</span>),
             core::mem::size_of::&lt;T&gt;(),
             access,
             options,

@@ -72,7 +72,109 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-</pre><pre class="rust"><code><span class="kw">use </span>std::time::Duration;
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+</pre><pre class="rust"><code><span class="attribute">#![feature(int_log)]
+#![feature(once_cell)]
+</span><span class="kw">use </span>std::time::Duration;
 
 <span class="kw">use </span>twizzler_abi::pager::{
     CompletionToKernel, CompletionToPager, KernelCompletionData, RequestFromKernel,
@@ -80,8 +182,23 @@
 };
 <span class="kw">use </span>twizzler_object::{ObjID, Object, ObjectInitFlags, Protections};
 
+<span class="kw">use </span>std::collections::BTreeMap;
+
+<span class="kw">use </span>tickv::{success_codes::SuccessCode, ErrorCode};
+
+<span class="kw">use </span><span class="kw">crate</span>::store::{Key, KeyValueStore, Storage, BLOCK_SIZE};
+
+<span class="kw">mod </span>nvme;
+<span class="kw">mod </span>store;
+
 <span class="kw">async fn </span>handle_request(_request: RequestFromKernel) -&gt; <span class="prelude-ty">Option</span>&lt;CompletionToKernel&gt; {
     <span class="prelude-val">Some</span>(CompletionToKernel::new(KernelCompletionData::EchoResp))
+}
+
+<span class="attribute">#[repr(C, packed)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">struct </span>Foo {
+    x: u32,
 }
 
 <span class="kw">fn </span>main() {
@@ -113,7 +230,7 @@
     <span class="kw">let </span>kqueue = twizzler_queue::Queue::&lt;RequestFromPager, CompletionToPager&gt;::from(kobject);
     <span class="kw">let </span>sq = twizzler_queue::QueueSender::new(kqueue);
 
-    <span class="kw">let </span>num_threads = <span class="number">1</span>;
+    <span class="kw">let </span>num_threads = <span class="number">2</span>;
     <span class="kw">for _ in </span><span class="number">0</span>..(num_threads - <span class="number">1</span>) {
         std::thread::spawn(|| twizzler_async::run(std::future::pending::&lt;()&gt;()));
     }
@@ -132,6 +249,12 @@
         }
     })
     .detach();
+    <span class="kw">let </span>nvme_ctrl = twizzler_async::block_on(nvme::init_nvme());
+    <span class="kw">let </span>len = twizzler_async::block_on(nvme_ctrl.flash_len());
+
+    <span class="kw">let </span>storage = Storage::new(nvme_ctrl);
+    <span class="kw">let </span><span class="kw-2">mut </span>read_buffer = [<span class="number">0</span>; BLOCK_SIZE];
+    <span class="kw">let </span>_kv = KeyValueStore::new(storage, <span class="kw-2">&amp;mut </span>read_buffer, len).unwrap();
 
     twizzler_async::Task::spawn(<span class="kw">async move </span>{
         <span class="kw">loop </span>{
@@ -145,6 +268,83 @@
     })
     .detach();
     twizzler_async::run(std::future::pending::&lt;()&gt;());
+}
+
+<span class="kw">static </span><span class="kw-2">mut </span>RAND_STATE: u32 = <span class="number">0</span>;
+<span class="kw">pub fn </span>quick_random() -&gt; u32 {
+    <span class="kw">let </span>state = <span class="kw">unsafe </span>{ RAND_STATE };
+    <span class="kw">let </span>newstate = state.wrapping_mul(<span class="number">69069</span>).wrapping_add(<span class="number">5</span>);
+    <span class="kw">unsafe </span>{
+        RAND_STATE = newstate;
+    }
+    newstate &gt;&gt; <span class="number">16
+</span>}
+
+<span class="kw">struct </span>Tester&lt;<span class="lifetime">&#39;a</span>&gt; {
+    kv: KeyValueStore&lt;<span class="lifetime">&#39;a</span>&gt;,
+    truth: BTreeMap&lt;Key, Foo&gt;,
+}
+
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Tester&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>test(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">const </span>TEST_ITERS: u32 = <span class="number">100000</span>;
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..TEST_ITERS {
+            <span class="comment">// Every once in a while, validate some things.
+            </span><span class="kw">if </span>i % <span class="number">2000 </span>== <span class="number">0 </span>{
+                <span class="self">self</span>.validate_has_all();
+            }
+            <span class="kw">let </span>x = i % (<span class="number">10001 </span>+ i / <span class="number">1000</span>);
+            <span class="kw">let </span>k = Key::new(ObjID::new(<span class="number">0</span>), x, store::KeyKind::ObjectInfo);
+            <span class="kw">let _ </span>= <span class="self">self</span>.get(k);
+            <span class="kw">let </span>num = quick_random() % <span class="number">3</span>;
+            <span class="kw">if </span>num == <span class="number">0 </span>|| num == <span class="number">2 </span>{
+                <span class="kw">let _ </span>= <span class="self">self</span>.put(k, Foo { x: x });
+            } <span class="kw">else if </span>num == <span class="number">1 </span>{
+                <span class="kw">let _ </span>= <span class="self">self</span>.del(k);
+            }
+        }
+    }
+
+    <span class="kw">fn </span>validate_has_all(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">for </span>(key, val) <span class="kw">in </span><span class="self">self</span>.truth.iter() {
+            <span class="kw">let </span>res: Foo = <span class="self">self</span>.kv.get(<span class="kw-2">*</span>key).unwrap();
+            <span class="macro">assert_eq!</span>(res, <span class="kw-2">*</span>val);
+        }
+    }
+
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: Key) -&gt; <span class="prelude-ty">Result</span>&lt;Foo, ErrorCode&gt; {
+        <span class="kw">let </span>r = <span class="self">self</span>.kv.get(key);
+        <span class="kw">if </span>r.is_ok() {
+            <span class="macro">assert!</span>(<span class="self">self</span>.truth.contains_key(<span class="kw-2">&amp;</span>key));
+            <span class="kw">let </span>t = <span class="self">self</span>.truth.get(<span class="kw-2">&amp;</span>key).unwrap();
+            <span class="macro">assert_eq!</span>(t, r.as_ref().unwrap());
+        } <span class="kw">else </span>{
+            <span class="macro">assert!</span>(!<span class="self">self</span>.truth.contains_key(<span class="kw-2">&amp;</span>key));
+        }
+        r
+    }
+
+    <span class="kw">fn </span>put(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Key, v: Foo) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessCode, ErrorCode&gt; {
+        <span class="kw">let </span>res = <span class="self">self</span>.kv.put(key, v);
+        <span class="kw">if </span>res.is_ok() {
+            <span class="macro">assert!</span>(!<span class="self">self</span>.truth.contains_key(<span class="kw-2">&amp;</span>key));
+            <span class="self">self</span>.truth.insert(key, v);
+        } <span class="kw">else </span>{
+            <span class="macro">assert!</span>(<span class="self">self</span>.truth.contains_key(<span class="kw-2">&amp;</span>key));
+        }
+        res
+    }
+
+    <span class="kw">fn </span>del(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: Key) -&gt; <span class="prelude-ty">Result</span>&lt;SuccessCode, ErrorCode&gt; {
+        <span class="kw">let </span>res = <span class="self">self</span>.kv.del(key);
+        <span class="kw">if </span>res.is_err() {
+            <span class="macro">assert!</span>(!<span class="self">self</span>.truth.contains_key(<span class="kw-2">&amp;</span>key));
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.truth.remove(<span class="kw-2">&amp;</span>key).unwrap();
+        }
+        res
+    }
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pager" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

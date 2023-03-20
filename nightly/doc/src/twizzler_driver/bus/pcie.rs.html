@@ -215,6 +215,16 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class="rust"><code><span class="doccomment">//! PCIe-specific functionality.
 
 </span><span class="kw">use </span>std::ptr::NonNull;
@@ -387,7 +397,8 @@
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">fn </span>allocate_pcie_interrupt(
+    <span class="attribute">#[allow(unaligned_references)]
+    </span><span class="kw">fn </span>allocate_pcie_interrupt(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         vec: InterruptVector,
         inum: usize,
@@ -398,6 +409,15 @@
             .ok_or(InterruptAllocationError::Unsupported)<span class="question-mark">?
         </span>{
             <span class="kw">if let </span>PcieCapability::MsiX(m) = cap {
+                <span class="kw">for </span>msitest <span class="kw">in </span><span class="self">self
+                    </span>.pcie_capabilities()
+                    .ok_or(InterruptAllocationError::Unsupported)<span class="question-mark">?
+                </span>{
+                    <span class="kw">if let </span>PcieCapability::Msi(m) = msitest {
+                        <span class="kw">let </span>msi = <span class="kw">unsafe </span>{ m.as_ref() };
+                        msi.msg_ctrl.set(<span class="number">0</span>);
+                    }
+                }
                 <span class="kw">return unsafe </span>{ <span class="self">self</span>.allocate_msix_interrupt(m.as_ref(), vec, inum) };
             }
         }

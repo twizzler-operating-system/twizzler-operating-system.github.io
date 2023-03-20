@@ -192,6 +192,12 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
 </pre><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     mem::MaybeUninit,
@@ -259,7 +265,13 @@
                 AnySubmitSummary::Done
             }
         } <span class="kw">else </span>{
-            AnySubmitSummary::Errors(<span class="self">self</span>.first_err)
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(resps) = <span class="self">self</span>.resps.take() {
+                <span class="kw">let </span>arr = resps.into_raw_parts();
+                <span class="kw">let </span>na = <span class="kw">unsafe </span>{ Vec::from_raw_parts(arr.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut </span>R, arr.<span class="number">1</span>, arr.<span class="number">2</span>) };
+                AnySubmitSummary::Errors(<span class="self">self</span>.first_err, na)
+            } <span class="kw">else </span>{
+                AnySubmitSummary::Errors(<span class="self">self</span>.first_err, <span class="macro">vec!</span>[])
+            }
         }
     }
 

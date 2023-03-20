@@ -401,13 +401,13 @@
 
 <span class="doccomment">/// A region of DMA memory, represented in virtual memory as type `T`, with a particular access mode
 /// and options.
-</span><span class="kw">pub struct </span>DmaRegion&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; {
+</span><span class="kw">pub struct </span>DmaRegion&lt;T: DeviceSync&gt; {
     virt: <span class="kw-2">*mut </span>u8,
     backing: <span class="prelude-ty">Option</span>&lt;(Vec&lt;PhysInfo&gt;, u32)&gt;,
     len: usize,
     access: Access,
-    dma: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DmaObject&gt;,
-    pool: <span class="prelude-ty">Option</span>&lt;(Arc&lt;AllocatableDmaObject&gt;, SplitPageRange)&gt;,
+    <span class="comment">//dma: Option&lt;&amp;&#39;a DmaObject&gt;,
+    </span>pool: <span class="prelude-ty">Option</span>&lt;(Arc&lt;AllocatableDmaObject&gt;, SplitPageRange)&gt;,
     options: DmaOptions,
     offset: usize,
     _pd: PhantomData&lt;T&gt;,
@@ -415,14 +415,13 @@
 
 <span class="doccomment">/// A region of DMA memory, represented in virtual memory as type `[T; len]`, with a particular access mode
 /// and options.
-</span><span class="kw">pub struct </span>DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; {
-    region: DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt;,
+</span><span class="kw">pub struct </span>DmaSliceRegion&lt;T: DeviceSync&gt; {
+    region: DmaRegion&lt;T&gt;,
     len: usize,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; DmaRegion&lt;T&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
-        dma: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DmaObject&gt;,
         len: usize,
         access: Access,
         options: DmaOptions,
@@ -431,7 +430,11 @@
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             virt: <span class="kw">unsafe </span>{
-                (dma.unwrap_or_else(|| pool.as_ref().unwrap().<span class="number">0</span>.dma_object())
+                (pool
+                    .as_ref()
+                    .unwrap()
+                    .<span class="number">0
+                    </span>.dma_object()
                     .object()
                     .base_mut_unchecked() <span class="kw">as </span><span class="kw-2">*mut </span>() <span class="kw">as </span><span class="kw-2">*mut </span>u8)
                     .add(offset)
@@ -439,7 +442,6 @@
             },
             len,
             access,
-            dma,
             options,
             backing: <span class="prelude-val">None</span>,
             pool,
@@ -457,8 +459,7 @@
     }
 
     <span class="kw">fn </span>dma_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>DmaObject {
-        <span class="self">self</span>.dma
-            .unwrap_or_else(|| <span class="self">self</span>.pool.as_ref().unwrap().<span class="number">0</span>.dma_object())
+        <span class="self">self</span>.pool.as_ref().unwrap().<span class="number">0</span>.dma_object()
     }
 
     <span class="doccomment">/// Calculate the number of pages this region covers.
@@ -597,9 +598,8 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; DmaSliceRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; DmaSliceRegion&lt;T&gt; {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
-        dma: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DmaObject&gt;,
         nrbytes: usize,
         access: Access,
         options: DmaOptions,
@@ -608,7 +608,7 @@
         pool: <span class="prelude-ty">Option</span>&lt;(Arc&lt;AllocatableDmaObject&gt;, SplitPageRange)&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            region: DmaRegion::new(dma, nrbytes, access, options, offset, pool),
+            region: DmaRegion::new(nrbytes, access, options, offset, pool),
             len,
         }
     }
@@ -743,7 +743,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; Drop <span class="kw">for </span>DmaRegion&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: DeviceSync&gt; Drop <span class="kw">for </span>DmaRegion&lt;T&gt; {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, token)) = <span class="self">self</span>.backing.as_ref() {
             <span class="self">self</span>.dma_object()
