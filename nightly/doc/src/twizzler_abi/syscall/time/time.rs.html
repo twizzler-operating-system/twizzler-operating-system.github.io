@@ -70,9 +70,20 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
 </pre><pre class="rust"><code><span class="kw">use </span>core::{time::Duration, ops::Sub};
 
-<span class="kw">use super</span>::{NanoSeconds, FemtoSeconds, Seconds, FEMTOS_PER_SEC, NANOS_PER_SEC};
+<span class="kw">use super</span>::{NanoSeconds, FemtoSeconds, Seconds, FEMTOS_PER_SEC, NANOS_PER_SEC, FEMTOS_PER_NANO};
 
 <span class="attribute">#[derive(Clone, Copy, Debug, PartialEq)]
 </span><span class="kw">pub struct </span>TimeSpan(<span class="kw">pub </span>Seconds, <span class="kw">pub </span>FemtoSeconds);
@@ -104,9 +115,20 @@
         )
     }
 
+    <span class="kw">pub const fn </span>from_nanos(nanos: u64) -&gt; TimeSpan {
+        TimeSpan(
+            Seconds(nanos / NANOS_PER_SEC),
+            FemtoSeconds(((nanos % NANOS_PER_SEC) <span class="kw">as </span>u64) * FEMTOS_PER_NANO)
+        )
+    }
+
     <span class="kw">pub fn </span>as_nanos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
         <span class="kw">let </span>nanos: NanoSeconds = <span class="self">self</span>.<span class="number">1</span>.into();
         <span class="self">self</span>.<span class="number">0.0 </span><span class="kw">as </span>u128 * NANOS_PER_SEC <span class="kw">as </span>u128 + nanos.<span class="number">0 </span><span class="kw">as </span>u128
+    }
+
+    <span class="kw">pub fn </span>as_femtos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
+        <span class="self">self</span>.<span class="number">0.0 </span><span class="kw">as </span>u128 * FEMTOS_PER_SEC <span class="kw">as </span>u128 + <span class="self">self</span>.<span class="number">1.0 </span><span class="kw">as </span>u128
     }
 
     <span class="kw">pub const fn </span>checked_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, other: TimeSpan) -&gt; <span class="prelude-ty">Option</span>&lt;TimeSpan&gt; {
