@@ -225,16 +225,137 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions for manipulating threads.
 
 </span><span class="kw">use </span>core::{
     alloc::Layout,
     ptr,
     sync::atomic::{AtomicU64, Ordering},
-    time::Duration,
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::syscall::{sys_thread_sync, ThreadSync, ThreadSyncFlags, ThreadSyncOp, ThreadSyncSleep};
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
+</span><span class="kw">use </span>core::time::Duration;
+
+<span class="kw">use </span><span class="kw">crate</span>::marker::BaseType;
+
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::syscall::<span class="kw-2">*</span>;
+
 <span class="attribute">#[allow(unused_imports)]
 </span><span class="kw">use crate</span>::{
     object::{ObjID, Protections},
@@ -242,31 +363,140 @@
     syscall::{MapFlags, ThreadSpawnArgs, ThreadSpawnFlags},
 };
 
+<span class="kw">pub mod </span>event;
 <span class="doccomment">/// Base type for a thread object.
-</span><span class="attribute">#[repr(C)]
+</span><span class="attribute">#[derive(Default)]
+#[repr(C)]
 </span><span class="kw">pub struct </span>ThreadRepr {
     version: u32,
     flags: u32,
-    status: AtomicU64,
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
+    </span>status: AtomicU64,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)]
+    </span><span class="kw">pub </span>status: AtomicU64,
     code: AtomicU64,
 }
 
+<span class="kw">impl </span>BaseType <span class="kw">for </span>ThreadRepr {
+    <span class="kw">fn </span>init&lt;T&gt;(_t: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
+    }
+
+    <span class="kw">fn </span>tags() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(<span class="kw">crate</span>::marker::BaseVersion, <span class="kw">crate</span>::marker::BaseTag)] {
+        <span class="macro">todo!</span>()
+    }
+}
+
+<span class="doccomment">/// Possible execution states for a thread. The transitions available are:
+/// +------------+     +-----------+     +-------------+
+/// |  Sleeping  +&lt;---&gt;+  Running  +&lt;---&gt;+  Suspended  |
+/// +------------+     +-----+-----+     +-------------+
+///                          |
+///                          |   +----------+
+///                          +--&gt;+  Exited  |
+///                              +----------+
+/// The kernel will not transition a thread out of the exited state.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>ExecutionState {
+    <span class="doccomment">/// The thread is running or waiting to be scheduled on a CPU.
+    </span>Running,
+    <span class="doccomment">/// The thread is sleeping, waiting for a condition in-kernel.
+    </span>Sleeping,
+    <span class="doccomment">/// The thread is suspended, and will not resume until manually transitioned back to running.
+    </span>Suspended,
+    <span class="doccomment">/// The thread has terminated, and will never run again.
+    </span>Exited = <span class="number">255</span>,
+}
+
+<span class="kw">impl </span>ExecutionState {
+    <span class="kw">fn </span>from_status(status: u64) -&gt; <span class="self">Self </span>{
+        <span class="comment">// If we see a status we don&#39;t understand, just assume the thread is running.
+        </span><span class="kw">match </span>status &amp; <span class="number">0xff </span>{
+            <span class="number">1 </span>=&gt; ExecutionState::Sleeping,
+            <span class="number">2 </span>=&gt; ExecutionState::Suspended,
+            <span class="number">255 </span>=&gt; ExecutionState::Exited,
+            <span class="kw">_ </span>=&gt; ExecutionState::Running,
+        }
+    }
+}
+
 <span class="kw">impl </span>ThreadRepr {
-    <span class="doccomment">/// Wait for a thread&#39;s status to change.
-    </span><span class="kw">pub fn </span>wait(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
-        <span class="kw">while </span><span class="self">self</span>.status.load(Ordering::SeqCst) == <span class="number">0 </span>{
+    <span class="kw">pub fn </span>get_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ExecutionState {
+        <span class="kw">let </span>status = <span class="self">self</span>.status.load(Ordering::Acquire);
+        ExecutionState::from_status(status)
+    }
+
+    <span class="kw">pub fn </span>get_code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.code.load(Ordering::SeqCst)
+    }
+
+    <span class="kw">pub fn </span>set_state(<span class="kw-2">&amp;</span><span class="self">self</span>, state: ExecutionState, code: u64) -&gt; ExecutionState {
+        <span class="kw">let </span><span class="kw-2">mut </span>old_status = <span class="self">self</span>.status.load(Ordering::SeqCst);
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>old_state = ExecutionState::from_status(old_status);
+            <span class="kw">if </span>old_state == ExecutionState::Exited {
+                <span class="kw">return </span>old_state;
+            }
+
+            <span class="kw">let </span>status = state <span class="kw">as </span>u8 <span class="kw">as </span>u64;
+            <span class="kw">if </span>state == ExecutionState::Exited {
+                <span class="self">self</span>.code.store(code, Ordering::SeqCst);
+            }
+
+            <span class="kw">let </span>result = <span class="self">self</span>.status.compare_exchange(
+                old_status,
+                status,
+                Ordering::SeqCst,
+                Ordering::SeqCst,
+            );
+            <span class="kw">match </span>result {
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="kw">if </span>!(old_state == ExecutionState::Running &amp;&amp; state == ExecutionState::Sleeping
+                        || old_state == ExecutionState::Sleeping
+                            &amp;&amp; state == ExecutionState::Running)
+                        &amp;&amp; old_state != state
+                    {
+                        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
+                        </span><span class="kw">let _ </span>= sys_thread_sync(
+                            <span class="kw-2">&amp;mut </span>[ThreadSync::new_wake(ThreadSyncWake::new(
+                                ThreadSyncReference::Virtual(<span class="kw-2">&amp;</span><span class="self">self</span>.status),
+                                usize::MAX,
+                            ))],
+                            <span class="prelude-val">None</span>,
+                        );
+                    }
+                    <span class="kw">return </span>old_state;
+                }
+                <span class="prelude-val">Err</span>(x) =&gt; {
+                    old_status = x;
+                }
+            }
+        }
+    }
+
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
+    </span><span class="doccomment">/// Wait for a thread&#39;s status to change, optionally timing out. Return value is None if timeout occurs, or
+    /// Some((ExecutionState, code)) otherwise.
+    </span><span class="kw">pub fn </span>wait(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;(ExecutionState, u64)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>status = <span class="self">self</span>.get_state();
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>status != ExecutionState::Running {
+                <span class="kw">return </span><span class="prelude-val">Some</span>((status, <span class="self">self</span>.code.load(Ordering::SeqCst)));
+            }
+
             <span class="kw">let </span>op = ThreadSync::new_sleep(ThreadSyncSleep::new(
-                <span class="kw">crate</span>::syscall::ThreadSyncReference::Virtual(<span class="kw-2">&amp;</span><span class="self">self</span>.status <span class="kw">as </span><span class="kw-2">*const </span>AtomicU64),
+                <span class="kw">crate</span>::syscall::ThreadSyncReference::Virtual(<span class="kw-2">&amp;</span><span class="self">self</span>.status),
                 <span class="number">0</span>,
                 ThreadSyncOp::Equal,
                 ThreadSyncFlags::empty(),
             ));
             sys_thread_sync(<span class="kw-2">&amp;mut </span>[op], timeout).unwrap();
-            <span class="kw">if </span>timeout.is_some() &amp;&amp; <span class="self">self</span>.status.load(Ordering::SeqCst) == <span class="number">0 </span>{
+            status = <span class="self">self</span>.get_state();
+            <span class="kw">if </span>timeout.is_some() &amp;&amp; status == ExecutionState::Running {
                 <span class="kw">return </span><span class="prelude-val">None</span>;
             }
         }
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.code.load(Ordering::SeqCst))
     }
 }
 
@@ -450,7 +680,7 @@
 
 <span class="doccomment">/// Exit the current thread.
 </span><span class="kw">pub fn </span>exit() -&gt; ! {
-    <span class="kw">crate</span>::syscall::sys_thread_exit(<span class="number">0</span>, ptr::null_mut());
+    <span class="kw">crate</span>::syscall::sys_thread_exit(<span class="number">0</span>);
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

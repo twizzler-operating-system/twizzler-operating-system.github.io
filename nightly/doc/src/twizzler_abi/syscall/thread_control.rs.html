@@ -76,8 +76,58 @@
 <span id="76">76</span>
 <span id="77">77</span>
 <span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
+<span id="90">90</span>
+<span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
+<span id="96">96</span>
+<span id="97">97</span>
+<span id="98">98</span>
+<span id="99">99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
 </pre><pre class="rust"><code><span class="kw">use crate</span>::{
     arch::syscall::raw_syscall,
+    object::ObjID,
     upcall::{UpcallFrame, UpcallInfo},
 };
 
@@ -97,8 +147,35 @@
     </span>Yield = <span class="number">1</span>,
     <span class="doccomment">/// Set thread&#39;s TLS pointer
     </span>SetTls = <span class="number">2</span>,
+    <span class="doccomment">/// Get the thread&#39;s TLS pointer.
+    </span>GetTls = <span class="number">3</span>,
     <span class="doccomment">/// Set the thread&#39;s upcall pointer (child threads in the same virtual address space will inherit).
-    </span>SetUpcall = <span class="number">3</span>,
+    </span>SetUpcall = <span class="number">4</span>,
+    <span class="doccomment">/// Get the upcall pointer.
+    </span>GetUpcall = <span class="number">5</span>,
+    <span class="doccomment">/// Read a register from the thread&#39;s CPU state. The thread must be suspended.
+    </span>ReadRegister = <span class="number">6</span>,
+    <span class="doccomment">/// Write a value to a register in the thread&#39;s CPU state. The thread must be suspended.
+    </span>WriteRegister = <span class="number">7</span>,
+    <span class="doccomment">/// Send a user-defined async or sync event to the thread.
+    </span>SendMessage = <span class="number">8</span>,
+    <span class="doccomment">/// Change the thread&#39;s state. Allowed transitions are:
+    /// running -&gt; suspended
+    /// suspended -&gt; running
+    /// running -&gt; exited
+    </span>ChangeState = <span class="number">9</span>,
+    <span class="doccomment">/// Set the Trap State for the thread.
+    </span>SetTrapState = <span class="number">10</span>,
+    <span class="doccomment">/// Get the Trap State for the thread.
+    </span>GetTrapState = <span class="number">11</span>,
+    <span class="doccomment">/// Set a thread&#39;s priority. Threads require special permission to increase their priority.
+    </span>SetPriority = <span class="number">12</span>,
+    <span class="doccomment">/// Get a thread&#39;s priority.
+    </span>GetPriority = <span class="number">13</span>,
+    <span class="doccomment">/// Set a thread&#39;s affinity.
+    </span>SetAffinity = <span class="number">14</span>,
+    <span class="doccomment">/// Get a thread&#39;s affinity.
+    </span>GetAffinity = <span class="number">15</span>,
 }
 
 <span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ThreadControl {
@@ -113,15 +190,11 @@
     }
 }
 
-<span class="doccomment">/// Exit the thread. arg1 and arg2 should be code and location respectively, where code contains
-/// a 64-bit value to write into *location, followed by the kernel performing a thread-wake
-/// event on the memory word at location. If location is null, the write and thread-wake do not occur.
-</span><span class="kw">pub fn </span>sys_thread_exit(code: u64, location: <span class="kw-2">*mut </span>u64) -&gt; ! {
+<span class="doccomment">/// Exit the thread. The code will be written to the [crate::thread::ThreadRepr] for the current thread as part
+/// of updating the status and code to indicate thread has exited.
+</span><span class="kw">pub fn </span>sys_thread_exit(code: u64) -&gt; ! {
     <span class="kw">unsafe </span>{
-        raw_syscall(
-            Syscall::ThreadCtrl,
-            <span class="kw-2">&amp;</span>[ThreadControl::Exit <span class="kw">as </span>u64, code, location <span class="kw">as </span>u64],
-        );
+        raw_syscall(Syscall::ThreadCtrl, <span class="kw-2">&amp;</span>[ThreadControl::Exit <span class="kw">as </span>u64, code]);
     }
     <span class="macro">unreachable!</span>()
 }
@@ -153,6 +226,31 @@
             <span class="kw-2">&amp;</span>[ThreadControl::SetUpcall <span class="kw">as </span>u64, loc <span class="kw">as </span>usize <span class="kw">as </span>u64],
         );
     }
+}
+
+<span class="kw">pub fn </span>sys_thread_ctrl(
+    target: <span class="prelude-ty">Option</span>&lt;ObjID&gt;,
+    cmd: ThreadControl,
+    arg0: usize,
+    arg1: usize,
+    arg2: usize,
+) -&gt; (u64, u64) {
+    <span class="kw">let </span>target = target.unwrap_or(ObjID::new(<span class="number">0</span>));
+    <span class="kw">let </span>ids = target.split();
+    <span class="kw">unsafe </span>{
+        raw_syscall(
+            Syscall::ThreadCtrl,
+            <span class="kw-2">&amp;</span>[
+                ids.<span class="number">0</span>,
+                ids.<span class="number">1</span>,
+                cmd <span class="kw">as </span>u64,
+                arg0 <span class="kw">as </span>u64,
+                arg1 <span class="kw">as </span>u64,
+                arg2 <span class="kw">as </span>u64,
+            ],
+        )
+    };
+    <span class="macro">todo!</span>(<span class="string">&quot;not ready yet!&quot;</span>)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

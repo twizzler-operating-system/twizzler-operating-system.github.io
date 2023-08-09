@@ -224,9 +224,6 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Runtime functions for Twizzler userspace. This part of the code is a bit arcane and somewhat
 //! tricky, so buckle up.
 //!
@@ -450,11 +447,8 @@
     }
 
     <span class="comment">/* it&#39;s unsafe because it&#39;s an extern C function. */
-    /* TODO: pass env and args */
-    // let code = unsafe { std_runtime_start(arg_count, arg_ptr, &amp;null_env as *const *const i8) };
     </span><span class="kw">let </span>code = <span class="kw">unsafe </span>{ std_runtime_start(arg_count, arg_ptr, env_ptr) };
-    <span class="comment">//TODO: exit val
-    </span><span class="kw">crate</span>::syscall::sys_thread_exit(code <span class="kw">as </span>u64, ptr::null_mut())
+    <span class="kw">crate</span>::syscall::sys_thread_exit(code <span class="kw">as </span>u64)
 }
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

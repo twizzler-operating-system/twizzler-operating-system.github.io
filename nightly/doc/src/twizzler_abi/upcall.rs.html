@@ -201,7 +201,7 @@
         <span class="kw">crate</span>::syscall::KernelConsoleWriteFlags::empty(),
     );
     <span class="kw">if </span>UPCALL_PANIC.load(Ordering::SeqCst) {
-        <span class="kw">crate</span>::syscall::sys_thread_exit(<span class="number">127</span>, core::ptr::null_mut());
+        <span class="kw">crate</span>::syscall::sys_thread_exit(<span class="number">127</span>);
     }
     UPCALL_PANIC.store(<span class="bool-val">true</span>, Ordering::SeqCst);
     <span class="comment">// TODO: check if we have a panic runtime.

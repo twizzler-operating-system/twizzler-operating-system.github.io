@@ -471,6 +471,8 @@
 <span id="471">471</span>
 <span id="472">472</span>
 <span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
 </pre><pre class="rust"><code><span class="comment">//#![no_std]
 </span><span class="attribute">#![feature(lang_items)]
 #![feature(naked_functions)]
@@ -858,7 +860,9 @@ pub fn __panic(_: &amp;core::panic::PanicInfo) -&gt; ! {
                     <span class="kw">unsafe </span>{
                         <span class="kw">let </span>val = tr.as_ref().unwrap().wait(<span class="prelude-val">None</span>);
                         <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = val {
-                            <span class="kw">if </span>val != <span class="number">0 </span>{
+                            <span class="kw">if </span>val.<span class="number">0 </span>== ExecutionState::Exited &amp;&amp; val.<span class="number">1 </span>!= <span class="number">0
+                                </span>|| val.<span class="number">0 </span>== ExecutionState::Suspended
+                            {
                                 test_failed = <span class="bool-val">true</span>;
                             }
                         }
@@ -941,7 +945,7 @@ extern &quot;C&quot; fn _start() -&gt; ! {
         NewHandleFlags, ObjectCreate, ObjectCreateFlags, ThreadSync, ThreadSyncFlags, ThreadSyncOp,
         ThreadSyncReference, ThreadSyncSleep, ThreadSyncWake,
     },
-    thread::ThreadRepr,
+    thread::{ExecutionState, ThreadRepr},
 };
 <span class="kw">use </span>twizzler_object::{CreateSpec, Object, ObjectInitFlags};
 </code></pre></div>
