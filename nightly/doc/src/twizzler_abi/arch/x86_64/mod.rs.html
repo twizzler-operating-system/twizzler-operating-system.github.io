@@ -2,9 +2,21 @@
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
+<span id="5">5</span>
+<span id="6">6</span>
+<span id="7">7</span>
+<span id="8">8</span>
+<span id="9">9</span>
+<span id="10">10</span>
 </pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;rt&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>rt0;
 <span class="kw">pub mod </span>syscall;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>upcall;
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rt&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_thread_tls() -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">*mut </span>u8, usize, usize)&gt; {
+    <span class="comment">// x86_64 uses variant II for TLS
+    </span><span class="kw">crate</span>::rt1::tls_variant2()
+}
 </code></pre></div>
 </section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="twizzler_abi" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.66.0-dev" ></div></body></html>

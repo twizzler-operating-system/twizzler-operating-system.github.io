@@ -224,6 +224,53 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Runtime functions for Twizzler userspace. This part of the code is a bit arcane and somewhat
 //! tricky, so buckle up.
 //!
@@ -319,7 +366,8 @@
     </span>}
 }
 
-<span class="kw">const </span>MIN_TLS_ALIGN: usize = <span class="number">16</span>;
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">const </span>MIN_TLS_ALIGN: usize = <span class="number">16</span>;
 <span class="kw">use </span>core::alloc::Layout;
 <span class="kw">fn </span>init_tls() -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
     new_thread_tls().map(|(s, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| s <span class="kw">as </span>u64)
@@ -327,6 +375,52 @@
 
 <span class="comment">//let (tls_set, tls_base, tls_len, tls_align) = crate::rt1::new_thread_tls();
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_thread_tls() -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">*mut </span>u8, usize, usize)&gt; {
+    <span class="kw">crate</span>::arch::new_thread_tls()
+}
+
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tls_variant1() -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">*mut </span>u8, usize, usize)&gt; {
+    <span class="kw">unsafe </span>{
+        TLS_INFO.as_ref().map(|tls_template| {
+            <span class="comment">// TODO: reserved region may be arch specific. aarch64 reserves two
+            // words after the thread pointer (TP), before any TLS blocks
+            </span><span class="kw">let </span>reserved_bytes = core::mem::size_of::&lt;<span class="kw-2">*const </span>u64&gt;() * <span class="number">2</span>;
+            <span class="comment">// the size of the TLS region in memory
+            </span><span class="kw">let </span>tls_size = tls_template.memsz + reserved_bytes;
+
+            <span class="comment">// generate a layout where the size is rounded up if not aligned
+            </span><span class="kw">let </span>layout = <span class="kw">crate</span>::internal_unwrap(
+                Layout::from_size_align(tls_size, tls_template.align).ok(),
+                <span class="string">&quot;failed to unwrap TLS layout&quot;</span>,
+            );            
+            
+            <span class="comment">// allocate a region of memory for the thread-local data initialized to zero
+            </span><span class="kw">let </span>tcb_base = <span class="kw">crate</span>::alloc::global_alloc(layout);
+            <span class="kw">if </span>tcb_base.is_null() {
+                <span class="kw">crate</span>::print_err(<span class="string">&quot;failed to allocate TLS&quot;</span>);
+                <span class="kw">crate</span>::abort();
+            }
+            ptr::write_bytes(tcb_base, <span class="number">0x00</span>, layout.size());
+
+            <span class="comment">// Architechtures that use TLS Variant I (e.g. ARM) have the thread pointer 
+            // point to the start of the TCB and thread-local vars are defined 
+            // before this in higher memory addresses. So accessing a thread
+            // local var adds some offset to the thread pointer
+            //
+            // we need a pointer offset of reserved_bytes. add here increments
+            // the pointer offset by sizeof u8 bytes.
+            </span><span class="kw">let </span>tls_base = tcb_base.add(reserved_bytes);
+            <span class="comment">// copy from the ELF TLS segment to the allocated region of memory
+            </span>core::ptr::copy_nonoverlapping(tls_template.template_start, tls_base, tls_template.filsz);
+
+            <span class="comment">// the TP points to the base of the TCB which exists in lower memory.
+            </span>(tcb_base <span class="kw">as </span>usize, tcb_base, layout.size(), layout.align())
+        })
+    }
+}
+
+<span class="attribute">#[allow(dead_code)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tls_variant2() -&gt; <span class="prelude-ty">Option</span>&lt;(usize, <span class="kw-2">*mut </span>u8, usize, usize)&gt; {
     <span class="kw">unsafe </span>{
         TLS_INFO.as_ref().map(|info| {
             <span class="kw">let </span><span class="kw-2">mut </span>tls_size = info.memsz;
