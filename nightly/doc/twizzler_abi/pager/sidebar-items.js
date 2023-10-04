@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["KernelCommand",""],["KernelCompletionData",""],["PagerCompletionData",""],["PagerRequest",""]],"struct":[["CompletionToKernel",""],["CompletionToPager",""],["RequestFromKernel",""],["RequestFromPager",""]]};
+window.SIDEBAR_ITEMS = {"enum":["KernelCommand","KernelCompletionData","PagerCompletionData","PagerRequest"],"struct":["CompletionToKernel","CompletionToPager","RequestFromKernel","RequestFromPager"]};

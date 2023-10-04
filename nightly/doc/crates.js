@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["devmgr","init","netmgr","nettest","pager","twizzler_abi","twizzler_async","twizzler_driver","twizzler_nando","twizzler_net","twizzler_object","twizzler_queue","twizzler_queue_raw"];
+window.ALL_CRATES = ["nvme","twizzler_abi","twizzler_async","twizzler_driver","twizzler_net","twizzler_object","twizzler_queue","twizzler_queue_raw","twizzler_runtime_api"];

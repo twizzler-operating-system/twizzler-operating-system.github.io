@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AccessFrequency","AccessLatency","NvmCommand"],"struct":["ContextAttributes","DatasetMgmtCommand","DatasetMgmtDword11","ReadCommand","ReadDword13","WriteCommand","WriteDword13"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["pcie",""]]};
+window.SIDEBAR_ITEMS = {"mod":["pcie"]};

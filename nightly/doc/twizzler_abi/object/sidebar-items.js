@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":[["MAX_SIZE","The maximum size of an object, including null page and meta page(s)."],["NULLPAGE_SIZE","The size of the null page."]],"struct":[["ObjID","An object ID, represented as a transparent wrapper type. Any value where the upper 64 bits are zero is invalid."],["Protections","Mapping protections for mapping objects into the address space."]]};
+window.SIDEBAR_ITEMS = {"constant":["MAX_SIZE","NULLPAGE_SIZE"],"struct":["ObjID","Protections"]};

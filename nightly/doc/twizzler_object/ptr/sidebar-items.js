@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["AtomicInvPtr","An atomic invariant pointer. Allows reading through an immutable reference without unsafe."],["InvPtr","The raw invariant pointer, containing just a 64-bit packed FOT entry and offset."]]};
+window.SIDEBAR_ITEMS = {"struct":["AtomicInvPtr","InvPtr"]};

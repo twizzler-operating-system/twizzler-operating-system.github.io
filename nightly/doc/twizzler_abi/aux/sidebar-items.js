@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["AuxEntry","Auxillary information provided to a new program on runtime entry."]],"fn":[["get_kernel_init_info","Get the initial kernel info for init. Only works for init."]],"struct":[["KernelInitInfo","Kernel init info, including initrd names."],["KernelInitName","Information about initrd object names."]]};
+window.SIDEBAR_ITEMS = {"struct":["KernelInitInfo","KernelInitName"]};

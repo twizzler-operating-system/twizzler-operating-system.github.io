@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["pcie","PCIe-specific functionality."]]};
+window.SIDEBAR_ITEMS = {"mod":["pcie"]};

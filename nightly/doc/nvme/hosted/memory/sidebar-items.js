@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["CacheType","DptrMode","PrpMode"],"struct":["VirtualRegion"],"trait":["PhysicalPageCollection"]};

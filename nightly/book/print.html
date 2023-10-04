@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">9.</strong> DMA</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">5.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">6.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">7.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">8.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">9.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">10.</strong> Twizzler Build System Crate Metadata</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -402,6 +402,29 @@ communicate with the device (e.g. DMA memory for a ring buffer). For this, twizz
 a <code>DmaPool</code> type that can be used to allocate DMA regions that share an access type and a set of
 <code>DmaOptions</code>. The pool will internally create new Twizzler objects that it uses to allocate DMA
 memory from, which it then uses to create DMA regions on-demand.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cargo-metadata-for-twizzler-crates-built-inside-xtask"><a class="header" href="#cargo-metadata-for-twizzler-crates-built-inside-xtask">Cargo metadata for Twizzler crates built inside xtask</a></h1>
+<p>The xtask program organizes the build into a series of &quot;collections&quot; that get built in different environments. There are:</p>
+<ul>
+<li>Tools (targets build system)</li>
+<li>Kernel (targets arch-machine-none)</li>
+<li>Userspace (targets arch-machine-twizzler, optional, default yes)</li>
+<li>Userspace-static (targets arch-machine-twizzler-minruntime, optional, default yes)</li>
+<li>Userspace-tests (targets arch-machine-twizzler-minruntime, optional, default no)</li>
+<li>Kernel-tests (targets arch-machine-none, optional, default no)</li>
+</ul>
+<p>Programs may select which collection to be compiled in based on the metadata value set in Cargo.toml, described in more detail below.</p>
+<h2 id="static-versus-non-static-builds"><a class="header" href="#static-versus-non-static-builds">Static versus non-static builds</a></h2>
+<p>Twizzler currently builds packages in two <code>target_env</code> settings: &quot;minruntime&quot; and &quot;&quot;. This translates to two triples that are used for userspace twizzler programs: arch-machine-twizzler, and arch-machine-twizzler-minruntime. The minruntime variant is defined to be for statically linked programs, using the default minimal runtime provided by twizzler-abi. Such crates can declare that they should be compiled only in the minruntime collection by setting the key <code>package.metadata.twizzler-build</code> to &quot;static&quot; in Cargo.toml:</p>
+<pre><code class="language-{toml}">[package.metadata]
+twizzler-build = &quot;static&quot;
+</code></pre>
+<h2 id="tools"><a class="header" href="#tools">Tools</a></h2>
+<p>Tools should be placed in the tools subdirectory, and should set the <code>package.metadata.twizzler-build</code> key to &quot;tool&quot; in Cargo.toml:</p>
+<pre><code class="language-{toml}">[package.metadata]
+twizzler-build = &quot;tool&quot;
+</code></pre>
+<h2 id="the-kernel-and-xtask"><a class="header" href="#the-kernel-and-xtask">The kernel and xtask</a></h2>
+<p>Both the kernel and xtask themselves set the <code>package.metadata.twizzler-build</code> key to &quot;kernel&quot; or &quot;xtask&quot;. Programs should not use these values. </p>
 
                     </main>
 

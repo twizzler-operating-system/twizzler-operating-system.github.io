@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["syscall",""]]};
+window.SIDEBAR_ITEMS = {"constant":["SLOTS"],"mod":["syscall"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Dptr","FuseSpec","Psdt"],"struct":["CommandDword0","CommonCommand"]};
