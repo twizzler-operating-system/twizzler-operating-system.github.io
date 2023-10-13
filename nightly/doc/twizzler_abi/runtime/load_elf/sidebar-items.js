@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["SpawnExecutableError"],"fn":["spawn_new_executable"],"struct":["ElfObject"]};
