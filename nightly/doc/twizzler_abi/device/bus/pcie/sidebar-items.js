@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["PcieKactionSpecific"],"fn":["get_bar"],"struct":["PcieBridgeHeader","PcieCapabilityHeader","PcieDeviceHeader","PcieDeviceInfo","PcieFunctionHeader","PcieInfo"]};
+window.SIDEBAR_ITEMS = {"enum":["PcieKactionSpecific"],"struct":["PcieBridgeHeader","PcieCapabilityHeader","PcieDeviceHeader","PcieDeviceInfo","PcieFunctionHeader","PcieInfo"]};

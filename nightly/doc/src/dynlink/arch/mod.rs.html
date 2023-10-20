@@ -10,10 +10,10 @@
 </pre></div><pre class="rust"><code><span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
 </span><span class="kw">mod </span>x86_64;
 <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>x86_64::<span class="kw-2">*</span>;
+</span><span class="kw">pub use </span>x86_64::<span class="kw-2">*</span>;
 
 <span class="attr">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
 </span><span class="kw">mod </span>aarch64;
 <span class="attr">#[cfg(target_arch = <span class="string">&quot;aarch64&quot;</span>)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>aarch64::<span class="kw-2">*</span>;
+</span><span class="kw">pub use </span>aarch64::<span class="kw-2">*</span>;
 </code></pre></div></section></main></body></html>

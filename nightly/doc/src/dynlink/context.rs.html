@@ -203,6 +203,76 @@
 <a href="#203" id="203">203</a>
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of global context.
 
 </span><span class="kw">use </span>std::{
@@ -215,8 +285,9 @@
 
 <span class="kw">use crate</span>::{
     compartment::{Compartment, CompartmentRef},
-    library::{Library, LibraryLoader, LibraryRef},
+    library::{CtorInfo, InitState, Library, LibraryLoader, LibraryRef},
     symbol::{LookupFlags, RelocatedSymbol},
+    tls::TlsRegion,
     DynlinkError, ECollector,
 };
 
@@ -232,6 +303,8 @@
     <span class="comment">// We care about both names and dependency ordering for libraries.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) library_names: HashMap&lt;String, LibraryRef&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) library_deps: StableDiGraph&lt;LibraryRef, ()&gt;,
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) static_ctors: Vec&lt;CtorInfo&gt;,
 }
 
 <span class="attr">#[allow(dead_code)]
@@ -333,6 +406,36 @@
             name: name.to_string(),
         })
     }
+
+    <span class="kw">fn </span>build_ctors&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, roots: I) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[CtorInfo], DynlinkError&gt;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+    {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctors = <span class="macro">vec!</span>[];
+        <span class="self">self</span>.with_dfs_postorder(roots, |lib| {
+            <span class="kw">if </span>lib.try_set_init_state(InitState::Uninit, InitState::StaticUninit) {
+                ctors.push(lib.get_ctor_info())
+            }
+        });
+        <span class="kw">let </span><span class="kw-2">mut </span>ctors = ctors.into_iter().ecollect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
+        <span class="self">self</span>.static_ctors.append(<span class="kw-2">&amp;mut </span>ctors);
+        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.static_ctors)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_runtime_info&lt;I&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        roots: I,
+        tls: TlsRegion,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+    {
+        <span class="kw">let </span>ctors = {
+            <span class="kw">let </span>ctors = <span class="self">self</span>.build_ctors(roots)<span class="question-mark">?</span>;
+            (ctors.as_ptr(), ctors.len())
+        };
+        <span class="prelude-val">Ok</span>(RuntimeInitInfo::new(ctors.<span class="number">0</span>, ctors.<span class="number">1</span>, tls))
+    }
 }
 
 <span class="attr">#[derive(Default)]
@@ -380,6 +483,18 @@
         <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>.lookup_symbol(start, name, lookup_flags)
     }
 
+    <span class="doccomment">/// Get initial runtime information for bootstrapping.
+    </span><span class="kw">pub fn </span>build_runtime_info&lt;I&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        roots: I,
+        tls: TlsRegion,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+    {
+        <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>.build_runtime_info(roots, tls)
+    }
+
     <span class="doccomment">/// Add an unloaded library to the context (and load it)
     </span><span class="kw">pub fn </span>add_library(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -406,6 +521,31 @@
                 root.relocate(<span class="kw-2">&amp;</span>inner).map(|<span class="kw">_</span>| root)
             })
             .ecollect()
+    }
+}
+
+<span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>RuntimeInitInfo {
+    ctor_info_array: <span class="kw-2">*const </span>CtorInfo,
+    ctor_info_array_len: usize,
+
+    <span class="kw">pub </span>tls_region: TlsRegion,
+}
+<span class="kw">impl </span>RuntimeInitInfo {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        ctor_info_array: <span class="kw-2">*const </span>CtorInfo,
+        ctor_info_array_len: usize,
+        tls_region: TlsRegion,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ctor_info_array,
+            ctor_info_array_len,
+            tls_region,
+        }
+    }
+
+    <span class="kw">pub fn </span>ctor_infos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[CtorInfo] {
+        <span class="kw">unsafe </span>{ core::slice::from_raw_parts(<span class="self">self</span>.ctor_info_array, <span class="self">self</span>.ctor_info_array_len) }
     }
 }
 </code></pre></div></section></main></body></html>

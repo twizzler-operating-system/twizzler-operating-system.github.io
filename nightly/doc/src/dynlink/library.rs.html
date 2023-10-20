@@ -163,6 +163,8 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of individual libraries.
 
 </span><span class="kw">use </span>std::{
@@ -182,7 +184,7 @@
 <span class="kw">mod </span>relocate;
 <span class="kw">mod </span>tls;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>init::CtorInfo;
+<span class="kw">pub use </span>init::CtorInfo;
 <span class="kw">pub use </span>load::LibraryLoader;
 
 <span class="kw">use </span>petgraph::stable_graph::NodeIndex;
@@ -212,6 +214,8 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>InitState {
     <span class="doccomment">/// No constructors have been called.
     </span>Uninit,
+    <span class="doccomment">/// This library has been loaded as part of the static set, but hasn&#39;t been initialized (waiting for runtime entry).
+    </span>StaticUninit,
     <span class="doccomment">/// Constructors have been called, destructors have not been called.
     </span>Constructed,
     <span class="doccomment">/// Destructors have been called.

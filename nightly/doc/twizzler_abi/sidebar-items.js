@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["arch","aux","device","kso","marker","meta","object","pager","runtime","slot","syscall","thread","upcall"]};
+window.SIDEBAR_ITEMS = {"mod":["arch","aux","device","kso","marker","meta","object","pager","slot","syscall","thread","upcall"]};

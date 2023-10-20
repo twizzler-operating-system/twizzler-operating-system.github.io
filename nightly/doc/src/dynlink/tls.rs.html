@@ -231,11 +231,26 @@
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
 <a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local storage as prep for this code.
 
 </span><span class="kw">use </span>std::{alloc::Layout, mem::align_of, mem::size_of, ptr::NonNull};
 
 <span class="kw">use </span>tracing::{error, trace};
+<span class="kw">use </span>twizzler_runtime_api::TlsIndex;
 
 <span class="kw">use crate</span>::{arch::MINIMUM_TLS_ALIGNMENT, compartment::CompartmentRef, DynlinkError};
 
@@ -387,11 +402,11 @@
 }
 
 <span class="attr">#[repr(C)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Tcb&lt;T&gt; {
+</span><span class="kw">pub struct </span>Tcb&lt;T&gt; {
     self_ptr: <span class="kw-2">*const </span>Tcb&lt;T&gt;,
     dtv: <span class="kw-2">*const </span>usize,
     dtv_len: usize,
-    runtime_data: T,
+    <span class="kw">pub </span>runtime_data: T,
 }
 
 <span class="kw">impl</span>&lt;T&gt; Tcb&lt;T&gt; {
@@ -402,6 +417,13 @@
             dtv: tls_region.dtv.as_ptr(),
             dtv_len: tls_region.num_dtv_entries,
             runtime_data: tcb_data,
+        }
+    }
+
+    <span class="kw">pub fn </span>get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>slice = core::slice::from_raw_parts(<span class="self">self</span>.dtv, <span class="self">self</span>.dtv_len);
+            <span class="prelude-val">Some</span>((slice.get(index.mod_id)<span class="question-mark">? </span>+ index.offset) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>)
         }
     }
 }
@@ -439,6 +461,10 @@
 }
 
 <span class="kw">impl </span>TlsRegion {
+    <span class="kw">pub fn </span>get_thread_pointer_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.thread_pointer.as_ptr() <span class="kw">as </span>usize
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_dtv_entry(<span class="kw-2">&amp;</span><span class="self">self</span>, tm: <span class="kw-2">&amp;</span>TlsModule) {
         <span class="kw">let </span>dtv_slice =
             <span class="kw">unsafe </span>{ core::slice::from_raw_parts_mut(<span class="self">self</span>.dtv.as_ptr(), <span class="self">self</span>.num_dtv_entries) };
@@ -464,4 +490,6 @@
         }
     }
 }
+
+<span class="kw">pub use </span><span class="kw">crate</span>::arch::get_thread_control_block;
 </code></pre></div></section></main></body></html>

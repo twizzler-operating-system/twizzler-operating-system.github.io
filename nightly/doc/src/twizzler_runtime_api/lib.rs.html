@@ -411,16 +411,18 @@
 <a href="#411" id="411">411</a>
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including startup, execution, and libstd support.
 //! It defines a set of traits that, when all implemented, form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
-//! 
+//!
 //! From a high level, a Twizzler program links against Rust&#39;s libstd and a particular runtime that will support libstd. That runtime
 //! must implement the minimum set of interfaces required by the [Runtime] trait. Libstd then invokes the runtime functions when needed
 //! (e.g. allocating memory, exiting a thread, etc.). Other libraries may invoke runtime functions directly as well (bypassing libstd),
 //! but note that doing so may not play nicely with libstd&#39;s view of the world.
-//! 
+//!
 //! # What does it look like to use the runtime?
-//! 
+//!
 //! When a program (including libstd) wishes to use the runtime, it invokes this library&#39;s [get_runtime] function, which will return
 //! a reference (a &amp;&#39;static dyn reference) to a type that implements the Runtime trait. From there, runtime functions can be called:
 //! ```
@@ -428,36 +430,32 @@
 //! runtime.get_monotonic()
 //! ```
 //! Note that this function is only exposed if the runtime feature is enabled.
-//! 
+//!
 //! # So who is providing that type that implements [Runtime]?
-//! 
+//!
 //! Another library! Right now, Twizzler defines two runtimes: a &quot;minimal&quot; runtime, and a &quot;reference&quot; runtime. Those are not implemented
 //! in this crate. The minimal runtime is implemented as part of the twizzler-abi crate, as it&#39;s the most &quot;baremetal&quot; runtime. The
 //! reference runtime is implemented as a standalone set of crates. Of course, other runtimes can be implemented, as long as they implement
 //! the required interface in this crate, libstd will work.
-//! 
+//!
 //! ## Okay but how does get_runtime work?
-//! 
+//!
 //! Well, [get_runtime] is just a wrapper around calling an extern &quot;C&quot; function, [__twz_get_runtime]. This symbol is external, so not
 //! defined in this crate. A crate that implements [Runtime] then defines [__twz_get_runtime], allowing link-time swapping of runtimes.
 //! The twizzler-abi crate defines this symbol with (weak linkage)[https://en.wikipedia.org/wiki/Weak_symbol], causing it to be linked
 //! only if another (strong) definition is not present. Thus, a program can link to a specific runtime, but it can also be loaded by a
 //! dynamic linker and have its runtime selected at load time.
 
-
 </span><span class="attr">#![no_std]
 #![feature(unboxed_closures)]
 #![feature(naked_functions)]
 
 </span><span class="kw">use </span>core::{
-    alloc::GlobalAlloc, ffi::CStr, num::NonZeroUsize, sync::atomic::AtomicU32, time::Duration,
+    alloc::GlobalAlloc, ffi::CStr, num::NonZeroUsize, panic::RefUnwindSafe,
+    sync::atomic::AtomicU32, time::Duration,
 };
 
-<span class="attr">#[cfg(all(
-    feature = <span class="string">&quot;runtime&quot;</span>,
-    not(feature = <span class="string">&quot;kernel&quot;</span>),
-    feature = <span class="string">&quot;rustc-dep-of-std&quot;
-</span>))]
+<span class="attr">#[cfg(feature = <span class="string">&quot;rt0&quot;</span>)]
 </span><span class="kw">pub mod </span>rt0;
 
 <span class="doccomment">/// Core object ID type in Twizzler.
@@ -478,6 +476,8 @@
     </span>Arguments(usize, u64),
     <span class="doccomment">/// The object ID of the executable.
     </span>ExecId(ObjID),
+    <span class="doccomment">/// Initial runtime information. The value is runtime-specific.
+    </span>RuntimeInfo(usize),
 }
 
 <span class="doccomment">/// Full runtime trait, composed of smaller traits
@@ -557,7 +557,8 @@
 
     <span class="doccomment">/// Implements the __tls_get_addr functionality. If the runtime feature is enabled, this crate defines the
     /// extern &quot;C&quot; function __tls_get_addr as a wrapper around calling this function after getting the runtime from [get_runtime].
-    </span><span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, tls_index: <span class="kw-2">&amp;</span>TlsIndex) -&gt; <span class="kw-2">*const </span>u8;
+    /// If the provided index is invalid, return None.
+    </span><span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, tls_index: <span class="kw-2">&amp;</span>TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt;;
 }
 
 <span class="doccomment">/// All the object related runtime functions.
@@ -682,15 +683,18 @@
 </span><span class="kw">pub trait </span>RustProcessRuntime: RustStdioRuntime {}
 
 <span class="doccomment">/// The type of a callback to an IO Read call (see: [RustStdioRuntime]).
-</span><span class="kw">pub type </span>IoReadDynCallback&lt;<span class="lifetime">&#39;a</span>, R&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>(<span class="kw">dyn </span>(FnMut(<span class="kw-2">&amp;mut </span><span class="kw">dyn </span>IoRead) -&gt; R));
+</span><span class="kw">pub type </span>IoReadDynCallback&lt;<span class="lifetime">&#39;a</span>, R&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>(<span class="kw">dyn </span>(FnMut(<span class="kw-2">&amp;</span><span class="kw">dyn </span>IoRead) -&gt; R));
 
 <span class="doccomment">/// The type of a callback to an IO Write call (see: [RustStdioRuntime]).
-</span><span class="kw">pub type </span>IoWriteDynCallback&lt;<span class="lifetime">&#39;a</span>, R&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>(Fn(<span class="kw-2">&amp;mut </span><span class="kw">dyn </span>IoWrite) -&gt; R));
+</span><span class="kw">pub type </span>IoWriteDynCallback&lt;<span class="lifetime">&#39;a</span>, R&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>(Fn(<span class="kw-2">&amp;</span><span class="kw">dyn </span>IoWrite) -&gt; R));
+
+<span class="doccomment">/// The type of a callback to an IO Write call (see: [RustStdioRuntime]).
+</span><span class="kw">pub type </span>IoWritePanicDynCallback&lt;<span class="lifetime">&#39;a</span>, R&gt; = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>(Fn(<span class="kw-2">&amp;</span><span class="kw">dyn </span>IoWrite) -&gt; R) + RefUnwindSafe);
 
 <span class="doccomment">/// Runtime that implements stdio.
 </span><span class="kw">pub trait </span>RustStdioRuntime {
     <span class="doccomment">/// Execute a closure with an implementer of [IoWrite] that can be used for panic output.
-    </span><span class="kw">fn </span>with_panic_output(<span class="kw-2">&amp;</span><span class="self">self</span>, cb: IoWriteDynCallback&lt;<span class="lifetime">&#39;_</span>, ()&gt;);
+    </span><span class="kw">fn </span>with_panic_output(<span class="kw-2">&amp;</span><span class="self">self</span>, cb: IoWritePanicDynCallback&lt;<span class="lifetime">&#39;_</span>, ()&gt;);
 
     <span class="doccomment">/// Execute a closure with an implementer of [IoRead] that can be used for stdin.
     </span><span class="kw">fn </span>with_stdin(
@@ -739,15 +743,15 @@
 <span class="doccomment">/// Trait for stdin
 </span><span class="kw">pub trait </span>IoRead {
     <span class="doccomment">/// Read data into buf, returning the number of bytes read.
-    </span><span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ReadError&gt;;
+    </span><span class="kw">fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ReadError&gt;;
 }
 
 <span class="doccomment">/// Trait for stdout/stderr
 </span><span class="kw">pub trait </span>IoWrite {
     <span class="doccomment">/// Write data from buf, returning the number of bytes written.
-    </span><span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, WriteError&gt;;
+    </span><span class="kw">fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, WriteError&gt;;
     <span class="doccomment">/// Flush any buffered internal data. This function is allowed to be a no-op.
-    </span><span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), WriteError&gt;;
+    </span><span class="kw">fn </span>flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), WriteError&gt;;
 }
 
 <span class="doccomment">/// Runtime trait for libstd&#39;s time support
@@ -789,7 +793,7 @@
 </span><span class="doccomment">/// Internal library ID type.
 </span><span class="kw">pub struct </span>LibraryId(<span class="kw">pub </span>usize);
 
-<span class="doccomment">/// The runtime must ensure that the addresses are constant for the whole life of the library type, and that all threads 
+<span class="doccomment">/// The runtime must ensure that the addresses are constant for the whole life of the library type, and that all threads
 /// may see the type.
 </span><span class="kw">unsafe impl </span>Send <span class="kw">for </span>Library {}
 

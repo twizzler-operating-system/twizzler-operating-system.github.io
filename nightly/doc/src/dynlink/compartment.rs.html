@@ -102,6 +102,11 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Compartments are an abstraction for isolation of library components, but they are not done yet.
 
 </span><span class="kw">use </span>std::{
@@ -171,7 +176,8 @@
 
 <span class="kw">pub type </span>CompartmentRef = Arc&lt;Compartment&gt;;
 
-<span class="kw">impl </span>CompartmentInner {
+<span class="attr">#[allow(dead_code)]
+</span><span class="kw">impl </span>CompartmentInner {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String, id: u128) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name,
@@ -180,6 +186,10 @@
             alloc_objects: <span class="macro">vec!</span>[],
             tls_info: Default::default(),
         }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>alloc_objects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Object&lt;u8&gt;] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.alloc_objects
     }
 }
 
