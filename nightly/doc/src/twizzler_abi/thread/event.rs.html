@@ -66,6 +66,8 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::object::ObjID;
 
 <span class="doccomment">/// Basic structure of an async event sent to a thread queue.
@@ -104,6 +106,7 @@
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Async event flags.
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     </span><span class="kw">pub struct </span>AsyncEventFlags : u32 {
         <span class="doccomment">/// The sender did not (or does not) want to wait for the completion.
         </span><span class="kw">const </span>NON_BLOCKING = <span class="number">1</span>;
@@ -131,6 +134,7 @@
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Async event completion flags. Reserved for future use.
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     </span><span class="kw">pub struct </span>AsyncEventCompletionFlags : u32 {
     }
 }

@@ -230,6 +230,7 @@
 <a href="#230" id="230">230</a>
 <a href="#231" id="231">231</a>
 <a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>clock;
 <span class="kw">mod </span>time;
 <span class="kw">mod </span>units;
@@ -346,6 +347,7 @@
     }
 
     <span class="doccomment">/// Flags to pass to [`sys_read_clock_list`].
+    </span><span class="attr">#[derive(PartialEq, Eq)]
     </span><span class="kw">pub struct </span>ReadClockListFlags: u32 {
         <span class="doccomment">/// Fill the buffer with all clocks from the clock list, for every `ClockKind`.
         </span><span class="kw">const </span>ALL_CLOCKS = <span class="number">1 </span>&lt;&lt; <span class="number">0</span>;

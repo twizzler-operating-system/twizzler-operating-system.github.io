@@ -413,6 +413,7 @@
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including startup, execution, and libstd support.
 //! It defines a set of traits that, when all implemented, form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
 //!
@@ -599,6 +600,7 @@
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Mapping protections for mapping objects into the address space.
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     </span><span class="kw">pub struct </span>MapFlags: u32 {
         <span class="doccomment">/// Read allowed.
         </span><span class="kw">const </span>READ = <span class="number">1</span>;

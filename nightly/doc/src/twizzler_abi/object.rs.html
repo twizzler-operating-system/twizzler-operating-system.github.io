@@ -84,6 +84,7 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Low-level object APIs, mostly around IDs and basic things like protection definitions and metadata.
 
 </span><span class="kw">use </span>core::fmt::{LowerHex, UpperHex};
@@ -158,6 +159,7 @@
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Mapping protections for mapping objects into the address space.
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     </span><span class="kw">pub struct </span>Protections: u32 {
         <span class="doccomment">/// Read allowed.
         </span><span class="kw">const </span>READ = <span class="number">1</span>;

@@ -190,6 +190,8 @@
 <a href="#190" id="190">190</a>
 <a href="#191" id="191">191</a>
 <a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
 <span class="kw">use crate</span>::{object::ObjID, arch::syscall::raw_syscall};
@@ -253,12 +255,14 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags to pass to the object create system call.
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)] 
     </span><span class="kw">pub struct </span>ObjectCreateFlags: u32 {
     }
 }
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags controlling how a particular object tie operates.
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     </span><span class="kw">pub struct </span>CreateTieFlags: u32 {
     }
 }

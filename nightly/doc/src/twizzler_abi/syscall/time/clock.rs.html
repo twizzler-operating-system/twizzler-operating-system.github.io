@@ -146,12 +146,14 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>bitflags::bitflags;
 
 <span class="kw">use super</span>::{ClockSource, ReadClockFlags, ReadClockListFlags, TimeSpan, FemtoSeconds};
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags about a given clock or clock read.
+    </span><span class="attr">#[derive(Debug, Clone, Copy)]
     </span><span class="kw">pub struct </span>ClockFlags: u32 {
         <span class="kw">const </span>MONOTONIC = <span class="number">1</span>;
     }
