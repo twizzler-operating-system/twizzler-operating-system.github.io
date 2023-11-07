@@ -184,7 +184,7 @@
                 <span class="kw">let </span>len = (vaddr - dest_start) + filesz;
                 <span class="prelude-val">Ok</span>((
                     targets_data,
-                    twizzler_abi::syscall::ObjectSource::new(
+                    twizzler_abi::syscall::ObjectSource::new_copy(
                         <span class="self">self</span>.full_obj.id(),
                         src_start <span class="kw">as </span>u64,
                         dest_start <span class="kw">as </span>u64,

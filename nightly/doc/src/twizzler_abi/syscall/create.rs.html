@@ -192,12 +192,22 @@
 <a href="#192" id="192">192</a>
 <a href="#193" id="193">193</a>
 <a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
-<span class="kw">use crate</span>::{object::ObjID, arch::syscall::raw_syscall};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 <span class="kw">use </span>bitflags::bitflags;
 
-<span class="kw">use super</span>::{Syscall, convert_codes_to_result};
+<span class="kw">use super</span>::{convert_codes_to_result, Syscall};
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
 #[repr(C)]
@@ -205,22 +215,32 @@
 /// source:[src_start, src_start + len) copied to &lt;some unspecified destination object&gt;:[dest_start,
 /// dest_start + len). Each range must start within an object, and end within the object.
 </span><span class="kw">pub struct </span>ObjectSource {
-    <span class="doccomment">/// The ID of the source object.
+    <span class="doccomment">/// The ID of the source object, or zero for filling destination with zero.
     </span><span class="kw">pub </span>id: ObjID,
-    <span class="doccomment">/// The offset into the source object to start the copy.
+    <span class="doccomment">/// The offset into the source object to start the copy. If id is zero, this field is reserved for future use.
     </span><span class="kw">pub </span>src_start: u64,
-    <span class="doccomment">/// The offset into the dest object to start the copy to.
+    <span class="doccomment">/// The offset into the dest object to start the copy or zero.
     </span><span class="kw">pub </span>dest_start: u64,
-    <span class="doccomment">/// The length of the copy.
+    <span class="doccomment">/// The length of the copy or zero.
     </span><span class="kw">pub </span>len: usize,
 }
 
 <span class="kw">impl </span>ObjectSource {
     <span class="doccomment">/// Construct a new ObjectSource.
-    </span><span class="kw">pub fn </span>new(id: ObjID, src_start: u64, dest_start: u64, len: usize) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new_copy(id: ObjID, src_start: u64, dest_start: u64, len: usize) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             id,
             src_start,
+            dest_start,
+            len,
+        }
+    }
+
+    <span class="doccomment">/// Construct a new ObjectSource.
+    </span><span class="kw">pub fn </span>new_zero(dest_start: u64, len: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            id: <span class="number">0</span>.into(),
+            src_start: <span class="number">0</span>,
             dest_start,
             len,
         }
@@ -255,7 +275,7 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags to pass to the object create system call.
-    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)] 
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     </span><span class="kw">pub struct </span>ObjectCreateFlags: u32 {
     }
 }
