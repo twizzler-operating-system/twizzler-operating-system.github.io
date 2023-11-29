@@ -213,6 +213,11 @@
 <a href="#213" id="213">213</a>
 <a href="#214" id="214">214</a>
 <a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Slot allocator. This proceeds in two phases. During the initialization phase, before the runtime is
 //! marked ready, we use early slot allocation. After the runtime is ready, we use normal slot allocation.
 //! Right before switching, the runtime must call in and initialize the proper slot allocator.
@@ -247,9 +252,15 @@
     <span class="prelude-val">Some</span>(EARLY_SLOT_ALLOC.next.fetch_add(<span class="number">1</span>, Ordering::SeqCst))
 }
 
-<span class="kw">pub fn </span>mark_slot_reserved(_slot: usize) {
-    <span class="comment">// TODO: actually reserve bootstrap slots
-</span>}
+<span class="doccomment">/// Mark a slot as reserved. This probably should only be called by the monitor initialization code.
+</span><span class="kw">pub fn </span>mark_slot_reserved(slot: usize) {
+    <span class="comment">// Do a simple reservation. The bootstrap is likely to reserve slots in-order,
+    // so we can get away just starting our slots above the bootstrap slots.
+    </span><span class="kw">let </span>current = EARLY_SLOT_ALLOC.next.load(Ordering::SeqCst);
+    <span class="kw">if </span>slot &gt;= current {
+        EARLY_SLOT_ALLOC.next.store(slot + <span class="number">1</span>, Ordering::SeqCst);
+    }
+}
 
 <span class="comment">// Simple incremental allocator.
 </span><span class="kw">struct </span>EarlySlotAllocator {
@@ -259,8 +270,7 @@
 <span class="kw">impl </span>EarlySlotAllocator {}
 
 <span class="kw">static </span>EARLY_SLOT_ALLOC: EarlySlotAllocator = EarlySlotAllocator {
-    <span class="comment">// TODO: actually reserve bootstrap slots
-    </span>next: AtomicUsize::new(<span class="number">100</span>),
+    next: AtomicUsize::new(<span class="number">0</span>),
 };
 
 <span class="kw">struct </span>SlotAllocatorInner {
@@ -386,8 +396,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>inner = SLOT_ALLOCATOR.inner.lock().unwrap();
         inner.singles = singles;
         inner.singles_aux = singles_aux;
-        <span class="comment">// TODO: proper pre-reservation
-        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(EARLY_SLOT_ALLOC.next.load(Ordering::SeqCst) / <span class="number">2 </span>+ <span class="number">1</span>) {
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(EARLY_SLOT_ALLOC.next.load(Ordering::SeqCst) / <span class="number">2 </span>+ <span class="number">1</span>) {
             inner.set(i);
         }
     }
@@ -409,7 +418,8 @@
         <span class="comment">// early alloc has no ability to release slots
     </span>}
 
-    <span class="doccomment">/// Allocate a pair of adjacent slots, returning their numbers if a pair is available. The returned tuple will always be of form (x, x+1).
+    <span class="doccomment">/// Allocate a pair of adjacent slots, returning their numbers if a pair is available.
+    /// The returned tuple will always be of form (x, x+1).
     </span><span class="kw">pub fn </span>allocate_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt; {
         <span class="kw">if </span><span class="self">self</span>.state().contains(RuntimeState::READY) {
             SLOT_ALLOCATOR.inner.lock().unwrap().alloc_pair()

@@ -103,26 +103,39 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implements thread management routines. Largely unimplemented still.
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Implements thread management routines.
 
 </span><span class="kw">use </span>dynlink::tls::Tcb;
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>tracing::trace;
 <span class="kw">use </span>twizzler_abi::syscall::{
     sys_thread_sync, sys_thread_yield, ThreadSync, ThreadSyncError, ThreadSyncFlags, ThreadSyncOp,
     ThreadSyncReference, ThreadSyncSleep, ThreadSyncWake,
 };
-<span class="kw">use </span>twizzler_runtime_api::ThreadRuntime;
+<span class="kw">use </span>twizzler_runtime_api::{JoinError, SpawnError, ThreadRuntime, TlsIndex};
 
-<span class="kw">use </span><span class="kw">crate</span>::preinit_println;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::thread::mgr::ThreadManager;
+
+<span class="kw">use </span><span class="self">self</span>::tcb::with_current_thread;
 
 <span class="kw">use </span><span class="kw">super</span>::ReferenceRuntime;
 
-<span class="kw">pub struct </span>RuntimeThreadControl {
-    name: String,
+<span class="kw">mod </span>internal;
+<span class="kw">mod </span>mgr;
+<span class="kw">mod </span>tcb;
+
+<span class="kw">pub use </span>tcb::RuntimeThreadControl;
+
+<span class="kw">const </span>MIN_STACK_ALIGN: usize = <span class="number">128</span>;
+
+<span class="macro">lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>THREAD_MGR: ThreadManager = ThreadManager::new();
 }
 
-<span class="comment">// TODO: implement spawning and joining
-
-</span><span class="kw">impl </span>ThreadRuntime <span class="kw">for </span>ReferenceRuntime {
+<span class="kw">impl </span>ThreadRuntime <span class="kw">for </span>ReferenceRuntime {
     <span class="kw">fn </span>available_parallelism(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; core::num::NonZeroUsize {
         twizzler_abi::syscall::sys_info().cpu_count()
     }
@@ -169,43 +182,36 @@
         <span class="kw">let _ </span>= sys_thread_sync(<span class="kw-2">&amp;mut </span>[wake], <span class="prelude-val">None</span>);
     }
 
-    <span class="kw">fn </span>spawn(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _args: twizzler_runtime_api::ThreadSpawnArgs,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;u32, twizzler_runtime_api::SpawnError&gt; {
-        <span class="macro">todo!</span>()
-    }
-
     <span class="kw">fn </span>yield_now(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         sys_thread_yield()
     }
 
     <span class="kw">fn </span>set_name(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>std::ffi::CStr) {
-        <span class="kw">let </span>tp: <span class="kw-2">&amp;mut </span>Tcb&lt;RuntimeThreadControl&gt; =
-            <span class="kw">unsafe </span>{ dynlink::tls::get_thread_control_block().as_mut().unwrap() };
-        tp.runtime_data.name = name.to_string_lossy().to_string();
+        with_current_thread(|cur| {
+            <span class="macro">trace!</span>(<span class="string">&quot;naming thread {} `{}&#39;&quot;</span>, cur.id(), name.to_string_lossy());
+            THREAD_MGR.with_internal(cur.id(), |th| th.set_name(name));
+        })
     }
 
     <span class="kw">fn </span>sleep(<span class="kw-2">&amp;</span><span class="self">self</span>, duration: std::time::Duration) {
         <span class="kw">let _ </span>= sys_thread_sync(<span class="kw-2">&amp;mut </span>[], <span class="prelude-val">Some</span>(duration));
     }
 
-    <span class="kw">fn </span>join(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _id: u32,
-        _timeout: <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), twizzler_runtime_api::JoinError&gt; {
-        <span class="macro">preinit_println!</span>(<span class="string">&quot;HERE: join&quot;</span>);
-        <span class="macro">todo!</span>()
-    }
-
-    <span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>twizzler_runtime_api::TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt; {
+    <span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt; {
         <span class="kw">let </span>tp: <span class="kw-2">&amp;</span>Tcb&lt;()&gt; = <span class="kw">unsafe </span>{
-            dynlink::tls::get_thread_control_block()
+            dynlink::tls::get_current_thread_control_block()
                 .as_ref()
                 .expect(<span class="string">&quot;failed to find thread control block&quot;</span>)
         };
         tp.get_addr(index)
+    }
+
+    <span class="kw">fn </span>spawn(<span class="kw-2">&amp;</span><span class="self">self</span>, args: twizzler_runtime_api::ThreadSpawnArgs) -&gt; <span class="prelude-ty">Result</span>&lt;u32, SpawnError&gt; {
+        <span class="self">self</span>.impl_spawn(args)
+    }
+
+    <span class="kw">fn </span>join(<span class="kw-2">&amp;</span><span class="self">self</span>, id: u32, timeout: <span class="prelude-ty">Option</span>&lt;std::time::Duration&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), JoinError&gt; {
+        <span class="self">self</span>.impl_join(id, timeout)
     }
 }
 </code></pre></div></section></main></body></html>

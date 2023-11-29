@@ -114,6 +114,12 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>tracing::{debug, trace};
 <span class="kw">use </span>twizzler_abi::{
     object::{MAX_SIZE, NULLPAGE_SIZE},
@@ -179,6 +185,10 @@
                     <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::Unknown);
                 }
 
+                <span class="kw">if </span>filesz != memsz {
+                    <span class="macro">todo!</span>()
+                }
+
                 <span class="kw">let </span>src_start = (NULLPAGE_SIZE + offset) &amp; !(align - <span class="number">1</span>);
                 <span class="kw">let </span>dest_start = vaddr &amp; !(align - <span class="number">1</span>);
                 <span class="kw">let </span>len = (vaddr - dest_start) + filesz;
@@ -186,8 +196,8 @@
                     targets_data,
                     twizzler_abi::syscall::ObjectSource::new_copy(
                         <span class="self">self</span>.full_obj.id(),
-                        src_start <span class="kw">as </span>u64,
-                        dest_start <span class="kw">as </span>u64,
+                        (src_start % MAX_SIZE) <span class="kw">as </span>u64,
+                        (dest_start % MAX_SIZE) <span class="kw">as </span>u64,
                         len,
                     ),
                 ))
@@ -213,6 +223,8 @@
             data_copy_cmds.len(),
             text_copy_cmds.len()
         );
+        <span class="macro">trace!</span>(<span class="string">&quot;{}: text copy commands: {:?}&quot;</span>, <span class="self">self</span>, text_copy_cmds);
+        <span class="macro">trace!</span>(<span class="string">&quot;{}: data copy commands: {:?}&quot;</span>, <span class="self">self</span>, data_copy_cmds);
         <span class="kw">let </span>(data_obj, text_obj) = loader.create_segments(<span class="kw-2">&amp;</span>data_copy_cmds, <span class="kw-2">&amp;</span>text_copy_cmds)<span class="question-mark">?</span>;
         <span class="comment">// The base address is the &quot;0-point&quot; for the virtual addresses within the library.
         </span><span class="kw">let </span>base_addr = <span class="kw">unsafe </span>{ text_obj.base_unchecked() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize } - NULLPAGE_SIZE;

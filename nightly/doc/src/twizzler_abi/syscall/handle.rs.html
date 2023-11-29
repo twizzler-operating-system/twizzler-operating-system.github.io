@@ -230,7 +230,7 @@
             <span class="kw-2">&amp;</span>[hi, lo, handle_type <span class="kw">as </span>u64, flags.bits()],
         )
     };
-    convert_codes_to_result(code, val, |c, <span class="kw">_</span>| c != <span class="number">0</span>, |<span class="kw">_</span>, v| v <span class="kw">as </span>u64, justval)
+    convert_codes_to_result(code, val, |c, <span class="kw">_</span>| c != <span class="number">0</span>, |<span class="kw">_</span>, v| v, justval)
 }
 
 <span class="doccomment">/// Unbind an object from handle status.

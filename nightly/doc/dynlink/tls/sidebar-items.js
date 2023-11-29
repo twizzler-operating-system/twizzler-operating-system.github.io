@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_thread_control_block"],"struct":["Tcb","TlsRegion"]};
+window.SIDEBAR_ITEMS = {"fn":["get_current_thread_control_block"],"struct":["Tcb","TlsModId","TlsRegion"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Context","RuntimeInitInfo"]};
+window.SIDEBAR_ITEMS = {"struct":["Context","ContextInner","RuntimeInitInfo"]};

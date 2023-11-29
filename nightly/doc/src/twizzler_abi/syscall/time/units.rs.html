@@ -171,9 +171,10 @@
 <a href="#171" id="171">171</a>
 <a href="#172" id="172">172</a>
 <a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::ops::Mul;
 
-<span class="kw">use </span><span class="kw">super</span>::time::TimeSpan;
+<span class="kw">use </span><span class="kw">super</span>::TimeSpan;
 
 <span class="kw">pub const </span>FEMTOS_PER_SEC: u64 = <span class="number">1_000_000_000_000_000</span>;
 <span class="kw">pub const </span>FEMTOS_PER_NANO: u64 = <span class="number">1_000_000</span>;
@@ -181,7 +182,7 @@
 
 <span class="attr">#[derive(Debug)]
 </span><span class="kw">pub enum </span>TimeUnitError {
-    ConversionOverflow
+    ConversionOverflow,
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug, PartialEq)]
@@ -190,7 +191,7 @@
 
 <span class="kw">impl </span>Mul&lt;Seconds&gt; <span class="kw">for </span>u64 {
     <span class="kw">type </span>Output = TimeSpan;
- 
+
     <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: Seconds) -&gt; <span class="self">Self</span>::Output {
         TimeSpan::from_secs(<span class="self">self </span>* rhs.<span class="number">0</span>)
     }
@@ -227,12 +228,12 @@
 
 <span class="kw">impl </span>Mul&lt;FemtoSeconds&gt; <span class="kw">for </span>u64 {
     <span class="kw">type </span>Output = TimeSpan;
- 
+
     <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: FemtoSeconds) -&gt; <span class="self">Self</span>::Output {
         <span class="kw">let </span>t = <span class="self">self </span><span class="kw">as </span>u128 * rhs.<span class="number">0 </span><span class="kw">as </span>u128;
         TimeSpan::new(
             (t / FEMTOS_PER_SEC <span class="kw">as </span>u128) <span class="kw">as </span>u64,
-            (t % FEMTOS_PER_SEC <span class="kw">as </span>u128) <span class="kw">as </span>u64
+            (t % FEMTOS_PER_SEC <span class="kw">as </span>u128) <span class="kw">as </span>u64,
         )
     }
 }
@@ -250,27 +251,23 @@
     (<span class="macro-nonterminal">$unit</span>: ident, <span class="macro-nonterminal">$conver</span>: expr) =&gt; {
         <span class="kw">impl </span>Mul&lt;<span class="macro-nonterminal">$unit</span>&gt; <span class="kw">for </span>u64 {
             <span class="kw">type </span>Output = TimeSpan;
-         
+
             <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="macro-nonterminal">$unit</span>) -&gt; <span class="self">Self</span>::Output {
                 <span class="kw">let </span>t = <span class="self">self </span><span class="kw">as </span>u128 * rhs.<span class="number">0 </span><span class="kw">as </span>u128;
-                <span class="kw">let </span>f: FemtoSeconds = 
-                    <span class="macro-nonterminal">$unit</span>((t % <span class="macro-nonterminal">$conver </span><span class="kw">as </span>u128) <span class="kw">as </span>u64).try_into().unwrap();
-                TimeSpan::new(
-                    (t / <span class="macro-nonterminal">$conver </span><span class="kw">as </span>u128) <span class="kw">as </span>u64,
-                    f.<span class="number">0
-                </span>)
+                <span class="kw">let </span>f: FemtoSeconds = <span class="macro-nonterminal">$unit</span>((t % <span class="macro-nonterminal">$conver </span><span class="kw">as </span>u128) <span class="kw">as </span>u64).try_into().unwrap();
+                TimeSpan::new((t / <span class="macro-nonterminal">$conver </span><span class="kw">as </span>u128) <span class="kw">as </span>u64, f.<span class="number">0</span>)
             }
         }
-        
+
         <span class="kw">impl </span>Mul&lt;u64&gt; <span class="kw">for </span><span class="macro-nonterminal">$unit </span>{
             <span class="kw">type </span>Output = TimeSpan;
-        
+
             <span class="comment">// apply reflexive property
             </span><span class="kw">fn </span>mul(<span class="self">self</span>, rhs: u64) -&gt; <span class="self">Self</span>::Output {
                 rhs * <span class="self">self
             </span>}
         }
-    }
+    };
 }
 
 <span class="macro">impl_scalar_mul!</span>(NanoSeconds, NANOS_PER_SEC);
@@ -282,18 +279,18 @@
                 <span class="macro-nonterminal">$big</span>(unit.<span class="number">0 </span>/ <span class="macro-nonterminal">$conver</span>)
             }
         }
-        
+
         <span class="comment">// conversion to a smaller unit might fail (overlfow)
         </span><span class="kw">impl </span>TryFrom&lt;<span class="macro-nonterminal">$big</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$small </span>{
             <span class="kw">type </span>Error = TimeUnitError;
             <span class="kw">fn </span>try_from(unit: <span class="macro-nonterminal">$big</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
                 <span class="kw">match </span>unit.<span class="number">0</span>.checked_mul(<span class="macro-nonterminal">$conver</span>) {
                     <span class="prelude-val">Some</span>(t) =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$small</span>(t)),
-                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(TimeUnitError::ConversionOverflow)
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(TimeUnitError::ConversionOverflow),
                 }
             }
         }
-    }
+    };
 }
 
 <span class="macro">impl_unit_conversion!</span>(Seconds, FemtoSeconds, FEMTOS_PER_SEC);
@@ -302,7 +299,7 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
 
-    <span class="kw">use </span><span class="kw">crate</span>::syscall::{Seconds, FemtoSeconds, TimeSpan, FEMTOS_PER_SEC};
+    <span class="kw">use </span><span class="kw">crate</span>::syscall::{FemtoSeconds, Seconds, TimeSpan, FEMTOS_PER_SEC};
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>secs_mult() {
@@ -322,10 +319,16 @@
         <span class="kw">let </span>femtos: u64 = <span class="number">500</span>;
 
         <span class="comment">// lhs is FemtoSeconds(), rhs is a scalar
-        </span><span class="macro">assert_eq!</span>(FemtoSeconds(femtos) * scalar, TimeSpan::new(<span class="number">0</span>, femtos * scalar));
+        </span><span class="macro">assert_eq!</span>(
+            FemtoSeconds(femtos) * scalar,
+            TimeSpan::new(<span class="number">0</span>, femtos * scalar)
+        );
 
         <span class="comment">// lhs is a scalar, rhs is FemtoSeconds()
-        </span><span class="macro">assert_eq!</span>(scalar * FemtoSeconds(femtos), TimeSpan::new(<span class="number">0</span>, femtos * scalar));
+        </span><span class="macro">assert_eq!</span>(
+            scalar * FemtoSeconds(femtos),
+            TimeSpan::new(<span class="number">0</span>, femtos * scalar)
+        );
     }
 
     <span class="attr">#[test]
@@ -333,12 +336,11 @@
         <span class="kw">let </span>femtos = FemtoSeconds(FEMTOS_PER_SEC * <span class="number">3</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>secs: Seconds = femtos.into();
 
-        
         <span class="macro">assert_eq!</span>(secs, Seconds(<span class="number">3</span>));
 
         secs = Seconds(<span class="number">3</span>);
-        <span class="kw">let </span>f: FemtoSeconds = secs.
-            try_into()
+        <span class="kw">let </span>f: FemtoSeconds = secs
+            .try_into()
             .expect(<span class="string">&quot;could not convert Seconds to FemtoSeconds&quot;</span>);
 
         <span class="macro">assert_eq!</span>(femtos, f);

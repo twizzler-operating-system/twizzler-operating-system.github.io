@@ -225,22 +225,16 @@
 <a href="#225" id="225">225</a>
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>clock;
-<span class="kw">mod </span>time;
+<span class="kw">mod </span>timedefs;
 <span class="kw">mod </span>units;
 
 <span class="kw">pub use </span>clock::<span class="kw-2">*</span>;
-<span class="kw">pub use </span>time::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>timedefs::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>units::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>core::{fmt, mem::MaybeUninit};
 <span class="kw">use </span>bitflags::bitflags;
+<span class="kw">use </span>core::{fmt, mem::MaybeUninit};
 
 <span class="kw">use </span><span class="kw">crate</span>::arch::syscall::raw_syscall;
 
@@ -364,7 +358,7 @@
 </span><span class="kw">pub enum </span>ClockSource {
     BestMonotonic,
     BestRealTime,
-    ID(ClockID)
+    ID(ClockID),
 }
 
 <span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ClockSource {
@@ -382,8 +376,8 @@
         <span class="kw">match </span>source {
             ClockSource::BestMonotonic =&gt; <span class="number">0</span>,
             ClockSource::BestRealTime =&gt; <span class="number">1</span>,
-            ClockSource::ID(clk) =&gt; clk.<span class="number">0
-        </span>}
+            ClockSource::ID(clk) =&gt; clk.<span class="number">0</span>,
+        }
     }
 }
 
@@ -456,12 +450,6 @@
             ],
         )
     };
-    convert_codes_to_result(
-        code,
-        val,
-        |c, <span class="kw">_</span>| c != <span class="number">0</span>,
-        |<span class="kw">_</span>, v| v <span class="kw">as </span>usize,
-        |<span class="kw">_</span>, v| v.into(),
-    )
+    convert_codes_to_result(code, val, |c, <span class="kw">_</span>| c != <span class="number">0</span>, |<span class="kw">_</span>, v| v <span class="kw">as </span>usize, |<span class="kw">_</span>, v| v.into())
 }
 </code></pre></div></section></main></body></html>

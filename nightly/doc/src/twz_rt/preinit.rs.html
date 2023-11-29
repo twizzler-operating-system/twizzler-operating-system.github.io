@@ -80,31 +80,26 @@
 <a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Utilities that enable formatted printing for early runtime init.
 
-</span><span class="kw">use </span>core::fmt::Write;
+</span><span class="kw">use </span>std::fmt;
 
 <span class="kw">use </span>twizzler_abi::syscall::{sys_kernel_console_write, KernelConsoleWriteFlags};
 
-<span class="attr">#[derive(Clone, Copy)]
-</span><span class="kw">pub struct </span>PreinitLogger {}
+<span class="attr">#[repr(C)]
+</span><span class="kw">struct </span>PreinitLogger;
 
-<span class="kw">impl </span>core::fmt::Write <span class="kw">for </span>PreinitLogger {
-    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; core::fmt::Result {
-        <span class="self">self</span>.write(s.as_bytes());
+<span class="kw">impl </span>fmt::Write <span class="kw">for </span>PreinitLogger {
+    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
+        sys_kernel_console_write(s.as_bytes(), KernelConsoleWriteFlags::empty());
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl </span>PreinitLogger {
-    <span class="kw">pub fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
-        sys_kernel_console_write(data, KernelConsoleWriteFlags::empty());
-    }
-}
-
-<span class="kw">static </span><span class="kw-2">mut </span>PREINIT_OUTPUT: PreinitLogger = PreinitLogger {};
+<span class="kw">static </span><span class="kw-2">mut </span>PREINIT_OUTPUT: PreinitLogger = PreinitLogger;
 
 <span class="attr">#[doc(hidden)]
-</span><span class="kw">pub fn </span>_print_normal(args: ::core::fmt::Arguments) {
-    <span class="kw">let _ </span>= <span class="kw">unsafe </span>{ PREINIT_OUTPUT }.write_fmt(args);
+</span><span class="kw">pub fn </span>_print_normal(args: core::fmt::Arguments) {
+    <span class="kw">use </span>fmt::Write;
+    <span class="kw">let _ </span>= <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut </span>PREINIT_OUTPUT }.write_fmt(args);
 }
 
 <span class="attr">#[macro_export]
@@ -127,7 +122,12 @@
     };
 }
 
-<span class="kw">pub fn </span>preinit_abort() -&gt; ! {
+<span class="attr">#[track_caller]
+</span><span class="kw">pub fn </span>preinit_abort() -&gt; ! {
+    <span class="macro">preinit_println!</span>(
+        <span class="string">&quot;preinit abort called from {}&quot;</span>,
+        core::panic::Location::caller()
+    );
     core::intrinsics::abort()
 }
 

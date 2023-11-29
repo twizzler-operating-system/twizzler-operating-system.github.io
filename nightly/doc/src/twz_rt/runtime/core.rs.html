@@ -143,9 +143,6 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>dynlink::{context::RuntimeInitInfo, library::CtorInfo};
@@ -190,8 +187,7 @@
 
     <span class="kw">fn </span>exit(<span class="kw-2">&amp;</span><span class="self">self</span>, code: i32) -&gt; ! {
         <span class="kw">if </span><span class="self">self</span>.state().contains(RuntimeState::READY) {
-            <span class="comment">// TODO: hook into debugging?
-            </span><span class="macro">todo!</span>()
+            twizzler_abi::syscall::sys_thread_exit(code <span class="kw">as </span>u64);
         } <span class="kw">else </span>{
             <span class="macro">preinit_println!</span>(<span class="string">&quot;runtime exit before runtime ready: {}&quot;</span>, code);
             preinit_abort();
@@ -200,8 +196,7 @@
 
     <span class="kw">fn </span>abort(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ! {
         <span class="kw">if </span><span class="self">self</span>.state().contains(RuntimeState::READY) {
-            <span class="comment">// TODO: hook into debugging?
-            </span>preinit_abort();
+            preinit_abort();
         } <span class="kw">else </span>{
             <span class="macro">preinit_println!</span>(<span class="string">&quot;runtime abort before runtime ready&quot;</span>);
             preinit_abort();
@@ -282,10 +277,9 @@
         }
     }
 
-    <span class="kw">fn </span>init_allocator(<span class="kw-2">&amp;</span><span class="self">self</span>, _info: <span class="kw-2">&amp;</span>RuntimeInitInfo) {
-        <span class="comment">// TODO: fix this hack
-        </span><span class="kw">for </span>slot <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
-            mark_slot_reserved(slot)
+    <span class="kw">fn </span>init_allocator(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>RuntimeInitInfo) {
+        <span class="kw">for </span>slot <span class="kw">in </span><span class="kw-2">&amp;</span>info.used_slots {
+            mark_slot_reserved(<span class="kw-2">*</span>slot);
         }
     }
 

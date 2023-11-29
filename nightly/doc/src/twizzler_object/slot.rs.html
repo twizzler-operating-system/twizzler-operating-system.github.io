@@ -130,6 +130,7 @@
 <a href="#130" id="130">130</a>
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     mem::size_of,
@@ -185,6 +186,14 @@
             prot,
             runtime_handle: rh,
         })
+    }
+
+    <span class="kw">pub fn </span>runtime_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectHandle {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.runtime_handle
+    }
+
+    <span class="kw">pub fn </span>slot_number(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.vaddr_null() / MAX_SIZE
     }
 
     <span class="doccomment">/// Get the ID of the object in this slot.
@@ -254,12 +263,5 @@
     <span class="kw">let </span>w = Arc::downgrade(<span class="kw-2">&amp;</span>slot);
     slots.insert((id, prot), w);
     <span class="prelude-val">Ok</span>(slot)
-}
-
-<span class="kw">impl </span>Drop <span class="kw">for </span>Slot {
-    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="kw">let </span>runtime = twizzler_runtime_api::get_runtime();
-        runtime.unmap_object(<span class="kw-2">&amp;</span><span class="self">self</span>.runtime_handle);
-    }
 }
 </code></pre></div></section></main></body></html>

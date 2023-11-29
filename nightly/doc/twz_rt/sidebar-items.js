@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["RuntimeError"],"macro":["preinit_print","preinit_println"]};
+window.SIDEBAR_ITEMS = {"enum":["RuntimeError"],"macro":["preinit_print","preinit_println"],"mod":["monitor"]};

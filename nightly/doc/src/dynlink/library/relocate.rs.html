@@ -384,6 +384,10 @@
 <a href="#384" id="384">384</a>
 <a href="#385" id="385">385</a>
 <a href="#386" id="386">386</a>
+<a href="#387" id="387">387</a>
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{mem::size_of, sync::Arc};
 
 <span class="kw">use </span>elf::{
@@ -451,11 +455,11 @@
 }
 
 <span class="kw">impl </span>Library {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>laddr&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>T&gt; {
+    <span class="kw">pub fn </span>laddr&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>T&gt; {
         <span class="self">self</span>.base_addr.map(|base| (base + val <span class="kw">as </span>usize) <span class="kw">as </span><span class="kw-2">*const </span>T)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>laddr_mut&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*mut </span>T&gt; {
+    <span class="kw">pub fn </span>laddr_mut&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, val: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*mut </span>T&gt; {
         <span class="self">self</span>.base_addr.map(|base| (base + val <span class="kw">as </span>usize) <span class="kw">as </span><span class="kw-2">*mut </span>T)
     }
 
@@ -482,8 +486,10 @@
                     </span><span class="kw">if </span>sym.st_bind() != STB_WEAK {
                         <span class="kw">return </span><span class="prelude-val">Ok</span>(RelocatedSymbol::new(sym, <span class="self">self</span>.clone()));
                     } <span class="kw">else </span>{
-                        <span class="macro">trace!</span>(<span class="string">&quot;lookup symbol {} skipping weak binding in {}&quot;</span>, name, <span class="self">self</span>);
+                        <span class="macro">tracing::info!</span>(<span class="string">&quot;lookup symbol {} skipping weak binding in {}&quot;</span>, name, <span class="self">self</span>);
                     }
+                } <span class="kw">else </span>{
+                    <span class="macro">tracing::info!</span>(<span class="string">&quot;undefined symbol: {}&quot;</span>, name);
                 }
             }
             <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::NotFound {
@@ -507,8 +513,10 @@
                     </span><span class="kw">if </span>sym.st_bind() != STB_WEAK {
                         <span class="kw">return </span><span class="prelude-val">Ok</span>(RelocatedSymbol::new(sym, <span class="self">self</span>.clone()));
                     } <span class="kw">else </span>{
-                        <span class="macro">trace!</span>(<span class="string">&quot;lookup symbol {} skipping weak binding in {}&quot;</span>, name, <span class="self">self</span>);
+                        <span class="macro">tracing::info!</span>(<span class="string">&quot;lookup symbol {} skipping weak binding in {}&quot;</span>, name, <span class="self">self</span>);
                     }
+                } <span class="kw">else </span>{
+                    <span class="macro">tracing::info!</span>(<span class="string">&quot;undefined symbol: {}&quot;</span>, name);
                 }
             }
         }

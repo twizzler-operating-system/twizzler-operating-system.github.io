@@ -69,7 +69,7 @@
     InvalidVersion(BaseVersion),
 }
 
-<span class="kw">fn </span>match_tags&lt;T&gt;(_meta: NonNull&lt;MetaInfo&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), BaseError&gt; {
+<span class="kw">fn </span>match_tags(_meta: NonNull&lt;MetaInfo&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), BaseError&gt; {
     <span class="comment">// TODO
     </span><span class="prelude-val">Ok</span>(())
 }
@@ -79,7 +79,7 @@
     /// for the BaseType match.
     </span><span class="kw">pub fn </span>base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>T, BaseError&gt; {
         <span class="kw">let </span>meta = <span class="kw">unsafe </span>{ <span class="self">self</span>.meta() };
-        match_tags::&lt;T&gt;(meta)<span class="question-mark">?</span>;
+        match_tags(meta)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.base_unchecked() })
     }
 }

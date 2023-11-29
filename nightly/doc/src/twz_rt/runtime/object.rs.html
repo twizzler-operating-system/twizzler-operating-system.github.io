@@ -51,7 +51,16 @@
 <a href="#51" id="51">51</a>
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>twizzler_abi::{
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::ptr::NonNull;
+
+<span class="kw">use </span>tracing::warn;
+<span class="kw">use </span>twizzler_abi::{
     object::{ObjID, Protections, MAX_SIZE, NULLPAGE_SIZE},
     syscall::{sys_object_map, sys_object_unmap, UnmapFlags},
 };
@@ -62,7 +71,8 @@
 <span class="comment">// TODO: implement an object cache
 
 </span><span class="kw">impl </span>ObjectRuntime <span class="kw">for </span>ReferenceRuntime {
-    <span class="kw">fn </span>map_object(
+    <span class="attr">#[tracing::instrument(ret, skip(<span class="self">self</span>), level = <span class="string">&quot;trace&quot;</span>)]
+    </span><span class="kw">fn </span>map_object(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         id: twizzler_runtime_api::ObjID,
         flags: twizzler_runtime_api::MapFlags,
@@ -78,7 +88,7 @@
             prot.insert(Protections::EXEC);
         }
         <span class="kw">let </span>slot = <span class="self">self</span>.allocate_slot().ok_or(MapError::OutOfResources)<span class="question-mark">?</span>;
-        <span class="kw">let _ </span>= sys_object_map(
+        sys_object_map(
             <span class="prelude-val">None</span>,
             ObjID::new(id),
             slot,
@@ -86,21 +96,23 @@
             twizzler_abi::syscall::MapFlags::empty(),
         )
         .map_err(|<span class="kw">_</span>| MapError::InternalError)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(ObjectHandle {
+        <span class="prelude-val">Ok</span>(ObjectHandle::new(
+            NonNull::new(Box::into_raw(Box::default())).unwrap(),
             id,
             flags,
-            start: (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-            meta: (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-        })
+            (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+            (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+        ))
     }
 
-    <span class="kw">fn </span>unmap_object(<span class="kw-2">&amp;</span><span class="self">self</span>, _handle: <span class="kw-2">&amp;</span>twizzler_runtime_api::ObjectHandle) {}
-
-    <span class="kw">fn </span>release_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: <span class="kw-2">&amp;mut </span>twizzler_runtime_api::ObjectHandle) {
+    <span class="attr">#[tracing::instrument(skip(<span class="self">self</span>), level = <span class="string">&quot;trace&quot;</span>)]
+    </span><span class="kw">fn </span>release_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: <span class="kw-2">&amp;mut </span>twizzler_runtime_api::ObjectHandle) {
         <span class="kw">let </span>slot = (handle.start <span class="kw">as </span>usize) / MAX_SIZE;
 
         <span class="kw">if </span>sys_object_unmap(<span class="prelude-val">None</span>, slot, UnmapFlags::empty()).is_ok() {
             <span class="self">self</span>.release_slot(slot);
+        } <span class="kw">else </span>{
+            <span class="macro">warn!</span>(<span class="string">&quot;failed to unmap slot {}&quot;</span>, slot);
         }
     }
 }

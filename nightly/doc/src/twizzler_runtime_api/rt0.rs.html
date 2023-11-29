@@ -49,6 +49,20 @@
 <a href="#49" id="49">49</a>
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! rt0 defines a collection of functions that the basic Rust ABI expects to be defined by some part of the C runtime:
 //!
 //!   - __tls_get_addr for handling non-local TLS regions.
@@ -64,7 +78,7 @@
 <span class="attr">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
 </span><span class="kw">pub use </span>x86_64::<span class="kw-2">*</span>;
 
-<span class="kw">use </span><span class="kw">crate</span>::AuxEntry;
+<span class="kw">use crate</span>::{AuxEntry, DlPhdrInfo};
 
 <span class="comment">// The C-based entry point coming from arch-specific assembly _start function.
 </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>entry(arg: usize) -&gt; ! {
@@ -99,5 +113,19 @@
     runtime
         .tls_get_addr(index)
         .expect(<span class="string">&quot;index passed to __tls_get_addr is invalid&quot;</span>)
+}
+
+<span class="doccomment">/// Public definition of dl_iterate_phdr, used by libunwind for learning where loaded objects (executables, libraries, ...) are.
+</span><span class="attr">#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>dl_iterate_phdr(
+    callback: <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(
+        ptr: <span class="kw-2">*const </span>DlPhdrInfo,
+        sz: core::ffi::c_size_t,
+        data: <span class="kw-2">*mut </span>core::ffi::c_void,
+    ) -&gt; core::ffi::c_int,
+    data: <span class="kw-2">*mut </span>core::ffi::c_void,
+) -&gt; core::ffi::c_int {
+    <span class="kw">let </span>runtime = <span class="kw">crate</span>::get_runtime();
+    runtime.iterate_phdr(<span class="kw-2">&amp;mut </span>|info| callback(<span class="kw-2">&amp;</span>info, core::mem::size_of::&lt;DlPhdrInfo&gt;(), data))
 }
 </code></pre></div></section></main></body></html>

@@ -273,6 +273,65 @@
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of global context.
 
 </span><span class="kw">use </span>std::{
@@ -291,8 +350,8 @@
     DynlinkError, ECollector,
 };
 
-<span class="attr">#[derive(Default)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ContextInner {
+<span class="attr">#[derive(Default, Clone)]
+</span><span class="kw">pub struct </span>ContextInner {
     <span class="comment">// Simple unique ID generation.
     </span>id_counter: u128,
     id_stack: Vec&lt;u128&gt;,
@@ -309,6 +368,11 @@
 
 <span class="attr">#[allow(dead_code)]
 </span><span class="kw">impl </span>ContextInner {
+    <span class="kw">pub fn </span>get_compartment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompartmentRef {
+        <span class="comment">// TODO
+        </span><span class="self">self</span>.compartment_names.values().nth(<span class="number">0</span>).cloned().unwrap()
+    }
+
     <span class="kw">fn </span>get_fresh_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u128 {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(old) = <span class="self">self</span>.id_stack.pop() {
             old
@@ -318,16 +382,37 @@
         }
     }
 
+    <span class="doccomment">/// Lookup a library by name
+    </span><span class="kw">pub fn </span>lookup_library(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>LibraryRef&gt; {
+        <span class="self">self</span>.library_names.get(name)
+    }
+
     <span class="doccomment">/// Visit libraries in a post-order DFS traversal, starting from a number of roots. Note that
     /// because multiple roots may be specified, this means that nodes may be visited `O(|roots|)`
     /// times (|roots| is the number of roots yielded by the iterator).
-    </span><span class="kw">pub fn </span>with_dfs_postorder&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, roots: I, <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LibraryRef))
+    </span><span class="kw">pub fn </span>with_dfs_postorder&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, roots: I, <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LibraryRef))
     <span class="kw">where
-        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt;,
     {
         <span class="kw">for </span>root <span class="kw">in </span>roots.into_iter() {
             <span class="kw">let </span><span class="kw-2">mut </span>visit =
                 petgraph::visit::DfsPostOrder::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root.idx.get().unwrap());
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
+                <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[node];
+                f(dep)
+            }
+        }
+    }
+
+    <span class="doccomment">/// Visit libraries in a BFS traversal, starting from a number of roots. Note that
+    /// because multiple roots may be specified, this means that nodes may be visited `O(|roots|)`
+    /// times (|roots| is the number of roots yielded by the iterator).
+    </span><span class="kw">pub fn </span>with_bfs&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, roots: I, <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LibraryRef))
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt;,
+    {
+        <span class="kw">for </span>root <span class="kw">in </span>roots.into_iter() {
+            <span class="kw">let </span><span class="kw-2">mut </span>visit = petgraph::visit::Bfs::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root.idx.get().unwrap());
             <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
                 <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[node];
                 f(dep)
@@ -407,9 +492,9 @@
         })
     }
 
-    <span class="kw">fn </span>build_ctors&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, roots: I) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[CtorInfo], DynlinkError&gt;
+    <span class="kw">fn </span>build_ctors&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, roots: I) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[CtorInfo], DynlinkError&gt;
     <span class="kw">where
-        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>ctors = <span class="macro">vec!</span>[];
         <span class="self">self</span>.with_dfs_postorder(roots, |lib| {
@@ -422,19 +507,29 @@
         <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.static_ctors)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_runtime_info&lt;I&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_runtime_info&lt;<span class="lifetime">&#39;a</span>, I&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         roots: I,
         tls: TlsRegion,
+        outer: <span class="kw-2">&amp;</span>Context,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt;
     <span class="kw">where
-        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt; + Clone,
     {
+        <span class="kw">let </span>root_names = roots
+            .clone()
+            .into_iter()
+            .map(|r| r.name.clone())
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
         <span class="kw">let </span>ctors = {
-            <span class="kw">let </span>ctors = <span class="self">self</span>.build_ctors(roots)<span class="question-mark">?</span>;
+            <span class="kw">let </span>ctors = <span class="self">self</span>.build_ctors(roots.clone())<span class="question-mark">?</span>;
             (ctors.as_ptr(), ctors.len())
         };
-        <span class="prelude-val">Ok</span>(RuntimeInitInfo::new(ctors.<span class="number">0</span>, ctors.<span class="number">1</span>, tls))
+        <span class="kw">let </span><span class="kw-2">mut </span>used_slots = <span class="macro">vec!</span>[];
+        <span class="self">self</span>.with_bfs(roots, |lib| used_slots.append(<span class="kw-2">&amp;mut </span>lib.used_slots()));
+        <span class="prelude-val">Ok</span>(RuntimeInitInfo::new(
+            ctors.<span class="number">0</span>, ctors.<span class="number">1</span>, tls, outer, root_names, used_slots,
+        ))
     }
 }
 
@@ -445,17 +540,14 @@
 
 <span class="attr">#[allow(dead_code)]
 </span><span class="kw">impl </span>Context {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_inner_mut&lt;R&gt;(
+    <span class="kw">pub fn </span>with_inner_mut&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ContextInner) -&gt; R,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
         <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.lock()<span class="question-mark">?</span>))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_inner&lt;R&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>ContextInner) -&gt; R,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
+    <span class="kw">pub fn </span>with_inner&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>ContextInner) -&gt; R) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
         <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;*</span><span class="self">self</span>.inner.lock()<span class="question-mark">?</span>))
     }
 
@@ -473,6 +565,11 @@
         <span class="prelude-val">Ok</span>(compartment)
     }
 
+    <span class="doccomment">/// Lookup a library by name.
+    </span><span class="kw">pub fn </span>lookup_library(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryRef&gt; {
+        <span class="self">self</span>.inner.lock().ok()<span class="question-mark">?</span>.lookup_library(name).cloned()
+    }
+
     <span class="doccomment">/// Lookup a given symbol within the context.
     </span><span class="kw">pub fn </span>lookup_symbol(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -484,15 +581,15 @@
     }
 
     <span class="doccomment">/// Get initial runtime information for bootstrapping.
-    </span><span class="kw">pub fn </span>build_runtime_info&lt;I&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
+    </span><span class="kw">pub fn </span>build_runtime_info&lt;<span class="lifetime">&#39;a</span>, I&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         roots: I,
         tls: TlsRegion,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt;
     <span class="kw">where
-        </span>I: IntoIterator&lt;Item = LibraryRef&gt;,
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt; + Clone,
     {
-        <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>.build_runtime_info(roots, tls)
+        <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>.build_runtime_info(roots, tls, <span class="self">self</span>)
     }
 
     <span class="doccomment">/// Add an unloaded library to the context (and load it)
@@ -524,23 +621,44 @@
     }
 }
 
+<span class="kw">impl </span>Clone <span class="kw">for </span>Context {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner: Mutex::new(<span class="self">self</span>.inner.lock().unwrap().clone()),
+        }
+    }
+}
+
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>RuntimeInitInfo {
     ctor_info_array: <span class="kw-2">*const </span>CtorInfo,
     ctor_info_array_len: usize,
 
     <span class="kw">pub </span>tls_region: TlsRegion,
+    <span class="kw">pub </span>ctx: <span class="kw-2">*const </span>Context,
+    <span class="kw">pub </span>root_names: Vec&lt;String&gt;,
+    <span class="kw">pub </span>used_slots: Vec&lt;usize&gt;,
 }
+
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>RuntimeInitInfo {}
+<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>RuntimeInitInfo {}
+
 <span class="kw">impl </span>RuntimeInitInfo {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         ctor_info_array: <span class="kw-2">*const </span>CtorInfo,
         ctor_info_array_len: usize,
         tls_region: TlsRegion,
+        ctx: <span class="kw-2">&amp;</span>Context,
+        root_names: Vec&lt;String&gt;,
+        used_slots: Vec&lt;usize&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             ctor_info_array,
             ctor_info_array_len,
             tls_region,
+            ctx,
+            root_names,
+            used_slots,
         }
     }
 
