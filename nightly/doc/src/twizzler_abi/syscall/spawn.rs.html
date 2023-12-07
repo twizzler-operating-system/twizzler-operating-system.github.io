@@ -120,11 +120,23 @@
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
 <span class="kw">use </span>bitflags::bitflags;
 
-<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID, upcall::UpcallTarget};
 
 <span class="kw">use super</span>::{convert_codes_to_result, Syscall};
 <span class="macro">bitflags! </span>{
@@ -132,6 +144,14 @@
     </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
     </span><span class="kw">pub struct </span>ThreadSpawnFlags: u32 {
     }
+}
+
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+#[repr(C)]
+</span><span class="kw">pub enum </span>UpcallTargetSpawnOption {
+    DefaultAbort,
+    Inherit,
+    SetTo(UpcallTarget),
 }
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
@@ -145,11 +165,13 @@
     <span class="kw">pub </span>arg: usize,
     <span class="kw">pub </span>flags: ThreadSpawnFlags,
     <span class="kw">pub </span>vm_context_handle: <span class="prelude-ty">Option</span>&lt;ObjID&gt;,
+    <span class="kw">pub </span>upcall_target: UpcallTargetSpawnOption,
 }
 
 <span class="kw">impl </span>ThreadSpawnArgs {
     <span class="doccomment">/// Construct a new ThreadSpawnArgs. If vm_context_handle is Some(handle), then spawn the thread in the
     /// VM context defined by handle. Otherwise spawn it in the same VM context as the spawner.
+    </span><span class="attr">#[warn(clippy::too_many_arguments)]
     </span><span class="kw">pub fn </span>new(
         entry: usize,
         stack_base: usize,
@@ -158,6 +180,7 @@
         arg: usize,
         flags: ThreadSpawnFlags,
         vm_context_handle: <span class="prelude-ty">Option</span>&lt;ObjID&gt;,
+        upcall_target: UpcallTargetSpawnOption,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             entry,
@@ -167,6 +190,7 @@
             arg,
             flags,
             vm_context_handle,
+            upcall_target,
         }
     }
 }

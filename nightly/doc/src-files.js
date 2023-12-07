@@ -10,6 +10,6 @@ var srcIndex = JSON.parse('{\
 "twizzler_queue":["",[],["callback_queue.rs","lib.rs","queue.rs","sender_queue.rs"]],\
 "twizzler_queue_raw":["",[],["lib.rs"]],\
 "twizzler_runtime_api":["",[["rt0",[],["x86_64.rs"]]],["lib.rs","rt0.rs"]],\
-"twz_rt":["",[["arch",[],["x86_64.rs"]],["runtime",[["thread",[],["internal.rs","mgr.rs","tcb.rs"]]],["alloc.rs","core.rs","debug.rs","file.rs","object.rs","process.rs","slot.rs","stdio.rs","thread.rs","time.rs"]]],["arch.rs","error.rs","lib.rs","monitor.rs","preinit.rs","runtime.rs"]]\
+"twz_rt":["",[["arch",[],["x86_64.rs"]],["runtime",[["thread",[],["internal.rs","mgr.rs","tcb.rs"]]],["alloc.rs","core.rs","debug.rs","file.rs","object.rs","process.rs","slot.rs","stdio.rs","thread.rs","time.rs","upcall.rs"]]],["arch.rs","error.rs","lib.rs","monitor.rs","preinit.rs","runtime.rs"]]\
 }');
 createSrcSidebar();

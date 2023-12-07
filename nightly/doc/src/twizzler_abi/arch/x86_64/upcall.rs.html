@@ -76,13 +76,24 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre></div><pre class="rust"><code><span class="attr">#[allow(unused_imports)]
-</span><span class="kw">use </span><span class="kw">crate</span>::upcall::UpcallInfo;
+</span><span class="kw">use </span><span class="kw">crate</span>::upcall::{UpcallData, UpcallInfo};
+
+<span class="kw">pub const </span>XSAVE_LEN: usize = <span class="number">1024</span>;
 
 <span class="doccomment">/// Arch-specific frame info for upcall.
-</span><span class="attr">#[derive(Clone, Debug)]
-#[repr(C)]
+</span><span class="attr">#[derive(Clone, Debug, Copy)]
+#[repr(C, align(<span class="number">64</span>))]
 </span><span class="kw">pub struct </span>UpcallFrame {
+    <span class="kw">pub </span>xsave_region: [u8; XSAVE_LEN],
     <span class="kw">pub </span>rip: u64,
     <span class="kw">pub </span>rflags: u64,
     <span class="kw">pub </span>rsp: u64,
@@ -101,6 +112,8 @@
     <span class="kw">pub </span>r13: u64,
     <span class="kw">pub </span>r14: u64,
     <span class="kw">pub </span>r15: u64,
+    <span class="kw">pub </span>thread_ptr: u64,
+    <span class="kw">pub </span>prior_ctx: <span class="kw">crate</span>::object::ObjID,
 }
 
 <span class="kw">impl </span>UpcallFrame {
@@ -124,7 +137,7 @@
 #[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>upcall_entry2(
     rdi: <span class="kw-2">*const </span>UpcallFrame,
-    rsi: <span class="kw-2">*const </span>UpcallInfo,
+    rsi: <span class="kw-2">*const </span>UpcallData,
 ) -&gt; ! {
     <span class="kw">use </span><span class="kw">crate</span>::runtime::__twz_get_runtime;
 
@@ -135,7 +148,10 @@
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
 #[no_mangle]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>upcall_entry(rdi: <span class="kw-2">*const </span>UpcallFrame, rsi: <span class="kw-2">*const </span>UpcallInfo) -&gt; ! {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe extern </span><span class="string">&quot;C-unwind&quot; </span><span class="kw">fn </span>upcall_entry(
+    rdi: <span class="kw-2">*mut </span>UpcallFrame,
+    rsi: <span class="kw-2">*const </span>UpcallData,
+) -&gt; ! {
     <span class="macro">core::arch::asm!</span>(
         <span class="string">&quot;.cfi_signal_frame&quot;</span>,
         <span class="string">&quot;mov rbp, rdx&quot;</span>,

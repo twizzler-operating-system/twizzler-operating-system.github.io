@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["SLOTS"],"mod":["syscall"]};
+window.SIDEBAR_ITEMS = {"constant":["SLOTS","XSAVE_LEN"],"mod":["syscall"]};

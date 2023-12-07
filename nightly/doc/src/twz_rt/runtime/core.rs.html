@@ -143,9 +143,22 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>dynlink::{context::RuntimeInitInfo, library::CtorInfo};
+<span class="kw">use </span>twizzler_abi::upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget};
 <span class="kw">use </span>twizzler_runtime_api::{AuxEntry, BasicAux, CoreRuntime};
 
 <span class="kw">use crate</span>::{
@@ -238,7 +251,18 @@
         <span class="kw">let </span>init_info = <span class="kw">unsafe </span>{ preinit_unwrap((init_info <span class="kw">as </span><span class="kw-2">*const </span>RuntimeInitInfo).as_ref()) };
 
         <span class="comment">// Step 3: bootstrap pre-std stuff: upcalls, allocator, TLS, constructors (the order matters, ctors need to happen last)
-        </span>twizzler_abi::syscall::sys_thread_set_upcall(<span class="kw">crate</span>::arch::rr_upcall_entry);
+        </span><span class="kw">let </span>upcall_target = UpcallTarget::new(
+            <span class="kw">crate</span>::arch::rr_upcall_entry,
+            <span class="kw">crate</span>::arch::rr_upcall_entry,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>.into(),
+            [UpcallOptions {
+                flags: UpcallFlags::empty(),
+                mode: UpcallMode::CallSelf,
+            }; UpcallInfo::NR_UPCALLS],
+        );
+        twizzler_abi::syscall::sys_thread_set_upcall(upcall_target);
         <span class="self">self</span>.init_allocator(init_info);
         <span class="self">self</span>.init_tls(init_info);
         <span class="self">self</span>.init_ctors(init_info.ctor_infos());

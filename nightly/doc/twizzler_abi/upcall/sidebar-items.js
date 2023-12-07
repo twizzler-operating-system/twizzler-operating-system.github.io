@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MemoryAccessKind","ObjectMemoryError","UpcallInfo"],"struct":["ExceptionInfo","MemoryContextViolationInfo","ObjectMemoryFaultInfo","UpcallFrame"]};
+window.SIDEBAR_ITEMS = {"constant":["UPCALL_EXIT_CODE"],"enum":["MemoryAccessKind","ObjectMemoryError","UpcallInfo","UpcallMode"],"struct":["ExceptionInfo","MemoryContextViolationInfo","ObjectMemoryFaultInfo","UpcallData","UpcallFlags","UpcallFrame","UpcallHandlerFlags","UpcallOptions","UpcallTarget"]};
