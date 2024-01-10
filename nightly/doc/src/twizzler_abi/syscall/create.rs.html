@@ -209,7 +209,7 @@
 
 <span class="kw">use super</span>::{convert_codes_to_result, Syscall};
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Default)]
 #[repr(C)]
 </span><span class="doccomment">/// Specifications for an object-copy from a source object. The specified ranges are
 /// source:[src_start, src_start + len) copied to &lt;some unspecified destination object&gt;:[dest_start,

@@ -106,111 +106,183 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Definitions for errors for the dynamic linker. One thing of note is that we allow for a collection of
-//! multiple error within the error type ([DynlinkError]). This is to enable returning multiple (e.g.) symbol
-//! lookup failures that can acted upon as a group instead of one at a time.
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Definitions for errors for the dynamic linker.
+</span><span class="kw">use </span>std::alloc::Layout;
 
-</span><span class="kw">use </span>std::sync::PoisonError;
-
+<span class="kw">use </span>elf::file::Class;
+<span class="kw">use </span>itertools::{Either, Itertools};
+<span class="kw">use </span>miette::Diagnostic;
 <span class="kw">use </span>thiserror::Error;
-<span class="doccomment">/// The main error type for dynlink.
-</span><span class="attr">#[derive(Debug, Error)]
-</span><span class="kw">pub enum </span>DynlinkError {
-    <span class="doccomment">/// Unknown error.
-    </span><span class="attr">#[error(<span class="string">&quot;unknown&quot;</span>)]
-    </span>Unknown,
-    <span class="doccomment">/// A collection of errors.
-    </span><span class="attr">#[error(<span class="string">&quot;{}&quot;</span>, .<span class="number">0</span>.iter().map(|e| e.to_string()).fold(String::new(), |a, b| a + <span class="kw-2">&amp;</span>b + <span class="string">&quot;\n&quot;</span>))]
-    </span>Collection(Vec&lt;DynlinkError&gt;),
-    <span class="doccomment">/// Identifier lookup of name failed.
-    </span><span class="attr">#[error(<span class="string">&quot;not found: {name}&quot;</span>)]
-    </span>NotFound { name: String },
-    <span class="doccomment">/// Tried to add a name that was already present to the namespace.
-    </span><span class="attr">#[error(<span class="string">&quot;name already exists: {name}&quot;</span>)]
-    </span>AlreadyExists { name: String },
-    <span class="doccomment">/// Failed to parse ELF data.
-    </span><span class="attr">#[error(<span class="string">&quot;parse failed: {err}&quot;</span>)]
+
+<span class="kw">use crate</span>::{
+    compartment::CompartmentId,
+    context::engine::LoadDirective,
+    library::{LibraryId, UnloadedLibrary},
+};
+
+<span class="attr">#[derive(Debug, Error, Diagnostic)]
+#[error(<span class="string">&quot;{kind}&quot;</span>)]
+</span><span class="kw">pub struct </span>DynlinkError {
+    <span class="kw">pub </span>kind: DynlinkErrorKind,
+    <span class="attr">#[related]
+    </span><span class="kw">pub </span>related: Vec&lt;DynlinkError&gt;,
+}
+
+<span class="kw">impl </span>DynlinkError {
+    <span class="kw">pub fn </span>new_collect(kind: DynlinkErrorKind, related: Vec&lt;DynlinkError&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ kind, related }
+    }
+
+    <span class="kw">pub fn </span>new(kind: DynlinkErrorKind) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind,
+            related: <span class="macro">vec!</span>[],
+        }
+    }
+
+    <span class="kw">pub fn </span>collect&lt;I, T&gt;(parent_kind: DynlinkErrorKind, it: I) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;T&gt;, DynlinkError&gt;
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, DynlinkError&gt;&gt;,
+    {
+        <span class="comment">// Collect errors and values, and then if there any errors, build a new error from them.
+        </span><span class="kw">let </span>(vals, errs): (Vec&lt;T&gt;, Vec&lt;DynlinkError&gt;) =
+            it.into_iter().partition_map(|item| <span class="kw">match </span>item {
+                <span class="prelude-val">Ok</span>(o) =&gt; Either::Left(o),
+                <span class="prelude-val">Err</span>(e) =&gt; Either::Right(e),
+            });
+
+        <span class="kw">if </span>errs.is_empty() {
+            <span class="prelude-val">Ok</span>(vals)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(DynlinkError {
+                kind: parent_kind,
+                related: errs,
+            })
+        }
+    }
+}
+
+<span class="kw">impl </span>From&lt;DynlinkErrorKind&gt; <span class="kw">for </span>DynlinkError {
+    <span class="kw">fn </span>from(value: DynlinkErrorKind) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: value,
+            related: <span class="macro">vec!</span>[],
+        }
+    }
+}
+
+<span class="attr">#[derive(Debug, Error, Diagnostic)]
+</span><span class="kw">pub enum </span>DynlinkErrorKind {
+    <span class="attr">#[error(<span class="string">&quot;failed to load library {library}&quot;</span>)]
+    </span>LibraryLoadFail { library: UnloadedLibrary },
+    <span class="attr">#[error(<span class="string">&quot;name not found: {name}&quot;</span>)]
+    </span>NameNotFound { name: String },
+    <span class="attr">#[error(<span class="string">&quot;failed to find symbol &#39;{symname}&#39; in &#39;{sourcelib}&#39;&quot;</span>)]
+    </span>SymbolLookupFail { symname: String, sourcelib: String },
+    <span class="attr">#[error(<span class="string">&quot;name already exists: {name}&quot;</span>)]
+    </span>NameAlreadyExists { name: String },
+    <span class="attr">#[error(<span class="string">&quot;parse failed: {err}&quot;</span>)]
     </span>ParseError {
         <span class="attr">#[from]
         </span>err: elf::ParseError,
     },
-    <span class="doccomment">/// Any other error.
-    </span><span class="attr">#[error(transparent)]
-    </span>Other(<span class="attr">#[from] </span>anyhow::Error),
+    <span class="attr">#[error(<span class="string">&quot;dynamic object is missing a required segment or section &#39;{name}&#39;&quot;</span>)]
+    </span>MissingSection { name: String },
+    <span class="attr">#[error(<span class="string">&quot;failed to allocate {:?} within compartment {}&quot;</span>, layout, comp)]
+    </span>FailedToAllocate { comp: String, layout: Layout },
+    <span class="attr">#[error(<span class="string">&quot;invalid allocation layout: {err}&quot;</span>)]
+    </span>LayoutError {
+        <span class="attr">#[from]
+        </span>err: std::alloc::LayoutError,
+    },
+    <span class="attr">#[error(<span class="string">&quot;failed to enumerate dependencies for {library}&quot;</span>)]
+    </span>DepEnumerationFail { library: String },
+    <span class="attr">#[error(<span class="string">&quot;library {library} had no TLS data for request&quot;</span>)]
+    </span>NoTLSInfo { library: String },
+    <span class="attr">#[error(<span class="string">&quot;library {library} requested relocation that is unsupported&quot;</span>)]
+    </span>UnsupportedReloc { library: String, reloc: String },
+    <span class="attr">#[error(<span class="string">&quot;failed to process relocation section &#39;{secname}&#39; for library &#39;{library}&#39;&quot;</span>)]
+    </span>RelocationSectionFail { secname: String, library: String },
+    <span class="attr">#[error(<span class="string">&quot;library &#39;{library}&#39; failed to relocate&quot;</span>)]
+    </span>RelocationFail { library: String },
+    <span class="attr">#[error(<span class="string">&quot;failed to create new backing data&quot;</span>)]
+    </span>NewBackingFail,
+    <span class="attr">#[error(<span class="string">&quot;failed to satisfy load directive&quot;</span>)]
+    </span>LoadDirectiveFail { dir: LoadDirective },
+    <span class="attr">#[error(<span class="string">&quot;tried to operate on an unloaded library &#39;{library}&#39;&quot;</span>)]
+    </span>UnloadedLibrary { library: String },
+    <span class="attr">#[error(<span class="string">&quot;dependencies of &#39;{library}&#39; failed to relocate&quot;</span>)]
+    </span>DepsRelocFail { library: String },
+    <span class="attr">#[error(<span class="string">&quot;invalid library ID &#39;{id}&#39;&quot;</span>)]
+    </span>InvalidLibraryId { id: LibraryId },
+    <span class="attr">#[error(<span class="string">&quot;invalid compartment ID &#39;{id}&#39;&quot;</span>)]
+    </span>InvalidCompartmentId { id: CompartmentId },
+    <span class="attr">#[error(<span class="string">&quot;invalid ELF header: {hdr_err}&quot;</span>)]
+    </span>InvalidELFHeader {
+        <span class="attr">#[source]
+        #[from]
+        #[diagnostic_source]
+        </span>hdr_err: HeaderError,
+    },
 }
 
-<span class="kw">impl</span>&lt;T&gt; From&lt;PoisonError&lt;T&gt;&gt; <span class="kw">for </span>DynlinkError {
-    <span class="kw">fn </span>from(value: PoisonError&lt;T&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Other(<span class="macro">anyhow::anyhow!</span>(value.to_string()))
-    }
+<span class="attr">#[derive(Debug, Error, Diagnostic)]
+</span><span class="kw">pub enum </span>HeaderError {
+    <span class="attr">#[error(<span class="string">&quot;class mismatch: expected {expect:?}, got {got:?}&quot;</span>)]
+    </span>ClassMismatch { expect: Class, got: Class },
+    <span class="attr">#[error(<span class="string">&quot;ELF version mismatch: expected {expect}, got {got}&quot;</span>)]
+    </span>VersionMismatch { expect: u32, got: u32 },
+    <span class="attr">#[error(<span class="string">&quot;OS/ABI mismatch: expected {expect}, got {got}&quot;</span>)]
+    </span>OSABIMismatch { expect: u8, got: u8 },
+    <span class="attr">#[error(<span class="string">&quot;ABI version mismatch: expected {expect}, got {got}&quot;</span>)]
+    </span>ABIVersionMismatch { expect: u8, got: u8 },
+    <span class="attr">#[error(<span class="string">&quot;ELF type mismatch: expected {expect}, got {got}&quot;</span>)]
+    </span>ELFTypeMismatch { expect: u16, got: u16 },
+    <span class="attr">#[error(<span class="string">&quot;machine mismatch: expected {expect}, got {got}&quot;</span>)]
+    </span>MachineMismatch { expect: u16, got: u16 },
 }
 
-<span class="kw">impl </span>From&lt;Vec&lt;anyhow::Error&gt;&gt; <span class="kw">for </span>DynlinkError {
-    <span class="kw">fn </span>from(value: Vec&lt;anyhow::Error&gt;) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Collection(value.into_iter().map(|e| e.into()).collect())
-    }
-}
-
-<span class="kw">impl </span>FromIterator&lt;anyhow::Error&gt; <span class="kw">for </span>DynlinkError {
-    <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = anyhow::Error&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::Collection(iter.into_iter().map(|e| e.into()).collect())
-    }
-}
-
-<span class="kw">impl </span>From&lt;Vec&lt;DynlinkError&gt;&gt; <span class="kw">for </span>DynlinkError {
-    <span class="kw">fn </span>from(value: Vec&lt;DynlinkError&gt;) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>new = <span class="macro">vec!</span>[];
-        <span class="kw">for </span>v <span class="kw">in </span>value {
-            <span class="kw">match </span>v {
-                DynlinkError::Collection(<span class="kw-2">mut </span>list) =&gt; {
-                    new.append(<span class="kw-2">&amp;mut </span>list);
-                }
-                v =&gt; new.push(v),
-            }
-        }
-        <span class="self">Self</span>::Collection(new)
-    }
-}
-
-<span class="doccomment">/// A collector trait that lets us combine multiple [DynlinkError]s into one Collection. Design borrowed from beau_collector.
-</span><span class="kw">pub trait </span>ECollector&lt;T&gt; {
-    <span class="kw">fn </span>ecollect&lt;I&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;I, DynlinkError&gt;
-    <span class="kw">where
-        </span>I: std::iter::FromIterator&lt;T&gt;;
-}
-
-<span class="kw">impl</span>&lt;T, U, E&gt; ECollector&lt;T&gt; <span class="kw">for </span>U
-<span class="kw">where
-    </span>U: Iterator&lt;Item = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;,
-    E: std::convert::Into&lt;DynlinkError&gt;,
-{
-    <span class="attr">#[allow(clippy::redundant_closure_call)]
-    </span><span class="kw">fn </span>ecollect&lt;I&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;I, DynlinkError&gt;
-    <span class="kw">where
-        </span>I: std::iter::FromIterator&lt;T&gt;,
-    {
-        <span class="kw">let </span>(good, bad): (I, Vec&lt;DynlinkError&gt;) = (|(g, b): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;)| {
-            (
-                g.into_iter()
-                    .map(|res| <span class="kw">match </span>res {
-                        <span class="prelude-val">Ok</span>(x) =&gt; x,
-                        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(),
-                    })
-                    .collect(),
-                b.into_iter()
-                    .map(|res| <span class="kw">match </span>res {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(),
-                        <span class="prelude-val">Err</span>(e) =&gt; e,
-                    })
-                    .map(Into::into)
-                    .collect(),
-            )
-        })(<span class="self">self</span>.partition(Result::is_ok));
-
-        <span class="kw">if </span>bad.is_empty() {
-            <span class="prelude-val">Ok</span>(good)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(DynlinkError::Collection(bad))
+<span class="kw">impl </span>From&lt;elf::ParseError&gt; <span class="kw">for </span>DynlinkError {
+    <span class="kw">fn </span>from(value: elf::ParseError) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: DynlinkErrorKind::ParseError { err: value },
+            related: <span class="macro">vec!</span>[],
         }
     }
 }

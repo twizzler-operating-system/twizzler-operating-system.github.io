@@ -95,9 +95,14 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::{Arc, OnceLock};
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::{Arc, Mutex, OnceLock};
 
-<span class="kw">use </span>twizzler_abi::object::{MAX_SIZE, NULLPAGE_SIZE};
+<span class="kw">use </span>dynlink::library::BackingData;
 <span class="kw">use </span>twizzler_runtime_api::{AddrRange, DlPhdrInfo, Library, LibraryId};
 <span class="kw">use </span>twz_rt::monitor::MonitorActions;
 
@@ -109,10 +114,10 @@
 }
 
 <span class="kw">struct </span>MonitorActionsImpl {
-    state: Arc&lt;MonitorState&gt;,
+    state: Arc&lt;Mutex&lt;MonitorState&gt;&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>init_actions(state: Arc&lt;MonitorState&gt;) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>init_actions(state: Arc&lt;Mutex&lt;MonitorState&gt;&gt;) {
     <span class="kw">let _ </span>= ACTIONS.set(MonitorActionsImpl { state });
 }
 
@@ -121,18 +126,18 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         id: twizzler_runtime_api::LibraryId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::Library&gt; {
-        <span class="kw">let </span>lib = <span class="self">self</span>.state.get_nth_library(id.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>state = <span class="self">self</span>.state.lock().unwrap();
+        <span class="kw">let </span>lib = state.get_nth_library(id.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>next_id = LibraryId(id.<span class="number">0 </span>+ <span class="number">1</span>);
         <span class="kw">let </span>phdrs = lib.get_phdrs_raw()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(Library {
-            mapping: lib.full_obj.slot().runtime_handle().clone(),
-            range: (
-                lib.full_obj.raw_lea(NULLPAGE_SIZE),
-                lib.full_obj.raw_lea(MAX_SIZE - NULLPAGE_SIZE),
-            ),
+            mapping: lib.full_obj.clone().to_inner(),
+            range: (lib.full_obj.data().<span class="number">0</span>, <span class="kw">unsafe </span>{
+                lib.full_obj.data().<span class="number">0</span>.add(lib.full_obj.data().<span class="number">1</span>)
+            }),
             dl_info: <span class="prelude-val">Some</span>(DlPhdrInfo {
-                addr: lib.base_addr<span class="question-mark">?</span>,
+                addr: lib.base_addr(),
                 name: core::ptr::null(),
                 phdr_start: phdrs.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>,
                 phdr_num: phdrs.<span class="number">1</span>.try_into().ok()<span class="question-mark">?</span>,
@@ -146,7 +151,7 @@
                     .ok()<span class="question-mark">?</span>,
                 tls_data: core::ptr::null(),
             }),
-            next_id: <span class="self">self</span>.state.get_nth_library(next_id.<span class="number">0</span>).map(|<span class="kw">_</span>| next_id),
+            next_id: state.get_nth_library(next_id.<span class="number">0</span>).map(|<span class="kw">_</span>| next_id),
             id,
         })
     }
@@ -156,7 +161,8 @@
     }
 
     <span class="kw">fn </span>lookup_library_name(<span class="kw-2">&amp;</span><span class="self">self</span>, id: LibraryId, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
-        <span class="kw">let </span>lib = <span class="self">self</span>.state.get_nth_library(id.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>state = <span class="self">self</span>.state.lock().unwrap();
+        <span class="kw">let </span>lib = state.get_nth_library(id.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">if </span>buf.len() &lt; lib.name.len() {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -166,12 +172,13 @@
 
     <span class="kw">fn </span>get_segment(<span class="kw-2">&amp;</span><span class="self">self</span>, id: LibraryId, seg: usize) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::AddrRange&gt; {
         <span class="kw">const </span>PT_LOAD: u32 = <span class="number">1</span>;
-        <span class="kw">let </span>lib = <span class="self">self</span>.state.get_nth_library(id.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>state = <span class="self">self</span>.state.lock().unwrap();
+        <span class="kw">let </span>lib = state.get_nth_library(id.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>phdrs = lib.get_phdrs_raw()<span class="question-mark">?</span>;
         <span class="kw">let </span>slice = <span class="kw">unsafe </span>{ core::slice::from_raw_parts(phdrs.<span class="number">0</span>, phdrs.<span class="number">1</span>) };
         <span class="kw">let </span>phdr = slice.iter().filter(|p| p.p_type == PT_LOAD).nth(seg)<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(AddrRange {
-            start: lib.laddr::&lt;u8&gt;(phdr.p_vaddr)<span class="question-mark">? </span><span class="kw">as </span>usize,
+            start: lib.laddr::&lt;u8&gt;(phdr.p_vaddr) <span class="kw">as </span>usize,
             len: phdr.p_memsz <span class="kw">as </span>usize,
         })
     }
@@ -179,11 +186,14 @@
     <span class="kw">fn </span>allocate_tls_region(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;dynlink::tls::TlsRegion&gt; {
         <span class="kw">let </span>tcb = twz_rt::monitor::RuntimeThreadControl::new();
 
-        <span class="self">self</span>.state
+        <span class="kw">let </span><span class="kw-2">mut </span>state = <span class="self">self</span>.state.lock().unwrap();
+        <span class="kw">let </span>comp = state.dynlink.lookup_compartment(<span class="string">&quot;monitor&quot;</span>).unwrap();
+        state
             .dynlink
-            .with_inner_mut(|inner| inner.get_compartment().build_tls_region(tcb).ok())
+            .get_compartment_mut(comp)
+            .unwrap()
+            .build_tls_region(tcb)
             .ok()
-            .flatten()
     }
 
     <span class="kw">fn </span>free_tls_region(<span class="kw-2">&amp;</span><span class="self">self</span>, tls: dynlink::tls::TlsRegion) {

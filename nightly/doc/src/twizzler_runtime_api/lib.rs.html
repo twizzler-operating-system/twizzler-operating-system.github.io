@@ -526,6 +526,45 @@
 <a href="#526" id="526">526</a>
 <a href="#527" id="527">527</a>
 <a href="#528" id="528">528</a>
+<a href="#529" id="529">529</a>
+<a href="#530" id="530">530</a>
+<a href="#531" id="531">531</a>
+<a href="#532" id="532">532</a>
+<a href="#533" id="533">533</a>
+<a href="#534" id="534">534</a>
+<a href="#535" id="535">535</a>
+<a href="#536" id="536">536</a>
+<a href="#537" id="537">537</a>
+<a href="#538" id="538">538</a>
+<a href="#539" id="539">539</a>
+<a href="#540" id="540">540</a>
+<a href="#541" id="541">541</a>
+<a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including startup, execution, and libstd support.
 //! It defines a set of traits that, when all implemented, form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
 //!
@@ -689,6 +728,45 @@
     </span><span class="kw">fn </span>map_object(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ObjID, flags: MapFlags) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectHandle, MapError&gt;;
     <span class="doccomment">/// Called on drop of an object handle.
     </span><span class="kw">fn </span>release_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: <span class="kw-2">&amp;mut </span>ObjectHandle);
+
+    <span class="doccomment">/// Map two objects in sequence, useful for executable loading. The default implementation makes no guarantees about
+    /// ordering.
+    </span><span class="kw">fn </span>map_two_objects(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        in_id_a: ObjID,
+        in_flags_a: MapFlags,
+        in_id_b: ObjID,
+        in_flags_b: MapFlags,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(ObjectHandle, ObjectHandle), MapError&gt; {
+        <span class="kw">let </span>map_and_check = |rev: bool| {
+            <span class="kw">let </span>(id_a, flags_a) = <span class="kw">if </span>rev {
+                (in_id_b, in_flags_b)
+            } <span class="kw">else </span>{
+                (in_id_a, in_flags_a)
+            };
+
+            <span class="kw">let </span>(id_b, flags_b) = <span class="kw">if </span>!rev {
+                (in_id_b, in_flags_b)
+            } <span class="kw">else </span>{
+                (in_id_a, in_flags_a)
+            };
+
+            <span class="kw">let </span>a = <span class="self">self</span>.map_object(id_a, flags_a)<span class="question-mark">?</span>;
+            <span class="kw">let </span>b = <span class="self">self</span>.map_object(id_b, flags_b)<span class="question-mark">?</span>;
+            <span class="kw">let </span>a_addr = a.start <span class="kw">as </span>usize;
+            <span class="kw">let </span>b_addr = b.start <span class="kw">as </span>usize;
+
+            <span class="kw">if </span>rev &amp;&amp; a_addr &gt; b_addr {
+                <span class="prelude-val">Ok</span>((b, a))
+            } <span class="kw">else if </span>!rev &amp;&amp; b_addr &gt; a_addr {
+                <span class="prelude-val">Ok</span>((a, b))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">Err</span>(MapError::InternalError)
+            }
+        };
+
+        map_and_check(<span class="bool-val">false</span>).or_else(|<span class="kw">_</span>| map_and_check(<span class="bool-val">true</span>))
+    }
 }
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]

@@ -44,23 +44,23 @@
 <a href="#44" id="44">44</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Definitions for symbols in the dynamic linker.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::library::LibraryRef;
+</span><span class="kw">use </span><span class="kw">crate</span>::library::{BackingData, Library};
 
 <span class="doccomment">/// A (relocated) symbol. Contains information about the symbol itself, like value and size, along with a reference to
 /// the library that it comes from.
-</span><span class="kw">pub struct </span>RelocatedSymbol {
+</span><span class="kw">pub struct </span>RelocatedSymbol&lt;<span class="lifetime">&#39;lib</span>, Backing: BackingData&gt; {
     sym: elf::symbol::Symbol,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) lib: LibraryRef,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) lib: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lib </span>Library&lt;Backing&gt;,
 }
 
-<span class="kw">impl </span>RelocatedSymbol {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(sym: elf::symbol::Symbol, lib: LibraryRef) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;lib</span>, Backing: BackingData&gt; RelocatedSymbol&lt;<span class="lifetime">&#39;lib</span>, Backing&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(sym: elf::symbol::Symbol, lib: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lib </span>Library&lt;Backing&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ sym, lib }
     }
 
     <span class="doccomment">/// Returns the relocated address of the symbol, i.e. the value of the symbol added to the base address of the library it comes from.
     </span><span class="kw">pub fn </span>reloc_value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-        <span class="self">self</span>.sym.st_value + <span class="self">self</span>.lib.base_addr.unwrap() <span class="kw">as </span>u64
+        <span class="self">self</span>.sym.st_value + <span class="self">self</span>.lib.base_addr() <span class="kw">as </span>u64
     }
 
     <span class="doccomment">/// Returns the raw symbol value (unrelocated).

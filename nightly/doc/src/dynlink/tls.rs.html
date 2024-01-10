@@ -261,30 +261,6 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local storage as prep for this code.
 
 </span><span class="kw">use </span>std::{alloc::Layout, mem::align_of, mem::size_of, ptr::NonNull};
@@ -292,11 +268,15 @@
 <span class="kw">use </span>tracing::{error, trace};
 <span class="kw">use </span>twizzler_runtime_api::TlsIndex;
 
-<span class="kw">use crate</span>::{arch::MINIMUM_TLS_ALIGNMENT, compartment::CompartmentRef, DynlinkError};
+<span class="kw">use crate</span>::{
+    arch::MINIMUM_TLS_ALIGNMENT, compartment::Compartment, library::BackingData, DynlinkError,
+    DynlinkErrorKind,
+};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsInfo {
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsInfo {
     <span class="comment">// DTV needs to start with a generation count.
-    </span>gen_count: u64,
+    </span>gen: u64,
     <span class="comment">// When adding modules to the static TLS region
     </span>alloc_size_mods: usize,
     <span class="comment">// Calculate the maximum alignment we&#39;ll need.
@@ -306,20 +286,30 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) tls_mods: Vec&lt;TlsModule&gt;,
 }
 
-<span class="kw">impl </span>Default <span class="kw">for </span>TlsInfo {
-    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>TlsInfo {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(gen: u64) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            gen_count: Default::default(),
+            gen,
             alloc_size_mods: Default::default(),
             max_align: MINIMUM_TLS_ALIGNMENT,
             tls_mods: Default::default(),
             offset: <span class="number">0</span>,
         }
     }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clone_to_new_gen(<span class="kw-2">&amp;</span><span class="self">self</span>, new_gen: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            gen: new_gen,
+            alloc_size_mods: <span class="self">self</span>.alloc_size_mods,
+            max_align: <span class="self">self</span>.max_align,
+            tls_mods: <span class="self">self</span>.tls_mods.clone(),
+            offset: <span class="self">self</span>.offset,
+        }
+    }
 }
 
-<span class="attr">#[derive(Debug)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsModule {
+<span class="attr">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>TlsModule {
     <span class="kw">pub </span>is_static: bool,
     <span class="kw">pub </span>template_addr: usize,
     <span class="kw">pub </span>template_filesz: usize,
@@ -374,19 +364,18 @@
         </span><span class="kw">let </span>id = TlsModId((<span class="self">self</span>.tls_mods.len() + <span class="number">1</span>) <span class="kw">as </span>u64, <span class="self">self</span>.offset);
         tm.id = <span class="prelude-val">Some</span>(id);
         <span class="self">self</span>.tls_mods.push(tm);
-        <span class="self">self</span>.gen_count += <span class="number">1</span>;
         id
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>allocate&lt;T&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>allocate&lt;T, B: BackingData&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        comp: <span class="kw-2">&amp;</span>CompartmentRef,
+        _comp: <span class="kw-2">&amp;</span>Compartment&lt;B&gt;,
         alloc_base: NonNull&lt;u8&gt;,
         tcb: T,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TlsRegion, DynlinkError&gt; {
         <span class="kw">let </span>layout = <span class="self">self
             </span>.allocation_layout::&lt;T&gt;()
-            .map_err(|<span class="kw">_</span>| DynlinkError::Unknown)<span class="question-mark">?</span>;
+            .map_err(|err| DynlinkErrorKind::LayoutError { err })<span class="question-mark">?</span>;
 
         <span class="comment">// TODO: check all this for arm
         // Given an allocation regions, lets find all the interesting pointers.
@@ -395,13 +384,12 @@
         </span>base -= base &amp; (layout.align() - <span class="number">1</span>);
         <span class="kw">let </span>thread_pointer = NonNull::new(base <span class="kw">as </span><span class="kw-2">*mut </span>u8).unwrap();
         <span class="kw">let </span>tls_region = TlsRegion {
-            drop_safe: <span class="bool-val">true</span>,
+            gen: <span class="self">self</span>.gen,
             module_top: thread_pointer,
             thread_pointer,
             dtv: alloc_base.cast(),
             num_dtv_entries: <span class="self">self</span>.dtv_len(),
             alloc_base,
-            comp: comp.clone(),
             layout,
         };
 
@@ -416,8 +404,8 @@
         }
 
         <span class="comment">// Write the gen count.
-        </span><span class="macro">trace!</span>(<span class="string">&quot;setting dtv[0] to gen_count {}&quot;</span>, <span class="self">self</span>.gen_count);
-        <span class="kw">unsafe </span>{ <span class="kw-2">*</span>tls_region.dtv.as_ptr() = <span class="self">self</span>.gen_count <span class="kw">as </span>usize };
+        </span><span class="macro">trace!</span>(<span class="string">&quot;setting dtv[0] to gen_count {}&quot;</span>, <span class="self">self</span>.gen);
+        <span class="kw">unsafe </span>{ <span class="kw-2">*</span>tls_region.dtv.as_ptr() = <span class="self">self</span>.gen <span class="kw">as </span>usize };
 
         <span class="comment">// Finally fill out the control block.
         </span><span class="kw">unsafe </span>{
@@ -484,55 +472,19 @@
     </span>}
 }
 
-<span class="attr">#[derive(Debug)]
+<span class="attr">#[repr(C)]
+#[derive(Debug)]
 </span><span class="kw">pub struct </span>TlsRegion {
-    drop_safe: bool,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) comp: CompartmentRef,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) layout: Layout,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) alloc_base: NonNull&lt;u8&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) thread_pointer: NonNull&lt;u8&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) dtv: NonNull&lt;usize&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) num_dtv_entries: usize,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) module_top: NonNull&lt;u8&gt;,
-}
-
-<span class="kw">impl </span>Drop <span class="kw">for </span>TlsRegion {
-    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="macro">trace!</span>(
-            <span class="string">&quot;dropping TLS Region {:p} {} with layout {:?}&quot;</span>,
-            <span class="self">self</span>.alloc_base.as_ptr(),
-            <span class="self">self</span>.drop_safe,
-            <span class="self">self</span>.layout,
-        );
-        <span class="kw">if </span>!<span class="self">self</span>.drop_safe {
-            <span class="kw">return</span>;
-        }
-        <span class="kw">let _ </span>= <span class="self">self</span>.comp.with_inner_mut(|inner| {
-            <span class="macro">trace!</span>(
-                <span class="string">&quot;dealloc in {} {:p}&quot;</span>,
-                inner.alloc_objects().len(),
-                inner.alloc_objects()[<span class="number">0</span>].raw_lea::&lt;u8&gt;(<span class="number">0</span>)
-            );
-            <span class="kw">unsafe </span>{ inner.dealloc(<span class="self">self</span>.alloc_base, <span class="self">self</span>.layout) };
-        });
-    }
+    <span class="kw">pub </span>gen: u64,
+    <span class="kw">pub </span>layout: Layout,
+    <span class="kw">pub </span>alloc_base: NonNull&lt;u8&gt;,
+    <span class="kw">pub </span>thread_pointer: NonNull&lt;u8&gt;,
+    <span class="kw">pub </span>dtv: NonNull&lt;usize&gt;,
+    <span class="kw">pub </span>num_dtv_entries: usize,
+    <span class="kw">pub </span>module_top: NonNull&lt;u8&gt;,
 }
 
 <span class="kw">impl </span>TlsRegion {
-    <span class="kw">pub fn </span>dont_drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.drop_safe = <span class="bool-val">false</span>;
-        <span class="self">Self </span>{
-            drop_safe: <span class="bool-val">true</span>,
-            comp: <span class="self">self</span>.comp.clone(),
-            layout: <span class="self">self</span>.layout,
-            alloc_base: <span class="self">self</span>.alloc_base,
-            thread_pointer: <span class="self">self</span>.thread_pointer,
-            dtv: <span class="self">self</span>.dtv,
-            num_dtv_entries: <span class="self">self</span>.num_dtv_entries,
-            module_top: <span class="self">self</span>.module_top,
-        }
-    }
-
     <span class="kw">pub fn </span>alloc_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>u8 {
         <span class="self">self</span>.alloc_base.as_ptr()
     }

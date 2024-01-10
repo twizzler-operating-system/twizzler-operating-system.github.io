@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Context","ContextInner","RuntimeInitInfo"]};
+window.SIDEBAR_ITEMS = {"enum":["LoadedOrUnloaded"],"mod":["engine","runtime"],"struct":["Context"]};

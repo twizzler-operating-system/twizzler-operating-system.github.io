@@ -220,450 +220,226 @@
 <a href="#220" id="220">220</a>
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
-<a href="#235" id="235">235</a>
-<a href="#236" id="236">236</a>
-<a href="#237" id="237">237</a>
-<a href="#238" id="238">238</a>
-<a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
-<a href="#242" id="242">242</a>
-<a href="#243" id="243">243</a>
-<a href="#244" id="244">244</a>
-<a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
-<a href="#249" id="249">249</a>
-<a href="#250" id="250">250</a>
-<a href="#251" id="251">251</a>
-<a href="#252" id="252">252</a>
-<a href="#253" id="253">253</a>
-<a href="#254" id="254">254</a>
-<a href="#255" id="255">255</a>
-<a href="#256" id="256">256</a>
-<a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
-<a href="#263" id="263">263</a>
-<a href="#264" id="264">264</a>
-<a href="#265" id="265">265</a>
-<a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
-<a href="#273" id="273">273</a>
-<a href="#274" id="274">274</a>
-<a href="#275" id="275">275</a>
-<a href="#276" id="276">276</a>
-<a href="#277" id="277">277</a>
-<a href="#278" id="278">278</a>
-<a href="#279" id="279">279</a>
-<a href="#280" id="280">280</a>
-<a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
-<a href="#289" id="289">289</a>
-<a href="#290" id="290">290</a>
-<a href="#291" id="291">291</a>
-<a href="#292" id="292">292</a>
-<a href="#293" id="293">293</a>
-<a href="#294" id="294">294</a>
-<a href="#295" id="295">295</a>
-<a href="#296" id="296">296</a>
-<a href="#297" id="297">297</a>
-<a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
-<a href="#318" id="318">318</a>
-<a href="#319" id="319">319</a>
-<a href="#320" id="320">320</a>
-<a href="#321" id="321">321</a>
-<a href="#322" id="322">322</a>
-<a href="#323" id="323">323</a>
-<a href="#324" id="324">324</a>
-<a href="#325" id="325">325</a>
-<a href="#326" id="326">326</a>
-<a href="#327" id="327">327</a>
-<a href="#328" id="328">328</a>
-<a href="#329" id="329">329</a>
-<a href="#330" id="330">330</a>
-<a href="#331" id="331">331</a>
-<a href="#332" id="332">332</a>
-<a href="#333" id="333">333</a>
-<a href="#334" id="334">334</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of global context.
 
-</span><span class="kw">use </span>std::{
-    collections::HashMap,
-    sync::{Arc, Mutex},
-};
+</span><span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::fmt::Display;
 
+<span class="kw">use </span>petgraph::stable_graph::NodeIndex;
 <span class="kw">use </span>petgraph::stable_graph::StableDiGraph;
-<span class="kw">use </span>tracing::{debug, trace};
+<span class="kw">use </span>stable_vec::StableVec;
 
+<span class="kw">use </span><span class="kw">crate</span>::compartment::CompartmentId;
+<span class="kw">use </span><span class="kw">crate</span>::library::LibraryId;
+<span class="kw">use </span><span class="kw">crate</span>::DynlinkErrorKind;
 <span class="kw">use crate</span>::{
-    compartment::{Compartment, CompartmentRef},
-    library::{CtorInfo, InitState, Library, LibraryLoader, LibraryRef},
-    symbol::{LookupFlags, RelocatedSymbol},
-    tls::TlsRegion,
-    DynlinkError, ECollector,
+    compartment::Compartment,
+    library::{BackingData, Library, UnloadedLibrary},
+    DynlinkError,
 };
 
-<span class="attr">#[derive(Default, Clone)]
-</span><span class="kw">pub struct </span>ContextInner {
-    <span class="comment">// Simple unique ID generation.
-    </span>id_counter: u128,
-    id_stack: Vec&lt;u128&gt;,
+<span class="kw">use </span><span class="self">self</span>::engine::ContextEngine;
 
+<span class="kw">mod </span>deps;
+<span class="kw">pub mod </span>engine;
+<span class="kw">mod </span>load;
+<span class="kw">mod </span>relocate;
+<span class="kw">pub mod </span>runtime;
+<span class="kw">mod </span>syms;
+
+<span class="doccomment">/// A dynamic linker context, the main state struct for this crate.
+</span><span class="kw">pub struct </span>Context&lt;Engine: ContextEngine&gt; {
+    <span class="comment">// Implementation callbacks.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) engine: Engine,
     <span class="comment">// Track all the compartment names.
-    </span>compartment_names: HashMap&lt;String, CompartmentRef&gt;,
+    </span>compartment_names: HashMap&lt;String, usize&gt;,
+    <span class="comment">// Compartments get stable IDs from StableVec.
+    </span>compartments: StableVec&lt;Compartment&lt;Engine::Backing&gt;&gt;,
 
-    <span class="comment">// We care about both names and dependency ordering for libraries.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) library_names: HashMap&lt;String, LibraryRef&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) library_deps: StableDiGraph&lt;LibraryRef, ()&gt;,
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) static_ctors: Vec&lt;CtorInfo&gt;,
+    <span class="comment">// This is the primary list of libraries, all libraries have an entry here, and they are
+    // placed here independent of compartment. Edges denote dependency relationships, and may also cross compartments.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) library_deps: StableDiGraph&lt;LoadedOrUnloaded&lt;Engine::Backing&gt;, ()&gt;,
 }
 
-<span class="attr">#[allow(dead_code)]
-</span><span class="kw">impl </span>ContextInner {
-    <span class="kw">pub fn </span>get_compartment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompartmentRef {
-        <span class="comment">// TODO
-        </span><span class="self">self</span>.compartment_names.values().nth(<span class="number">0</span>).cloned().unwrap()
+<span class="comment">// Libraries in the dependency graph are placed there before loading, so that they can participate
+// in dependency search. So we need to track both kinds of libraries that may be at a given index in the graph.
+</span><span class="kw">pub enum </span>LoadedOrUnloaded&lt;Backing: BackingData&gt; {
+    Unloaded(UnloadedLibrary),
+    Loaded(Library&lt;Backing&gt;),
+}
+
+<span class="kw">impl</span>&lt;Backing: BackingData&gt; Display <span class="kw">for </span>LoadedOrUnloaded&lt;Backing&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            LoadedOrUnloaded::Unloaded(unlib) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;(unloaded){}&quot;</span>, unlib),
+            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;(loaded){}&quot;</span>, lib),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;Backing: BackingData&gt; LoadedOrUnloaded&lt;Backing&gt; {
+    <span class="doccomment">/// Get the name of this library, loaded or unloaded.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            LoadedOrUnloaded::Unloaded(unlib) =&gt; <span class="kw-2">&amp;</span>unlib.name,
+            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="kw-2">&amp;</span>lib.name,
+        }
     }
 
-    <span class="kw">fn </span>get_fresh_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u128 {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(old) = <span class="self">self</span>.id_stack.pop() {
-            old
-        } <span class="kw">else </span>{
-            <span class="self">self</span>.id_counter += <span class="number">1</span>;
-            <span class="self">self</span>.id_counter
+    <span class="doccomment">/// Get back a reference to the underlying loaded library, if loaded.
+    </span><span class="kw">pub fn </span>loaded(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Library&lt;Backing&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            LoadedOrUnloaded::Unloaded(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="prelude-val">Some</span>(lib),
         }
+    }
+
+    <span class="doccomment">/// Get back a mutable reference to the underlying loaded library, if loaded.
+    </span><span class="kw">pub fn </span>loaded_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>Library&lt;Backing&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            LoadedOrUnloaded::Unloaded(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="prelude-val">Some</span>(lib),
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
+    <span class="doccomment">/// Construct a new dynamic linker context.
+    </span><span class="kw">pub fn </span>new(engine: Engine) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            engine,
+            compartment_names: HashMap::new(),
+            library_deps: StableDiGraph::new(),
+            compartments: StableVec::new(),
+        }
+    }
+
+    <span class="doccomment">/// Lookup a compartment by name.
+    </span><span class="kw">pub fn </span>lookup_compartment(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;CompartmentId&gt; {
+        <span class="prelude-val">Some</span>(CompartmentId(<span class="kw-2">*</span><span class="self">self</span>.compartment_names.get(name)<span class="question-mark">?</span>))
+    }
+
+    <span class="doccomment">/// Get a reference to a compartment back by ID.
+    </span><span class="kw">pub fn </span>get_compartment(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: CompartmentId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Compartment&lt;Engine::Backing&gt;, DynlinkError&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.compartments.has_element_at(id.<span class="number">0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::InvalidCompartmentId { id }.into());
+        }
+        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.compartments[id.<span class="number">0</span>])
+    }
+
+    <span class="doccomment">/// Get a mut reference to a compartment back by ID.
+    </span><span class="kw">pub fn </span>get_compartment_mut(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        id: CompartmentId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;mut </span>Compartment&lt;Engine::Backing&gt;, DynlinkError&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.compartments.has_element_at(id.<span class="number">0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::InvalidCompartmentId { id }.into());
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.compartments[id.<span class="number">0</span>])
     }
 
     <span class="doccomment">/// Lookup a library by name
-    </span><span class="kw">pub fn </span>lookup_library(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>LibraryRef&gt; {
-        <span class="self">self</span>.library_names.get(name)
-    }
-
-    <span class="doccomment">/// Visit libraries in a post-order DFS traversal, starting from a number of roots. Note that
-    /// because multiple roots may be specified, this means that nodes may be visited `O(|roots|)`
-    /// times (|roots| is the number of roots yielded by the iterator).
-    </span><span class="kw">pub fn </span>with_dfs_postorder&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, roots: I, <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LibraryRef))
-    <span class="kw">where
-        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt;,
-    {
-        <span class="kw">for </span>root <span class="kw">in </span>roots.into_iter() {
-            <span class="kw">let </span><span class="kw-2">mut </span>visit =
-                petgraph::visit::DfsPostOrder::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root.idx.get().unwrap());
-            <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
-                <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[node];
-                f(dep)
-            }
-        }
-    }
-
-    <span class="doccomment">/// Visit libraries in a BFS traversal, starting from a number of roots. Note that
-    /// because multiple roots may be specified, this means that nodes may be visited `O(|roots|)`
-    /// times (|roots| is the number of roots yielded by the iterator).
-    </span><span class="kw">pub fn </span>with_bfs&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, roots: I, <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LibraryRef))
-    <span class="kw">where
-        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt;,
-    {
-        <span class="kw">for </span>root <span class="kw">in </span>roots.into_iter() {
-            <span class="kw">let </span><span class="kw-2">mut </span>visit = petgraph::visit::Bfs::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root.idx.get().unwrap());
-            <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
-                <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[node];
-                f(dep)
-            }
-        }
-    }
-
-    <span class="doccomment">/// Insert a library without specifying dependencies.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_lib_predeps(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lib: LibraryRef) {
-        <span class="self">self</span>.library_names.insert(lib.name.clone(), lib.clone());
-        lib.idx.set(<span class="prelude-val">Some</span>(<span class="self">self</span>.library_deps.add_node(lib.clone())));
-    }
-
-    <span class="doccomment">/// Add all dependency edges for a library.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_lib_deps(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        lib: <span class="kw-2">&amp;</span>LibraryRef,
-        deps: <span class="kw">impl </span>IntoIterator&lt;Item = LibraryRef&gt;,
-    ) {
-        <span class="kw">for </span>dep <span class="kw">in </span>deps.into_iter() {
-            <span class="self">self</span>.library_deps
-                .add_edge(lib.idx.get().unwrap(), dep.idx.get().unwrap(), ());
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lookup_symbol(
+    </span><span class="kw">pub fn </span>lookup_library(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        start: <span class="kw-2">&amp;</span>LibraryRef,
+        comp: <span class="kw-2">&amp;</span>Compartment&lt;Engine::Backing&gt;,
         name: <span class="kw-2">&amp;</span>str,
-        lookup_flags: LookupFlags,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol, DynlinkError&gt; {
-        <span class="comment">// First try looking up within ourselves.
-        </span><span class="kw">if </span>!lookup_flags.contains(LookupFlags::SKIP_SELF) {
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = start.lookup_symbol(name) {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
-            }
-        }
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryId&gt; {
+        <span class="prelude-val">Some</span>(LibraryId(<span class="kw-2">*</span>comp.library_names.get(name)<span class="question-mark">?</span>))
+    }
 
-        <span class="comment">// Next, try all of our transitive dependencies.
-        </span><span class="kw">if </span>!lookup_flags.contains(LookupFlags::SKIP_DEPS) {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(sym) = <span class="self">self
-                </span>.library_deps
-                .neighbors_directed(start.idx.get().unwrap(), petgraph::Direction::Outgoing)
-                .find_map(|depidx| {
-                    <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[depidx];
-                    <span class="kw">if </span>depidx != start.idx.get().unwrap() {
-                        <span class="self">self</span>.lookup_symbol(dep, name, lookup_flags).ok()
-                    } <span class="kw">else </span>{
-                        <span class="prelude-val">None
-                    </span>}
-                })
-            {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
-            }
+    <span class="doccomment">/// Get a reference to a library back by ID.
+    </span><span class="kw">pub fn </span>get_library(<span class="kw-2">&amp;</span><span class="self">self</span>, id: LibraryId) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>Library&lt;Engine::Backing&gt;, DynlinkError&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.library_deps.contains_node(id.<span class="number">0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::InvalidLibraryId { id }.into());
         }
-
-        <span class="comment">// Fall back to global search.
-        </span><span class="kw">if </span>!lookup_flags.contains(LookupFlags::SKIP_GLOBAL) {
-            <span class="macro">trace!</span>(<span class="string">&quot;falling back to global search for {}&quot;</span>, name);
-            <span class="self">self</span>.lookup_symbol_global(name)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">Err</span>(DynlinkError::NotFound {
-                name: name.to_string(),
-            })
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[id.<span class="number">0</span>] {
+            LoadedOrUnloaded::Unloaded(unlib) =&gt; <span class="prelude-val">Err</span>(DynlinkErrorKind::UnloadedLibrary {
+                library: unlib.name.to_string(),
+            }
+            .into()),
+            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="prelude-val">Ok</span>(lib),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lookup_symbol_global(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol, DynlinkError&gt; {
-        <span class="kw">for </span>idx <span class="kw">in </span><span class="self">self</span>.library_deps.node_indices() {
-            <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[idx];
-            <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = dep.lookup_symbol(name) {
-                <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
-            }
-        }
-        <span class="prelude-val">Err</span>(DynlinkError::NotFound {
-            name: name.to_string(),
-        })
-    }
-
-    <span class="kw">fn </span>build_ctors&lt;<span class="lifetime">&#39;a</span>, I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, roots: I) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>[CtorInfo], DynlinkError&gt;
-    <span class="kw">where
-        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt;,
-    {
-        <span class="kw">let </span><span class="kw-2">mut </span>ctors = <span class="macro">vec!</span>[];
-        <span class="self">self</span>.with_dfs_postorder(roots, |lib| {
-            <span class="kw">if </span>lib.try_set_init_state(InitState::Uninit, InitState::StaticUninit) {
-                ctors.push(lib.get_ctor_info())
-            }
-        });
-        <span class="kw">let </span><span class="kw-2">mut </span>ctors = ctors.into_iter().ecollect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
-        <span class="self">self</span>.static_ctors.append(<span class="kw-2">&amp;mut </span>ctors);
-        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.static_ctors)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build_runtime_info&lt;<span class="lifetime">&#39;a</span>, I&gt;(
+    <span class="doccomment">/// Get a mut reference to a library back by ID.
+    </span><span class="kw">pub fn </span>get_library_mut(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        roots: I,
-        tls: TlsRegion,
-        outer: <span class="kw-2">&amp;</span>Context,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt;
-    <span class="kw">where
-        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt; + Clone,
-    {
-        <span class="kw">let </span>root_names = roots
-            .clone()
-            .into_iter()
-            .map(|r| r.name.clone())
-            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-        <span class="kw">let </span>ctors = {
-            <span class="kw">let </span>ctors = <span class="self">self</span>.build_ctors(roots.clone())<span class="question-mark">?</span>;
-            (ctors.as_ptr(), ctors.len())
-        };
-        <span class="kw">let </span><span class="kw-2">mut </span>used_slots = <span class="macro">vec!</span>[];
-        <span class="self">self</span>.with_bfs(roots, |lib| used_slots.append(<span class="kw-2">&amp;mut </span>lib.used_slots()));
-        <span class="prelude-val">Ok</span>(RuntimeInitInfo::new(
-            ctors.<span class="number">0</span>, ctors.<span class="number">1</span>, tls, outer, root_names, used_slots,
-        ))
+        id: LibraryId,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;mut </span>Library&lt;Engine::Backing&gt;, DynlinkError&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.library_deps.contains_node(id.<span class="number">0</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::InvalidLibraryId { id }.into());
+        }
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.library_deps[id.<span class="number">0</span>] {
+            LoadedOrUnloaded::Unloaded(unlib) =&gt; <span class="prelude-val">Err</span>(DynlinkErrorKind::UnloadedLibrary {
+                library: unlib.name.to_string(),
+            }
+            .into()),
+            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="prelude-val">Ok</span>(lib),
+        }
     }
-}
 
-<span class="attr">#[derive(Default)]
-</span><span class="kw">pub struct </span>Context {
-    inner: Mutex&lt;ContextInner&gt;,
-}
-
-<span class="attr">#[allow(dead_code)]
-</span><span class="kw">impl </span>Context {
-    <span class="kw">pub fn </span>with_inner_mut&lt;R&gt;(
+    <span class="doccomment">/// Traverse the library graph with DFS postorder, calling the callback for each library.
+    </span><span class="kw">pub fn </span>with_dfs_postorder&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ContextInner) -&gt; R,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
-        <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.lock()<span class="question-mark">?</span>))
+        root_id: LibraryId,
+        <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LoadedOrUnloaded&lt;Engine::Backing&gt;) -&gt; R,
+    ) -&gt; Vec&lt;R&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>rets = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>visit = petgraph::visit::DfsPostOrder::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root_id.<span class="number">0</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
+            <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[node];
+            rets.push(f(dep))
+        }
+        rets
     }
 
-    <span class="kw">pub fn </span>with_inner&lt;R&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>ContextInner) -&gt; R) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
-        <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;*</span><span class="self">self</span>.inner.lock()<span class="question-mark">?</span>))
+    <span class="doccomment">/// Traverse the library graph with DFS postorder, calling the callback for each library (mutable ref).
+    </span><span class="kw">pub fn </span>with_dfs_postorder_mut&lt;R&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        root_id: LibraryId,
+        <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;mut </span>LoadedOrUnloaded&lt;Engine::Backing&gt;) -&gt; R,
+    ) -&gt; Vec&lt;R&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>rets = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>visit = petgraph::visit::DfsPostOrder::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root_id.<span class="number">0</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
+            <span class="kw">let </span>dep = <span class="kw-2">&amp;mut </span><span class="self">self</span>.library_deps[node];
+            rets.push(f(dep))
+        }
+        rets
+    }
+
+    <span class="doccomment">/// Traverse the library graph with BFS, calling the callback for each library.
+    </span><span class="kw">pub fn </span>with_bfs(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        root_id: LibraryId,
+        <span class="kw-2">mut </span>f: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>LoadedOrUnloaded&lt;Engine::Backing&gt;),
+    ) {
+        <span class="kw">let </span><span class="kw-2">mut </span>visit = petgraph::visit::Bfs::new(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps, root_id.<span class="number">0</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = visit.next(<span class="kw-2">&amp;</span><span class="self">self</span>.library_deps) {
+            <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[node];
+            f(dep)
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_library(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lib: UnloadedLibrary) -&gt; NodeIndex {
+        <span class="self">self</span>.library_deps.add_node(LoadedOrUnloaded::Unloaded(lib))
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add_dep(<span class="kw-2">&amp;mut </span><span class="self">self</span>, parent: <span class="kw-2">&amp;</span>Library&lt;Engine::Backing&gt;, dep: NodeIndex) {
+        <span class="self">self</span>.library_deps.add_edge(parent.idx, dep, ());
     }
 
     <span class="doccomment">/// Create a new compartment with a given name.
-    </span><span class="kw">pub fn </span>add_compartment(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw">impl </span>ToString) -&gt; <span class="prelude-ty">Result</span>&lt;CompartmentRef, DynlinkError&gt; {
+    </span><span class="kw">pub fn </span>add_compartment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>ToString) -&gt; <span class="prelude-ty">Result</span>&lt;CompartmentId, DynlinkError&gt; {
         <span class="kw">let </span>name = name.to_string();
-        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>;
-        <span class="kw">if </span>inner.compartment_names.contains_key(<span class="kw-2">&amp;</span>name) {
-            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::AlreadyExists { name });
-        }
-        <span class="kw">let </span>id = inner.get_fresh_id();
-        <span class="kw">let </span>compartment = Arc::new(Compartment::new(name.clone(), id));
-        inner.compartment_names.insert(name, compartment.clone());
-
-        <span class="prelude-val">Ok</span>(compartment)
-    }
-
-    <span class="doccomment">/// Lookup a library by name.
-    </span><span class="kw">pub fn </span>lookup_library(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryRef&gt; {
-        <span class="self">self</span>.inner.lock().ok()<span class="question-mark">?</span>.lookup_library(name).cloned()
-    }
-
-    <span class="doccomment">/// Lookup a given symbol within the context.
-    </span><span class="kw">pub fn </span>lookup_symbol(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        start: <span class="kw-2">&amp;</span>LibraryRef,
-        name: <span class="kw-2">&amp;</span>str,
-        lookup_flags: LookupFlags,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol, DynlinkError&gt; {
-        <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>.lookup_symbol(start, name, lookup_flags)
-    }
-
-    <span class="doccomment">/// Get initial runtime information for bootstrapping.
-    </span><span class="kw">pub fn </span>build_runtime_info&lt;<span class="lifetime">&#39;a</span>, I&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        roots: I,
-        tls: TlsRegion,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt;
-    <span class="kw">where
-        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>LibraryRef&gt; + Clone,
-    {
-        <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>.build_runtime_info(roots, tls, <span class="self">self</span>)
-    }
-
-    <span class="doccomment">/// Add an unloaded library to the context (and load it)
-    </span><span class="kw">pub fn </span>add_library(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        compartment: <span class="kw-2">&amp;</span>CompartmentRef,
-        lib: Library,
-        loader: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>LibraryLoader,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;LibraryRef, DynlinkError&gt; {
-        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>;
-
-        compartment.load_library(lib, <span class="kw-2">&amp;mut </span>inner, loader)
-    }
-
-    <span class="doccomment">/// Iterate through all libraries and process relocations for any libraries that haven&#39;t yet been relocated.
-    </span><span class="kw">pub fn </span>relocate_all(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        roots: <span class="kw">impl </span>IntoIterator&lt;Item = LibraryRef&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;LibraryRef&gt;, DynlinkError&gt; {
-        <span class="kw">let </span>inner = <span class="self">self</span>.inner.lock()<span class="question-mark">?</span>;
-
-        roots
-            .into_iter()
-            .map(|root| {
-                <span class="macro">debug!</span>(<span class="string">&quot;relocate_all: relocation root: {}&quot;</span>, root);
-                root.relocate(<span class="kw-2">&amp;</span>inner).map(|<span class="kw">_</span>| root)
-            })
-            .ecollect()
-    }
-}
-
-<span class="kw">impl </span>Clone <span class="kw">for </span>Context {
-    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            inner: Mutex::new(<span class="self">self</span>.inner.lock().unwrap().clone()),
-        }
-    }
-}
-
-<span class="attr">#[repr(C)]
-</span><span class="kw">pub struct </span>RuntimeInitInfo {
-    ctor_info_array: <span class="kw-2">*const </span>CtorInfo,
-    ctor_info_array_len: usize,
-
-    <span class="kw">pub </span>tls_region: TlsRegion,
-    <span class="kw">pub </span>ctx: <span class="kw-2">*const </span>Context,
-    <span class="kw">pub </span>root_names: Vec&lt;String&gt;,
-    <span class="kw">pub </span>used_slots: Vec&lt;usize&gt;,
-}
-
-<span class="kw">unsafe impl </span>Send <span class="kw">for </span>RuntimeInitInfo {}
-<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>RuntimeInitInfo {}
-
-<span class="kw">impl </span>RuntimeInitInfo {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
-        ctor_info_array: <span class="kw-2">*const </span>CtorInfo,
-        ctor_info_array_len: usize,
-        tls_region: TlsRegion,
-        ctx: <span class="kw-2">&amp;</span>Context,
-        root_names: Vec&lt;String&gt;,
-        used_slots: Vec&lt;usize&gt;,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            ctor_info_array,
-            ctor_info_array_len,
-            tls_region,
-            ctx,
-            root_names,
-            used_slots,
-        }
-    }
-
-    <span class="kw">pub fn </span>ctor_infos(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[CtorInfo] {
-        <span class="kw">unsafe </span>{ core::slice::from_raw_parts(<span class="self">self</span>.ctor_info_array, <span class="self">self</span>.ctor_info_array_len) }
+        <span class="kw">let </span>comp = Compartment::new(name.clone());
+        <span class="kw">let </span>idx = <span class="self">self</span>.compartments.push(comp);
+        <span class="self">self</span>.compartment_names.insert(name, idx);
+        <span class="prelude-val">Ok</span>(CompartmentId(idx))
     }
 }
 </code></pre></div></section></main></body></html>

@@ -155,9 +155,10 @@
 <a href="#155" id="155">155</a>
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
-</span><span class="kw">use </span>dynlink::{context::RuntimeInitInfo, library::CtorInfo};
+</span><span class="kw">use </span>dynlink::{context::runtime::RuntimeInitInfo, library::CtorInfo};
 <span class="kw">use </span>twizzler_abi::upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget};
 <span class="kw">use </span>twizzler_runtime_api::{AuxEntry, BasicAux, CoreRuntime};
 
@@ -265,10 +266,11 @@
         twizzler_abi::syscall::sys_thread_set_upcall(upcall_target);
         <span class="self">self</span>.init_allocator(init_info);
         <span class="self">self</span>.init_tls(init_info);
-        <span class="self">self</span>.init_ctors(init_info.ctor_infos());
+        <span class="self">self</span>.init_ctors(<span class="kw-2">&amp;</span>init_info.ctors);
 
         <span class="comment">// Step 4: call into libstd to finish setting up the standard library and call main
         </span><span class="kw">let </span>ba = build_basic_aux(aux_slice);
+
         <span class="kw">let </span>ret = <span class="kw">unsafe </span>{ std_entry(ba) };
         <span class="self">self</span>.exit(ret.code);
     }

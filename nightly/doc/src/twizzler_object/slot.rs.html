@@ -131,6 +131,30 @@
 <a href="#131" id="131">131</a>
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     mem::size_of,
@@ -177,6 +201,22 @@
     flags
 }
 
+<span class="kw">fn </span>into_protections(flags: twizzler_runtime_api::MapFlags) -&gt; Protections {
+    <span class="kw">let </span><span class="kw-2">mut </span>prot = Protections::empty();
+    <span class="kw">if </span>flags.contains(twizzler_runtime_api::MapFlags::EXEC) {
+        prot.insert(Protections::EXEC);
+    }
+
+    <span class="kw">if </span>flags.contains(twizzler_runtime_api::MapFlags::READ) {
+        prot.insert(Protections::READ);
+    }
+
+    <span class="kw">if </span>flags.contains(twizzler_runtime_api::MapFlags::WRITE) {
+        prot.insert(Protections::WRITE);
+    }
+    prot
+}
+
 <span class="kw">impl </span>Slot {
     <span class="kw">fn </span>new(id: ObjID, prot: Protections) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ObjectInitError&gt; {
         <span class="kw">let </span>runtime = twizzler_runtime_api::get_runtime();
@@ -185,6 +225,14 @@
             id,
             prot,
             runtime_handle: rh,
+        })
+    }
+
+    <span class="kw">pub fn </span>new_from_handle(handle: ObjectHandle) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ObjectInitError&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            id: ObjID::new(handle.id),
+            prot: into_protections(handle.flags),
+            runtime_handle: handle,
         })
     }
 

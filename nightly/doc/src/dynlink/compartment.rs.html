@@ -62,158 +62,68 @@
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
 <a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-<a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Compartments are an abstraction for isolation of library components, but they are not done yet.
 
-</span><span class="kw">use </span>std::{
-    fmt::Debug,
-    sync::{Arc, Mutex},
+</span><span class="kw">use </span>petgraph::stable_graph::NodeIndex;
+<span class="kw">use </span>std::{
+    collections::HashMap,
+    fmt::{Debug, Display},
 };
 
 <span class="kw">use </span>talc::{ErrOnOom, Talc};
-<span class="kw">use </span>twizzler_object::Object;
 
-<span class="kw">use crate</span>::{tls::TlsInfo, DynlinkError};
+<span class="kw">use crate</span>::{library::BackingData, tls::TlsInfo};
 
 <span class="kw">mod </span>alloc;
-<span class="kw">mod </span>load;
 <span class="kw">mod </span>tls;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CompartmentInner {
-    name: String,
-    id: u128,
-    allocator: Talc&lt;ErrOnOom&gt;,
-    alloc_objects: Vec&lt;Object&lt;u8&gt;&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) tls_info: TlsInfo,
+<span class="doccomment">/// A compartment that contains libraries (and a local runtime).
+</span><span class="kw">pub struct </span>Compartment&lt;Backing: BackingData&gt; {
+    <span class="kw">pub </span>name: String,
+    <span class="comment">// Library names are per-compartment.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) library_names: HashMap&lt;String, NodeIndex&gt;,
+    <span class="comment">// We maintain an allocator, so we can alloc data within the compartment.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) allocator: Talc&lt;ErrOnOom&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) alloc_objects: Vec&lt;Backing&gt;,
+
+    <span class="comment">// Information for TLS. We store all the &quot;active&quot; generations.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) tls_info: HashMap&lt;u64, TlsInfo&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tls_gen: u64,
 }
 
-<span class="kw">pub struct </span>Compartment {
-    name: String,
-    inner: Mutex&lt;CompartmentInner&gt;,
-}
+<span class="doccomment">/// ID type for a compartment.
+</span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>CompartmentId(<span class="kw">pub</span>(<span class="kw">crate</span>) usize);
 
-<span class="kw">impl </span>PartialEq <span class="kw">for </span>CompartmentInner {
-    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
-        <span class="self">self</span>.id == other.id
-    }
-}
-
-<span class="kw">impl </span>Eq <span class="kw">for </span>CompartmentInner {}
-
-<span class="kw">impl </span>PartialOrd <span class="kw">for </span>CompartmentInner {
-    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
-    }
-}
-
-<span class="kw">impl </span>Ord <span class="kw">for </span>CompartmentInner {
-    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
-        <span class="self">self</span>.id.cmp(<span class="kw-2">&amp;</span>other.id)
-    }
-}
-
-<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>CompartmentInner {
+<span class="kw">impl </span>Display <span class="kw">for </span>CompartmentId {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.name)
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>Compartment {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.name)
-    }
-}
-
-<span class="kw">impl </span>Debug <span class="kw">for </span>Compartment {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;Compartment[{}]&quot;</span>, <span class="self">self</span>.name)
-    }
-}
-
-<span class="kw">pub type </span>CompartmentRef = Arc&lt;Compartment&gt;;
-
-<span class="attr">#[allow(dead_code)]
-</span><span class="kw">impl </span>CompartmentInner {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String, id: u128) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;Backing: BackingData&gt; Compartment&lt;Backing&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name,
-            id,
+            library_names: HashMap::new(),
             allocator: Talc::new(ErrOnOom),
             alloc_objects: <span class="macro">vec!</span>[],
-            tls_info: Default::default(),
+            tls_info: HashMap::new(),
+            tls_gen: <span class="number">0</span>,
         }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>alloc_objects(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Object&lt;u8&gt;] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.alloc_objects
     }
 }
 
-<span class="attr">#[allow(dead_code)]
-</span><span class="kw">impl </span>Compartment {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String, id: u128) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            name: name.clone(),
-            inner: Mutex::new(CompartmentInner::new(name, id)),
-        }
+<span class="kw">impl</span>&lt;Backing: BackingData&gt; core::fmt::Display <span class="kw">for </span>Compartment&lt;Backing&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.name)
     }
+}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_inner_mut&lt;R&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>CompartmentInner) -&gt; R,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
-        <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.inner.lock()<span class="question-mark">?</span>))
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_inner&lt;R&gt;(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>CompartmentInner) -&gt; R,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;R, DynlinkError&gt; {
-        <span class="prelude-val">Ok</span>(f(<span class="kw-2">&amp;*</span><span class="self">self</span>.inner.lock()<span class="question-mark">?</span>))
+<span class="kw">impl</span>&lt;Backing: BackingData&gt; Debug <span class="kw">for </span>Compartment&lt;Backing&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Compartment[{}]&quot;</span>, <span class="self">self</span>.name)
     }
 }
 </code></pre></div></section></main></body></html>

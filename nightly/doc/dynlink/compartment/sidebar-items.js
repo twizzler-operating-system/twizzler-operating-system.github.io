@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Compartment"],"type":["CompartmentRef"]};
+window.SIDEBAR_ITEMS = {"struct":["Compartment","CompartmentId"]};

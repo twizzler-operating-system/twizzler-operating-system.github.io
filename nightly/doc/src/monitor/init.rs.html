@@ -70,44 +70,25 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
-<a href="#73" id="73">73</a>
-<a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>dynlink::{
-    context::{Context, RuntimeInitInfo},
-    library::LibraryRef,
+    context::{runtime::RuntimeInitInfo, Context},
+    engines::Engine,
 };
 <span class="kw">use </span>twizzler_runtime_api::AuxEntry;
 
 <span class="kw">static </span><span class="kw-2">mut </span>AUX: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>RuntimeInitInfo&gt; = <span class="prelude-val">None</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InitDynlinkContext {
-    <span class="kw">pub </span>ctx: Context,
-    <span class="kw">pub </span>roots: Vec&lt;LibraryRef&gt;,
+    <span class="kw">pub </span>ctx: <span class="kw-2">*mut </span>Context&lt;Engine&gt;,
+    <span class="kw">pub </span>root: String,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bootstrap_dynlink_context() -&gt; <span class="prelude-ty">Option</span>&lt;InitDynlinkContext&gt; {
     <span class="kw">let </span>info = <span class="kw">unsafe </span>{ AUX.unwrap().as_ref().unwrap() };
-    <span class="kw">let </span>ctx = <span class="kw">unsafe </span>{ info.ctx.as_ref().unwrap() };
-    <span class="kw">let </span>roots = info
-        .root_names
-        .iter()
-        .map(|name| {
-            ctx.lookup_library(name)
-                .expect(<span class="string">&quot;supplied root library could not be looked up&quot;</span>)
-        })
-        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+    <span class="kw">let </span>ctx = info.ctx <span class="kw">as </span><span class="kw-2">*mut </span>Context&lt;Engine&gt;;
+    <span class="kw">let </span>root = info.root_name.clone();
 
-    <span class="prelude-val">Some</span>(InitDynlinkContext {
-        ctx: ctx.clone(),
-        roots,
-    })
+    <span class="prelude-val">Some</span>(InitDynlinkContext { ctx, root })
 }
 
 <span class="attr">#[no_mangle]
@@ -133,6 +114,7 @@
         AuxEntry::RuntimeInfo(r) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>r),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     });
+
     <span class="kw">unsafe </span>{
         AUX = runtime_info.map(|info| info <span class="kw">as </span><span class="kw-2">*const </span>RuntimeInitInfo);
         twizzler_runtime_api::rt0::rust_entry(aux);

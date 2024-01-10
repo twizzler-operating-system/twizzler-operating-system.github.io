@@ -82,9 +82,6 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Internal thread struct routines.
 
 </span><span class="kw">use </span>std::{
@@ -98,10 +95,7 @@
 <span class="kw">use </span>twizzler_abi::{object::NULLPAGE_SIZE, thread::ThreadRepr};
 <span class="kw">use </span>twizzler_runtime_api::{CoreRuntime, ObjectHandle, ThreadSpawnArgs};
 
-<span class="kw">use crate</span>::{
-    monitor::get_monitor_actions,
-    runtime::{thread::MIN_STACK_ALIGN, OUR_RUNTIME},
-};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::{thread::MIN_STACK_ALIGN, OUR_RUNTIME};
 
 <span class="doccomment">/// Internal representation of a thread, tracking the resources
 /// allocated for this thread.
@@ -111,7 +105,7 @@
     stack_size: usize,
     args_box: usize,
     <span class="kw">pub</span>(<span class="kw">super</span>) id: u32,
-    tls: TlsRegion,
+    _tls: TlsRegion,
     name: Mutex&lt;CString&gt;,
 }
 
@@ -130,7 +124,7 @@
             stack_size,
             args_box,
             id,
-            tls,
+            _tls: tls,
             name: Mutex::new(CString::default()),
         }
     }
@@ -168,7 +162,7 @@
             <span class="comment">// Args is allocated by a box.
             </span><span class="kw">let </span>_args = Box::from_raw(<span class="self">self</span>.args_box <span class="kw">as </span><span class="kw-2">*mut </span>ThreadSpawnArgs);
             drop(_args);
-            get_monitor_actions().free_tls_region(<span class="self">self</span>.tls.dont_drop());
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;TODO: drop TLS&quot;</span>);
         }
     }
 }

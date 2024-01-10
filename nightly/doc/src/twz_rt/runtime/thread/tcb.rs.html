@@ -237,7 +237,7 @@
                 .as_ref()
                 .unwrap()
         };
-        <span class="comment">// Jump to the requested entry point. Handle the return, just in-case, but this is
+        <span class="comment">// Jump to the requested entry point. Handle the return, just in case, but this is
         // not supposed to return.
         </span><span class="kw">let </span>entry: <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(usize) = <span class="kw">unsafe </span>{ core::mem::transmute(arg.start) };
         (entry)(arg.arg);

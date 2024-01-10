@@ -31,37 +31,51 @@
 <a href="#31" id="31">31</a>
 <a href="#32" id="32">32</a>
 <a href="#33" id="33">33</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>dynlink::{context::Context, library::LibraryRef};
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>dynlink::{
+    context::Context,
+    engines::{Backing, Engine},
+};
 
 <span class="kw">use </span><span class="kw">crate</span>::init::InitDynlinkContext;
 
-<span class="attr">#[allow(dead_code)]
-</span><span class="kw">pub struct </span>MonitorState {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) dynlink: Context,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) roots: Vec&lt;LibraryRef&gt;,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) library_list: Vec&lt;LibraryRef&gt;,
+<span class="kw">pub struct </span>MonitorState {
+    <span class="kw">pub </span>dynlink: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>Context&lt;Engine&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) root: String,
 }
 
 <span class="kw">impl </span>MonitorState {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(init: InitDynlinkContext) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>all = <span class="macro">vec!</span>[];
-        init.ctx
-            .with_inner(|inner| {
-                inner.with_bfs(<span class="kw-2">&amp;</span>init.roots, |lib| {
-                    all.push(lib.clone());
-                })
-            })
-            .expect(<span class="string">&quot;failed to generate initial library list&quot;</span>);
-
         <span class="self">Self </span>{
-            dynlink: init.ctx,
-            roots: init.roots,
-            library_list: all,
+            dynlink: <span class="kw">unsafe </span>{ init.ctx.as_mut().unwrap() },
+            root: init.root,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_nth_library(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryRef&gt; {
-        <span class="self">self</span>.library_list.get(n).cloned()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_nth_library(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dynlink::library::Library&lt;Backing&gt;&gt; {
+        <span class="comment">// TODO: this sucks.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>all = <span class="macro">vec!</span>[];
+        <span class="comment">// TODO
+        </span><span class="kw">let </span>comp_id = <span class="self">self</span>.dynlink.lookup_compartment(<span class="string">&quot;monitor&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>comp = <span class="self">self</span>.dynlink.get_compartment(comp_id).ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>root_id = <span class="self">self</span>.dynlink.lookup_library(comp, <span class="kw-2">&amp;</span><span class="self">self</span>.root)<span class="question-mark">?</span>;
+        <span class="self">self</span>.dynlink
+            .with_bfs(root_id, |lib| all.push(lib.name().to_string()));
+        <span class="kw">let </span>lib = all
+            .get(n)
+            <span class="comment">// TODO
+            </span>.and_then(|x| <span class="kw">match </span><span class="self">self</span>.dynlink.lookup_library(comp, <span class="kw-2">&amp;</span>x) {
+                <span class="prelude-val">Some</span>(l) =&gt; <span class="prelude-val">Some</span>(l),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+            })<span class="question-mark">?</span>;
+
+        <span class="self">self</span>.dynlink.get_library(lib).ok()
     }
 }
 </code></pre></div></section></main></body></html>
