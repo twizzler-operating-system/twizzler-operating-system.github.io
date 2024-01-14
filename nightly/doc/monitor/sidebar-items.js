@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_kernel_init_info","main"]};
+window.SIDEBAR_ITEMS = {"fn":["get_kernel_init_info","main"],"mod":["secgate_test"]};

@@ -394,6 +394,36 @@
 <a href="#394" id="394">394</a>
 <a href="#395" id="395">395</a>
 <a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a>
+<a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::mem::size_of;
 
 <span class="kw">use </span>elf::{
@@ -402,12 +432,13 @@
     file::Class,
 };
 <span class="kw">use </span>petgraph::stable_graph::NodeIndex;
+<span class="kw">use </span>secgate::RawSecGateInfo;
 <span class="kw">use </span>tracing::{debug, trace, warn};
 
 <span class="kw">use crate</span>::{
     compartment::{Compartment, CompartmentId},
     context::engine::{LoadDirective, LoadFlags},
-    library::{BackingData, CtorInfo, Library, LibraryId, UnloadedLibrary},
+    library::{BackingData, CtorInfo, Library, LibraryId, SecgateInfo, UnloadedLibrary},
     tls::TlsModule,
     DynlinkError, DynlinkErrorKind, HeaderError,
 };
@@ -415,6 +446,27 @@
 <span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
 
 <span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_secgate_info(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        libname: <span class="kw-2">&amp;</span>str,
+        elf: <span class="kw-2">&amp;</span>elf::ElfBytes&lt;<span class="lifetime">&#39;_</span>, NativeEndian&gt;,
+        base_addr: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SecgateInfo, DynlinkError&gt; {
+        <span class="kw">let </span>info = elf
+            .section_header_by_name(<span class="string">&quot;.twz_secgate_info&quot;</span>)<span class="question-mark">?
+            </span>.map(|info| SecgateInfo {
+                info_addr: <span class="prelude-val">Some</span>((info.sh_addr <span class="kw">as </span>usize) + base_addr),
+                num: (info.sh_size <span class="kw">as </span>usize) / core::mem::size_of::&lt;RawSecGateInfo&gt;(),
+            })
+            .unwrap_or_default();
+
+        <span class="macro">debug!</span>(
+            <span class="string">&quot;{}: registered secure gate info: {} gates&quot;</span>,
+            libname, info.num
+        );
+
+        <span class="prelude-val">Ok</span>(info)
+    }
     <span class="comment">// Collect information about constructors.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_ctor_info(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -622,8 +674,9 @@
             })
             .transpose()<span class="question-mark">?</span>;
 
-        <span class="comment">// Step 3: lookup constructor information for this library.
+        <span class="comment">// Step 3: lookup constructor and secgate information for this library.
         </span><span class="kw">let </span>ctor_info = <span class="self">self</span>.get_ctor_info(<span class="kw-2">&amp;</span>unlib.name, <span class="kw-2">&amp;</span>elf, base_addr)<span class="question-mark">?</span>;
+        <span class="kw">let </span>secgate_info = <span class="self">self</span>.get_secgate_info(<span class="kw-2">&amp;</span>unlib.name, <span class="kw-2">&amp;</span>elf, base_addr)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>comp = <span class="self">self</span>.get_compartment(comp_id)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(Library::new(
@@ -634,6 +687,7 @@
             backings,
             tls_id,
             ctor_info,
+            secgate_info,
         ))
     }
 
@@ -643,14 +697,13 @@
     ) -&gt; <span class="prelude-ty">Option</span>&lt;(NodeIndex, CompartmentId, <span class="kw-2">&amp;</span>Compartment&lt;Engine::Backing&gt;)&gt; {
         <span class="kw">for </span>(idx, comp) <span class="kw">in </span><span class="self">self</span>.compartments.iter() {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(lib_id) = comp.library_names.get(<span class="kw-2">&amp;</span>unlib.name) {
-                <span class="comment">// TODO: only do this if it actually has secure gates.
-                </span><span class="kw">let </span>lib = <span class="self">self</span>.get_library(LibraryId(<span class="kw-2">*</span>lib_id));
-                <span class="comment">// TODO: HACK that will be addressed next PR.
-                </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(lib) = lib {
-                    <span class="kw">if </span>lib.name.starts_with(<span class="string">&quot;libstd&quot;</span>) || lib.name.starts_with(<span class="string">&quot;libtwz_rt&quot;</span>) {
-                        <span class="kw">return </span><span class="prelude-val">None</span>;
+                <span class="kw">let </span>lib = <span class="self">self</span>.get_library(LibraryId(<span class="kw-2">*</span>lib_id));
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(lib) = lib {
+                    <span class="comment">// Only allow cross-compartment refs for a library that has secure gates.
+                    </span><span class="kw">if </span>lib.secgate_info.info_addr.is_some() {
+                        <span class="kw">return </span><span class="prelude-val">Some</span>((<span class="kw-2">*</span>lib_id, CompartmentId(idx), comp));
                     }
-                    <span class="kw">return </span><span class="prelude-val">Some</span>((<span class="kw-2">*</span>lib_id, CompartmentId(idx), comp));
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
             }
         }
@@ -662,21 +715,21 @@
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load_library&lt;Namer&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         comp_id: CompartmentId,
-        unlib: UnloadedLibrary,
+        root_unlib: UnloadedLibrary,
         idx: NodeIndex,
         namer: Namer,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;NodeIndex, DynlinkError&gt;
     <span class="kw">where
         </span>Namer: FnMut(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Engine::Backing&gt; + Clone,
     {
-        <span class="macro">debug!</span>(<span class="string">&quot;loading library {}&quot;</span>, unlib);
+        <span class="macro">debug!</span>(<span class="string">&quot;loading library {}&quot;</span>, root_unlib);
         <span class="comment">// First load the main library.
         </span><span class="kw">let </span>lib = <span class="self">self
-            </span>.load(comp_id, unlib.clone(), idx, namer.clone())
+            </span>.load(comp_id, root_unlib.clone(), idx, namer.clone())
             .map_err(|e| {
                 DynlinkError::new_collect(
                     DynlinkErrorKind::LibraryLoadFail {
-                        library: unlib.clone(),
+                        library: root_unlib.clone(),
                     },
                     <span class="macro">vec!</span>[e],
                 )
@@ -686,17 +739,17 @@
         </span><span class="kw">let </span>deps = <span class="self">self</span>.enumerate_needed(<span class="kw-2">&amp;</span>lib).map_err(|e| {
             DynlinkError::new_collect(
                 DynlinkErrorKind::DepEnumerationFail {
-                    library: unlib.name.to_string(),
+                    library: root_unlib.name.to_string(),
                 },
                 <span class="macro">vec!</span>[e],
             )
         })<span class="question-mark">?</span>;
         <span class="kw">if </span>!deps.is_empty() {
-            <span class="macro">debug!</span>(<span class="string">&quot;{}: loading {} dependencies&quot;</span>, unlib, deps.len());
+            <span class="macro">debug!</span>(<span class="string">&quot;{}: loading {} dependencies&quot;</span>, root_unlib, deps.len());
         }
         <span class="kw">let </span>deps = deps
             .into_iter()
-            .map(|unlib| {
+            .map(|dep_unlib| {
                 <span class="comment">// Dependency search + load alg:
                 // 1. Search library name in current compartment. If found, use that.
                 // 2. Fallback to searching globally for the name, by checking compartment by compartment. If found, use that.
@@ -705,24 +758,26 @@
 
                 </span><span class="kw">let </span>comp = <span class="self">self</span>.get_compartment(comp_id)<span class="question-mark">?</span>;
                 <span class="kw">let </span>(existing_idx, load_comp) =
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(existing) = comp.library_names.get(<span class="kw-2">&amp;</span>unlib.name) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(existing) = comp.library_names.get(<span class="kw-2">&amp;</span>dep_unlib.name) {
                         <span class="macro">debug!</span>(
-                            <span class="string">&quot;using existing library for {} (intra-compartment)&quot;</span>,
-                            unlib.name
+                            <span class="string">&quot;{}: dep using existing library for {} (intra-compartment in {})&quot;</span>,
+                            root_unlib, dep_unlib.name, comp.name
                         );
                         (<span class="prelude-val">Some</span>(<span class="kw-2">*</span>existing), comp_id)
                     } <span class="kw">else if let </span><span class="prelude-val">Some</span>((existing, other_comp_id, other_comp)) =
-                        <span class="self">self</span>.find_cross_compartment_library(<span class="kw-2">&amp;</span>unlib)
+                        <span class="self">self</span>.find_cross_compartment_library(<span class="kw-2">&amp;</span>dep_unlib)
                     {
                         <span class="macro">debug!</span>(
-                            <span class="string">&quot;using existing library for {} (cross-compartment -&gt; {})&quot;</span>,
-                            unlib.name, other_comp.name
+                            <span class="string">&quot;{}: dep using existing library for {} (cross-compartment to {})&quot;</span>,
+                            root_unlib, dep_unlib.name, other_comp.name
                         );
                         (<span class="prelude-val">Some</span>(existing), other_comp_id)
                     } <span class="kw">else </span>{
                         (
                             <span class="prelude-val">None</span>,
-                            <span class="self">self</span>.engine.select_compartment(<span class="kw-2">&amp;</span>unlib).unwrap_or(comp_id),
+                            <span class="self">self</span>.engine
+                                .select_compartment(<span class="kw-2">&amp;</span>dep_unlib)
+                                .unwrap_or(comp_id),
                         )
                     };
 
@@ -730,15 +785,15 @@
                 </span><span class="kw">let </span>idx = <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_idx) = existing_idx {
                     existing_idx
                 } <span class="kw">else </span>{
-                    <span class="kw">let </span>idx = <span class="self">self</span>.add_library(unlib.clone());
+                    <span class="kw">let </span>idx = <span class="self">self</span>.add_library(dep_unlib.clone());
 
                     <span class="kw">let </span>comp = <span class="self">self</span>.get_compartment_mut(load_comp)<span class="question-mark">?</span>;
-                    comp.library_names.insert(unlib.name.clone(), idx);
-                    <span class="self">self</span>.load_library(comp_id, unlib.clone(), idx, namer.clone())
+                    comp.library_names.insert(dep_unlib.name.clone(), idx);
+                    <span class="self">self</span>.load_library(comp_id, dep_unlib.clone(), idx, namer.clone())
                         .map_err(|e| {
                             DynlinkError::new_collect(
                                 DynlinkErrorKind::LibraryLoadFail {
-                                    library: unlib.clone(),
+                                    library: dep_unlib.clone(),
                                 },
                                 <span class="macro">vec!</span>[e],
                             )
@@ -749,7 +804,12 @@
             })
             .collect::&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, DynlinkError&gt;&gt;&gt;();
 
-        <span class="kw">let _ </span>= DynlinkError::collect(DynlinkErrorKind::LibraryLoadFail { library: unlib }, deps)<span class="question-mark">?</span>;
+        <span class="kw">let _ </span>= DynlinkError::collect(
+            DynlinkErrorKind::LibraryLoadFail {
+                library: root_unlib,
+            },
+            deps,
+        )<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(idx, lib.idx);
         <span class="self">self</span>.library_deps[idx] = LoadedOrUnloaded::Loaded(lib);

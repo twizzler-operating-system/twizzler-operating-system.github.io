@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["CtorInfo","Library","LibraryId","UnloadedLibrary"],"trait":["BackingData"]};
+window.SIDEBAR_ITEMS = {"struct":["CtorInfo","Library","LibraryId","SecgateInfo","UnloadedLibrary"],"trait":["BackingData"]};

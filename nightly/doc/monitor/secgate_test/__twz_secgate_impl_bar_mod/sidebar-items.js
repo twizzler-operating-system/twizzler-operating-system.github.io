@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["bar_trampoline"],"static":["BAR_INFO"],"type":["Args","Ret"]};
