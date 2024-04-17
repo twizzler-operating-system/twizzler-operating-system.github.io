@@ -4,9 +4,57 @@
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
 <a href="#6" id="6">6</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>twizzler_abi::upcall::{UpcallData, UpcallFrame};
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::OnceLock;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upcall_rust_entry(_frame: <span class="kw-2">&amp;mut </span>UpcallFrame, info: <span class="kw-2">&amp;</span>UpcallData) {
+<span class="kw">use </span>twizzler_abi::upcall::{UpcallData, UpcallFrame, UpcallHandlerFlags};
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upcall_rust_entry(frame: <span class="kw-2">&amp;mut </span>UpcallFrame, info: <span class="kw-2">&amp;</span>UpcallData) {
+    <span class="kw">let </span>imp = UPCALL_IMPL.get();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(imp) = imp {
+        imp(frame, info)
+    } <span class="kw">else </span>{
+        upcall_def_handler(frame, info)
+    }
+}
+
+<span class="kw">pub type </span>HandlerType = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;mut </span>UpcallFrame, <span class="kw-2">&amp;</span>UpcallData) + Send + Sync + <span class="lifetime">&#39;static</span>);
+<span class="kw">static </span>UPCALL_IMPL: OnceLock&lt;HandlerType&gt; = OnceLock::new();
+
+<span class="kw">pub fn </span>set_upcall_handler(handler: HandlerType) -&gt; <span class="prelude-ty">Result</span>&lt;(), HandlerSetError&gt; {
+    UPCALL_IMPL.set(handler).map_err(|<span class="kw">_</span>| HandlerSetError)
+}
+
+<span class="attr">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>HandlerSetError;
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upcall_def_handler(_frame: <span class="kw-2">&amp;mut </span>UpcallFrame, info: <span class="kw-2">&amp;</span>UpcallData) {
+    <span class="kw">if </span>info.flags.contains(UpcallHandlerFlags::SWITCHED_CONTEXT) {
+        <span class="macro">println!</span>(<span class="string">&quot;got supervisor upcall&quot;</span>);
+    }
     <span class="macro">println!</span>(<span class="string">&quot;got upcall: {:?}&quot;</span>, info);
     <span class="macro">panic!</span>(<span class="string">&quot;upcall&quot;</span>);
 }

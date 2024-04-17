@@ -132,6 +132,13 @@
 <a href="#132" id="132">132</a>
 <a href="#133" id="133">133</a>
 <a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
 
 <span class="kw">use </span>bitflags::bitflags;
@@ -149,9 +156,16 @@
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
 #[repr(C)]
 </span><span class="kw">pub enum </span>UpcallTargetSpawnOption {
-    DefaultAbort,
-    Inherit,
-    SetTo(UpcallTarget),
+    <span class="doccomment">/// Set all sync event handlers to abort by default. Entry addresses will be zero, and upcalls will not be issued.
+    </span>DefaultAbort,
+    <span class="doccomment">/// Inherit the upcall target entry address. All supervisor fields are cleared.
+    </span>Inherit,
+    <span class="doccomment">/// Set the upcall target directly. The following conditions must be met:
+    ///   1. The super_ctx field holds the ID of the current thread&#39;s active context (prevents priv escalation).
+    ///   2. The super_entry_address is at most r-x, and at least --x in the super_ctx.
+    ///   3. The super_thread_pointer is exactly rw- in the super_ctx.
+    ///   4. The super_stack_pointer is exactly rw- in the super_ctx.
+    </span>SetTo(UpcallTarget),
 }
 
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]

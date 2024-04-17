@@ -434,9 +434,9 @@
 
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>Tcb&lt;T&gt; {
-    self_ptr: <span class="kw-2">*const </span>Tcb&lt;T&gt;,
-    dtv: <span class="kw-2">*const </span>usize,
-    dtv_len: usize,
+    <span class="kw">pub </span>self_ptr: <span class="kw-2">*const </span>Tcb&lt;T&gt;,
+    <span class="kw">pub </span>dtv: <span class="kw-2">*const </span>usize,
+    <span class="kw">pub </span>dtv_len: usize,
     <span class="kw">pub </span>runtime_data: T,
 }
 

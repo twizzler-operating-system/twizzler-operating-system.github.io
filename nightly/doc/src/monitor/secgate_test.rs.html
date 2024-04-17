@@ -3,9 +3,13 @@
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
 <a href="#5" id="5">5</a>
-</pre></div><pre class="rust"><code><span class="attr">#[secgate::secure_gate]
-</span><span class="kw">fn </span>bar(x: i32, y: bool) -&gt; u32 {
-    <span class="macro">tracing::info!</span>(<span class="string">&quot;in sec gate bar: {} {}&quot;</span>, x, y);
-    <span class="number">420
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>secgate::GateCallInfo;
+
+<span class="attr">#[secgate::secure_gate(options(info))]
+</span><span class="kw">fn </span>bar(info: <span class="kw-2">&amp;</span>GateCallInfo, x: i32, y: bool) -&gt; u32 {
+    <span class="macro">tracing::info!</span>(<span class="string">&quot;in sec gate bar: {} {}: {:?}&quot;</span>, x, y, info);
+    <span class="number">42
 </span>}
 </code></pre></div></section></main></body></html>

@@ -42,6 +42,8 @@
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Definitions for symbols in the dynamic linker.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::library::{BackingData, Library};
@@ -84,6 +86,8 @@
         </span><span class="kw">const </span>SKIP_DEPS = <span class="number">2</span>;
         <span class="doccomment">/// Don&#39;t do a global search.
         </span><span class="kw">const </span>SKIP_GLOBAL = <span class="number">4</span>;
+        <span class="doccomment">/// Allow any symbols, not just secgates.
+        </span><span class="kw">const </span>SKIP_SECGATE_CHECK = <span class="number">8</span>;
     }
 }
 </code></pre></div></section></main></body></html>

@@ -62,6 +62,8 @@
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
 <a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Compartments are an abstraction for isolation of library components, but they are not done yet.
 
 </span><span class="kw">use </span>petgraph::stable_graph::NodeIndex;
@@ -74,12 +76,13 @@
 
 <span class="kw">use crate</span>::{library::BackingData, tls::TlsInfo};
 
-<span class="kw">mod </span>alloc;
 <span class="kw">mod </span>tls;
 
-<span class="doccomment">/// A compartment that contains libraries (and a local runtime).
+<span class="attr">#[repr(C)]
+</span><span class="doccomment">/// A compartment that contains libraries (and a local runtime).
 </span><span class="kw">pub struct </span>Compartment&lt;Backing: BackingData&gt; {
     <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>id: CompartmentId,
     <span class="comment">// Library names are per-compartment.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) library_names: HashMap&lt;String, NodeIndex&gt;,
     <span class="comment">// We maintain an allocator, so we can alloc data within the compartment.
@@ -103,9 +106,10 @@
 }
 
 <span class="kw">impl</span>&lt;Backing: BackingData&gt; Compartment&lt;Backing&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(name: String, id: CompartmentId) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             name,
+            id,
             library_names: HashMap::new(),
             allocator: Talc::new(ErrOnOom),
             alloc_objects: <span class="macro">vec!</span>[],

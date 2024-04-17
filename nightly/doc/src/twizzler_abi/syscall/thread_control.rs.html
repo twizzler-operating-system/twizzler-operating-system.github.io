@@ -138,6 +138,14 @@
 <a href="#138" id="138">138</a>
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
 <span class="kw">use crate</span>::{
@@ -194,6 +202,8 @@
     </span>GetAffinity = <span class="number">15</span>,
     <span class="doccomment">/// Resume from an upcall.
     </span>ResumeFromUpcall = <span class="number">16</span>,
+    <span class="doccomment">/// Get the repr ID of the calling thread.
+    </span>GetSelfId = <span class="number">17</span>,
 }
 
 <span class="doccomment">/// Exit the thread. The code will be written to the [crate::thread::ThreadRepr] for the current thread as part
@@ -220,6 +230,12 @@
     <span class="kw">unsafe </span>{
         raw_syscall(Syscall::ThreadCtrl, <span class="kw-2">&amp;</span>[ThreadControl::SetTls <span class="kw">as </span>u64, tls]);
     }
+}
+
+<span class="doccomment">/// Get the repr ID of the calling thread.
+</span><span class="kw">pub fn </span>sys_thread_self_id() -&gt; ObjID {
+    <span class="kw">let </span>(hi, lo) = <span class="kw">unsafe </span>{ raw_syscall(Syscall::ThreadCtrl, <span class="kw-2">&amp;</span>[ThreadControl::GetSelfId <span class="kw">as </span>u64]) };
+    ObjID::new_from_parts(hi, lo)
 }
 
 <span class="doccomment">/// Set the upcall location for this thread.

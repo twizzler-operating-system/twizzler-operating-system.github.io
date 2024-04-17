@@ -565,6 +565,72 @@
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
+<a href="#625" id="625">625</a>
+<a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including startup, execution, and libstd support.
 //! It defines a set of traits that, when all implemented, form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
 //!
@@ -603,7 +669,8 @@
 #![feature(naked_functions)]
 #![feature(c_size_t)]
 
-#[cfg_attr(feature = <span class="string">&quot;kernel&quot;</span>, allow(unused_imports))]
+</span><span class="kw">use </span>core::fmt::{LowerHex, UpperHex};
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;kernel&quot;</span>, allow(unused_imports))]
 </span><span class="kw">use </span>core::{
     alloc::GlobalAlloc,
     ffi::CStr,
@@ -617,8 +684,68 @@
 <span class="attr">#[cfg(feature = <span class="string">&quot;rt0&quot;</span>)]
 </span><span class="kw">pub mod </span>rt0;
 
-<span class="doccomment">/// Core object ID type in Twizzler.
-</span><span class="kw">pub type </span>ObjID = u128;
+<span class="attr">#[repr(transparent)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+</span><span class="doccomment">/// An object ID, represented as a transparent wrapper type. Any value where the upper 64 bits are
+/// zero is invalid.
+</span><span class="kw">pub struct </span>ObjID(u128);
+
+<span class="kw">impl </span>ObjID {
+    <span class="doccomment">/// Create a new ObjID out of a 128 bit value.
+    </span><span class="kw">pub const fn </span>new(id: u128) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(id)
+    }
+
+    <span class="doccomment">/// Split an object ID into upper and lower values, useful for syscalls.
+    </span><span class="kw">pub fn </span>split(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (u64, u64) {
+        ((<span class="self">self</span>.<span class="number">0 </span>&gt;&gt; <span class="number">64</span>) <span class="kw">as </span>u64, (<span class="self">self</span>.<span class="number">0 </span>&amp; <span class="number">0xffffffffffffffff</span>) <span class="kw">as </span>u64)
+    }
+
+    <span class="doccomment">/// Build a new ObjID out of a high part and a low part.
+    </span><span class="kw">pub fn </span>new_from_parts(hi: u64, lo: u64) -&gt; <span class="self">Self </span>{
+        ObjID::new(((hi <span class="kw">as </span>u128) &lt;&lt; <span class="number">64</span>) | (lo <span class="kw">as </span>u128))
+    }
+
+    <span class="kw">pub fn </span>as_u128(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u128 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>core::convert::AsRef&lt;ObjID&gt; <span class="kw">for </span>ObjID {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjID {
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;u128&gt; <span class="kw">for </span>ObjID {
+    <span class="kw">fn </span>from(id: u128) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(id)
+    }
+}
+
+<span class="kw">impl </span>LowerHex <span class="kw">for </span>ObjID {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{:x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>UpperHex <span class="kw">for </span>ObjID {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{:X}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>ObjID {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;ObjID({:x})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
+
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>ObjID {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;ObjID({:x})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+    }
+}
 
 <span class="attr">#[repr(C)]
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
@@ -797,7 +924,7 @@
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Mapping protections for mapping objects into the address space.
-    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     </span><span class="kw">pub struct </span>MapFlags: u32 {
         <span class="doccomment">/// Read allowed.
         </span><span class="kw">const </span>READ = <span class="number">1</span>;
@@ -812,7 +939,8 @@
 </span><span class="doccomment">/// A handle to an internal object. This has similar semantics to Arc, but since this crate
 /// must be #[no_std], we need to implement refcounting ourselves.
 </span><span class="kw">pub struct </span>ObjectHandle {
-    internal_refs: NonNull&lt;InternalHandleRefs&gt;,
+    <span class="doccomment">/// Pointer to refcounter.
+    </span><span class="kw">pub </span>internal_refs: NonNull&lt;InternalHandleRefs&gt;,
     <span class="doccomment">/// The ID of the object.
     </span><span class="kw">pub </span>id: ObjID,
     <span class="doccomment">/// The flags of this handle.
@@ -1056,10 +1184,10 @@
     <span class="doccomment">/// How this library is mapped.
     </span><span class="kw">pub </span>mapping: ObjectHandle,
     <span class="doccomment">/// Actual range of addresses that comprise the library binary data.
-    </span><span class="kw">pub </span>range: (<span class="kw-2">*const </span>u8, <span class="kw-2">*const </span>u8),
+    </span><span class="kw">pub </span>range: AddrRange,
     <span class="doccomment">/// Information for dl_iterate_phdr
     </span><span class="kw">pub </span>dl_info: <span class="prelude-ty">Option</span>&lt;DlPhdrInfo&gt;,
-    <span class="doccomment">/// The Library ID of the next library, either the first dependency of this library, or a sibling.
+    <span class="doccomment">/// The Library ID of first dependency.
     </span><span class="kw">pub </span>next_id: <span class="prelude-ty">Option</span>&lt;LibraryId&gt;,
 }
 
@@ -1067,6 +1195,12 @@
     <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Library {
         <span class="self">self
     </span>}
+}
+
+<span class="kw">impl </span>Library {
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CStr&gt; {
+        <span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(CStr::from_ptr(<span class="self">self</span>.dl_info<span class="question-mark">?</span>.name <span class="kw">as </span><span class="kw-2">*const </span>i8)) }
+    }
 }
 
 <span class="attr">#[repr(transparent)]
@@ -1083,7 +1217,7 @@
 <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;x86_64&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>))]
 </span><span class="kw">pub type </span>ElfHalf = u32;
 
-<span class="attr">#[derive(Copy, Clone)]
+<span class="attr">#[derive(Copy, Clone, Debug)]
 #[repr(C)]
 </span><span class="kw">pub struct </span>DlPhdrInfo {
     <span class="kw">pub </span>addr: ElfAddr,
@@ -1100,9 +1234,6 @@
 </span><span class="kw">pub trait </span>DebugRuntime {
     <span class="doccomment">/// Gets a handle to a library given the ID.
     </span><span class="kw">fn </span>get_library(<span class="kw-2">&amp;</span><span class="self">self</span>, id: LibraryId) -&gt; <span class="prelude-ty">Option</span>&lt;Library&gt;;
-    <span class="doccomment">/// Get library name. If the buffer is too small, returns Err(()). Otherwise,
-    /// returns the length of the name in bytes.
-    </span><span class="kw">fn </span>get_library_name(<span class="kw-2">&amp;</span><span class="self">self</span>, lib: <span class="kw-2">&amp;</span>Library, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt;;
     <span class="doccomment">/// Returns the ID of the main executable, if there is one.
     </span><span class="kw">fn </span>get_exeid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryId&gt;;
     <span class="doccomment">/// Get a segment of a library, if the segment index exists. All segment IDs are indexes, so they range from [0, N).
@@ -1113,7 +1244,8 @@
     </span><span class="kw">fn </span>iterate_phdr(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(DlPhdrInfo) -&gt; core::ffi::c_int) -&gt; core::ffi::c_int;
 }
 
-<span class="doccomment">/// An address range.
+<span class="attr">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="doccomment">/// An address range.
 </span><span class="kw">pub struct </span>AddrRange {
     <span class="doccomment">/// Starting virtual address.
     </span><span class="kw">pub </span>start: usize,

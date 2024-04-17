@@ -210,6 +210,14 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+<a href="#215" id="215">215</a>
+<a href="#216" id="216">216</a>
+<a href="#217" id="217">217</a>
+<a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Functions for handling upcalls from the kernel.
 
 </span><span class="kw">pub use </span><span class="kw">crate</span>::arch::upcall::UpcallFrame;
@@ -331,6 +339,8 @@
     </span><span class="kw">pub </span>flags: UpcallHandlerFlags,
     <span class="doccomment">/// Source context
     </span><span class="kw">pub </span>source_ctx: ObjID,
+    <span class="doccomment">/// The thread ID for this thread.
+    </span><span class="kw">pub </span>thread_id: ObjID,
 }
 
 <span class="doccomment">/// Information for handling an upcall, per-thread. By default, a thread starts with
@@ -344,6 +354,8 @@
     </span><span class="kw">pub </span>super_address: usize,
     <span class="doccomment">/// Address of supervisor stack to use, when switching to supervisor context.
     </span><span class="kw">pub </span>super_stack: usize,
+    <span class="doccomment">/// Size of the super stack.
+    </span><span class="kw">pub </span>super_stack_size: usize,
     <span class="doccomment">/// Value to use for stack pointer, when switching to supervisor context.
     </span><span class="kw">pub </span>super_thread_ptr: usize,
     <span class="doccomment">/// Supervisor context to use, when switching to supervisor context.
@@ -355,20 +367,24 @@
 <span class="kw">impl </span>UpcallTarget {
     <span class="doccomment">/// Construct a new upcall target.
     </span><span class="kw">pub fn </span>new(
-        self_address: <span class="kw">unsafe extern </span><span class="string">&quot;C-unwind&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>UpcallFrame, <span class="kw-2">*const </span>UpcallData) -&gt; !,
-        super_address: <span class="kw">unsafe extern </span><span class="string">&quot;C-unwind&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>UpcallFrame, <span class="kw-2">*const </span>UpcallData) -&gt; !,
+        self_address: <span class="prelude-ty">Option</span>&lt;<span class="kw">unsafe extern </span><span class="string">&quot;C-unwind&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>UpcallFrame, <span class="kw-2">*const </span>UpcallData) -&gt; !&gt;,
+        super_address: <span class="prelude-ty">Option</span>&lt;
+            <span class="kw">unsafe extern </span><span class="string">&quot;C-unwind&quot; </span><span class="kw">fn</span>(<span class="kw-2">*mut </span>UpcallFrame, <span class="kw-2">*const </span>UpcallData) -&gt; !,
+        &gt;,
         super_stack: usize,
+        super_stack_size: usize,
         super_thread_ptr: usize,
         super_ctx: ObjID,
         options: [UpcallOptions; UpcallInfo::NR_UPCALLS],
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
-            self_address: self_address <span class="kw">as </span>usize,
-            super_address: super_address <span class="kw">as </span>usize,
+            self_address: self_address.map(|addr| addr <span class="kw">as </span>usize).unwrap_or_default(),
+            super_address: super_address.map(|addr| addr <span class="kw">as </span>usize).unwrap_or_default(),
             super_stack,
             super_thread_ptr,
             super_ctx,
             options,
+            super_stack_size,
         }
     }
 }

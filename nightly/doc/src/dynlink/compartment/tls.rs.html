@@ -67,7 +67,15 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>tracing::{debug, trace};
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::{alloc::Layout, ptr::NonNull};
+
+<span class="kw">use </span>tracing::{debug, trace};
 
 <span class="kw">use crate</span>::{
     library::BackingData,
@@ -104,7 +112,11 @@
     }
 
     <span class="doccomment">/// Build a useable TLS region, complete with copied templates, a control block, and a dtv.
-    </span><span class="kw">pub fn </span>build_tls_region&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tcb: T) -&gt; <span class="prelude-ty">Result</span>&lt;TlsRegion, DynlinkError&gt; {
+    </span><span class="kw">pub fn </span>build_tls_region&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        tcb: T,
+        alloc: <span class="kw">impl </span>FnOnce(Layout) -&gt; <span class="prelude-ty">Option</span>&lt;NonNull&lt;u8&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;TlsRegion, DynlinkError&gt; {
         <span class="kw">let </span>tls_info = <span class="self">self</span>.tls_info.get(<span class="kw-2">&amp;</span><span class="self">self</span>.tls_gen).ok_or_else(|| {
             DynlinkError::new(DynlinkErrorKind::NoTLSInfo {
                 library: <span class="self">self</span>.name.clone(),
@@ -113,18 +125,18 @@
         <span class="kw">let </span>alloc_layout = tls_info
             .allocation_layout::&lt;T&gt;()
             .map_err(DynlinkErrorKind::from)<span class="question-mark">?</span>;
+        <span class="comment">// Each compartment has its own libstd, so we can just all alloc directly.
+        </span><span class="kw">let </span>base = alloc(alloc_layout).ok_or_else(|| DynlinkErrorKind::FailedToAllocate {
+            comp: <span class="self">self</span>.name.clone(),
+            layout: alloc_layout,
+        })<span class="question-mark">?</span>;
         <span class="macro">debug!</span>(
-            <span class="string">&quot;{}: building static TLS region (size: {}, align: {})&quot;</span>,
+            <span class="string">&quot;{}: building static TLS region (size: {}, align: {}) -&gt; {:p}&quot;</span>,
             <span class="self">self</span>,
             alloc_layout.size(),
-            alloc_layout.align()
+            alloc_layout.align(),
+            base
         );
-        <span class="kw">let </span>base = <span class="kw">unsafe </span>{ <span class="self">self</span>.alloc(alloc_layout) }.ok_or_else(|| {
-            DynlinkErrorKind::FailedToAllocate {
-                comp: <span class="self">self</span>.name.clone(),
-                layout: alloc_layout,
-            }
-        })<span class="question-mark">?</span>;
 
         <span class="kw">let </span>tls_info = <span class="self">self</span>.tls_info.get(<span class="kw-2">&amp;</span><span class="self">self</span>.tls_gen).ok_or_else(|| {
             DynlinkError::new(DynlinkErrorKind::NoTLSInfo {

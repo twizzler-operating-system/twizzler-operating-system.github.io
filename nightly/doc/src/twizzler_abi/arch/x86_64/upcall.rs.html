@@ -84,13 +84,26 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="attr">#[allow(unused_imports)]
 </span><span class="kw">use </span><span class="kw">crate</span>::upcall::{UpcallData, UpcallInfo};
 
 <span class="kw">pub const </span>XSAVE_LEN: usize = <span class="number">1024</span>;
 
 <span class="doccomment">/// Arch-specific frame info for upcall.
-</span><span class="attr">#[derive(Clone, Debug, Copy)]
+</span><span class="attr">#[derive(Clone, Copy)]
 #[repr(C, align(<span class="number">64</span>))]
 </span><span class="kw">pub struct </span>UpcallFrame {
     <span class="kw">pub </span>xsave_region: [u8; XSAVE_LEN],
@@ -114,6 +127,19 @@
     <span class="kw">pub </span>r15: u64,
     <span class="kw">pub </span>thread_ptr: u64,
     <span class="kw">pub </span>prior_ctx: <span class="kw">crate</span>::object::ObjID,
+}
+
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>UpcallFrame {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        f.debug_struct(<span class="string">&quot;UpcallFrame&quot;</span>)
+            .field(<span class="string">&quot;rip&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;0x{:x}&quot;</span>, <span class="self">self</span>.rip))
+            .field(<span class="string">&quot;rsp&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;0x{:x}&quot;</span>, <span class="self">self</span>.rsp))
+            .field(<span class="string">&quot;rbp&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;0x{:x}&quot;</span>, <span class="self">self</span>.rbp))
+            .field(<span class="string">&quot;rflags&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;0x{:x}&quot;</span>, <span class="self">self</span>.rflags))
+            .field(<span class="string">&quot;thread_ptr&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;0x{:x}&quot;</span>, <span class="self">self</span>.thread_ptr))
+            .field(<span class="string">&quot;prior_ctx&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;0x{:x}&quot;</span>, <span class="self">self</span>.prior_ctx))
+            .finish_non_exhaustive()
+    }
 }
 
 <span class="kw">impl </span>UpcallFrame {

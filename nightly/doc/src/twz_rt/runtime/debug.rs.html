@@ -72,33 +72,31 @@
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
-<a href="#76" id="76">76</a>
-<a href="#77" id="77">77</a>
-<a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
-<a href="#80" id="80">80</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::ffi::CString;
+</pre></div><pre class="rust"><code><span class="kw">use </span>elf::segment::Elf64_Phdr;
+<span class="kw">use </span>monitor_api::get_comp_config;
+<span class="kw">use </span>twizzler_runtime_api::{AddrRange, DebugRuntime, Library, MapFlags};
 
-<span class="kw">use </span>twizzler_runtime_api::DebugRuntime;
+<span class="kw">use super</span>::{object::new_object_handle, ReferenceRuntime};
 
-<span class="kw">use </span><span class="kw">crate</span>::monitor;
-
-<span class="kw">use </span><span class="kw">super</span>::ReferenceRuntime;
-
-<span class="comment">// Most of these implementations just delegate to asking the monitor for library
-// information. In the future, when we properly have compartments, these will get
-// more complicated.
-</span><span class="kw">impl </span>DebugRuntime <span class="kw">for </span>ReferenceRuntime {
+<span class="kw">impl </span>DebugRuntime <span class="kw">for </span>ReferenceRuntime {
     <span class="kw">fn </span>get_library(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         id: twizzler_runtime_api::LibraryId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::Library&gt; {
-        monitor::get_monitor_actions().lookup_library_by_id(id)
+        <span class="kw">let </span>info: monitor_api::LibraryInfo =
+            monitor_api::monitor_rt_get_library_info(id).unwrap()<span class="question-mark">?</span>;
+        <span class="kw">let </span>handle = new_object_handle(info.objid, info.slot, MapFlags::READ);
+        <span class="prelude-val">Some</span>(Library {
+            range: info.range,
+            dl_info: <span class="prelude-val">Some</span>(info.dl_info),
+            id,
+            mapping: handle,
+            next_id: info.next_id,
+        })
     }
 
     <span class="kw">fn </span>get_exeid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::LibraryId&gt; {
-        monitor::get_monitor_actions().local_primary()
+        get_comp_config().root_library_id
     }
 
     <span class="kw">fn </span>get_library_segment(
@@ -106,7 +104,18 @@
         lib: <span class="kw-2">&amp;</span>twizzler_runtime_api::Library,
         seg: usize,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::AddrRange&gt; {
-        monitor::get_monitor_actions().get_segment(lib.id, seg)
+        <span class="kw">const </span>PT_LOAD: u32 = <span class="number">1</span>;
+        <span class="kw">let </span>slice = <span class="kw">unsafe </span>{
+            core::slice::from_raw_parts(
+                lib.dl_info<span class="question-mark">?</span>.phdr_start <span class="kw">as </span><span class="kw-2">*const </span>Elf64_Phdr,
+                lib.dl_info<span class="question-mark">?</span>.phdr_num <span class="kw">as </span>usize,
+            )
+        };
+        <span class="kw">let </span>phdr = slice.iter().filter(|p| p.p_type == PT_LOAD).nth(seg)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(AddrRange {
+            start: lib.dl_info<span class="question-mark">?</span>.addr + phdr.p_vaddr <span class="kw">as </span>usize,
+            len: phdr.p_memsz <span class="kw">as </span>usize,
+        })
     }
 
     <span class="kw">fn </span>get_full_mapping(
@@ -125,20 +134,7 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>id = <span class="self">self</span>.get_exeid();
         <span class="comment">// Each library contains a field indicating the next library ID in this list.
         </span><span class="kw">while let </span><span class="prelude-val">Some</span>(library) = id.and_then(|id| <span class="self">self</span>.get_library(id)) {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>info) = library.dl_info {
-                <span class="comment">// Read the name. If it&#39;s too long, just give up for now.
-                // TODO: improve this for longer names.
-                </span><span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">256</span>];
-                <span class="kw">let </span>name = <span class="self">self
-                    </span>.get_library_name(<span class="kw-2">&amp;</span>library, <span class="kw-2">&amp;mut </span>buf)
-                    .map(|len| {
-                        <span class="kw">let </span><span class="kw-2">mut </span>v = buf[<span class="number">0</span>..len].to_vec();
-                        <span class="comment">// Null-terminate, since it needs to be a C string.
-                        </span>v.push(<span class="number">0</span>);
-                        CString::from_vec_with_nul(v).unwrap()
-                    })
-                    .unwrap_or_else(|| CString::new(<span class="string">b&quot;???\0&quot;</span>.to_vec()).unwrap());
-                info.name = name.as_c_str().as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>u8;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(info) = library.dl_info {
                 ret = f(info);
                 <span class="comment">// dl_iterate_phdr returns early if the callback returns non-zero.
                 </span><span class="kw">if </span>ret != <span class="number">0 </span>{
@@ -148,14 +144,6 @@
             id = library.next_id;
         }
         ret
-    }
-
-    <span class="kw">fn </span>get_library_name(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        lib: <span class="kw-2">&amp;</span>twizzler_runtime_api::Library,
-        buf: <span class="kw-2">&amp;mut </span>[u8],
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
-        monitor::get_monitor_actions().lookup_library_name(lib.id, buf)
     }
 }
 </code></pre></div></section></main></body></html>

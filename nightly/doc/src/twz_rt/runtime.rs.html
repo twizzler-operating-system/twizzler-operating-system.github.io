@@ -76,9 +76,20 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Top level runtime module, managing the basic presentation of the runtime.
 
-</span><span class="kw">use </span>std::sync::atomic::{AtomicU32, Ordering};
+</span><span class="kw">use </span>std::sync::{
+    atomic::{AtomicU32, Ordering},
+    Mutex,
+};
 
 <span class="kw">mod </span>alloc;
 <span class="kw">mod </span>core;
@@ -93,10 +104,14 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>upcall;
 
 <span class="kw">pub use </span>thread::RuntimeThreadControl;
+<span class="kw">pub use </span>upcall::set_upcall_handler;
+
+<span class="kw">use </span><span class="self">self</span>::object::ObjectHandleManager;
 
 <span class="doccomment">/// The runtime trait implementer itself.
 </span><span class="kw">pub struct </span>ReferenceRuntime {
     <span class="kw">pub</span>(<span class="kw">crate</span>) state: AtomicU32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) object_manager: Mutex&lt;ObjectHandleManager&gt;,
 }
 
 <span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>ReferenceRuntime {
@@ -121,7 +136,7 @@
 }
 
 <span class="kw">impl </span>ReferenceRuntime {
-    <span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RuntimeState {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RuntimeState {
         RuntimeState::from_bits_truncate(<span class="self">self</span>.state.load(Ordering::SeqCst))
     }
 
@@ -133,6 +148,7 @@
 
 <span class="kw">pub static </span>OUR_RUNTIME: ReferenceRuntime = ReferenceRuntime {
     state: AtomicU32::new(<span class="number">0</span>),
+    object_manager: Mutex::new(ObjectHandleManager::new()),
 };
 
 <span class="attr">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]

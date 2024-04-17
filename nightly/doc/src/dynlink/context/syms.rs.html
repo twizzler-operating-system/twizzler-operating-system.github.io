@@ -76,10 +76,20 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>tracing::trace;
 
 <span class="kw">use crate</span>::{
-    library::LibraryId,
+    library::{Library, LibraryId},
     symbol::{LookupFlags, RelocatedSymbol},
     DynlinkError, DynlinkErrorKind,
 };
@@ -95,9 +105,9 @@
         name: <span class="kw-2">&amp;</span>str,
         lookup_flags: LookupFlags,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;a</span>, Engine::Backing&gt;, DynlinkError&gt; {
+        <span class="kw">let </span>start_lib = <span class="self">self</span>.get_library(start_id)<span class="question-mark">?</span>;
         <span class="comment">// First try looking up within ourselves.
         </span><span class="kw">if </span>!lookup_flags.contains(LookupFlags::SKIP_SELF) {
-            <span class="kw">let </span>start_lib = <span class="self">self</span>.get_library(start_id)<span class="question-mark">?</span>;
             <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = start_lib.lookup_symbol(name) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
             }
@@ -112,8 +122,12 @@
                     <span class="kw">match </span>dep {
                         LoadedOrUnloaded::Unloaded(<span class="kw">_</span>) =&gt; {}
                         LoadedOrUnloaded::Loaded(dep) =&gt; {
-                            <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = dep.lookup_symbol(name) {
-                                <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
+                            <span class="kw">if </span>lookup_flags.contains(LookupFlags::SKIP_SECGATE_CHECK)
+                                || dep.is_local_or_secgate_from(start_lib, name)
+                            {
+                                <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = dep.lookup_symbol(name) {
+                                    <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
+                                }
                             }
                         }
                     }
@@ -124,7 +138,7 @@
         <span class="comment">// Fall back to global search.
         </span><span class="kw">if </span>!lookup_flags.contains(LookupFlags::SKIP_GLOBAL) {
             <span class="macro">trace!</span>(<span class="string">&quot;falling back to global search for {}&quot;</span>, name);
-            <span class="self">self</span>.lookup_symbol_global(name)
+            <span class="self">self</span>.lookup_symbol_global(start_lib, name, lookup_flags)
         } <span class="kw">else </span>{
             <span class="prelude-val">Err</span>(DynlinkErrorKind::NameNotFound {
                 name: name.to_string(),
@@ -135,15 +149,21 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lookup_symbol_global&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        start_lib: <span class="kw-2">&amp;</span>Library&lt;Engine::Backing&gt;,
         name: <span class="kw-2">&amp;</span>str,
+        lookup_flags: LookupFlags,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;a</span>, Engine::Backing&gt;, DynlinkError&gt; {
         <span class="kw">for </span>idx <span class="kw">in </span><span class="self">self</span>.library_deps.node_indices() {
             <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[idx];
             <span class="kw">match </span>dep {
                 LoadedOrUnloaded::Unloaded(<span class="kw">_</span>) =&gt; {}
                 LoadedOrUnloaded::Loaded(dep) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = dep.lookup_symbol(name) {
-                        <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
+                    <span class="kw">if </span>lookup_flags.contains(LookupFlags::SKIP_SECGATE_CHECK)
+                        || dep.is_local_or_secgate_from(start_lib, name)
+                    {
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(sym) = dep.lookup_symbol(name) {
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(sym);
+                        }
                     }
                 }
             }

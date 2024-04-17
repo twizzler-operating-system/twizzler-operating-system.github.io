@@ -82,6 +82,8 @@
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Internal thread struct routines.
 
 </span><span class="kw">use </span>std::{
@@ -90,12 +92,14 @@
     sync::Mutex,
 };
 
-<span class="kw">use </span>dynlink::tls::TlsRegion;
+<span class="kw">use </span>dynlink::tls::Tcb;
 <span class="kw">use </span>tracing::trace;
 <span class="kw">use </span>twizzler_abi::{object::NULLPAGE_SIZE, thread::ThreadRepr};
 <span class="kw">use </span>twizzler_runtime_api::{CoreRuntime, ObjectHandle, ThreadSpawnArgs};
 
 <span class="kw">use </span><span class="kw">crate</span>::runtime::{thread::MIN_STACK_ALIGN, OUR_RUNTIME};
+
+<span class="kw">use </span><span class="kw">super</span>::RuntimeThreadControl;
 
 <span class="doccomment">/// Internal representation of a thread, tracking the resources
 /// allocated for this thread.
@@ -105,7 +109,7 @@
     stack_size: usize,
     args_box: usize,
     <span class="kw">pub</span>(<span class="kw">super</span>) id: u32,
-    _tls: TlsRegion,
+    _tls: <span class="kw-2">*mut </span>Tcb&lt;RuntimeThreadControl&gt;,
     name: Mutex&lt;CString&gt;,
 }
 
@@ -116,7 +120,7 @@
         stack_size: usize,
         args_box: usize,
         id: u32,
-        tls: TlsRegion,
+        tls: <span class="kw-2">*mut </span>Tcb&lt;RuntimeThreadControl&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             repr_handle,

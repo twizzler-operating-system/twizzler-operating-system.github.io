@@ -312,6 +312,43 @@
 <a href="#312" id="312">312</a>
 <a href="#313" id="313">313</a>
 <a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
+<a href="#330" id="330">330</a>
+<a href="#331" id="331">331</a>
+<a href="#332" id="332">332</a>
+<a href="#333" id="333">333</a>
+<a href="#334" id="334">334</a>
+<a href="#335" id="335">335</a>
+<a href="#336" id="336">336</a>
+<a href="#337" id="337">337</a>
+<a href="#338" id="338">338</a>
+<a href="#339" id="339">339</a>
+<a href="#340" id="340">340</a>
+<a href="#341" id="341">341</a>
+<a href="#342" id="342">342</a>
+<a href="#343" id="343">343</a>
+<a href="#344" id="344">344</a>
+<a href="#345" id="345">345</a>
+<a href="#346" id="346">346</a>
+<a href="#347" id="347">347</a>
+<a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of individual libraries.
 
 </span><span class="kw">use </span>std::fmt::{Debug, Display};
@@ -326,7 +363,10 @@
 <span class="kw">use </span>petgraph::stable_graph::NodeIndex;
 <span class="kw">use </span>secgate::RawSecGateInfo;
 
-<span class="kw">use crate</span>::{symbol::RelocatedSymbol, tls::TlsModId, DynlinkError, DynlinkErrorKind};
+<span class="kw">use crate</span>::{
+    compartment::CompartmentId, symbol::RelocatedSymbol, tls::TlsModId, DynlinkError,
+    DynlinkErrorKind,
+};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>RelocState {
     <span class="doccomment">/// Relocation has not started.
@@ -343,10 +383,6 @@
     /// region is valid.
     </span><span class="kw">fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">*mut </span>u8, usize);
 
-    <span class="doccomment">/// Make a new backing data for holding allocated data for the dynamic linker.
-    </span><span class="kw">fn </span>new_data() -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, DynlinkError&gt;
-    <span class="kw">where
-        </span><span class="self">Self</span>: Sized;
     <span class="kw">fn </span>load_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
     <span class="doccomment">/// Get the data as a slice.
@@ -359,6 +395,7 @@
     <span class="kw">type </span>InnerType;
     <span class="doccomment">/// Get the inner implementation type.
     </span><span class="kw">fn </span>to_inner(<span class="self">self</span>) -&gt; <span class="self">Self</span>::InnerType;
+    <span class="kw">fn </span>inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::InnerType;
 
     <span class="doccomment">/// Get the ELF file for this backing.
     </span><span class="kw">fn </span>get_elf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;elf::ElfBytes&lt;<span class="lifetime">&#39;_</span>, NativeEndian&gt;, ParseError&gt; {
@@ -366,7 +403,8 @@
     }
 }
 
-<span class="doccomment">/// An unloaded library. It&#39;s just a name, really.
+<span class="attr">#[repr(C)]
+</span><span class="doccomment">/// An unloaded library. It&#39;s just a name, really.
 </span><span class="attr">#[derive(Debug, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 </span><span class="kw">pub struct </span>UnloadedLibrary {
     <span class="kw">pub </span>name: String,
@@ -386,20 +424,35 @@
 #[repr(transparent)]
 </span><span class="kw">pub struct </span>LibraryId(<span class="kw">pub</span>(<span class="kw">crate</span>) NodeIndex);
 
+<span class="kw">impl </span>From&lt;twizzler_runtime_api::LibraryId&gt; <span class="kw">for </span>LibraryId {
+    <span class="kw">fn </span>from(value: twizzler_runtime_api::LibraryId) -&gt; <span class="self">Self </span>{
+        LibraryId(NodeIndex::new(value.<span class="number">0</span>))
+    }
+}
+
+<span class="kw">impl </span>Into&lt;twizzler_runtime_api::LibraryId&gt; <span class="kw">for </span>LibraryId {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; twizzler_runtime_api::LibraryId {
+        twizzler_runtime_api::LibraryId(<span class="self">self</span>.<span class="number">0</span>.index())
+    }
+}
+
 <span class="kw">impl </span>Display <span class="kw">for </span>LibraryId {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.index())
     }
 }
 
-<span class="doccomment">/// A loaded library. It may be in various relocation states.
+<span class="attr">#[repr(C)]
+</span><span class="doccomment">/// A loaded library. It may be in various relocation states.
 </span><span class="kw">pub struct </span>Library&lt;Backing: BackingData&gt; {
     <span class="doccomment">/// Name of this library.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Node index for the dependency graph.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) idx: NodeIndex,
-    <span class="doccomment">/// Compartment name this library is loaded in.
-    </span><span class="kw">pub</span>(<span class="kw">crate</span>) comp_name: String,
+    <span class="doccomment">/// Compartment ID this library is loaded in.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) comp_id: CompartmentId,
+    <span class="doccomment">/// Just for debug and logging purposes.
+    </span>comp_name: String,
     <span class="doccomment">/// Object containing the full ELF data.
     </span><span class="kw">pub </span>full_obj: Backing,
     <span class="doccomment">/// State of relocation.
@@ -420,6 +473,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         name: String,
         idx: NodeIndex,
+        comp_id: CompartmentId,
         comp_name: String,
         full_obj: Backing,
         backings: Vec&lt;Backing&gt;,
@@ -435,6 +489,7 @@
             tls_id,
             ctors,
             reloc_state: RelocState::Unrelocated,
+            comp_id,
             comp_name,
             secgate_info,
         }
@@ -443,6 +498,11 @@
     <span class="doccomment">/// Get the ID for this library
     </span><span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LibraryId {
         LibraryId(<span class="self">self</span>.idx)
+    }
+
+    <span class="doccomment">/// Get the compartment ID for this library.
+    </span><span class="kw">pub fn </span>compartment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CompartmentId {
+        <span class="self">self</span>.comp_id
     }
 
     <span class="doccomment">/// Get a raw pointer to the program headers for this library.
@@ -577,6 +637,20 @@
             name: name.to_string(),
         }
         .into())
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_local_or_secgate_from(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Library&lt;Backing&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        other.comp_id == <span class="self">self</span>.comp_id || <span class="self">self</span>.is_secgate(name)
+    }
+
+    <span class="kw">fn </span>is_secgate(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.iter_secgates()
+            .map(|gates| {
+                gates
+                    .iter()
+                    .any(|gate| gate.name().to_bytes() == name.as_bytes())
+            })
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
     <span class="kw">pub fn </span>iter_secgates(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[RawSecGateInfo]&gt; {

@@ -156,6 +156,7 @@
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>dynlink::{context::runtime::RuntimeInitInfo, library::CtorInfo};
@@ -253,8 +254,9 @@
 
         <span class="comment">// Step 3: bootstrap pre-std stuff: upcalls, allocator, TLS, constructors (the order matters, ctors need to happen last)
         </span><span class="kw">let </span>upcall_target = UpcallTarget::new(
-            <span class="kw">crate</span>::arch::rr_upcall_entry,
-            <span class="kw">crate</span>::arch::rr_upcall_entry,
+            <span class="prelude-val">Some</span>(<span class="kw">crate</span>::arch::rr_upcall_entry),
+            <span class="prelude-val">Some</span>(<span class="kw">crate</span>::arch::rr_upcall_entry),
+            <span class="number">0</span>,
             <span class="number">0</span>,
             <span class="number">0</span>,
             <span class="number">0</span>.into(),

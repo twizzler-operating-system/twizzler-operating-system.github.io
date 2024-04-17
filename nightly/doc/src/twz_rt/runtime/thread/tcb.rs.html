@@ -122,6 +122,60 @@
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
 <a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Rountines and definitions for the thread control block.
 //!
 //! Note that the control struct here uses a manual lock instead of a Mutex.
@@ -130,12 +184,18 @@
 //! that might call into std (with one exception, below).
 
 </span><span class="kw">use </span>std::{
+    alloc::GlobalAlloc,
     cell::UnsafeCell,
+    collections::HashMap,
     panic::catch_unwind,
-    sync::atomic::{AtomicU32, Ordering},
+    sync::{
+        atomic::{AtomicU32, Ordering},
+        Mutex,
+    },
 };
 
 <span class="kw">use </span>dynlink::tls::Tcb;
+<span class="kw">use </span>monitor_api::TlsTemplateInfo;
 <span class="kw">use </span>tracing::trace;
 <span class="kw">use </span>twizzler_runtime_api::CoreRuntime;
 
@@ -151,16 +211,16 @@
 
 <span class="kw">impl </span>Default <span class="kw">for </span>RuntimeThreadControl {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new()
+        <span class="self">Self</span>::new(<span class="number">0</span>)
     }
 }
 
 <span class="kw">impl </span>RuntimeThreadControl {
-    <span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+    <span class="kw">pub const fn </span>new(id: u32) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             internal_lock: AtomicU32::new(<span class="number">0</span>),
             flags: AtomicU32::new(<span class="number">0</span>),
-            id: UnsafeCell::new(<span class="number">0</span>),
+            id: UnsafeCell::new(id),
         }
     }
 
@@ -231,6 +291,10 @@
             </span>cur.flags.fetch_or(THREAD_STARTED, Ordering::SeqCst);
             <span class="macro">trace!</span>(<span class="string">&quot;thread {} started&quot;</span>, cur.id());
         });
+        twizzler_abi::syscall::sys_kernel_console_write(
+            <span class="string">b&quot;alive\n&quot;</span>,
+            twizzler_abi::syscall::KernelConsoleWriteFlags::empty(),
+        );
         <span class="comment">// Find the arguments. arg is a pointer to a Box::into_raw of a Box of ThreadSpawnArgs.
         </span><span class="kw">let </span>arg = <span class="kw">unsafe </span>{
             (arg <span class="kw">as </span><span class="kw-2">*const </span>twizzler_runtime_api::ThreadSpawnArgs)
@@ -246,4 +310,48 @@
     .unwrap_or(THREAD_PANIC_CODE);
     twizzler_abi::syscall::sys_thread_exit(code);
 }
+
+<span class="attr">#[derive(Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsGenMgr {
+    map: HashMap&lt;u64, TlsGen&gt;,
+}
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsGen {
+    template: TlsTemplateInfo,
+    thread_count: usize,
+}
+
+<span class="kw">unsafe impl </span>Send <span class="kw">for </span>TlsGen {}
+
+<span class="macro">lazy_static::lazy_static! </span>{
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span><span class="kw-2">ref </span>TLS_GEN_MGR: Mutex&lt;TlsGenMgr&gt; = Mutex::new(TlsGenMgr::default());
+}
+
+<span class="kw">impl </span>TlsGenMgr {
+    <span class="kw">pub fn </span>get_next_tls_info&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mygen: u64,
+        new_tcb_data: <span class="kw">impl </span>FnOnce() -&gt; T,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*mut </span>Tcb&lt;T&gt;&gt; {
+        <span class="kw">let </span>cc = monitor_api::get_comp_config();
+        <span class="kw">let </span>template = <span class="kw">unsafe </span>{ cc.get_tls_template().as_ref().unwrap() };
+        <span class="kw">if </span>mygen == template.gen {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+
+        <span class="kw">let </span>new = <span class="kw">unsafe </span>{ OUR_RUNTIME.get_alloc().alloc(template.layout) };
+        <span class="kw">let </span>tlsgen = <span class="self">self</span>.map.entry(template.gen).or_insert_with(|| TlsGen {
+            template: <span class="kw-2">*</span>template,
+            thread_count: <span class="number">0</span>,
+        });
+        tlsgen.thread_count += <span class="number">1</span>;
+
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>tcb = tlsgen.template.init_new_tls_region(new, new_tcb_data());
+            <span class="prelude-val">Some</span>(tcb)
+        }
+    }
+
+    <span class="comment">// TODO: when threads exit or move on to a different TLS gen, track that in thread_count, and if it hits zero, notify the monitor.
+</span>}
 </code></pre></div></section></main></body></html>
