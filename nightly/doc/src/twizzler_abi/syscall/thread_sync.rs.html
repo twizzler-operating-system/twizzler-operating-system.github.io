@@ -251,7 +251,7 @@
 <span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
 <span class="kw">use super</span>::{convert_codes_to_result, Syscall};
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[repr(u32)]
 </span><span class="doccomment">/// Possible operations the kernel can perform when looking at the supplies reference and the
 /// supplied value. If the operation `*reference OP value` evaluates to true (or false if the INVERT
@@ -273,14 +273,14 @@
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags to pass to sys_thread_sync.
-    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+    </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
     </span><span class="kw">pub struct </span>ThreadSyncFlags: u32 {
         <span class="doccomment">/// Invert the decision test for sleeping the thread.
         </span><span class="kw">const </span>INVERT = <span class="number">1</span>;
     }
 }
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[repr(C)]
 </span><span class="doccomment">/// A reference to a piece of data. May either be a non-realized persistent reference or a virtual address.
 </span><span class="kw">pub enum </span>ThreadSyncReference {
@@ -304,7 +304,7 @@
     }
 }
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[repr(C)]
 </span><span class="doccomment">/// Specification for a thread sleep request.
 </span><span class="kw">pub struct </span>ThreadSyncSleep {
@@ -318,7 +318,7 @@
     </span><span class="kw">pub </span>flags: ThreadSyncFlags,
 }
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
 #[repr(C)]
 </span><span class="doccomment">/// Specification for a thread wake request.
 </span><span class="kw">pub struct </span>ThreadSyncWake {
