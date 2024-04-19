@@ -94,96 +94,46 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
-
-<span class="kw">use </span>bitflags::bitflags;
+</pre></div><pre class="rust"><code><span class="kw">use </span>bitflags::bitflags;
+<span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
 <span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
 <span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
-#[repr(u32)]
+<span class="attr">#[derive(
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    PartialOrd,
+    Ord,
+    Eq,
+    IntoPrimitive,
+    FromPrimitive,
+    thiserror::Error,
+)]
+#[repr(u64)]
 </span><span class="doccomment">/// Possible error values for [sys_new_handle].
 </span><span class="kw">pub enum </span>NewHandleError {
     <span class="doccomment">/// An unknown error occurred.
+    </span><span class="attr">#[num_enum(default)]
+    #[error(<span class="string">&quot;unknown error&quot;</span>)]
     </span>Unknown = <span class="number">0</span>,
     <span class="doccomment">/// One of the arguments was invalid.   
+    </span><span class="attr">#[error(<span class="string">&quot;invalid argument&quot;</span>)]
     </span>InvalidArgument = <span class="number">1</span>,
     <span class="doccomment">/// The specified object is already a handle.
+    </span><span class="attr">#[error(<span class="string">&quot;object is already a handle&quot;</span>)]
     </span>AlreadyHandle = <span class="number">2</span>,
     <span class="doccomment">/// The specified object was not found.
+    </span><span class="attr">#[error(<span class="string">&quot;object not found&quot;</span>)]
     </span>NotFound = <span class="number">3</span>,
     <span class="doccomment">/// The specified handle type is already saturated.
+    </span><span class="attr">#[error(<span class="string">&quot;handle type cannot be used again&quot;</span>)]
     </span>HandleSaturated = <span class="number">4</span>,
 }
 
-<span class="kw">impl </span>NewHandleError {
-    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;invalid argument&quot;</span>,
-            <span class="self">Self</span>::AlreadyHandle =&gt; <span class="string">&quot;object is already a handle&quot;</span>,
-            <span class="self">Self</span>::NotFound =&gt; <span class="string">&quot;object was not found&quot;</span>,
-            <span class="self">Self</span>::HandleSaturated =&gt; <span class="string">&quot;handle cannot support any more objects&quot;</span>,
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;NewHandleError&gt; <span class="kw">for </span>u64 {
-    <span class="kw">fn </span>from(x: NewHandleError) -&gt; <span class="self">Self </span>{
-        x <span class="kw">as </span>u64
-    }
-}
-
-<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>NewHandleError {
-    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>x {
-            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
-            <span class="number">2 </span>=&gt; <span class="self">Self</span>::AlreadyHandle,
-            <span class="number">3 </span>=&gt; <span class="self">Self</span>::NotFound,
-            <span class="number">4 </span>=&gt; <span class="self">Self</span>::HandleSaturated,
-            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
-        }
-    }
-}
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>NewHandleError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
-    }
-}
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>NewHandleError {
-    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.as_str()
-    }
-}
+<span class="kw">impl </span>core::error::Error <span class="kw">for </span>NewHandleError {}
 
 <span class="doccomment">/// Possible kernel handle types.
 </span><span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]

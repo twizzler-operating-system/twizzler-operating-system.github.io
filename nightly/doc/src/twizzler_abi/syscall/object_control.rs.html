@@ -79,82 +79,42 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
+</pre></div><pre class="rust"><code><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
 <span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
 <span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
-#[repr(u32)]
-</span><span class="doccomment">/// Possible error values for [sys_object_ctrl].
+<span class="attr">#[derive(
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    PartialOrd,
+    Ord,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    FromPrimitive,
+    thiserror::Error,
+)]
+#[repr(u64)]
+</span><span class="doccomment">/// Possible error returns for [sys_object_ctrl].
 </span><span class="kw">pub enum </span>ObjectControlError {
     <span class="doccomment">/// An unknown error occurred.
+    </span><span class="attr">#[num_enum(default)]
+    #[error(<span class="string">&quot;unknown error&quot;</span>)]
     </span>Unknown = <span class="number">0</span>,
-    <span class="doccomment">/// The ID was invalid.
-    </span>InvalidID = <span class="number">1</span>,
-    <span class="doccomment">/// An argument was invalid.
-    </span>InvalidArgument = <span class="number">2</span>,
+    <span class="doccomment">/// One of the arguments was invalid.
+    </span><span class="attr">#[error(<span class="string">&quot;invalid argument&quot;</span>)]
+    </span>InvalidArgument = <span class="number">1</span>,
+    <span class="doccomment">/// Invalid object ID.
+    </span><span class="attr">#[error(<span class="string">&quot;invalid object ID&quot;</span>)]
+    </span>InvalidID = <span class="number">2</span>,
 }
 
-<span class="kw">impl </span>ObjectControlError {
-    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="self">Self</span>::InvalidID =&gt; <span class="string">&quot;invalid ID&quot;</span>,
-            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;invalid argument&quot;</span>,
-        }
-    }
-}
+<span class="kw">impl </span>core::error::Error <span class="kw">for </span>ObjectControlError {}
 
-<span class="kw">impl </span>From&lt;ObjectControlError&gt; <span class="kw">for </span>u64 {
-    <span class="kw">fn </span>from(x: ObjectControlError) -&gt; u64 {
-        x <span class="kw">as </span>u64
-    }
-}
-
-<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>ObjectControlError {
-    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>x {
-            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidID,
-            <span class="number">2 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
-            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
-        }
-    }
-}
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ObjectControlError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
-    }
-}
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
-</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>ObjectControlError {
-    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="self">self</span>.as_str()
-    }
-}
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Flags to control operation of the object delete operation.
     </span><span class="attr">#[derive(Debug, Clone, Copy)]

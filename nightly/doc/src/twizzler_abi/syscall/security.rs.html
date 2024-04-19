@@ -49,74 +49,44 @@
 <a href="#49" id="49">49</a>
 <a href="#50" id="50">50</a>
 <a href="#51" id="51">51</a>
-<a href="#52" id="52">52</a>
-<a href="#53" id="53">53</a>
-<a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
-<a href="#64" id="64">64</a>
-<a href="#65" id="65">65</a>
-<a href="#66" id="66">66</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>core::fmt;
+</pre></div><pre class="rust"><code><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
 <span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
 <span class="kw">use super</span>::{convert_codes_to_result, Syscall};
 
-<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
-#[repr(u32)]
+<span class="attr">#[derive(
+    Debug,
+    Copy,
+    Clone,
+    PartialEq,
+    PartialOrd,
+    Ord,
+    Eq,
+    Hash,
+    IntoPrimitive,
+    FromPrimitive,
+    thiserror::Error,
+)]
+#[repr(u64)]
 </span><span class="doccomment">/// Possible error returns for [sys_sctx_attach].
 </span><span class="kw">pub enum </span>SctxAttachError {
     <span class="doccomment">/// An unknown error occurred.
+    </span><span class="attr">#[num_enum(default)]
+    #[error(<span class="string">&quot;unknown error&quot;</span>)]
     </span>Unknown = <span class="number">0</span>,
     <span class="doccomment">/// One of the arguments was invalid.
+    </span><span class="attr">#[error(<span class="string">&quot;invalid argument&quot;</span>)]
     </span>InvalidArgument = <span class="number">1</span>,
-    <span class="doccomment">/// A source or tie object was not found.
+    <span class="doccomment">/// An was not found.
+    </span><span class="attr">#[error(<span class="string">&quot;object not found&quot;</span>)]
     </span>ObjectNotFound = <span class="number">2</span>,
     <span class="doccomment">/// Permission denied.
+    </span><span class="attr">#[error(<span class="string">&quot;permission denied&quot;</span>)]
     </span>PermissionDenied = <span class="number">3</span>,
 }
 
-<span class="kw">impl </span>SctxAttachError {
-    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
-        <span class="kw">match </span><span class="self">self </span>{
-            <span class="self">Self</span>::Unknown =&gt; <span class="string">&quot;an unknown error occurred&quot;</span>,
-            <span class="self">Self</span>::InvalidArgument =&gt; <span class="string">&quot;an argument was invalid&quot;</span>,
-            <span class="self">Self</span>::ObjectNotFound =&gt; <span class="string">&quot;a referenced object was not found&quot;</span>,
-            <span class="self">Self</span>::PermissionDenied =&gt; <span class="string">&quot;a source specification had an unsatisfiable range&quot;</span>,
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;SctxAttachError&gt; <span class="kw">for </span>u64 {
-    <span class="kw">fn </span>from(x: SctxAttachError) -&gt; <span class="self">Self </span>{
-        x <span class="kw">as </span><span class="self">Self
-    </span>}
-}
-
-<span class="kw">impl </span>From&lt;u64&gt; <span class="kw">for </span>SctxAttachError {
-    <span class="kw">fn </span>from(x: u64) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span>x {
-            <span class="number">3 </span>=&gt; <span class="self">Self</span>::PermissionDenied,
-            <span class="number">2 </span>=&gt; <span class="self">Self</span>::ObjectNotFound,
-            <span class="number">1 </span>=&gt; <span class="self">Self</span>::InvalidArgument,
-            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Unknown,
-        }
-    }
-}
-
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SctxAttachError {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.as_str())
-    }
-}
+<span class="kw">impl </span>core::error::Error <span class="kw">for </span>SctxAttachError {}
 
 <span class="doccomment">/// Attach to a given security context.
 </span><span class="kw">pub fn </span>sys_sctx_attach(id: ObjID) -&gt; <span class="prelude-ty">Result</span>&lt;(), SctxAttachError&gt; {

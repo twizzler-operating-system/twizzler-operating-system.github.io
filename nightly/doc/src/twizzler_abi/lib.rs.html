@@ -85,6 +85,7 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This library provides a common interface for applications that want to talk to the Twizzler
 //! kernel, and defines that interface for both applications and the kernel to follow. It&#39;s made of
 //! several parts:
@@ -108,6 +109,7 @@
 #![feature(rustc_attrs)]
 #![feature(asm_const)]
 #![feature(linkage)]
+#![feature(error_in_core)]
 </span><span class="kw">pub mod </span>arch;
 
 <span class="attr">#[allow(unused_extern_crates)]
