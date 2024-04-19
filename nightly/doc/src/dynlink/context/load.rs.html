@@ -425,6 +425,8 @@
 <a href="#425" id="425">425</a>
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::mem::size_of;
 
 <span class="kw">use </span>elf::{
@@ -631,7 +633,7 @@
                     filesz: phdr.p_filesz <span class="kw">as </span>usize,
                 };
 
-                <span class="macro">trace!</span>(<span class="string">&quot;{}: {:?}&quot;</span>, unlib, ld);
+                <span class="macro">debug!</span>(<span class="string">&quot;{}: {:?}&quot;</span>, unlib, ld);
 
                 ld
             })
@@ -674,6 +676,8 @@
                 <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, DynlinkError&gt;(comp.insert(tm))
             })
             .transpose()<span class="question-mark">?</span>;
+
+        <span class="macro">debug!</span>(<span class="string">&quot;{}: got TLS ID {:?}&quot;</span>, unlib, tls_id);
 
         <span class="comment">// Step 3: lookup constructor and secgate information for this library.
         </span><span class="kw">let </span>ctor_info = <span class="self">self</span>.get_ctor_info(<span class="kw-2">&amp;</span>unlib.name, <span class="kw-2">&amp;</span>elf, base_addr)<span class="question-mark">?</span>;
@@ -724,7 +728,7 @@
     <span class="kw">where
         </span>Namer: FnMut(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Engine::Backing&gt; + Clone,
     {
-        <span class="macro">debug!</span>(<span class="string">&quot;loading library {}&quot;</span>, root_unlib);
+        <span class="macro">debug!</span>(<span class="string">&quot;loading library {} (idx = {:?})&quot;</span>, root_unlib, idx);
         <span class="comment">// First load the main library.
         </span><span class="kw">let </span>lib = <span class="self">self
             </span>.load(comp_id, root_unlib.clone(), idx, namer.clone())
@@ -762,16 +766,16 @@
                 <span class="kw">let </span>(existing_idx, load_comp) =
                     <span class="kw">if let </span><span class="prelude-val">Some</span>(existing) = comp.library_names.get(<span class="kw-2">&amp;</span>dep_unlib.name) {
                         <span class="macro">debug!</span>(
-                            <span class="string">&quot;{}: dep using existing library for {} (intra-compartment in {})&quot;</span>,
-                            root_unlib, dep_unlib.name, comp.name
+                            <span class="string">&quot;{}: dep using existing library for {} (intra-compartment in {}): {:?}&quot;</span>,
+                            root_unlib, dep_unlib.name, comp.name, existing
                         );
                         (<span class="prelude-val">Some</span>(<span class="kw-2">*</span>existing), comp_id)
                     } <span class="kw">else if let </span><span class="prelude-val">Some</span>((existing, other_comp_id, other_comp)) =
                         <span class="self">self</span>.find_cross_compartment_library(<span class="kw-2">&amp;</span>dep_unlib)
                     {
                         <span class="macro">debug!</span>(
-                            <span class="string">&quot;{}: dep using existing library for {} (cross-compartment to {})&quot;</span>,
-                            root_unlib, dep_unlib.name, other_comp.name
+                            <span class="string">&quot;{}: dep using existing library for {} (cross-compartment to {}): {:?}&quot;</span>,
+                            root_unlib, dep_unlib.name, other_comp.name, existing
                         );
                         (<span class="prelude-val">Some</span>(existing), other_comp_id)
                     } <span class="kw">else </span>{

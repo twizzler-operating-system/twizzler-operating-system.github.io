@@ -106,18 +106,21 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements thread management routines.
 
 </span><span class="kw">use </span>dynlink::tls::Tcb;
 <span class="kw">use </span>lazy_static::lazy_static;
-<span class="kw">use </span>tracing::trace;
 <span class="kw">use </span>twizzler_abi::syscall::{
     sys_thread_sync, sys_thread_yield, ThreadSync, ThreadSyncError, ThreadSyncFlags, ThreadSyncOp,
     ThreadSyncReference, ThreadSyncSleep, ThreadSyncWake,
 };
-<span class="kw">use </span>twizzler_runtime_api::{JoinError, SpawnError, ThreadRuntime, TlsIndex};
+<span class="kw">use </span>twizzler_runtime_api::{CoreRuntime, JoinError, SpawnError, ThreadRuntime, TlsIndex};
 
-<span class="kw">use </span><span class="kw">crate</span>::runtime::thread::mgr::ThreadManager;
+<span class="kw">use crate</span>::{preinit_println, runtime::thread::mgr::ThreadManager};
 
 <span class="kw">use </span><span class="self">self</span>::tcb::with_current_thread;
 
@@ -128,6 +131,7 @@
 <span class="kw">mod </span>tcb;
 
 <span class="kw">pub use </span>tcb::RuntimeThreadControl;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>tcb::TLS_GEN_MGR;
 
 <span class="kw">const </span>MIN_STACK_ALIGN: usize = <span class="number">128</span>;
 
@@ -188,7 +192,6 @@
 
     <span class="kw">fn </span>set_name(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>std::ffi::CStr) {
         with_current_thread(|cur| {
-            <span class="macro">trace!</span>(<span class="string">&quot;naming thread {} `{}&#39;&quot;</span>, cur.id(), name.to_string_lossy());
             THREAD_MGR.with_internal(cur.id(), |th| th.set_name(name));
         })
     }
@@ -199,10 +202,15 @@
 
     <span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, index: <span class="kw-2">&amp;</span>TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt; {
         <span class="kw">let </span>tp: <span class="kw-2">&amp;</span>Tcb&lt;()&gt; = <span class="kw">unsafe </span>{
-            dynlink::tls::get_current_thread_control_block()
-                .as_ref()
-                .expect(<span class="string">&quot;failed to find thread control block&quot;</span>)
+            <span class="kw">match </span>dynlink::tls::get_current_thread_control_block().as_ref() {
+                <span class="prelude-val">Some</span>(tp) =&gt; tp,
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="macro">preinit_println!</span>(<span class="string">&quot;failed to locate TLS data&quot;</span>);
+                    <span class="self">self</span>.abort();
+                }
+            }
         };
+
         tp.get_addr(index)
     }
 

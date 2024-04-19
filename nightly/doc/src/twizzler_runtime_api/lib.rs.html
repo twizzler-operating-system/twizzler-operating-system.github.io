@@ -698,6 +698,43 @@
 <a href="#698" id="698">698</a>
 <a href="#699" id="699">699</a>
 <a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including startup, execution, and libstd support.
 //! It defines a set of traits that, when all implemented, form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
 //!
@@ -735,6 +772,8 @@
 #![feature(unboxed_closures)]
 #![feature(naked_functions)]
 #![feature(c_size_t)]
+#![feature(linkage)]
+#![feature(core_intrinsics)]
 #![feature(error_in_core)]
 
 </span><span class="kw">use </span>core::fmt::{Display, LowerHex, UpperHex};
@@ -831,7 +870,7 @@
     <span class="doccomment">/// The object ID of the executable.
     </span>ExecId(ObjID),
     <span class="doccomment">/// Initial runtime information. The value is runtime-specific.
-    </span>RuntimeInfo(usize),
+    </span>RuntimeInfo(usize, u64),
 }
 
 <span class="doccomment">/// Full runtime trait, composed of smaller traits
@@ -1073,8 +1112,7 @@
 <span class="kw">unsafe impl </span>Send <span class="kw">for </span>ObjectHandle {}
 <span class="kw">unsafe impl </span>Sync <span class="kw">for </span>ObjectHandle {}
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;kernel&quot;</span>, allow(dead_code))]
-</span><span class="kw">pub struct </span>InternalHandleRefs {
+<span class="kw">pub struct </span>InternalHandleRefs {
     count: AtomicUsize,
 }
 
@@ -1104,8 +1142,7 @@
     }
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
-</span><span class="kw">impl </span>Clone <span class="kw">for </span>ObjectHandle {
+<span class="kw">impl </span>Clone <span class="kw">for </span>ObjectHandle {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ <span class="self">self</span>.internal_refs.as_ref() };
         <span class="comment">// This use of Relaxed ordering is justified by https://doc.rust-lang.org/nomicon/arc-mutex/arc-clone.html.
@@ -1125,8 +1162,7 @@
     }
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
-</span><span class="kw">impl </span>Drop <span class="kw">for </span>ObjectHandle {
+<span class="kw">impl </span>Drop <span class="kw">for </span>ObjectHandle {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="comment">// This use of Release ordering is justified by https://doc.rust-lang.org/nomicon/arc-mutex/arc-clone.html.
         </span><span class="kw">let </span>rc = <span class="kw">unsafe </span>{ <span class="self">self</span>.internal_refs.as_ref() };
@@ -1387,15 +1423,53 @@
     </span><span class="kw">pub </span>len: usize,
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
-</span><span class="kw">extern </span><span class="string">&quot;rust-call&quot; </span>{
+<span class="kw">extern </span><span class="string">&quot;rust-call&quot; </span>{
     <span class="doccomment">/// Called by get_runtime to actually get the runtime.
+    </span><span class="attr">#[linkage = <span class="string">&quot;extern_weak&quot;</span>]
     </span><span class="kw">fn </span>__twz_get_runtime(_a: ()) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Runtime + Sync);
 }
 
-<span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
-</span><span class="doccomment">/// Wrapper around call to __twz_get_runtime.
+<span class="doccomment">/// Wrapper around call to __twz_get_runtime.
 </span><span class="kw">pub fn </span>get_runtime() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Runtime + Sync) {
     <span class="kw">unsafe </span>{ __twz_get_runtime(()) }
+}
+
+<span class="attr">#[cfg(feature = <span class="string">&quot;kernel&quot;</span>)]
+</span><span class="kw">pub mod </span>__imp {
+    <span class="attr">#[linkage = <span class="string">&quot;weak&quot;</span>]
+    #[no_mangle]
+    </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__twz_get_runtime() {
+        core::intrinsics::abort();
+    }
+}
+
+<span class="doccomment">/// Public definition of __tls_get_addr, a function that gets automatically called by the compiler when needed for TLS
+/// pointer resolution.
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;rustc-dep-of-std&quot;</span>)]
+#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__tls_get_addr(arg: usize) -&gt; <span class="kw-2">*const </span>u8 {
+    <span class="comment">// Just call the runtime.
+    </span><span class="kw">let </span>runtime = <span class="kw">crate</span>::get_runtime();
+    <span class="kw">let </span>index = (arg <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">crate</span>::TlsIndex)
+        .as_ref()
+        .expect(<span class="string">&quot;null pointer passed to __tls_get_addr&quot;</span>);
+    runtime
+        .tls_get_addr(index)
+        .expect(<span class="string">&quot;index passed to __tls_get_addr is invalid&quot;</span>)
+}
+
+<span class="doccomment">/// Public definition of dl_iterate_phdr, used by libunwind for learning where loaded objects (executables, libraries, ...) are.
+</span><span class="attr">#[cfg(feature = <span class="string">&quot;rustc-dep-of-std&quot;</span>)]
+#[no_mangle]
+</span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>dl_iterate_phdr(
+    callback: <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(
+        ptr: <span class="kw-2">*const </span>DlPhdrInfo,
+        sz: core::ffi::c_size_t,
+        data: <span class="kw-2">*mut </span>core::ffi::c_void,
+    ) -&gt; core::ffi::c_int,
+    data: <span class="kw-2">*mut </span>core::ffi::c_void,
+) -&gt; core::ffi::c_int {
+    <span class="kw">let </span>runtime = <span class="kw">crate</span>::get_runtime();
+    runtime.iterate_phdr(<span class="kw-2">&amp;mut </span>|info| callback(<span class="kw-2">&amp;</span>info, core::mem::size_of::&lt;DlPhdrInfo&gt;(), data))
 }
 </code></pre></div></section></main></body></html>

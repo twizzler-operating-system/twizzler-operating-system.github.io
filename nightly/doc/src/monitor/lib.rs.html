@@ -167,6 +167,44 @@
 <a href="#167" id="167">167</a>
 <a href="#168" id="168">168</a>
 <a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
 </pre></div><pre class="rust"><code><span class="attr">#![feature(naked_functions)]
 #![feature(thread_local)]
 #![feature(c_str_literals)]
@@ -181,9 +219,11 @@
 <span class="kw">use </span>twizzler_abi::{
     aux::KernelInitInfo,
     object::{MAX_SIZE, NULLPAGE_SIZE},
+    syscall::{sys_object_create, ObjectCreate},
 };
 <span class="kw">use </span>twizzler_object::ObjID;
-<span class="kw">use </span>twz_rt::set_upcall_handler;
+<span class="kw">use </span>twizzler_runtime_api::AuxEntry;
+<span class="kw">use </span>twz_rt::{set_upcall_handler, CompartmentInitInfo};
 
 <span class="kw">use crate</span>::{compartment::Comp, state::set_monitor_state};
 
@@ -228,6 +268,7 @@
     state.add_comp(monitor_comp, twizzler_runtime_api::LibraryId(<span class="number">0</span>));
 
     <span class="kw">let </span>state = Arc::new(Mutex::new(state));
+    <span class="macro">tracing::info!</span>(<span class="string">&quot;.. state: {:p}&quot;</span>, state);
     <span class="macro">debug!</span>(
         <span class="string">&quot;found dynlink context, with root {}&quot;</span>,
         state.lock().unwrap().root
@@ -279,11 +320,25 @@
             .load_library_in_compartment(test_comp_id, lib, bootstrap_name_res)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>rt_id =
-        state
+        <span class="kw">match </span>state
             .dynlink
-            .load_library_in_compartment(test_comp_id, rt_lib, bootstrap_name_res)<span class="question-mark">?</span>;
+            .load_library_in_compartment(test_comp_id, rt_lib, bootstrap_name_res)
+        {
+            <span class="prelude-val">Ok</span>(rt_id) =&gt; {
+                state.dynlink.add_manual_dependency(libhw_id, rt_id);
+                rt_id
+            }
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; state
+                .dynlink
+                .lookup_library(test_comp_id, <span class="string">&quot;libtwz_rt.so&quot;</span>)
+                .unwrap(),
+        };
 
-    state.dynlink.add_manual_dependency(libhw_id, rt_id);
+    <span class="macro">println!</span>(<span class="string">&quot;found rt_id: {}&quot;</span>, rt_id);
+    <span class="kw">let </span>rt_lib = state.dynlink.get_library(rt_id).unwrap();
+
+    drop(rt_lib);
+
     state.dynlink.relocate_all(libhw_id)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>test_comp = Comp::new(
@@ -291,20 +346,41 @@
         state.dynlink.get_compartment_mut(test_comp_id).unwrap(),
     )
     .unwrap();
+
+    <span class="macro">info!</span>(<span class="string">&quot;!! root = {}&quot;</span>, libhw_id);
+    <span class="kw">let </span>ctors = state.dynlink.build_ctors_list(libhw_id).unwrap();
+
+    <span class="kw">let </span>rtinfo = CompartmentInitInfo {
+        ctor_array_start: ctors.as_ptr() <span class="kw">as </span>usize,
+        ctor_array_len: ctors.len(),
+        comp_config_addr: test_comp.get_comp_config() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize,
+    };
     state.add_comp(test_comp, libhw_id.into());
 
     <span class="macro">info!</span>(<span class="string">&quot;lookup entry&quot;</span>);
 
-    <span class="kw">let </span>sym = state
+    <span class="kw">let </span>rt_lib = state.dynlink.get_library(rt_id).unwrap();
+    <span class="kw">let </span>entry = rt_lib.get_entry_address().unwrap();
+
+    <span class="kw">let </span>aux = [
+        AuxEntry::RuntimeInfo(<span class="kw-2">&amp;</span>rtinfo <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize, <span class="number">1</span>),
+        AuxEntry::Null,
+    ];
+    <span class="macro">println!</span>(<span class="string">&quot;==&gt; {:p}&quot;</span>, entry);
+    drop(state);
+    entry(aux.as_ptr());
+    <span class="comment">/*
+    let sym = state
         .dynlink
-        .lookup_symbol(libhw_id, <span class="string">&quot;test_sec_call&quot;</span>, LookupFlags::empty())<span class="question-mark">?</span>;
+        .lookup_symbol(libhw_id, &quot;test_sec_call&quot;, LookupFlags::empty())?;
 
-    <span class="kw">let </span>addr = sym.reloc_value();
-    <span class="macro">info!</span>(<span class="string">&quot;addr = {:x}&quot;</span>, addr);
-    <span class="kw">let </span>ptr: <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>() = <span class="kw">unsafe </span>{ core::mem::transmute(addr <span class="kw">as </span>usize) };
+    let addr = sym.reloc_value();
+    info!(&quot;addr = {:x}&quot;, addr);
+    let ptr: extern &quot;C&quot; fn() = unsafe { core::mem::transmute(addr as usize) };
     (ptr)();
+    */
 
-    <span class="prelude-val">Ok</span>(())
+    </span><span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">fn </span>bootstrap_name_res(<span class="kw-2">mut </span>name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Backing&gt; {

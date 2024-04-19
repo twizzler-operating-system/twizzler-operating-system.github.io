@@ -157,9 +157,63 @@
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>dynlink::{context::runtime::RuntimeInitInfo, library::CtorInfo};
+<span class="kw">use </span>monitor_api::SharedCompConfig;
 <span class="kw">use </span>twizzler_abi::upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget};
 <span class="kw">use </span>twizzler_runtime_api::{AuxEntry, BasicAux, CoreRuntime};
 
@@ -167,9 +221,17 @@
     preinit::{preinit_abort, preinit_unwrap},
     preinit_println,
     runtime::RuntimeState,
+    RuntimeThreadControl,
 };
 
-<span class="kw">use super</span>::{slot::mark_slot_reserved, ReferenceRuntime};
+<span class="kw">use super</span>::{slot::mark_slot_reserved, thread::TLS_GEN_MGR, ReferenceRuntime};
+
+<span class="attr">#[repr(C)]
+</span><span class="kw">pub struct </span>CompartmentInitInfo {
+    <span class="kw">pub </span>ctor_array_start: usize,
+    <span class="kw">pub </span>ctor_array_len: usize,
+    <span class="kw">pub </span>comp_config_addr: usize,
+}
 
 <span class="kw">fn </span>build_basic_aux(aux: <span class="kw-2">&amp;</span>[AuxEntry]) -&gt; BasicAux {
     <span class="kw">let </span>args = aux
@@ -194,6 +256,9 @@
         env,
     }
 }
+
+<span class="attr">#[thread_local]
+</span><span class="kw">static </span>TLS_TEST: usize = <span class="number">3222</span>;
 
 <span class="kw">impl </span>CoreRuntime <span class="kw">for </span>ReferenceRuntime {
     <span class="kw">fn </span>default_allocator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>std::alloc::GlobalAlloc {
@@ -244,16 +309,42 @@
         } <span class="kw">else </span>{
             <span class="kw">unsafe </span>{ core::slice::from_raw_parts(aux, aux_len) }
         };
-
         <span class="comment">// Step 2: do some early AUX processing
-        </span><span class="kw">let </span>init_info = preinit_unwrap(aux_slice.iter().find_map(|aux| <span class="kw">match </span>aux {
-            twizzler_runtime_api::AuxEntry::RuntimeInfo(info) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>info),
+        </span><span class="kw">let </span>(init_info, is_monitor) = preinit_unwrap(aux_slice.iter().find_map(|aux| <span class="kw">match </span>aux {
+            twizzler_runtime_api::AuxEntry::RuntimeInfo(info, data) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span>info, <span class="kw-2">*</span>data == <span class="number">0</span>)),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }));
-        <span class="kw">let </span>init_info = <span class="kw">unsafe </span>{ preinit_unwrap((init_info <span class="kw">as </span><span class="kw-2">*const </span>RuntimeInitInfo).as_ref()) };
 
-        <span class="comment">// Step 3: bootstrap pre-std stuff: upcalls, allocator, TLS, constructors (the order matters, ctors need to happen last)
-        </span><span class="kw">let </span>upcall_target = UpcallTarget::new(
+        <span class="kw">if </span>is_monitor {
+            <span class="kw">let </span>init_info =
+                <span class="kw">unsafe </span>{ preinit_unwrap((init_info <span class="kw">as </span><span class="kw-2">*const </span>RuntimeInitInfo).as_ref()) };
+            <span class="self">self</span>.init_for_monitor(init_info);
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>init_info =
+                <span class="kw">unsafe </span>{ preinit_unwrap((init_info <span class="kw">as </span><span class="kw-2">*const </span>CompartmentInitInfo).as_ref()) };
+            <span class="self">self</span>.init_for_compartment(init_info);
+        }
+
+        <span class="comment">// Step 3: call into libstd to finish setting up the standard library and call main
+        </span><span class="kw">let </span>ba = build_basic_aux(aux_slice);
+        <span class="kw">let </span>ret = <span class="kw">unsafe </span>{ std_entry(ba) };
+        <span class="self">self</span>.exit(ret.code);
+    }
+
+    <span class="kw">fn </span>pre_main_hook(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="macro">preinit_println!</span>(<span class="string">&quot;====== {}&quot;</span>, TLS_TEST);
+        <span class="kw">if </span><span class="self">self</span>.state().contains(RuntimeState::IS_MONITOR) {
+            <span class="self">self</span>.init_slots();
+        }
+        <span class="self">self</span>.set_runtime_ready();
+    }
+
+    <span class="kw">fn </span>post_main_hook(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
+}
+
+<span class="kw">impl </span>ReferenceRuntime {
+    <span class="kw">fn </span>init_for_monitor(<span class="kw-2">&amp;</span><span class="self">self</span>, init_info: <span class="kw-2">&amp;</span>RuntimeInitInfo) {
+        <span class="kw">let </span>upcall_target = UpcallTarget::new(
             <span class="prelude-val">Some</span>(<span class="kw">crate</span>::arch::rr_upcall_entry),
             <span class="prelude-val">Some</span>(<span class="kw">crate</span>::arch::rr_upcall_entry),
             <span class="number">0</span>,
@@ -266,26 +357,40 @@
             }; UpcallInfo::NR_UPCALLS],
         );
         twizzler_abi::syscall::sys_thread_set_upcall(upcall_target);
+        <span class="self">self</span>.set_is_monitor();
         <span class="self">self</span>.init_allocator(init_info);
         <span class="self">self</span>.init_tls(init_info);
         <span class="self">self</span>.init_ctors(<span class="kw-2">&amp;</span>init_info.ctors);
-
-        <span class="comment">// Step 4: call into libstd to finish setting up the standard library and call main
-        </span><span class="kw">let </span>ba = build_basic_aux(aux_slice);
-
-        <span class="kw">let </span>ret = <span class="kw">unsafe </span>{ std_entry(ba) };
-        <span class="self">self</span>.exit(ret.code);
     }
 
-    <span class="kw">fn </span>pre_main_hook(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.init_slots();
-        <span class="self">self</span>.set_runtime_ready();
+    <span class="kw">fn </span>init_for_compartment(<span class="kw-2">&amp;</span><span class="self">self</span>, init_info: <span class="kw-2">&amp;</span>CompartmentInitInfo) {
+        <span class="kw">unsafe </span>{
+            preinit_unwrap(
+                monitor_api::set_comp_config(
+                    (init_info.comp_config_addr <span class="kw">as </span><span class="kw-2">*const </span>SharedCompConfig)
+                        .as_ref()
+                        .unwrap(),
+                )
+                .ok(),
+            );
+        }
+        <span class="kw">let </span>tls = preinit_unwrap(
+            preinit_unwrap(TLS_GEN_MGR.lock().ok())
+                .get_next_tls_info(<span class="prelude-val">None</span>, || RuntimeThreadControl::new(<span class="number">0</span>)),
+        );
+        twizzler_abi::syscall::sys_thread_settls(tls <span class="kw">as </span>u64);
+
+        <span class="kw">if </span>init_info.ctor_array_start != <span class="number">0 </span>&amp;&amp; init_info.ctor_array_len != <span class="number">0 </span>{
+            <span class="kw">let </span>ctor_slice = <span class="kw">unsafe </span>{
+                core::slice::from_raw_parts(
+                    init_info.ctor_array_start <span class="kw">as </span><span class="kw-2">*const </span>CtorInfo,
+                    init_info.ctor_array_len,
+                )
+            };
+            <span class="self">self</span>.init_ctors(ctor_slice);
+        }
     }
 
-    <span class="kw">fn </span>post_main_hook(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
-}
-
-<span class="kw">impl </span>ReferenceRuntime {
     <span class="kw">fn </span>init_ctors(<span class="kw-2">&amp;</span><span class="self">self</span>, ctor_array: <span class="kw-2">&amp;</span>[CtorInfo]) {
         <span class="kw">for </span>ctor <span class="kw">in </span>ctor_array {
             <span class="kw">unsafe </span>{
@@ -309,6 +414,7 @@
         <span class="kw">for </span>slot <span class="kw">in </span><span class="kw-2">&amp;</span>info.used_slots {
             mark_slot_reserved(<span class="kw-2">*</span>slot);
         }
+        <span class="self">self</span>.register_bootstrap_alloc(info.bootstrap_alloc_slot);
     }
 
     <span class="kw">fn </span>init_tls(<span class="kw-2">&amp;</span><span class="self">self</span>, info: <span class="kw-2">&amp;</span>RuntimeInitInfo) {

@@ -125,6 +125,7 @@
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     sync::{Arc, Mutex, OnceLock},
@@ -140,6 +141,7 @@
 <span class="kw">use </span>twizzler_abi::object::{MAX_SIZE, NULLPAGE_SIZE};
 <span class="kw">use </span>twizzler_object::ObjID;
 <span class="kw">use </span>twizzler_runtime_api::LibraryId;
+<span class="kw">use </span>twz_rt::preinit_println;
 
 <span class="kw">use crate</span>::{compartment::Comp, gates::LibraryInfo, init::InitDynlinkContext};
 
@@ -219,8 +221,8 @@
 
     <span class="kw">let </span>compartment = state.dynlink.get_compartment(lib.compartment()).ok()<span class="question-mark">?</span>;
     <span class="kw">if </span>compartment.id != comp.compartment_id {
-        <span class="kw">return </span><span class="prelude-val">None</span>;
-    }
+        <span class="comment">//return None;
+    </span>}
 
     <span class="kw">let </span>handle = lib.full_obj.inner();
 

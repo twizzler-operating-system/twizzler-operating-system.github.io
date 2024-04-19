@@ -86,6 +86,7 @@
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This library provides a common interface for applications that want to talk to the Twizzler
 //! kernel, and defines that interface for both applications and the kernel to follow. It&#39;s made of
 //! several parts:
@@ -124,6 +125,7 @@
 <span class="kw">pub mod </span>pager;
 <span class="attr">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
 </span><span class="kw">pub mod </span>runtime;
+<span class="kw">pub mod </span>security;
 <span class="kw">pub mod </span>slot;
 <span class="kw">pub mod </span>syscall;
 <span class="kw">pub mod </span>thread;

@@ -111,7 +111,7 @@
         <span class="kw">unsafe </span>{ core::slice::from_raw_parts(aux, aux_len) }
     };
     <span class="kw">let </span>runtime_info = aux_slice.iter().find_map(|x| <span class="kw">match </span>x {
-        AuxEntry::RuntimeInfo(r) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>r),
+        AuxEntry::RuntimeInfo(r, <span class="number">0</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>r),
         <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     });
 

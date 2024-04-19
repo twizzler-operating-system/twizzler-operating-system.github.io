@@ -63,7 +63,21 @@
 <a href="#63" id="63">63</a>
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::alloc::Layout;
+
+<span class="kw">use </span>twizzler_abi::object::MAX_SIZE;
+
+<span class="kw">use crate</span>::{
     library::{CtorInfo, LibraryId},
     tls::TlsRegion,
     DynlinkError,
@@ -78,6 +92,7 @@
     <span class="kw">pub </span>root_name: String,
     <span class="kw">pub </span>used_slots: Vec&lt;usize&gt;,
     <span class="kw">pub </span>ctors: Vec&lt;CtorInfo&gt;,
+    <span class="kw">pub </span>bootstrap_alloc_slot: usize,
 }
 
 <span class="comment">// Safety: the pointers involved here are used for a one-time handoff during bootstrap.
@@ -91,18 +106,23 @@
         root_name: String,
         ctors: Vec&lt;CtorInfo&gt;,
     ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>alloc_test = <span class="kw">unsafe </span>{ std::alloc::alloc(Layout::from_size_align(<span class="number">16</span>, <span class="number">8</span>).unwrap()) }
+            <span class="kw">as </span>usize
+            / MAX_SIZE;
         <span class="self">Self </span>{
             tls_region,
             ctx: ctx <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>u8,
             root_name,
             used_slots: <span class="macro">vec!</span>[],
             ctors,
+            bootstrap_alloc_slot: alloc_test,
         }
     }
 }
 
 <span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
-    <span class="kw">fn </span>build_ctors(<span class="kw-2">&amp;</span><span class="self">self</span>, root_id: LibraryId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CtorInfo&gt;, DynlinkError&gt; {
+    <span class="doccomment">/// Build up a list of constructors to call for a library and its dependencies.
+    </span><span class="kw">pub fn </span>build_ctors_list(<span class="kw-2">&amp;</span><span class="self">self</span>, root_id: LibraryId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CtorInfo&gt;, DynlinkError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ctors = <span class="macro">vec!</span>[];
         <span class="self">self</span>.with_dfs_postorder(root_id, |lib| <span class="kw">match </span>lib {
             LoadedOrUnloaded::Unloaded(<span class="kw">_</span>) =&gt; {}
@@ -119,7 +139,7 @@
         root_id: LibraryId,
         tls: TlsRegion,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;RuntimeInitInfo, DynlinkError&gt; {
-        <span class="kw">let </span>ctors = <span class="self">self</span>.build_ctors(root_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ctors = <span class="self">self</span>.build_ctors_list(root_id)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(RuntimeInitInfo::new(
             tls,
             <span class="self">self</span>,

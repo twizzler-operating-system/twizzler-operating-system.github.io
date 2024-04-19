@@ -74,6 +74,8 @@
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Utilities that enable formatted printing for early runtime init.
 
 </span><span class="kw">use </span>std::fmt;
@@ -123,7 +125,8 @@
     core::intrinsics::abort()
 }
 
-<span class="kw">pub fn </span>preinit_unwrap&lt;T&gt;(op: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; T {
+<span class="attr">#[track_caller]
+</span><span class="kw">pub fn </span>preinit_unwrap&lt;T&gt;(op: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; T {
     <span class="kw">match </span>op {
         <span class="prelude-val">Some</span>(item) =&gt; item,
         <span class="prelude-val">None </span>=&gt; {
@@ -136,7 +139,8 @@
     }
 }
 
-<span class="attr">#[allow(dead_code)]
+<span class="attr">#[track_caller]
+#[allow(dead_code)]
 </span><span class="kw">pub fn </span>preinit_unwrap_result&lt;T, E: core::fmt::Display&gt;(op: <span class="prelude-ty">Result</span>&lt;T, E&gt;) -&gt; T {
     <span class="kw">match </span>op {
         <span class="prelude-val">Ok</span>(item) =&gt; item,

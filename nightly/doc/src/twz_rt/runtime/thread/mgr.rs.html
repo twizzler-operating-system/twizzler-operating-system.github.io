@@ -357,7 +357,7 @@
         <span class="kw">let </span>tls = TLS_GEN_MGR
             .lock()
             .unwrap()
-            .get_next_tls_info(<span class="number">0</span>, || RuntimeThreadControl::new(<span class="number">0</span>))
+            .get_next_tls_info(<span class="prelude-val">None</span>, || RuntimeThreadControl::new(<span class="number">0</span>))
             .unwrap();
         <span class="kw">let </span>stack_raw = <span class="kw">unsafe </span>{
             OUR_RUNTIME

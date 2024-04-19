@@ -199,7 +199,7 @@
 <span class="kw">use </span>tracing::trace;
 <span class="kw">use </span>twizzler_runtime_api::CoreRuntime;
 
-<span class="kw">use </span><span class="kw">crate</span>::runtime::OUR_RUNTIME;
+<span class="kw">use crate</span>::{preinit_println, runtime::OUR_RUNTIME};
 
 <span class="kw">const </span>THREAD_STARTED: u32 = <span class="number">1</span>;
 <span class="kw">pub struct </span>RuntimeThreadControl {
@@ -330,12 +330,12 @@
 <span class="kw">impl </span>TlsGenMgr {
     <span class="kw">pub fn </span>get_next_tls_info&lt;T&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        mygen: u64,
+        mygen: <span class="prelude-ty">Option</span>&lt;u64&gt;,
         new_tcb_data: <span class="kw">impl </span>FnOnce() -&gt; T,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*mut </span>Tcb&lt;T&gt;&gt; {
         <span class="kw">let </span>cc = monitor_api::get_comp_config();
         <span class="kw">let </span>template = <span class="kw">unsafe </span>{ cc.get_tls_template().as_ref().unwrap() };
-        <span class="kw">if </span>mygen == template.gen {
+        <span class="kw">if </span>mygen.is_some_and(|mygen| mygen == template.gen) {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
