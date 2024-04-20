@@ -265,9 +265,9 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Submit a set of requests, for which we are **not** interested in the specific responses from the
-    /// device. Returns a future that awaits on an [InFlightFuture], so awaiting on this function
-    /// ensures that all requests are submitted, not necessarily handled.
+    <span class="doccomment">/// Submit a set of requests, for which we are **not** interested in the specific responses from
+    /// the device. Returns a future that awaits on an [InFlightFuture], so awaiting on this
+    /// function ensures that all requests are submitted, not necessarily handled.
     </span><span class="kw">pub async fn </span>submit(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         reqs: <span class="kw-2">&amp;mut </span>[SubmitRequest&lt;T::Request&gt;],
@@ -282,8 +282,8 @@
     }
 
     <span class="doccomment">/// Submit a set of requests, for which we **are** interested in the specific responses from the
-    /// device. Returns a future that awaits on an [InFlightFutureWithResponses], so awaiting on this function
-    /// ensures that all requests are submitted, not necessarily handled.
+    /// device. Returns a future that awaits on an [InFlightFutureWithResponses], so awaiting on
+    /// this function ensures that all requests are submitted, not necessarily handled.
     </span><span class="kw">pub async fn </span>submit_for_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         reqs: <span class="kw-2">&amp;mut </span>[SubmitRequest&lt;T::Request&gt;],

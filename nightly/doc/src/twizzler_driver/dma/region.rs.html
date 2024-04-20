@@ -378,8 +378,8 @@
 <a href="#378" id="378">378</a>
 <a href="#379" id="379">379</a>
 <a href="#380" id="380">380</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>core::marker::PhantomData;
-<span class="kw">use </span>core::ops::Range;
+<a href="#381" id="381">381</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>core::{marker::PhantomData, ops::Range};
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>twizzler_abi::{
@@ -391,13 +391,12 @@
     syscall::{sys_kaction, PinnedPage},
 };
 
-<span class="kw">use </span><span class="kw">crate</span>::arch::DMA_PAGE_SIZE;
-
 <span class="kw">use super</span>::{
     pin::{PhysInfo, PinError},
     pool::{AllocatableDmaObject, SplitPageRange},
     Access, DeviceSync, DmaObject, DmaOptions, DmaPin, SyncMode,
 };
+<span class="kw">use </span><span class="kw">crate</span>::arch::DMA_PAGE_SIZE;
 
 <span class="doccomment">/// A region of DMA memory, represented in virtual memory as type `T`, with a particular access mode
 /// and options.
@@ -413,8 +412,8 @@
     _pd: PhantomData&lt;T&gt;,
 }
 
-<span class="doccomment">/// A region of DMA memory, represented in virtual memory as type `[T; len]`, with a particular access mode
-/// and options.
+<span class="doccomment">/// A region of DMA memory, represented in virtual memory as type `[T; len]`, with a particular
+/// access mode and options.
 </span><span class="kw">pub struct </span>DmaSliceRegion&lt;T: DeviceSync&gt; {
     region: DmaRegion&lt;T&gt;,
     len: usize,
@@ -571,7 +570,8 @@
     <span class="doccomment">/// Release any pin created for this region.
     ///
     /// # Safety
-    /// Caller must ensure that no device is using the information from any active pins for this region.
+    /// Caller must ensure that no device is using the information from any active pins for this
+    /// region.
     </span><span class="kw">pub unsafe fn </span>release_pin(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, token)) = <span class="self">self</span>.backing {
             <span class="kw">super</span>::object::release_pin(<span class="self">self</span>.dma_object().object().id(), token);
@@ -685,7 +685,8 @@
         ret
     }
 
-    <span class="comment">// Run a closure that takes a mutable reference to a subslice of the DMA data, ensuring coherence.
+    <span class="comment">// Run a closure that takes a mutable reference to a subslice of the DMA data, ensuring
+    // coherence.
     </span><span class="kw">pub fn </span>with_mut&lt;F, R&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;usize&gt;, f: F) -&gt; R
     <span class="kw">where
         </span>F: FnOnce(<span class="kw-2">&amp;mut </span>[T]) -&gt; R,
@@ -718,7 +719,8 @@
     <span class="doccomment">/// Release any pin created for this region.
     ///
     /// # Safety
-    /// Caller must ensure that no device is using the information from any active pins for this region.
+    /// Caller must ensure that no device is using the information from any active pins for this
+    /// region.
     </span><span class="attr">#[inline]
     </span><span class="kw">pub unsafe fn </span>release_pin(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="self">self</span>.region.release_pin()

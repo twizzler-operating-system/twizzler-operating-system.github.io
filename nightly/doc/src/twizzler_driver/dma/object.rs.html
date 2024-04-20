@@ -91,6 +91,7 @@
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
 <a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::Mutex;
 
 <span class="kw">use </span>twizzler_abi::{
@@ -103,7 +104,8 @@
 <span class="kw">use super</span>::{Access, DeviceSync, DmaOptions, DmaRegion, DmaSliceRegion};
 
 <span class="doccomment">/// A handle for an object that can be used to perform DMA, and is most useful directly as a way to
-/// perform DMA operations on a specific object. For an allocator-like DMA interface, see [crate::dma::DmaPool].
+/// perform DMA operations on a specific object. For an allocator-like DMA interface, see
+/// [crate::dma::DmaPool].
 </span><span class="kw">pub struct </span>DmaObject {
     obj: Object&lt;()&gt;,
     <span class="kw">pub</span>(<span class="kw">crate</span>) releasable_pins: Mutex&lt;Vec&lt;u32&gt;&gt;,

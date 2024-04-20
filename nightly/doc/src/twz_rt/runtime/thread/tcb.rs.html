@@ -176,6 +176,7 @@
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Rountines and definitions for the thread control block.
 //!
 //! Note that the control struct here uses a manual lock instead of a Mutex.
@@ -352,6 +353,7 @@
         }
     }
 
-    <span class="comment">// TODO: when threads exit or move on to a different TLS gen, track that in thread_count, and if it hits zero, notify the monitor.
+    <span class="comment">// TODO: when threads exit or move on to a different TLS gen, track that in thread_count, and if
+    // it hits zero, notify the monitor.
 </span>}
 </code></pre></div></section></main></body></html>

@@ -178,9 +178,12 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implements stdio streams. For each one (stdin, stdout, and stderr), we have two possible sinks: a thread-local, and a &quot;local&quot;
-//! destination (here, local to this particular linking to this runtime). We try the thread-local first, if available, and if not, try
-//! the runtime local option. If that isn&#39;t present, we fallback to the Fallback writer and reader.
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Implements stdio streams. For each one (stdin, stdout, and stderr), we have two possible sinks:
+//! a thread-local, and a &quot;local&quot; destination (here, local to this particular linking to this
+//! runtime). We try the thread-local first, if available, and if not, try the runtime local option.
+//! If that isn&#39;t present, we fallback to the Fallback writer and reader.
 
 </span><span class="kw">use </span>std::{
     panic::RefUnwindSafe,
@@ -246,7 +249,8 @@
 <span class="kw">impl </span>RustStdioRuntime <span class="kw">for </span>ReferenceRuntime {
     <span class="kw">fn </span>with_panic_output(<span class="kw-2">&amp;</span><span class="self">self</span>, cb: twizzler_runtime_api::IoWritePanicDynCallback&lt;<span class="lifetime">&#39;_</span>, ()&gt;) {
         <span class="comment">// For panic output, try to never wait on any locks. Also, catch unwinds and treat
-        // the output option as None if the callback panics, to try to ensure the output goes somewhere.
+        // the output option as None if the callback panics, to try to ensure the output goes
+        // somewhere.
 
         // Unwrap-Ok: we ensure that no one can panic when holding the read lock.
         </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>out) = THREAD_STDERR.try_read() {

@@ -76,14 +76,12 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
-<a href="#79" id="79">79</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>elf::segment::Elf64_Phdr;
 <span class="kw">use </span>monitor_api::get_comp_config;
 <span class="kw">use </span>twizzler_runtime_api::{AddrRange, DebugRuntime, Library, MapFlags};
 
-<span class="kw">use </span><span class="kw">crate</span>::preinit_println;
-
 <span class="kw">use super</span>::{object::new_object_handle, ReferenceRuntime};
+<span class="kw">use </span><span class="kw">crate</span>::preinit_println;
 
 <span class="kw">impl </span>DebugRuntime <span class="kw">for </span>ReferenceRuntime {
     <span class="kw">fn </span>get_library(

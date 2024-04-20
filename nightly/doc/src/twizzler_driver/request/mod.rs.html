@@ -57,7 +57,6 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! A system for handling requests and organizing inflight requests while waiting for responses.
 //!
 //! The general structure of this system is that software implements the [RequestDriver] trait with
@@ -67,7 +66,8 @@
 //! A user of the requester can call the [Requester::submit] or [Requester::submit_for_response]
 //! functions to submit a set a requests depending on if the caller wants the responses or just
 //! wants to know if the requests succeeded. The reason this distinction is maintained is that
-//! collecting responses has an overhead. The requester interacts with the driver to submit the requests.
+//! collecting responses has an overhead. The requester interacts with the driver to submit the
+//! requests.
 //!
 //! Internally, the requester assigns IDs to requests for use in communicating with the driver.
 //! These IDs are not necessarily allocated sequentially and can only be relied upon to be unique
@@ -111,11 +111,9 @@
 
 <span class="comment">// TODO: drop for inflight tracker, so we can remove it to save work?
 
-</span><span class="kw">pub use </span>inflight::InFlightFuture;
-<span class="kw">pub use </span>inflight::InFlightFutureWithResponses;
+</span><span class="kw">pub use </span>inflight::{InFlightFuture, InFlightFutureWithResponses};
 <span class="kw">pub use </span>requester::Requester;
 <span class="kw">pub use </span>response_info::ResponseInfo;
 <span class="kw">pub use </span>submit::SubmitRequest;
-<span class="kw">pub use </span>summary::SubmitSummary;
-<span class="kw">pub use </span>summary::SubmitSummaryWithResponses;
+<span class="kw">pub use </span>summary::{SubmitSummary, SubmitSummaryWithResponses};
 </code></pre></div></section></main></body></html>

@@ -51,10 +51,10 @@
 <a href="#51" id="51">51</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::marker::PhantomData;
 
+<span class="kw">pub use </span>twizzler_abi::object::Protections;
 <span class="kw">use </span>twizzler_abi::{object::ObjID, syscall::ObjectMapError};
 
 <span class="kw">use </span><span class="kw">crate</span>::object::Object;
-<span class="kw">pub use </span>twizzler_abi::object::Protections;
 
 <span class="macro">bitflags::bitflags! </span>{
     <span class="doccomment">/// Flags to pass to object initialization routines.

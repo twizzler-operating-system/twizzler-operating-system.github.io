@@ -243,27 +243,18 @@
 <a href="#243" id="243">243</a>
 <a href="#244" id="244">244</a>
 <a href="#245" id="245">245</a>
-<a href="#246" id="246">246</a>
-<a href="#247" id="247">247</a>
-<a href="#248" id="248">248</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of global context.
 
-</span><span class="kw">use </span>std::collections::HashMap;
-<span class="kw">use </span>std::fmt::Display;
+</span><span class="kw">use </span>std::{collections::HashMap, fmt::Display};
 
-<span class="kw">use </span>petgraph::stable_graph::NodeIndex;
-<span class="kw">use </span>petgraph::stable_graph::StableDiGraph;
-
-<span class="kw">use </span><span class="kw">crate</span>::compartment::CompartmentId;
-<span class="kw">use </span><span class="kw">crate</span>::library::LibraryId;
-<span class="kw">use </span><span class="kw">crate</span>::DynlinkErrorKind;
-<span class="kw">use crate</span>::{
-    compartment::Compartment,
-    library::{BackingData, Library, UnloadedLibrary},
-    DynlinkError,
-};
+<span class="kw">use </span>petgraph::stable_graph::{NodeIndex, StableDiGraph};
 
 <span class="kw">use </span><span class="self">self</span>::engine::ContextEngine;
+<span class="kw">use crate</span>::{
+    compartment::{Compartment, CompartmentId},
+    library::{BackingData, Library, LibraryId, UnloadedLibrary},
+    DynlinkError, DynlinkErrorKind,
+};
 
 <span class="kw">mod </span>deps;
 <span class="kw">pub mod </span>engine;
@@ -283,12 +274,14 @@
     </span>compartments: Vec&lt;Compartment&lt;Engine::Backing&gt;&gt;,
 
     <span class="comment">// This is the primary list of libraries, all libraries have an entry here, and they are
-    // placed here independent of compartment. Edges denote dependency relationships, and may also cross compartments.
+    // placed here independent of compartment. Edges denote dependency relationships, and may also
+    // cross compartments.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) library_deps: StableDiGraph&lt;LoadedOrUnloaded&lt;Engine::Backing&gt;, ()&gt;,
 }
 
 <span class="comment">// Libraries in the dependency graph are placed there before loading, so that they can participate
-// in dependency search. So we need to track both kinds of libraries that may be at a given index in the graph.
+// in dependency search. So we need to track both kinds of libraries that may be at a given index in
+// the graph.
 </span><span class="kw">pub enum </span>LoadedOrUnloaded&lt;Backing: BackingData&gt; {
     Unloaded(UnloadedLibrary),
     Loaded(Library&lt;Backing&gt;),
@@ -419,7 +412,8 @@
         rets
     }
 
-    <span class="doccomment">/// Traverse the library graph with DFS postorder, calling the callback for each library (mutable ref).
+    <span class="doccomment">/// Traverse the library graph with DFS postorder, calling the callback for each library
+    /// (mutable ref).
     </span><span class="kw">pub fn </span>with_dfs_postorder_mut&lt;R&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         root_id: LibraryId,

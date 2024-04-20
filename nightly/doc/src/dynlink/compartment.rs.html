@@ -66,12 +66,12 @@
 <a href="#66" id="66">66</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Compartments are an abstraction for isolation of library components, but they are not done yet.
 
-</span><span class="kw">use </span>petgraph::stable_graph::NodeIndex;
-<span class="kw">use </span>std::{
+</span><span class="kw">use </span>std::{
     collections::HashMap,
     fmt::{Debug, Display},
 };
 
+<span class="kw">use </span>petgraph::stable_graph::NodeIndex;
 <span class="kw">use </span>talc::{ErrOnOom, Talc};
 
 <span class="kw">use crate</span>::{library::BackingData, tls::TlsInfo};

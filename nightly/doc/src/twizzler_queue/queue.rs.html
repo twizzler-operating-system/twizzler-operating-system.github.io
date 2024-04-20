@@ -176,24 +176,18 @@
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
-<span class="kw">use </span>twizzler_abi::object::NULLPAGE_SIZE;
-<span class="kw">use </span>twizzler_abi::syscall::{
-    sys_thread_sync, ThreadSync, ThreadSyncFlags, ThreadSyncOp, ThreadSyncReference,
-    ThreadSyncSleep, ThreadSyncWake,
+<span class="kw">use </span>twizzler_abi::{
+    object::NULLPAGE_SIZE,
+    syscall::{
+        sys_thread_sync, ThreadSync, ThreadSyncFlags, ThreadSyncOp, ThreadSyncReference,
+        ThreadSyncSleep, ThreadSyncWake,
+    },
 };
 <span class="kw">use </span>twizzler_object::{CreateError, CreateSpec, Object};
-<span class="kw">use </span>twizzler_queue_raw::RawQueue;
-<span class="kw">use </span>twizzler_queue_raw::{QueueEntry, RawQueueHdr};
-
-<span class="kw">pub use </span>twizzler_queue_raw::QueueBase;
-<span class="kw">pub use </span>twizzler_queue_raw::QueueError;
-<span class="kw">pub use </span>twizzler_queue_raw::ReceiveFlags;
-<span class="kw">pub use </span>twizzler_queue_raw::SubmissionFlags;
+<span class="kw">pub use </span>twizzler_queue_raw::{QueueBase, QueueError, ReceiveFlags, SubmissionFlags};
+<span class="kw">use </span>twizzler_queue_raw::{QueueEntry, RawQueue, RawQueueHdr};
 
 <span class="doccomment">/// A single queue, holding two subqueues (sending and completion). Objects of type S are sent
 /// across the sending queue, and completions of type C are sent back.

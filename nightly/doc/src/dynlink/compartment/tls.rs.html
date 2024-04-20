@@ -72,18 +72,16 @@
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
-<a href="#75" id="75">75</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{alloc::Layout, ptr::NonNull};
 
 <span class="kw">use </span>tracing::{debug, trace};
 
+<span class="kw">use </span><span class="kw">super</span>::Compartment;
 <span class="kw">use crate</span>::{
     library::BackingData,
     tls::{TlsInfo, TlsModId, TlsModule, TlsRegion},
     DynlinkError, DynlinkErrorKind,
 };
-
-<span class="kw">use </span><span class="kw">super</span>::Compartment;
 
 <span class="kw">impl</span>&lt;Backing: BackingData&gt; Compartment&lt;Backing&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tm: TlsModule) -&gt; TlsModId {

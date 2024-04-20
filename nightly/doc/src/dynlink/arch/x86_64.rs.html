@@ -27,23 +27,15 @@
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
-<a href="#31" id="31">31</a>
-<a href="#32" id="32">32</a>
-<a href="#33" id="33">33</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::tls::Tcb;
-<span class="kw">use </span><span class="kw">crate</span>::tls::TlsRegion;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::tls::{Tcb, TlsRegion};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MINIMUM_TLS_ALIGNMENT: usize = <span class="number">32</span>;
 
-<span class="kw">pub use </span>elf::abi::R_X86_64_64 <span class="kw">as </span>REL_SYMBOLIC;
-<span class="kw">pub use </span>elf::abi::R_X86_64_COPY <span class="kw">as </span>REL_COPY;
-<span class="kw">pub use </span>elf::abi::R_X86_64_DTPMOD64 <span class="kw">as </span>REL_DTPMOD;
-<span class="kw">pub use </span>elf::abi::R_X86_64_DTPOFF64 <span class="kw">as </span>REL_DTPOFF;
-<span class="kw">pub use </span>elf::abi::R_X86_64_GLOB_DAT <span class="kw">as </span>REL_GOT;
-<span class="kw">pub use </span>elf::abi::R_X86_64_JUMP_SLOT <span class="kw">as </span>REL_PLT;
-<span class="kw">pub use </span>elf::abi::R_X86_64_RELATIVE <span class="kw">as </span>REL_RELATIVE;
-<span class="kw">pub use </span>elf::abi::R_X86_64_TPOFF64 <span class="kw">as </span>REL_TPOFF;
+<span class="kw">pub use </span>elf::abi::{
+    R_X86_64_64 <span class="kw">as </span>REL_SYMBOLIC, R_X86_64_COPY <span class="kw">as </span>REL_COPY, R_X86_64_DTPMOD64 <span class="kw">as </span>REL_DTPMOD,
+    R_X86_64_DTPOFF64 <span class="kw">as </span>REL_DTPOFF, R_X86_64_GLOB_DAT <span class="kw">as </span>REL_GOT, R_X86_64_JUMP_SLOT <span class="kw">as </span>REL_PLT,
+    R_X86_64_RELATIVE <span class="kw">as </span>REL_RELATIVE, R_X86_64_TPOFF64 <span class="kw">as </span>REL_TPOFF,
+};
 
 <span class="doccomment">/// Get a pointer to the current thread control block, using the thread pointer.
 ///

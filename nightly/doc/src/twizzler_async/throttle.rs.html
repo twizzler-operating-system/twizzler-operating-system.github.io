@@ -20,11 +20,13 @@
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>scoped_tls_hkt::scoped_thread_local;
-<span class="kw">use </span>std::{
+<a href="#23" id="23">23</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     cell::Cell,
     task::{Context, Poll},
 };
+
+<span class="kw">use </span>scoped_tls_hkt::scoped_thread_local;
 
 <span class="macro">scoped_thread_local! </span>{
     <span class="kw">static </span>BUDGET: Cell&lt;u32&gt;

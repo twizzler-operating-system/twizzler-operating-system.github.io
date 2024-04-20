@@ -318,6 +318,8 @@
 <a href="#318" id="318">318</a>
 <a href="#319" id="319">319</a>
 <a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! APIs for accessing the device tree and device representation objects.
 
 </span><span class="kw">use </span>core::{
@@ -368,7 +370,8 @@
 </span><span class="attr">#[derive(Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Debug)]
 #[repr(u32)]
 </span><span class="kw">pub enum </span>SubObjectType {
-    <span class="doccomment">/// An info sub-object, which is comprised of a device-specific (or bus-specific) information structure.
+    <span class="doccomment">/// An info sub-object, which is comprised of a device-specific (or bus-specific) information
+    /// structure.
     </span>Info = <span class="number">0</span>,
     <span class="doccomment">/// A mapping of the MMIO registers for this device into an object.
     </span>Mmio = <span class="number">1</span>,
@@ -426,7 +429,8 @@
         <span class="macro">todo!</span>()
     }
 }
-<span class="doccomment">/// An mmio object has, at its base, a [MmioInfo] struct. At this offset, the mmio mapping actually starts.
+<span class="doccomment">/// An mmio object has, at its base, a [MmioInfo] struct. At this offset, the mmio mapping actually
+/// starts.
 </span><span class="kw">pub const </span>MMIO_OFFSET: usize = <span class="number">0x2000</span>;
 
 <span class="macro">bitflags::bitflags! </span>{

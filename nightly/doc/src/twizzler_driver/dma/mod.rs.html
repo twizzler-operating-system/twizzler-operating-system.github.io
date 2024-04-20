@@ -81,6 +81,9 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Module for managing DMA memory, using objects for DMA, and creating pools of DMA memory that can
 //! be allocated from. Internally, the DMA functions will interact with the kernel to ensure
 //! stability of physical addresses for DMA memory, and will also ensure proper coherence between
@@ -93,18 +96,21 @@
 
 <span class="kw">use </span>std::cell::UnsafeCell;
 
-<span class="kw">pub use </span><span class="kw">super</span>::arch::DMA_PAGE_SIZE;
 <span class="kw">pub use </span>object::DmaObject;
 <span class="kw">pub use </span>pin::{DmaPin, PinError};
 <span class="kw">pub use </span>pool::DmaPool;
 <span class="kw">pub use </span>region::{DmaRegion, DmaSliceRegion};
 
+<span class="kw">pub use </span><span class="kw">super</span>::arch::DMA_PAGE_SIZE;
+
 <span class="attr">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash)]
 </span><span class="doccomment">/// Intended access direction for DMA memory.
 </span><span class="kw">pub enum </span>Access {
-    <span class="doccomment">/// The memory is used for the host to write and the device to read. Device writes may not be coherent.
+    <span class="doccomment">/// The memory is used for the host to write and the device to read. Device writes may not be
+    /// coherent.
     </span>HostToDevice,
-    <span class="doccomment">/// The memory is used for the host to read and the device to write. Host writes may not be coherent.
+    <span class="doccomment">/// The memory is used for the host to read and the device to write. Host writes may not be
+    /// coherent.
     </span>DeviceToHost,
     <span class="doccomment">/// The memory is accessed read/write by both device and host.
     </span>BiDirectional,

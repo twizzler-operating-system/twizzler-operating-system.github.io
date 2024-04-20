@@ -93,13 +93,11 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>bitflags::bitflags;
 <span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
-<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
-
 <span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 <span class="attr">#[derive(
     Debug,
     Copy,

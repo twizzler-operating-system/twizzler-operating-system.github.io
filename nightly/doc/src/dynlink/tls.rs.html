@@ -261,9 +261,20 @@
 <a href="#261" id="261">261</a>
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local storage as prep for this code.
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local
+//! storage as prep for this code.
 
-</span><span class="kw">use </span>std::{alloc::Layout, mem::align_of, mem::size_of, ptr::NonNull};
+</span><span class="kw">use </span>std::{
+    alloc::Layout,
+    mem::{align_of, size_of},
+    ptr::NonNull,
+};
 
 <span class="kw">use </span>tracing::{error, trace};
 <span class="kw">use </span>twizzler_runtime_api::TlsIndex;
@@ -423,7 +434,8 @@
         <span class="comment">// Ensure that the alignment is enough for the control block.
         </span><span class="kw">let </span>align = std::cmp::max(<span class="self">self</span>.max_align, align_of::&lt;Tcb&lt;T&gt;&gt;()).next_power_of_two();
         <span class="comment">// Region needs space for each module, and we just assume they all need the max alignment.
-        // Add two to the mods length for calculating align padding, one for the dtv, one for the tcb.
+        // Add two to the mods length for calculating align padding, one for the dtv, one for the
+        // tcb.
         </span><span class="kw">let </span>region_size = <span class="self">self</span>.alloc_size_mods + align * (<span class="self">self</span>.tls_mods.len() + <span class="number">2</span>);
         <span class="kw">let </span>dtv_size = <span class="self">self</span>.dtv_len() * size_of::&lt;usize&gt;();
         <span class="comment">// We also need space for the control block and the dtv.

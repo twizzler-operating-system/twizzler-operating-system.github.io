@@ -198,6 +198,7 @@
 <a href="#198" id="198">198</a>
 <a href="#199" id="199">199</a>
 <a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     mem::MaybeUninit,
@@ -340,8 +341,9 @@
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="doccomment">/// A future for a set of in-flight requests for which we are uninterested in any responses from the device,
-/// we only care if the responses were completed successfully or not. On await, returns a [SubmitSummary].
+</span><span class="doccomment">/// A future for a set of in-flight requests for which we are uninterested in any responses from the
+/// device, we only care if the responses were completed successfully or not. On await, returns a
+/// [SubmitSummary].
 </span><span class="kw">pub struct </span>InFlightFuture&lt;R&gt; {
     inflight: Arc&lt;InFlight&lt;R&gt;&gt;,
 }
@@ -376,8 +378,8 @@
 }
 
 <span class="attr">#[derive(Debug)]
-</span><span class="doccomment">/// A future for a set of in-flight requests for which we are interested in all responses from the device.
-/// On await, returns a [SubmitSummaryWithResponses].
+</span><span class="doccomment">/// A future for a set of in-flight requests for which we are interested in all responses from the
+/// device. On await, returns a [SubmitSummaryWithResponses].
 </span><span class="kw">pub struct </span>InFlightFutureWithResponses&lt;R&gt; {
     inflight: Arc&lt;InFlight&lt;R&gt;&gt;,
 }

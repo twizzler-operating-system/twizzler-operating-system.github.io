@@ -335,21 +335,15 @@
 <a href="#335" id="335">335</a>
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
-<a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Functions for manipulating threads.
 
 </span><span class="kw">use </span>core::sync::atomic::{AtomicU64, Ordering};
-
 <span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
 </span><span class="kw">use </span>core::time::Duration;
 
 <span class="kw">use </span><span class="kw">crate</span>::marker::BaseType;
-
 <span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
 </span><span class="kw">use </span><span class="kw">crate</span>::syscall::<span class="kw-2">*</span>;
-
 <span class="attr">#[allow(unused_imports)]
 </span><span class="kw">use crate</span>::{
     object::{ObjID, Protections},
@@ -469,8 +463,8 @@
     }
 
     <span class="attr">#[cfg(not(feature = <span class="string">&quot;kernel&quot;</span>))]
-    </span><span class="doccomment">/// Wait for a thread&#39;s status to change, optionally timing out. Return value is None if timeout occurs, or
-    /// Some((ExecutionState, code)) otherwise.
+    </span><span class="doccomment">/// Wait for a thread&#39;s status to change, optionally timing out. Return value is None if timeout
+    /// occurs, or Some((ExecutionState, code)) otherwise.
     </span><span class="kw">pub fn </span>wait(<span class="kw-2">&amp;</span><span class="self">self</span>, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;(ExecutionState, u64)&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>status = <span class="self">self</span>.get_state();
         <span class="kw">loop </span>{

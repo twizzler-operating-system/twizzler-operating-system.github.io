@@ -186,18 +186,16 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::mem::MaybeUninit;
 
 <span class="kw">use </span>bitflags::bitflags;
 <span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
+<span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
 <span class="kw">use crate</span>::{
     arch::syscall::raw_syscall,
     object::{ObjID, Protections},
 };
-
-<span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
 
 <span class="attr">#[derive(
     Debug,

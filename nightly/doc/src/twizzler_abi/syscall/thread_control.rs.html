@@ -146,24 +146,25 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
+<span class="kw">use </span><span class="kw">super</span>::Syscall;
 <span class="kw">use crate</span>::{
     arch::syscall::raw_syscall,
     object::ObjID,
     upcall::{UpcallFrame, UpcallTarget},
 };
 
-<span class="kw">use </span><span class="kw">super</span>::Syscall;
-
 <span class="attr">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, FromPrimitive, IntoPrimitive)]
 #[repr(u64)]
 </span><span class="doccomment">/// Possible Thread Control operations
 </span><span class="kw">pub enum </span>ThreadControl {
     <span class="attr">#[default]
-    </span><span class="doccomment">/// Exit the thread. arg1 and arg2 should be code and location respectively, where code contains
-    /// a 64-bit value to write into *location, followed by the kernel performing a thread-wake
-    /// event on the memory word at location. If location is null, the write and thread-wake do not occur.
+    </span><span class="doccomment">/// Exit the thread. arg1 and arg2 should be code and location respectively, where code
+    /// contains a 64-bit value to write into *location, followed by the kernel performing a
+    /// thread-wake event on the memory word at location. If location is null, the write and
+    /// thread-wake do not occur.
     </span>Exit = <span class="number">0</span>,
     <span class="doccomment">/// Yield the thread&#39;s CPU time now. The actual effect of this is unspecified, but it acts as a
     /// hint to the kernel that this thread does not need to run right now. The kernel, of course,
@@ -173,7 +174,8 @@
     </span>SetTls = <span class="number">2</span>,
     <span class="doccomment">/// Get the thread&#39;s TLS pointer.
     </span>GetTls = <span class="number">3</span>,
-    <span class="doccomment">/// Set the thread&#39;s upcall pointer (child threads in the same virtual address space will inherit).
+    <span class="doccomment">/// Set the thread&#39;s upcall pointer (child threads in the same virtual address space will
+    /// inherit).
     </span>SetUpcall = <span class="number">4</span>,
     <span class="doccomment">/// Get the upcall pointer.
     </span>GetUpcall = <span class="number">5</span>,
@@ -206,8 +208,8 @@
     </span>GetSelfId = <span class="number">17</span>,
 }
 
-<span class="doccomment">/// Exit the thread. The code will be written to the [crate::thread::ThreadRepr] for the current thread as part
-/// of updating the status and code to indicate thread has exited.
+<span class="doccomment">/// Exit the thread. The code will be written to the [crate::thread::ThreadRepr] for the current
+/// thread as part of updating the status and code to indicate thread has exited.
 </span><span class="kw">pub fn </span>sys_thread_exit(code: u64) -&gt; ! {
     <span class="kw">unsafe </span>{
         raw_syscall(Syscall::ThreadCtrl, <span class="kw-2">&amp;</span>[ThreadControl::Exit <span class="kw">as </span>u64, code]);

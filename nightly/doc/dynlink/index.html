@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Welcome to the dynamic linker."><title>dynlink - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="dynlink" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-dev" data-channel="nightly" data-search-js="search-cfcb9d78f851226e.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../dynlink/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../dynlink/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate dynlink</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">dynlink</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/dynlink/lib.rs.html#1-111">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Welcome to the dynamic linker.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Welcome to the dynamic linker."><title>dynlink - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="dynlink" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-dev" data-channel="nightly" data-search-js="search-cfcb9d78f851226e.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../dynlink/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a></nav><nav class="sidebar"><a class="logo-container" href="../dynlink/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate dynlink</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 0.1.0</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">dynlink</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/dynlink/lib.rs.html#1-121">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Welcome to the dynamic linker.</p>
 <p>The job of the dynamic linker (dynlink) is:</p>
 <ol>
 <li>Load dynamic shared objects (DSOs) and their dependencies.</li>
@@ -6,13 +6,13 @@
 <li>Manage TLS regions</li>
 </ol>
 <p>On the surface, this isn’t too bad. But it’s mired in a long history, compatibility, deep
-magic for performance, and a lack of good, easy to understand “official” documentation. However, we
-will, in this crate, try to be as clear and forthcoming with what we are doing and why.</p>
+magic for performance, and a lack of good, easy to understand “official” documentation. However,
+we will, in this crate, try to be as clear and forthcoming with what we are doing and why.</p>
 <h2 id="basic-dynamic-linking-concepts"><a href="#basic-dynamic-linking-concepts">Basic Dynamic Linking Concepts</a></h2>
 <p><em>What is a dynamic shared object (DSO)?</em>
-Practically speaking (and for our purposes), it’s an ELF file that has been prepared in such a way that we can load it
-into memory, fix it up a bit based on where we loaded it (the file is relocatable), and then call code within it. The
-overall process looks like this:</p>
+Practically speaking (and for our purposes), it’s an ELF file that has been prepared in such a
+way that we can load it into memory, fix it up a bit based on where we loaded it (the file is
+relocatable), and then call code within it. The overall process looks like this:</p>
 <p>Loading:</p>
 <ol>
 <li>Map the library into memory</li>
@@ -26,54 +26,66 @@ overall process looks like this:</p>
 <ol>
 <li>If marked done, return.</li>
 <li>Recurse on all dependencies</li>
-<li>For each relocation entry,
-3a. Fixup the relocation entry according to its contents, possibly looking up a symbol if necessary.</li>
+<li>For each relocation entry, 3a. Fixup the relocation entry according to its contents, possibly
+looking up a symbol if necessary.</li>
 <li>Mark as done</li>
 </ol>
-<p>Let’s talk about loading first. In step 1, for example, we need to iterate the program headers of the ELF file,
-looking for PT_LOAD statements. These statements tell us how to setup the virtual memory for this program. Since these
-DSOs are relocatable, we can load them <em>at a specific base address</em>. Each DSO gets loaded to its own base address and
-is mapped into memory according to the base address and the PT_LOAD entries. In Twizzler, we can leverage the powerful
+<p>Let’s talk about loading first. In step 1, for example, we need to iterate the program headers
+of the ELF file, looking for PT_LOAD statements. These statements tell us how to setup the
+virtual memory for this program. Since these DSOs are relocatable, we can load them <em>at a
+specific base address</em>. Each DSO gets loaded to its own base address and is mapped into memory
+according to the base address and the PT_LOAD entries. In Twizzler, we can leverage the powerful
 copy-from primitive to make this easier.</p>
-<p>In steps 2 and 3 we are noting down information ahead of time. We want to record the loaded libraries for TLS purposes
-in this order, since we must reserve one exalted DSO to live right next to the thread pointer. On most systems, this is
-reserved for the executable. For us, it’s just the first DSO to be loaded. We also note down if this library has any
-constructors, that is, code that needs to be run before we can call any other code in the DSO.</p>
-<p>In step 4, we just add the library into global context. At this point, we have recorded enough info that we can make
-this library namable and searchable for symbols. Finally, in the last two steps, we recurse on each dependency, and
-add edges to the graph to note dependencies. I should note that dependencies may have already been loaded (e.g. a
-library foo depends on bar and baz, and library bar depends on baz, only one copy of baz will be loaded), and thus
-if we try to load a library that already has been loaded according to some namespace, we can just point the graph
-to the existing node instead of loading up a fresh copy of the library. This is why the graph may have cycles, by
-the way.</p>
-<p>When relocating a DSO, we need to ensure that it is fixed up to run at the base address we loaded it to. As a simple
-mental model, we can imagine that if we had some static variable, foo, that lives in a DSO. When linking, the linker
-has no idea where the dynamic linker will end up putting the DSO in memory. So when accessing foo, the compiler emits
-some <em>relative</em> address for reaching foo, say “0x300 + BASE”, where BASE is a 64-bit value in the code. But again,
-we don’t know the base address, so we need to emit an entry in a relocation table that tells the dynamic linker, “hey,
-when you load this DSO, go to <em>this spot</em> (where BASE is) and change it to the actual base address of the DSO”.</p>
-<p>In practice, of course, its more complex, there are optimizations, there are indirections, etc, but this is basically
-the idea. In the steps listed above, we perform a post-order depth-first walk over the graph, performing all relocations
-that the DSO specifies.</p>
-<p>One key idea that happens in relocations is <em>symbol lookup</em>. A relocation can say, “hey, write into me the address of
-the symbol foo”, and the dynamic linker will go look for that symbol’s address by name. This is possible because each
-DSO has a symbol table for symbols that it is advertising as useable for dynamic linking. The dynamic linker thus, when
-looking up symbols, transitively looks though a DSO’s dependencies until it finds the symbol. If it doesn’t, it
+<p>In steps 2 and 3 we are noting down information ahead of time. We want to record the loaded
+libraries for TLS purposes in this order, since we must reserve one exalted DSO to live right
+next to the thread pointer. On most systems, this is reserved for the executable. For us, it’s
+just the first DSO to be loaded. We also note down if this library has any constructors, that
+is, code that needs to be run before we can call any other code in the DSO.</p>
+<p>In step 4, we just add the library into global context. At this point, we have recorded enough
+info that we can make this library namable and searchable for symbols. Finally, in the last two
+steps, we recurse on each dependency, and add edges to the graph to note dependencies. I should
+note that dependencies may have already been loaded (e.g. a library foo depends on bar and baz,
+and library bar depends on baz, only one copy of baz will be loaded), and thus if we try to load
+a library that already has been loaded according to some namespace, we can just point the graph
+to the existing node instead of loading up a fresh copy of the library. This is why the graph
+may have cycles, by the way.</p>
+<p>When relocating a DSO, we need to ensure that it is fixed up to run at the base address we
+loaded it to. As a simple mental model, we can imagine that if we had some static variable, foo,
+that lives in a DSO. When linking, the linker has no idea where the dynamic linker will end up
+putting the DSO in memory. So when accessing foo, the compiler emits some <em>relative</em> address for
+reaching foo, say “0x300 + BASE”, where BASE is a 64-bit value in the code. But again,
+we don’t know the base address, so we need to emit an entry in a relocation table that tells the
+dynamic linker, “hey, when you load this DSO, go to <em>this spot</em> (where BASE is) and change it to
+the actual base address of the DSO”.</p>
+<p>In practice, of course, its more complex, there are optimizations, there are indirections, etc,
+but this is basically the idea. In the steps listed above, we perform a post-order depth-first
+walk over the graph, performing all relocations that the DSO specifies.</p>
+<p>One key idea that happens in relocations is <em>symbol lookup</em>. A relocation can say, “hey, write
+into me the address of the symbol foo”, and the dynamic linker will go look for that symbol’s
+address by name. This is possible because each DSO has a symbol table for symbols that it is
+advertising as useable for dynamic linking. The dynamic linker thus, when looking up symbols,
+transitively looks though a DSO’s dependencies until it finds the symbol. If it doesn’t, it
 falls back to a global lookup, where it traverses the entire graph looking for the symbol.</p>
 <h2 id="basic-concepts-for-this-crate"><a href="#basic-concepts-for-this-crate">Basic Concepts for this crate</a></h2><h3 id="context"><a href="#context">Context</a></h3>
-<p>All of the work of dynlink happens inside a Context, which contains, essentially, a single “invocation” of the dynamic
-linker. It defines the symbol namespace, the compartments that exist, and manages the library dependency graph.</p>
+<p>All of the work of dynlink happens inside a Context, which contains, essentially, a single
+“invocation” of the dynamic linker. It defines the symbol namespace, the compartments that
+exist, and manages the library dependency graph.</p>
 <h3 id="library"><a href="#library">Library</a></h3>
 <p>This crate calls DSOs Libraries, because in Twizzler, there is usually little difference.</p>
 <h3 id="error-handling"><a href="#error-handling">Error Handling</a></h3>
-<p>This crate reports error with the <a href="struct.DynlinkError.html" title="struct dynlink::DynlinkError">error::DynlinkError</a> type, which implements std::error::Error and miette’s Diagnostic.</p>
+<p>This crate reports error with the <a href="struct.DynlinkError.html" title="struct dynlink::DynlinkError">error::DynlinkError</a> type, which implements std::error::Error
+and miette’s Diagnostic.</p>
 <h3 id="compartments"><a href="#compartments">Compartments</a></h3>
-<p>We add one major concept to the dynamic linking scene: compartments. A compartment is a collection of DSOs that operate
-within a single, shared isolation group. Calls inside a compartment operate like normal calls, but cross-compartment
-calls or accesses may be subject to additional processing and checks. Compartments modify the dependency algorithm a bit:</p>
-<p>When loading a DSO and enumerating dependencies, we check if a dependency can be satified within the same compartment. If
-so, dependencies act like normal. If not, we do a <em>global compartment search</em> for that same dependency (subject to restrictions,
-e.g., permissions). If we don’t find it there, we try to load it in either the same compartment as its parent (if allowed) or in
-a new compartment (only if we must). Thus the dependency graph is still correct, and still allows symbol lookup to work, even
-if libraries’ dependency relationships may cross compartment boundaries.</p>
-</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="compartment/index.html" title="mod dynlink::compartment">compartment</a></div><div class="desc docblock-short">Compartments are an abstraction for isolation of library components, but they are not done yet.</div></li><li><div class="item-name"><a class="mod" href="context/index.html" title="mod dynlink::context">context</a></div><div class="desc docblock-short">Management of global context.</div></li><li><div class="item-name"><a class="mod" href="engines/index.html" title="mod dynlink::engines">engines</a></div></li><li><div class="item-name"><a class="mod" href="library/index.html" title="mod dynlink::library">library</a></div><div class="desc docblock-short">Management of individual libraries.</div></li><li><div class="item-name"><a class="mod" href="symbol/index.html" title="mod dynlink::symbol">symbol</a></div><div class="desc docblock-short">Definitions for symbols in the dynamic linker.</div></li><li><div class="item-name"><a class="mod" href="tls/index.html" title="mod dynlink::tls">tls</a></div><div class="desc docblock-short">Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local storage as prep for this code.</div></li></ul><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.DynlinkError.html" title="struct dynlink::DynlinkError">DynlinkError</a></div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.DynlinkErrorKind.html" title="enum dynlink::DynlinkErrorKind">DynlinkErrorKind</a></div></li><li><div class="item-name"><a class="enum" href="enum.HeaderError.html" title="enum dynlink::HeaderError">HeaderError</a></div></li></ul></section></div></main></body></html>
+<p>We add one major concept to the dynamic linking scene: compartments. A compartment is a
+collection of DSOs that operate within a single, shared isolation group. Calls inside a
+compartment operate like normal calls, but cross-compartment calls or accesses may be subject to
+additional processing and checks. Compartments modify the dependency algorithm a bit:</p>
+<p>When loading a DSO and enumerating dependencies, we check if a dependency can be satified within
+the same compartment. If so, dependencies act like normal. If not, we do a <em>global compartment
+search</em> for that same dependency (subject to restrictions, e.g., permissions). If we don’t find
+it there, we try to load it in either the same compartment as its parent (if allowed) or in
+a new compartment (only if we must). Thus the dependency graph is still correct, and still
+allows symbol lookup to work, even if libraries’ dependency relationships may cross compartment
+boundaries.</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="compartment/index.html" title="mod dynlink::compartment">compartment</a></div><div class="desc docblock-short">Compartments are an abstraction for isolation of library components, but they are not done yet.</div></li><li><div class="item-name"><a class="mod" href="context/index.html" title="mod dynlink::context">context</a></div><div class="desc docblock-short">Management of global context.</div></li><li><div class="item-name"><a class="mod" href="engines/index.html" title="mod dynlink::engines">engines</a></div></li><li><div class="item-name"><a class="mod" href="library/index.html" title="mod dynlink::library">library</a></div><div class="desc docblock-short">Management of individual libraries.</div></li><li><div class="item-name"><a class="mod" href="symbol/index.html" title="mod dynlink::symbol">symbol</a></div><div class="desc docblock-short">Definitions for symbols in the dynamic linker.</div></li><li><div class="item-name"><a class="mod" href="tls/index.html" title="mod dynlink::tls">tls</a></div><div class="desc docblock-short">Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local
+storage as prep for this code.</div></li></ul><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.DynlinkError.html" title="struct dynlink::DynlinkError">DynlinkError</a></div></li></ul><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.DynlinkErrorKind.html" title="enum dynlink::DynlinkErrorKind">DynlinkErrorKind</a></div></li><li><div class="item-name"><a class="enum" href="enum.HeaderError.html" title="enum dynlink::HeaderError">HeaderError</a></div></li></ul></section></div></main></body></html>

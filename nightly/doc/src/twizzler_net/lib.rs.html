@@ -216,11 +216,10 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::sync::atomic::{AtomicU64, Ordering};
 
+<span class="attr">#[cfg(feature = <span class="string">&quot;manager&quot;</span>)]
+</span><span class="kw">use </span>twizzler_abi::syscall::{BackingType, LifetimeType, ObjectCreate, ObjectCreateFlags};
 <span class="kw">use </span>twizzler_abi::{
     marker::BaseType,
     syscall::{
@@ -230,23 +229,18 @@
 };
 <span class="kw">use </span>twizzler_object::{ObjID, Object, ObjectInitFlags, Protections};
 
-<span class="attr">#[cfg(feature = <span class="string">&quot;manager&quot;</span>)]
-</span><span class="kw">use </span>twizzler_abi::syscall::{BackingType, LifetimeType, ObjectCreate, ObjectCreateFlags};
-
 <span class="kw">pub mod </span>addr;
 <span class="kw">pub mod </span>buffer;
 <span class="kw">mod </span>nm_handle;
 <span class="kw">mod </span>req;
 <span class="kw">mod </span>rx_req;
 <span class="kw">mod </span>tx_req;
+<span class="kw">pub use </span>nm_handle::{open_nm_handle, NmHandle};
+<span class="attr">#[cfg(feature = <span class="string">&quot;manager&quot;</span>)]
+</span><span class="kw">pub use </span>nm_handle::{server_open_nm_handle, NmHandleManager};
 <span class="kw">pub use </span>req::{CloseInfo, ConnectionId, PacketData};
 <span class="kw">pub use </span>rx_req::{Connection, RxCompletion, RxRequest};
 <span class="kw">pub use </span>tx_req::{ListenFlags, ListenInfo, TxCompletion, TxCompletionError, TxRequest};
-
-<span class="kw">pub use </span>nm_handle::{open_nm_handle, NmHandle};
-
-<span class="attr">#[cfg(feature = <span class="string">&quot;manager&quot;</span>)]
-</span><span class="kw">pub use </span>nm_handle::{server_open_nm_handle, NmHandleManager};
 
 <span class="kw">struct </span>Rendezvous {
     ready: AtomicU64,

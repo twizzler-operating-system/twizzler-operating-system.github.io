@@ -425,17 +425,13 @@
 };
 <span class="kw">use </span>tracing::{debug, error, trace};
 
+<span class="kw">use super</span>::{engine::ContextEngine, Context, Library};
 <span class="kw">use crate</span>::{
+    arch::{REL_DTPMOD, REL_DTPOFF, REL_GOT, REL_PLT, REL_RELATIVE, REL_SYMBOLIC, REL_TPOFF},
     library::{LibraryId, RelocState},
     symbol::LookupFlags,
     DynlinkError, DynlinkErrorKind,
 };
-
-<span class="kw">use </span><span class="kw">crate</span>::arch::{
-    REL_DTPMOD, REL_DTPOFF, REL_GOT, REL_PLT, REL_RELATIVE, REL_SYMBOLIC, REL_TPOFF,
-};
-
-<span class="kw">use super</span>::{engine::ContextEngine, Context, Library};
 
 <span class="comment">// A relocation is either a REL type or a RELA type. The only difference is that
 // the RELA type contains an addend (used in the reloc calculations below).
@@ -619,8 +615,8 @@
             name,
             sz / ent
         );
-        <span class="comment">// Try to parse the table as REL or RELA, according to ent size. If get_parsing_iter succeeds for a given
-        // relocation type, that&#39;s the correct one.
+        <span class="comment">// Try to parse the table as REL or RELA, according to ent size. If get_parsing_iter
+        // succeeds for a given relocation type, that&#39;s the correct one.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>(rels) = <span class="self">self</span>.get_parsing_iter(start, ent, sz) {
             DynlinkError::collect(
                 DynlinkErrorKind::RelocationSectionFail {
@@ -671,7 +667,8 @@
         <span class="comment">// Helper to lookup a single value in the dynamic table.
         </span><span class="kw">let </span>find_dyn_value = |tag| dynamic.iter().find(|d| d.d_tag == tag).map(|d| d.d_val());
 
-        <span class="comment">// Many of the relocation tables are described in a similar way -- start, entry size, and table size (in bytes).
+        <span class="comment">// Many of the relocation tables are described in a similar way -- start, entry size, and
+        // table size (in bytes).
         </span><span class="kw">let </span>find_dyn_rels = |tag, ent, sz| {
             <span class="kw">let </span>rel = find_dyn_entry(tag);
             <span class="kw">let </span>relent = find_dyn_value(ent);
@@ -740,7 +737,8 @@
             )<span class="question-mark">?</span>;
         }
 
-        <span class="comment">// This one is a little special in that instead of an entry size, we are given a relocation type.
+        <span class="comment">// This one is a little special in that instead of an entry size, we are given a relocation
+        // type.
         </span><span class="kw">if let </span><span class="prelude-val">Some</span>((rel, kind, sz)) = jmprels {
             <span class="kw">let </span>ent = <span class="kw">match </span>kind <span class="kw">as </span>i64 {
                 DT_REL =&gt; <span class="number">2</span>,  <span class="comment">// 2 usize long, according to ELF
@@ -778,9 +776,10 @@
             }
         }
 
-        <span class="comment">// We do this recursively instead of using a traversal, since we want to be able to prune nodes that
-        // we know we no longer need to relocate. But since the reloc state gets set at the end (so we can do this pruning),
-        // we&#39;ll need to track the visit states. In the end, this is depth-first postorder.
+        <span class="comment">// We do this recursively instead of using a traversal, since we want to be able to prune
+        // nodes that we know we no longer need to relocate. But since the reloc state gets
+        // set at the end (so we can do this pruning), we&#39;ll need to track the visit states.
+        // In the end, this is depth-first postorder.
         </span><span class="kw">let </span>deps = <span class="self">self
             </span>.library_deps
             .neighbors_directed(root_id.<span class="number">0</span>, petgraph::Direction::Outgoing)
@@ -814,7 +813,8 @@
         res
     }
 
-    <span class="doccomment">/// Iterate through all libraries and process relocations for any libraries that haven&#39;t yet been relocated.
+    <span class="doccomment">/// Iterate through all libraries and process relocations for any libraries that haven&#39;t yet
+    /// been relocated.
     </span><span class="kw">pub fn </span>relocate_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>, root_id: LibraryId) -&gt; <span class="prelude-ty">Result</span>&lt;(), DynlinkError&gt; {
         <span class="kw">let </span>name = <span class="self">self</span>.get_library(root_id)<span class="question-mark">?</span>.name.to_string();
         <span class="self">self</span>.relocate_recursive(root_id).map_err(|e| {

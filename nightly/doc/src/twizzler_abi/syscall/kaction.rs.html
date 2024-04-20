@@ -44,14 +44,12 @@
 <a href="#44" id="44">44</a>
 <a href="#45" id="45">45</a>
 <a href="#46" id="46">46</a>
-<a href="#47" id="47">47</a>
-</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+</pre></div><pre class="rust"><code><span class="kw">use super</span>::{convert_codes_to_result, Syscall};
+<span class="kw">use crate</span>::{
     arch::syscall::raw_syscall,
     kso::{KactionCmd, KactionError, KactionFlags, KactionValue},
     object::ObjID,
 };
-
-<span class="kw">use super</span>::{convert_codes_to_result, Syscall};
 
 <span class="doccomment">/// Execute a kaction on an object.
 </span><span class="kw">pub fn </span>sys_kaction(

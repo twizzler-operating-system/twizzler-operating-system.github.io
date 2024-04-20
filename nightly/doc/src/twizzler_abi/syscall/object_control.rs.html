@@ -78,12 +78,10 @@
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
-<a href="#81" id="81">81</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
-<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
-
 <span class="kw">use super</span>::{convert_codes_to_result, justval, Syscall};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID};
 
 <span class="attr">#[derive(
     Debug,

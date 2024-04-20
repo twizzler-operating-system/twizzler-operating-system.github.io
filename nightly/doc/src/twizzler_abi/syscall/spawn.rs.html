@@ -107,12 +107,13 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>bitflags::bitflags;
 <span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
-<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID, upcall::UpcallTarget};
-
 <span class="kw">use super</span>::{convert_codes_to_result, Syscall};
+<span class="kw">use crate</span>::{arch::syscall::raw_syscall, object::ObjID, upcall::UpcallTarget};
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags to pass to [sys_spawn].
     </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -123,12 +124,14 @@
 <span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
 #[repr(C)]
 </span><span class="kw">pub enum </span>UpcallTargetSpawnOption {
-    <span class="doccomment">/// Set all sync event handlers to abort by default. Entry addresses will be zero, and upcalls will not be issued.
+    <span class="doccomment">/// Set all sync event handlers to abort by default. Entry addresses will be zero, and upcalls
+    /// will not be issued.
     </span>DefaultAbort,
     <span class="doccomment">/// Inherit the upcall target entry address. All supervisor fields are cleared.
     </span>Inherit,
     <span class="doccomment">/// Set the upcall target directly. The following conditions must be met:
-    ///   1. The super_ctx field holds the ID of the current thread&#39;s active context (prevents priv escalation).
+    ///   1. The super_ctx field holds the ID of the current thread&#39;s active context (prevents priv
+    ///      escalation).
     ///   2. The super_entry_address is at most r-x, and at least --x in the super_ctx.
     ///   3. The super_thread_pointer is exactly rw- in the super_ctx.
     ///   4. The super_stack_pointer is exactly rw- in the super_ctx.
@@ -150,8 +153,9 @@
 }
 
 <span class="kw">impl </span>ThreadSpawnArgs {
-    <span class="doccomment">/// Construct a new ThreadSpawnArgs. If vm_context_handle is Some(handle), then spawn the thread in the
-    /// VM context defined by handle. Otherwise spawn it in the same VM context as the spawner.
+    <span class="doccomment">/// Construct a new ThreadSpawnArgs. If vm_context_handle is Some(handle), then spawn the thread
+    /// in the VM context defined by handle. Otherwise spawn it in the same VM context as the
+    /// spawner.
     </span><span class="attr">#[warn(clippy::too_many_arguments)]
     </span><span class="kw">pub fn </span>new(
         entry: usize,

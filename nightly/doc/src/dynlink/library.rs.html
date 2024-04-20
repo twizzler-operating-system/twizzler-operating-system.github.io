@@ -377,7 +377,6 @@
     symbol::Symbol,
     ParseError,
 };
-
 <span class="kw">use </span>petgraph::stable_graph::NodeIndex;
 <span class="kw">use </span>secgate::RawSecGateInfo;
 <span class="kw">use </span>twizzler_runtime_api::AuxEntry;
@@ -398,8 +397,8 @@
 
 <span class="doccomment">/// The core trait that represents loaded or mapped data.
 </span><span class="kw">pub trait </span>BackingData: Clone {
-    <span class="doccomment">/// Get a pointer to the start of a region, and a length, denoting valid memory representing this object. The memory
-    /// region is valid.
+    <span class="doccomment">/// Get a pointer to the start of a region, and a length, denoting valid memory representing
+    /// this object. The memory region is valid.
     </span><span class="kw">fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">*mut </span>u8, usize);
 
     <span class="kw">fn </span>load_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
@@ -723,7 +722,8 @@
 </span><span class="kw">pub struct </span>CtorInfo {
     <span class="doccomment">/// Legacy pointer to _init function for a library. Can be called with the C abi.
     </span><span class="kw">pub </span>legacy_init: usize,
-    <span class="doccomment">/// Pointer to start of the init array, which contains functions pointers that can be called by the C abi.
+    <span class="doccomment">/// Pointer to start of the init array, which contains functions pointers that can be called by
+    /// the C abi.
     </span><span class="kw">pub </span>init_array: usize,
     <span class="doccomment">/// Length of the init array.
     </span><span class="kw">pub </span>init_array_len: usize,

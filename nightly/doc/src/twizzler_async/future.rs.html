@@ -195,6 +195,9 @@
 <a href="#195" id="195">195</a>
 <a href="#196" id="196">196</a>
 <a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     future::Future,
     sync::{Arc, Mutex},
@@ -217,7 +220,8 @@
 
 <span class="doccomment">/// A future that waits on two sub-futures until the first one completes. If the second one
 /// completes first, this future will continue awaiting on the first future. If the first one
-/// completes first, this future returns immediately without continuing to wait on the second future.
+/// completes first, this future returns immediately without continuing to wait on the second
+/// future.
 </span><span class="kw">pub fn </span>wait_for_first&lt;FutOne, FutTwo, T, R&gt;(
     one: FutOne,
     two: FutTwo,
@@ -267,7 +271,8 @@
 
 <span class="attr">#[derive(Default)]
 </span><span class="doccomment">/// A basic condition variable for async tasks. If you call wait() you get back a future that you
-/// can await on, which will complete once another tasks calls signal_all(). But there&#39;s a gotcha here.
+/// can await on, which will complete once another tasks calls signal_all(). But there&#39;s a gotcha
+/// here.
 ///
 /// Okay so you know the rule with mutexes and condition variables? Like, you have some predicate
 /// that tells you &quot;ready&quot; or not, and this is tested with the mutex held, followed by waiting on
@@ -388,7 +393,8 @@
 </span>}
 
 <span class="doccomment">/// Await a future until a timeout occurs (or that future completes). If the timeout happens, return
-/// None, otherwise return Some of the result of the future. This timeout expires at an instant in time.
+/// None, otherwise return Some of the result of the future. This timeout expires at an instant in
+/// time.
 </span><span class="kw">pub async fn </span>timeout_at&lt;F: Future&gt;(f: F, at: Instant) -&gt; <span class="prelude-ty">Option</span>&lt;F::Output&gt; {
     Timeout::at(Box::pin(f), at).<span class="kw">await
 </span>}

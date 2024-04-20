@@ -158,8 +158,14 @@
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! This crate exists to break a circular dependency between twz-rt and monitor. We use extern symbols so that we
-//! can just call into the monitor without having to have it as an explicit dependency.
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! This crate exists to break a circular dependency between twz-rt and monitor. We use extern
+//! symbols so that we can just call into the monitor without having to have it as an explicit
+//! dependency.
 
 </span><span class="attr">#![feature(naked_functions)]
 #![feature(pointer_byte_offsets)]
@@ -183,10 +189,12 @@
 <span class="kw">pub use </span>gates::<span class="kw-2">*</span>;
 <span class="kw">use </span>twizzler_runtime_api::LibraryId;
 
-<span class="doccomment">/// Shared data between the monitor and a compartment runtime. Written to by the monitor, and read-only from the compartment.
+<span class="doccomment">/// Shared data between the monitor and a compartment runtime. Written to by the monitor, and
+/// read-only from the compartment.
 </span><span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>SharedCompConfig {
-    <span class="doccomment">/// The security context that this compartment derives from. Read-only, will not be overwritten.
+    <span class="doccomment">/// The security context that this compartment derives from. Read-only, will not be
+    /// overwritten.
     </span><span class="kw">pub </span>sctx: ObjID,
     <span class="comment">// Pointer to the current TLS template. Read-only by compartment, writable by monitor.
     </span>tls_template: AtomicPtr&lt;TlsTemplateInfo&gt;,
@@ -198,7 +206,8 @@
     config: <span class="kw-2">*const </span>SharedCompConfig,
 }
 
-<span class="comment">// Safety: the compartment config address is stable over the life of the compartment and doesn&#39;t change after init.
+<span class="comment">// Safety: the compartment config address is stable over the life of the compartment and doesn&#39;t
+// change after init.
 </span><span class="kw">unsafe impl </span>Sync <span class="kw">for </span>CompConfigFinder {}
 <span class="kw">unsafe impl </span>Send <span class="kw">for </span>CompConfigFinder {}
 
@@ -275,7 +284,8 @@
         <span class="kw">let </span>dtv_ptr = new.add(<span class="self">self</span>.dtv_offset) <span class="kw">as </span><span class="kw-2">*mut *mut </span>u8;
         <span class="kw">let </span>dtv = core::slice::from_raw_parts_mut(dtv_ptr, <span class="self">self</span>.num_dtv_entries);
 
-        <span class="comment">// Step 2a: &quot;relocate&quot; the pointers inside the DTV. First entry is the gen count, so skip that.
+        <span class="comment">// Step 2a: &quot;relocate&quot; the pointers inside the DTV. First entry is the gen count, so skip
+        // that.
         </span><span class="kw">for </span>entry <span class="kw">in </span>dtv.iter_mut().skip(<span class="number">1</span>) {
             <span class="kw">let </span>offset = (<span class="kw-2">*</span>entry).byte_offset_from(<span class="self">self</span>.alloc_base.as_ptr());
             <span class="kw-2">*</span>entry = new.byte_offset(offset);

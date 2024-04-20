@@ -115,6 +115,9 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     future::Future,
     pin::Pin,
@@ -131,8 +134,9 @@
 /// cancel a task explicitly with the [`cancel()`][Task::cancel()] method.
 ///
 /// Tasks that panic are immediately canceled, and awaiting a canceled task causes a panic. If the
-/// future panics, the panic will be unwound into the [`run()`][crate::run()] invocation that polled it, but this
-/// doesn&#39;t apply to the blocking executor, which will simply ignore panics and continue running.
+/// future panics, the panic will be unwound into the [`run()`][crate::run()] invocation that polled
+/// it, but this doesn&#39;t apply to the blocking executor, which will simply ignore panics and
+/// continue running.
 </span><span class="attr">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them; tasks, specifically, get canceled if you drop them, use `.detach()` to run them in the background&quot;</span>]
 </span><span class="kw">pub struct </span>Task&lt;T&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;async_task::JoinHandle&lt;T, u32&gt;&gt;);
 
@@ -148,8 +152,8 @@
 <span class="kw">impl</span>&lt;T: Send + <span class="lifetime">&#39;static</span>&gt; Task&lt;T&gt; {
     <span class="doccomment">/// Spawns a future onto the global executor.
     ///
-    /// This future may be stolen and polled by any thread calling [`run()`][crate::run()], and thus the future
-    /// (and its output) must be Send.
+    /// This future may be stolen and polled by any thread calling [`run()`][crate::run()], and thus
+    /// the future (and its output) must be Send.
     </span><span class="kw">pub fn </span>spawn(future: <span class="kw">impl </span>Future&lt;Output = T&gt; + Send + <span class="lifetime">&#39;static</span>) -&gt; Task&lt;T&gt; {
         <span class="kw">crate</span>::exec::Executor::get().spawn(future)
     }
@@ -178,8 +182,9 @@
     /// # Examples
     ///
     /// ```no_run
-    /// use twizzler_async::{Task, Timer};
     /// use std::time::Duration;
+    ///
+    /// use twizzler_async::{Task, Timer};
     ///
     /// # twizzler_async::run(async {
     /// Task::spawn(async {
@@ -200,7 +205,8 @@
     <span class="doccomment">/// Cancels the task and waits for it to stop running. If the task completed before canceling,
     /// return the task&#39;s output, or `None` if it wasn&#39;t complete. The advantage of calling
     /// `cancel()` explicitly over jus dropping the task is that it, one, waits for the task to stop
-    /// running before returning, and two, it returns the result if the task _did_ successfully complete.
+    /// running before returning, and two, it returns the result if the task _did_ successfully
+    /// complete.
     </span><span class="kw">pub async fn </span>cancel(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
         <span class="kw">let </span>handle = { <span class="self">self </span>}.<span class="number">0</span>.take().unwrap();
         handle.cancel();

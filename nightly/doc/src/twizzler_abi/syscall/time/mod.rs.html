@@ -186,21 +186,24 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
 </pre></div><pre class="rust"><code><span class="kw">mod </span>clock;
 <span class="kw">mod </span>timedefs;
 <span class="kw">mod </span>units;
 
+<span class="kw">use </span>core::mem::MaybeUninit;
+
+<span class="kw">use </span>bitflags::bitflags;
 <span class="kw">pub use </span>clock::<span class="kw-2">*</span>;
 <span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 <span class="kw">pub use </span>timedefs::<span class="kw-2">*</span>;
 <span class="kw">pub use </span>units::<span class="kw-2">*</span>;
 
-<span class="kw">use </span>bitflags::bitflags;
-<span class="kw">use </span>core::mem::MaybeUninit;
-
-<span class="kw">use </span><span class="kw">crate</span>::arch::syscall::raw_syscall;
-
 <span class="kw">use super</span>::{convert_codes_to_result, Syscall};
+<span class="kw">use </span><span class="kw">crate</span>::arch::syscall::raw_syscall;
 
 <span class="attr">#[derive(
     Debug,
@@ -347,7 +350,12 @@
 ///
 /// ```no_run
 /// let mut clocks = [Clock::ZERO; 4];
-/// let result = sys_read_clock_list(ClockKind::Monotonic, &amp;mut clocks, 0, ReadClockListFlags::FIRST_KIND);
+/// let result = sys_read_clock_list(
+///     ClockKind::Monotonic,
+///     &amp;mut clocks,
+///     0,
+///     ReadClockListFlags::FIRST_KIND,
+/// );
 /// if let Some(filled) = result {
 ///     if filled &gt; 0 {
 ///         println!(&quot;time now: {}&quot;, clock[0].read().as_nanos());

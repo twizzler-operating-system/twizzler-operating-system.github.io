@@ -223,7 +223,6 @@
 <a href="#223" id="223">223</a>
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Thread management routines, including spawn and join.
 
 </span><span class="kw">use </span>std::{alloc::Layout, collections::HashMap, sync::Mutex};
@@ -237,6 +236,7 @@
     CoreRuntime, JoinError, MapFlags, ObjectRuntime, SpawnError, ThreadSpawnArgs,
 };
 
+<span class="kw">use </span><span class="kw">super</span>::internal::InternalThread;
 <span class="kw">use </span><span class="kw">crate</span>::runtime::{
     thread::{
         tcb::{trampoline, RuntimeThreadControl, TLS_GEN_MGR},
@@ -244,8 +244,6 @@
     },
     ReferenceRuntime, OUR_RUNTIME,
 };
-
-<span class="kw">use </span><span class="kw">super</span>::internal::InternalThread;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ThreadManager {
     inner: Mutex&lt;ThreadManagerInner&gt;,
@@ -365,8 +363,8 @@
                 .alloc_zeroed(Layout::from_size_align(args.stack_size, MIN_STACK_ALIGN).unwrap())
         } <span class="kw">as </span>usize;
 
-        <span class="comment">// Take the thread management lock, so that when the new thread starts we cannot observe that thread
-        // running without the management data being recorded.
+        <span class="comment">// Take the thread management lock, so that when the new thread starts we cannot observe
+        // that thread running without the management data being recorded.
         </span><span class="kw">let </span><span class="kw-2">mut </span>inner = THREAD_MGR.inner.lock().unwrap();
         <span class="kw">let </span>id = inner.next_id();
 

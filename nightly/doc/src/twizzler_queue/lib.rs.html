@@ -23,7 +23,9 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Provides a duplex send/completion queue, where each direction is multiple-producer/single-consumer.
+<a href="#26" id="26">26</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Provides a duplex send/completion queue, where each direction is
+//! multiple-producer/single-consumer.
 //!
 //! The core queue abstraction is built around two subqueues, each providing an MPSC
 //! interface. These subqueues are stored in a single object, and so the verbs to interact with the

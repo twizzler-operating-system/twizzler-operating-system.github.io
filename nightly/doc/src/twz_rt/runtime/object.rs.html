@@ -172,6 +172,7 @@
 <a href="#172" id="172">172</a>
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, ptr::NonNull, sync::atomic::AtomicUsize};
 
 <span class="kw">use </span>tracing::warn;
@@ -212,7 +213,8 @@
 }
 
 <span class="kw">fn </span>map_sys_err(sys_err: ObjectMapError) -&gt; twizzler_runtime_api::MapError {
-    <span class="comment">// TODO (dbittman): in a future PR, I plan to cleanup all the error handling between the API and ABI crates.
+    <span class="comment">// TODO (dbittman): in a future PR, I plan to cleanup all the error handling between the API and
+    // ABI crates.
     </span><span class="kw">match </span>sys_err {
         ObjectMapError::Unknown =&gt; MapError::Other,
         ObjectMapError::ObjectNotFound =&gt; MapError::NoSuchObject,

@@ -123,6 +123,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>upcall;
 
 <span class="kw">pub use </span>core::CompartmentInitInfo;
+
 <span class="kw">pub use </span>thread::RuntimeThreadControl;
 <span class="kw">pub use </span>upcall::set_upcall_handler;
 
@@ -181,9 +182,8 @@
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>do_impl {
     <span class="kw">use </span>twizzler_runtime_api::Runtime;
 
-    <span class="kw">use </span><span class="kw">crate</span>::preinit_println;
-
     <span class="kw">use </span><span class="kw">super</span>::ReferenceRuntime;
+    <span class="kw">use </span><span class="kw">crate</span>::preinit_println;
 
     <span class="kw">impl </span>Runtime <span class="kw">for </span>ReferenceRuntime {}
 
@@ -199,9 +199,9 @@
     </span><span class="kw">static </span>USE_MARKER: <span class="kw">fn</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Runtime + Sync) = __twz_get_runtime;
 }
 
-<span class="comment">// These are exported by libunwind, but not re-exported by the standard library that pulls that in. Or,
-// at least, that&#39;s what it seems like. In any case, they&#39;re no-ops in libunwind and musl, so this is
-// fine for now.
+<span class="comment">// These are exported by libunwind, but not re-exported by the standard library that pulls that in.
+// Or, at least, that&#39;s what it seems like. In any case, they&#39;re no-ops in libunwind and musl, so
+// this is fine for now.
 </span><span class="attr">#[no_mangle]
 </span><span class="kw">pub fn </span>__register_frame_info() {}
 <span class="attr">#[no_mangle]

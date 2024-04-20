@@ -120,9 +120,9 @@
 <span class="doccomment">/// Runs executors.
 ///
 /// We run both the thread-local executor and the global executor, and also check for timer events.
-/// If we cannot make progress, we call the reactor, which handles waiting and waking up on [crate::Async]
-/// and [crate::AsyncDuplex] objects for use in externally signaled events that control non-blocking closures&#39;
-/// readiness.
+/// If we cannot make progress, we call the reactor, which handles waiting and waking up on
+/// [crate::Async] and [crate::AsyncDuplex] objects for use in externally signaled events that
+/// control non-blocking closures&#39; readiness.
 ///
 /// # Examples
 /// ```no_run
@@ -144,10 +144,10 @@
 /// twizzler_async::block_on(async {
 ///     twizzler_async::Task::spawn(async {
 ///         println!(&quot;Hello from executor thread!&quot;);
-///     }).await;
+///     })
+///     .await;
 /// });
 /// ```
-///
 </span><span class="kw">pub fn </span>run&lt;T&gt;(future: <span class="kw">impl </span>Future&lt;Output = T&gt;) -&gt; T {
     <span class="kw">let </span>local = ThreadLocalExecutor::new();
     <span class="kw">let </span>exec = Executor::get();

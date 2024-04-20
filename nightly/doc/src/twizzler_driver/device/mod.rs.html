@@ -83,23 +83,13 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Functions and types for managing a device.
 
 </span><span class="kw">use </span>std::fmt::Display;
 
-<span class="kw">pub use </span>twizzler_abi::device::BusType;
-<span class="kw">pub use </span>twizzler_abi::device::DeviceRepr;
-<span class="kw">pub use </span>twizzler_abi::device::DeviceType;
-<span class="kw">use </span>twizzler_abi::kso::KactionError;
-<span class="kw">use </span>twizzler_abi::kso::KactionValue;
-<span class="kw">use </span>twizzler_abi::kso::{KactionCmd, KactionFlags, KactionGenericCmd};
-<span class="kw">use </span>twizzler_object::Object;
-<span class="kw">use </span>twizzler_object::{ObjID, ObjectInitError, ObjectInitFlags, Protections};
+<span class="kw">pub use </span>twizzler_abi::device::{BusType, DeviceRepr, DeviceType};
+<span class="kw">use </span>twizzler_abi::kso::{KactionCmd, KactionError, KactionFlags, KactionGenericCmd, KactionValue};
+<span class="kw">use </span>twizzler_object::{ObjID, Object, ObjectInitError, ObjectInitFlags, Protections};
 
 <span class="kw">mod </span>children;
 <span class="kw">pub mod </span>events;

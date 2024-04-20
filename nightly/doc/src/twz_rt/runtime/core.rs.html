@@ -209,7 +209,6 @@
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
-<a href="#212" id="212">212</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>dynlink::{context::runtime::RuntimeInitInfo, library::CtorInfo};
@@ -217,14 +216,13 @@
 <span class="kw">use </span>twizzler_abi::upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget};
 <span class="kw">use </span>twizzler_runtime_api::{AuxEntry, BasicAux, CoreRuntime};
 
+<span class="kw">use super</span>::{slot::mark_slot_reserved, thread::TLS_GEN_MGR, ReferenceRuntime};
 <span class="kw">use crate</span>::{
     preinit::{preinit_abort, preinit_unwrap},
     preinit_println,
     runtime::RuntimeState,
     RuntimeThreadControl,
 };
-
-<span class="kw">use super</span>::{slot::mark_slot_reserved, thread::TLS_GEN_MGR, ReferenceRuntime};
 
 <span class="attr">#[repr(C)]
 </span><span class="kw">pub struct </span>CompartmentInitInfo {

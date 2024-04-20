@@ -735,19 +735,31 @@
 <a href="#735" id="735">735</a>
 <a href="#736" id="736">736</a>
 <a href="#737" id="737">737</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including startup, execution, and libstd support.
-//! It defines a set of traits that, when all implemented, form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including
+//! startup, execution, and libstd support. It defines a set of traits that, when all implemented,
+//! form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
 //!
-//! From a high level, a Twizzler program links against Rust&#39;s libstd and a particular runtime that will support libstd. That runtime
-//! must implement the minimum set of interfaces required by the [Runtime] trait. Libstd then invokes the runtime functions when needed
-//! (e.g. allocating memory, exiting a thread, etc.). Other libraries may invoke runtime functions directly as well (bypassing libstd),
-//! but note that doing so may not play nicely with libstd&#39;s view of the world.
+//! From a high level, a Twizzler program links against Rust&#39;s libstd and a particular runtime that
+//! will support libstd. That runtime must implement the minimum set of interfaces required by the
+//! [Runtime] trait. Libstd then invokes the runtime functions when needed (e.g. allocating memory,
+//! exiting a thread, etc.). Other libraries may invoke runtime functions directly as well
+//! (bypassing libstd), but note that doing so may not play nicely with libstd&#39;s view of the world.
 //!
 //! # What does it look like to use the runtime?
 //!
-//! When a program (including libstd) wishes to use the runtime, it invokes this library&#39;s [get_runtime] function, which will return
-//! a reference (a &amp;&#39;static dyn reference) to a type that implements the Runtime trait. From there, runtime functions can be called:
-//! ```
+//! When a program (including libstd) wishes to use the runtime, it invokes this library&#39;s
+//! [get_runtime] function, which will return a reference (a &amp;&#39;static dyn reference) to a type that
+//! implements the Runtime trait. From there, runtime functions can be called: ```
 //! let runtime = get_runtime();
 //! runtime.get_monotonic()
 //! ```
@@ -755,18 +767,20 @@
 //!
 //! # So who is providing that type that implements [Runtime]?
 //!
-//! Another library! Right now, Twizzler defines two runtimes: a &quot;minimal&quot; runtime, and a &quot;reference&quot; runtime. Those are not implemented
-//! in this crate. The minimal runtime is implemented as part of the twizzler-abi crate, as it&#39;s the most &quot;baremetal&quot; runtime. The
-//! reference runtime is implemented as a standalone set of crates. Of course, other runtimes can be implemented, as long as they implement
-//! the required interface in this crate, libstd will work.
+//! Another library! Right now, Twizzler defines two runtimes: a &quot;minimal&quot; runtime, and a
+//! &quot;reference&quot; runtime. Those are not implemented in this crate. The minimal runtime is implemented
+//! as part of the twizzler-abi crate, as it&#39;s the most &quot;baremetal&quot; runtime. The reference runtime
+//! is implemented as a standalone set of crates. Of course, other runtimes can be implemented, as
+//! long as they implement the required interface in this crate, libstd will work.
 //!
 //! ## Okay but how does get_runtime work?
 //!
-//! Well, [get_runtime] is just a wrapper around calling an extern &quot;C&quot; function, [__twz_get_runtime]. This symbol is external, so not
-//! defined in this crate. A crate that implements [Runtime] then defines [__twz_get_runtime], allowing link-time swapping of runtimes.
-//! The twizzler-abi crate defines this symbol with (weak linkage)[https://en.wikipedia.org/wiki/Weak_symbol], causing it to be linked
-//! only if another (strong) definition is not present. Thus, a program can link to a specific runtime, but it can also be loaded by a
-//! dynamic linker and have its runtime selected at load time.
+//! Well, [get_runtime] is just a wrapper around calling an extern &quot;C&quot; function,
+//! [__twz_get_runtime]. This symbol is external, so not defined in this crate. A crate that
+//! implements [Runtime] then defines [__twz_get_runtime], allowing link-time swapping of runtimes. The twizzler-abi crate defines this symbol with (weak linkage)[https://en.wikipedia.org/wiki/Weak_symbol], causing it to be linked
+//! only if another (strong) definition is not present. Thus, a program can link to a specific
+//! runtime, but it can also be loaded by a dynamic linker and have its runtime selected at load
+//! time.
 
 </span><span class="attr">#![no_std]
 #![feature(unboxed_closures)]
@@ -964,21 +978,23 @@
     <span class="doccomment">/// Wait for the specified thread to terminate, or optionally time out.
     </span><span class="kw">fn </span>join(<span class="kw-2">&amp;</span><span class="self">self</span>, id: u32, timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), JoinError&gt;;
 
-    <span class="doccomment">/// Implements the __tls_get_addr functionality. If the runtime feature is enabled, this crate defines the
-    /// extern &quot;C&quot; function __tls_get_addr as a wrapper around calling this function after getting the runtime from [get_runtime].
-    /// If the provided index is invalid, return None.
+    <span class="doccomment">/// Implements the __tls_get_addr functionality. If the runtime feature is enabled, this crate
+    /// defines the extern &quot;C&quot; function __tls_get_addr as a wrapper around calling this function
+    /// after getting the runtime from [get_runtime]. If the provided index is invalid, return
+    /// None.
     </span><span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, tls_index: <span class="kw-2">&amp;</span>TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt;;
 }
 
 <span class="doccomment">/// All the object related runtime functions.
 </span><span class="kw">pub trait </span>ObjectRuntime {
-    <span class="doccomment">/// Map an object to an [ObjectHandle]. The handle may reference the same internal mapping as other calls to this function.
+    <span class="doccomment">/// Map an object to an [ObjectHandle]. The handle may reference the same internal mapping as
+    /// other calls to this function.
     </span><span class="kw">fn </span>map_object(<span class="kw-2">&amp;</span><span class="self">self</span>, id: ObjID, flags: MapFlags) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectHandle, MapError&gt;;
     <span class="doccomment">/// Called on drop of an object handle.
     </span><span class="kw">fn </span>release_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: <span class="kw-2">&amp;mut </span>ObjectHandle);
 
-    <span class="doccomment">/// Map two objects in sequence, useful for executable loading. The default implementation makes no guarantees about
-    /// ordering.
+    <span class="doccomment">/// Map two objects in sequence, useful for executable loading. The default implementation makes
+    /// no guarantees about ordering.
     </span><span class="kw">fn </span>map_two_objects(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         in_id_a: ObjID,
@@ -1147,8 +1163,8 @@
         <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ <span class="self">self</span>.internal_refs.as_ref() };
         <span class="comment">// This use of Relaxed ordering is justified by https://doc.rust-lang.org/nomicon/arc-mutex/arc-clone.html.
         </span><span class="kw">let </span>old_count = rc.count.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
-        <span class="comment">// The above link also justifies the following behavior. If our count gets this high, we have probably
-        // run into a problem somewhere.
+        <span class="comment">// The above link also justifies the following behavior. If our count gets this high, we
+        // have probably run into a problem somewhere.
         </span><span class="kw">if </span>old_count &gt;= isize::MAX <span class="kw">as </span>usize {
             get_runtime().abort();
         }
@@ -1188,14 +1204,16 @@
     <span class="doccomment">/// Called by libstd after returning from main.
     </span><span class="kw">fn </span>post_main_hook(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
 
-    <span class="doccomment">/// Exit the calling thread. This is allowed to cause a full exit of the entire program and all threads.
+    <span class="doccomment">/// Exit the calling thread. This is allowed to cause a full exit of the entire program and all
+    /// threads.
     </span><span class="kw">fn </span>exit(<span class="kw-2">&amp;</span><span class="self">self</span>, code: i32) -&gt; !;
 
     <span class="doccomment">/// Thread abort. This is allowed to cause a full exit of the entire program and all threads.
     </span><span class="kw">fn </span>abort(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; !;
 
-    <span class="doccomment">/// Called by rt0 code to start the runtime. Once the runtime has initialized, it should call the provided entry function. The pointer
-    /// arg is a pointer to an array of [AuxEntry] that terminates with an [AuxEntry::Null].
+    <span class="doccomment">/// Called by rt0 code to start the runtime. Once the runtime has initialized, it should call
+    /// the provided entry function. The pointer arg is a pointer to an array of [AuxEntry] that
+    /// terminates with an [AuxEntry::Null].
     </span><span class="kw">fn </span>runtime_entry(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         arg: <span class="kw-2">*const </span>AuxEntry,
@@ -1378,8 +1396,8 @@
 </span><span class="doccomment">/// Internal library ID type.
 </span><span class="kw">pub struct </span>LibraryId(<span class="kw">pub </span>usize);
 
-<span class="doccomment">/// The runtime must ensure that the addresses are constant for the whole life of the library type, and that all threads
-/// may see the type.
+<span class="doccomment">/// The runtime must ensure that the addresses are constant for the whole life of the library type,
+/// and that all threads may see the type.
 </span><span class="kw">unsafe impl </span>Send <span class="kw">for </span>Library {}
 
 <span class="attr">#[cfg(any(target_arch = <span class="string">&quot;x86_64&quot;</span>, target_arch = <span class="string">&quot;aarch64&quot;</span>))]
@@ -1406,7 +1424,8 @@
     </span><span class="kw">fn </span>get_library(<span class="kw-2">&amp;</span><span class="self">self</span>, id: LibraryId) -&gt; <span class="prelude-ty">Option</span>&lt;Library&gt;;
     <span class="doccomment">/// Returns the ID of the main executable, if there is one.
     </span><span class="kw">fn </span>get_exeid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryId&gt;;
-    <span class="doccomment">/// Get a segment of a library, if the segment index exists. All segment IDs are indexes, so they range from [0, N).
+    <span class="doccomment">/// Get a segment of a library, if the segment index exists. All segment IDs are indexes, so
+    /// they range from [0, N).
     </span><span class="kw">fn </span>get_library_segment(<span class="kw-2">&amp;</span><span class="self">self</span>, lib: <span class="kw-2">&amp;</span>Library, seg: usize) -&gt; <span class="prelude-ty">Option</span>&lt;AddrRange&gt;;
     <span class="doccomment">/// Get the full mapping of the underlying library.
     </span><span class="kw">fn </span>get_full_mapping(<span class="kw-2">&amp;</span><span class="self">self</span>, lib: <span class="kw-2">&amp;</span>Library) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectHandle&gt;;
@@ -1443,8 +1462,8 @@
     }
 }
 
-<span class="doccomment">/// Public definition of __tls_get_addr, a function that gets automatically called by the compiler when needed for TLS
-/// pointer resolution.
+<span class="doccomment">/// Public definition of __tls_get_addr, a function that gets automatically called by the compiler
+/// when needed for TLS pointer resolution.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;rustc-dep-of-std&quot;</span>)]
 #[no_mangle]
 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>__tls_get_addr(arg: usize) -&gt; <span class="kw-2">*const </span>u8 {
@@ -1458,7 +1477,8 @@
         .expect(<span class="string">&quot;index passed to __tls_get_addr is invalid&quot;</span>)
 }
 
-<span class="doccomment">/// Public definition of dl_iterate_phdr, used by libunwind for learning where loaded objects (executables, libraries, ...) are.
+<span class="doccomment">/// Public definition of dl_iterate_phdr, used by libunwind for learning where loaded objects
+/// (executables, libraries, ...) are.
 </span><span class="attr">#[cfg(feature = <span class="string">&quot;rustc-dep-of-std&quot;</span>)]
 #[no_mangle]
 </span><span class="kw">pub unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>dl_iterate_phdr(

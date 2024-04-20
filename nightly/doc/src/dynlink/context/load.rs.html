@@ -427,6 +427,14 @@
 <a href="#427" id="427">427</a>
 <a href="#428" id="428">428</a>
 <a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::mem::size_of;
 
 <span class="kw">use </span>elf::{
@@ -438,6 +446,7 @@
 <span class="kw">use </span>secgate::RawSecGateInfo;
 <span class="kw">use </span>tracing::{debug, trace, warn};
 
+<span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
 <span class="kw">use crate</span>::{
     compartment::{Compartment, CompartmentId},
     context::engine::{LoadDirective, LoadFlags},
@@ -445,8 +454,6 @@
     tls::TlsModule,
     DynlinkError, DynlinkErrorKind, HeaderError,
 };
-
-<span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
 
 <span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_secgate_info(
@@ -483,7 +490,8 @@
                 name: <span class="string">&quot;dynamic&quot;</span>.to_string(),
             })<span class="question-mark">?</span>;
 
-        <span class="comment">// If this isn&#39;t present, just call it 0, since if there&#39;s an init_array, this entry must be present in valid ELF files.
+        <span class="comment">// If this isn&#39;t present, just call it 0, since if there&#39;s an init_array, this entry must be
+        // present in valid ELF files.
         </span><span class="kw">let </span>init_array_len = dynamic
             .iter()
             .find_map(|d| {
@@ -533,7 +541,8 @@
         })
     }
 
-    <span class="comment">// Load (map) a single library into memory via creating two objects, one for text, and one for data.
+    <span class="comment">// Load (map) a single library into memory via creating two objects, one for text, and one for
+    // data.
     </span><span class="kw">fn </span>load&lt;Namer&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         comp_id: CompartmentId,
@@ -544,8 +553,9 @@
     <span class="kw">where
         </span>Namer: FnMut(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Engine::Backing&gt;,
     {
-        <span class="comment">// At this point, all we know is a name. Ask the system implementation to use the name resolver to get a backing object from the name,
-        // and then map it for access (this will be the full ELF file data).
+        <span class="comment">// At this point, all we know is a name. Ask the system implementation to use the name
+        // resolver to get a backing object from the name, and then map it for access (this
+        // will be the full ELF file data).
         </span><span class="kw">let </span>backing = <span class="self">self</span>.engine.load_object(<span class="kw-2">&amp;</span>unlib, namer)<span class="question-mark">?</span>;
         <span class="kw">let </span>elf = backing.get_elf()<span class="question-mark">?</span>;
 
@@ -611,7 +621,8 @@
             .into());
         }
 
-        <span class="comment">// Step 1: map the PT_LOAD directives to copy-from commands Twizzler can use for creating objects.
+        <span class="comment">// Step 1: map the PT_LOAD directives to copy-from commands Twizzler can use for creating
+        // objects.
         </span><span class="kw">let </span>directives: Vec&lt;<span class="kw">_</span>&gt; = elf
             .segments()
             .ok_or_else(|| DynlinkErrorKind::MissingSection {
@@ -758,9 +769,12 @@
             .map(|dep_unlib| {
                 <span class="comment">// Dependency search + load alg:
                 // 1. Search library name in current compartment. If found, use that.
-                // 2. Fallback to searching globally for the name, by checking compartment by compartment. If found, use that.
-                // 3. Okay, now we know we need to load the dep, so check if it can go in the current compartment. If not, create a new compartment.
-                // 4. Finally, recurse to load it and its dependencies into either the current compartment or the new one, if created.
+                // 2. Fallback to searching globally for the name, by checking compartment by
+                //    compartment. If found, use that.
+                // 3. Okay, now we know we need to load the dep, so check if it can go in the
+                //    current compartment. If not, create a new compartment.
+                // 4. Finally, recurse to load it and its dependencies into either the current
+                //    compartment or the new one, if created.
 
                 </span><span class="kw">let </span>comp = <span class="self">self</span>.get_compartment(comp_id)<span class="question-mark">?</span>;
                 <span class="kw">let </span>(existing_idx, load_comp) =
@@ -787,7 +801,8 @@
                         )
                     };
 
-                <span class="comment">// If we decided to use an existing library, then use that. Otherwise, load into the chosen compartment.
+                <span class="comment">// If we decided to use an existing library, then use that. Otherwise, load into the
+                // chosen compartment.
                 </span><span class="kw">let </span>idx = <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_idx) = existing_idx {
                     existing_idx
                 } <span class="kw">else </span>{
@@ -822,8 +837,9 @@
         <span class="prelude-val">Ok</span>(idx)
     }
 
-    <span class="doccomment">/// Load a library into a given compartment. The namer callback resolves names to Backing objects, allowing
-    /// the caller to hook into the &quot;name-of-dependency&quot; -&gt; backing object pipeline.
+    <span class="doccomment">/// Load a library into a given compartment. The namer callback resolves names to Backing
+    /// objects, allowing the caller to hook into the &quot;name-of-dependency&quot; -&gt; backing object
+    /// pipeline.
     </span><span class="kw">pub fn </span>load_library_in_compartment&lt;Namer&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         comp_id: CompartmentId,

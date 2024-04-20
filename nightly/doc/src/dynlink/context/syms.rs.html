@@ -88,17 +88,17 @@
 <a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>tracing::trace;
 
+<span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
 <span class="kw">use crate</span>::{
     library::{Library, LibraryId},
     symbol::{LookupFlags, RelocatedSymbol},
     DynlinkError, DynlinkErrorKind,
 };
 
-<span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
-
 <span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
-    <span class="doccomment">/// Search for a symbol, starting from library denoted by start_id. For normal symbol lookup, this should be the
-    /// ID of the library that needs a symbol looked up. Flags can be specified which allow control over where to look for the symbol.
+    <span class="doccomment">/// Search for a symbol, starting from library denoted by start_id. For normal symbol lookup,
+    /// this should be the ID of the library that needs a symbol looked up. Flags can be
+    /// specified which allow control over where to look for the symbol.
     </span><span class="kw">pub fn </span>lookup_symbol&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
         start_id: LibraryId,

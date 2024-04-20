@@ -147,9 +147,11 @@
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>bitflags::bitflags;
 
-<span class="kw">use super</span>::{ClockSource, ReadClockFlags, ReadClockListFlags, TimeSpan, FemtoSeconds};
+<span class="kw">use super</span>::{ClockSource, FemtoSeconds, ReadClockFlags, ReadClockListFlags, TimeSpan};
 
 <span class="macro">bitflags! </span>{
     <span class="doccomment">/// Flags about a given clock or clock read.
@@ -174,10 +176,11 @@
         TimeSpan::ZERO,
         FemtoSeconds(<span class="number">0</span>),
         FemtoSeconds(<span class="number">0</span>),
-        ClockFlags::MONOTONIC
+        ClockFlags::MONOTONIC,
     );
 
-    <span class="doccomment">/// Construct a new ClockInfo. You probably want to be getting these from [sys_read_clock_info], though.
+    <span class="doccomment">/// Construct a new ClockInfo. You probably want to be getting these from [sys_read_clock_info],
+    /// though.
     </span><span class="kw">pub const fn </span>new(
         current: TimeSpan,
         precision: FemtoSeconds,
@@ -213,7 +216,6 @@
     }
 }
 
-
 <span class="doccomment">/// Different kinds of clocks exposed by the kernel.
 </span><span class="attr">#[derive(Clone, Copy, Debug)]
 #[repr(C)]
@@ -228,8 +230,8 @@
         <span class="kw">match </span>clock {
             ClockKind::Monotonic =&gt; <span class="number">0</span>,
             ClockKind::RealTime =&gt; <span class="number">1</span>,
-            ClockKind::Unknown =&gt; <span class="number">2
-        </span>}
+            ClockKind::Unknown =&gt; <span class="number">2</span>,
+        }
     }
 }
 
@@ -238,7 +240,7 @@
         <span class="kw">match </span>x {
             <span class="number">0 </span>=&gt; ClockKind::Monotonic,
             <span class="number">1 </span>=&gt; ClockKind::RealTime,
-            <span class="kw">_ </span>=&gt; ClockKind::Unknown
+            <span class="kw">_ </span>=&gt; ClockKind::Unknown,
         }
     }
 }
@@ -254,27 +256,27 @@
 </span><span class="kw">pub struct </span>Clock {
     <span class="kw">pub </span>info: ClockInfo,
     id: ClockID,
-    kind: ClockKind
+    kind: ClockKind,
 }
 
 <span class="kw">impl </span>Clock {
     <span class="kw">pub const </span>ZERO: Clock = Clock {
         info: ClockInfo::ZERO,
         id: ClockID(<span class="number">0</span>),
-        kind: ClockKind::Unknown
+        kind: ClockKind::Unknown,
     };
 
     <span class="kw">pub fn </span>new(info: ClockInfo, id: ClockID, kind: ClockKind) -&gt; Clock {
-        <span class="self">Self </span>{info, id, kind}
+        <span class="self">Self </span>{ info, id, kind }
     }
 
     <span class="kw">pub fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TimeSpan {
         <span class="kw">match </span><span class="kw">super</span>::sys_read_clock_info(ClockSource::ID(<span class="self">self</span>.id), ReadClockFlags::empty()) {
             <span class="prelude-val">Ok</span>(ci) =&gt; ci.current_value(),
-            <span class="kw">_ </span>=&gt; TimeSpan::ZERO
+            <span class="kw">_ </span>=&gt; TimeSpan::ZERO,
         }
     }
-    
+
     <span class="kw">pub fn </span>info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ClockInfo {
         <span class="self">self</span>.info
     }
@@ -282,9 +284,11 @@
     <span class="doccomment">/// Returns a new instance of a Clock from the specified ClockKind
     </span><span class="kw">pub fn </span>get(kind: ClockKind) -&gt; Clock {
         <span class="kw">let </span><span class="kw-2">mut </span>clk = [Clock::ZERO];
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(filled) = <span class="kw">super</span>::sys_read_clock_list(kind, <span class="kw-2">&amp;mut </span>clk, <span class="number">0</span>, ReadClockListFlags::FIRST_KIND) {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(filled) =
+            <span class="kw">super</span>::sys_read_clock_list(kind, <span class="kw-2">&amp;mut </span>clk, <span class="number">0</span>, ReadClockListFlags::FIRST_KIND)
+        {
             <span class="kw">if </span>filled &gt; <span class="number">0 </span>{
-                <span class="kw">return </span>clk[<span class="number">0</span>]
+                <span class="kw">return </span>clk[<span class="number">0</span>];
             }
         }
         Clock::ZERO
