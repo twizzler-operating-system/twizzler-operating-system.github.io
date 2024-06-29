@@ -147,6 +147,19 @@
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>num_enum::{FromPrimitive, IntoPrimitive};
 
 <span class="kw">use </span><span class="kw">super</span>::Syscall;
@@ -206,6 +219,8 @@
     </span>ResumeFromUpcall = <span class="number">16</span>,
     <span class="doccomment">/// Get the repr ID of the calling thread.
     </span>GetSelfId = <span class="number">17</span>,
+    <span class="doccomment">/// Get the ID of the active security context.
+    </span>GetActiveSctxId = <span class="number">18</span>,
 }
 
 <span class="doccomment">/// Exit the thread. The code will be written to the [crate::thread::ThreadRepr] for the current
@@ -237,6 +252,17 @@
 <span class="doccomment">/// Get the repr ID of the calling thread.
 </span><span class="kw">pub fn </span>sys_thread_self_id() -&gt; ObjID {
     <span class="kw">let </span>(hi, lo) = <span class="kw">unsafe </span>{ raw_syscall(Syscall::ThreadCtrl, <span class="kw-2">&amp;</span>[ThreadControl::GetSelfId <span class="kw">as </span>u64]) };
+    ObjID::new_from_parts(hi, lo)
+}
+
+<span class="doccomment">/// Get the active security context ID for the calling thread.
+</span><span class="kw">pub fn </span>sys_thread_active_sctx_id() -&gt; ObjID {
+    <span class="kw">let </span>(hi, lo) = <span class="kw">unsafe </span>{
+        raw_syscall(
+            Syscall::ThreadCtrl,
+            <span class="kw-2">&amp;</span>[ThreadControl::GetActiveSctxId <span class="kw">as </span>u64],
+        )
+    };
     ObjID::new_from_parts(hi, lo)
 }
 
