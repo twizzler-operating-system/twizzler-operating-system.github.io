@@ -203,8 +203,6 @@
 <a href="#203" id="203">203</a>
 <a href="#204" id="204">204</a>
 <a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
 </pre></div><pre class="rust"><code><span class="attr">#![feature(naked_functions)]
 #![feature(thread_local)]
 #![feature(c_str_literals)]
@@ -314,25 +312,23 @@
     <span class="kw">let </span><span class="kw-2">mut </span>state = state.lock().unwrap();
     <span class="kw">let </span>test_comp_id = state.dynlink.add_compartment(<span class="string">&quot;test&quot;</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>libhw_id =
-        state
-            .dynlink
-            .load_library_in_compartment(test_comp_id, lib, bootstrap_name_res)<span class="question-mark">?</span>;
+    <span class="kw">let </span>libhw_id = state
+        .dynlink
+        .load_library_in_compartment(test_comp_id, lib)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>rt_id =
-        <span class="kw">match </span>state
+    <span class="kw">let </span>rt_id = <span class="kw">match </span>state
+        .dynlink
+        .load_library_in_compartment(test_comp_id, rt_lib)
+    {
+        <span class="prelude-val">Ok</span>(rt_id) =&gt; {
+            state.dynlink.add_manual_dependency(libhw_id, rt_id);
+            rt_id
+        }
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; state
             .dynlink
-            .load_library_in_compartment(test_comp_id, rt_lib, bootstrap_name_res)
-        {
-            <span class="prelude-val">Ok</span>(rt_id) =&gt; {
-                state.dynlink.add_manual_dependency(libhw_id, rt_id);
-                rt_id
-            }
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; state
-                .dynlink
-                .lookup_library(test_comp_id, <span class="string">&quot;libtwz_rt.so&quot;</span>)
-                .unwrap(),
-        };
+            .lookup_library(test_comp_id, <span class="string">&quot;libtwz_rt.so&quot;</span>)
+            .unwrap(),
+    };
 
     <span class="macro">println!</span>(<span class="string">&quot;found rt_id: {}&quot;</span>, rt_id);
     <span class="kw">let </span>rt_lib = state.dynlink.get_library(rt_id).unwrap();

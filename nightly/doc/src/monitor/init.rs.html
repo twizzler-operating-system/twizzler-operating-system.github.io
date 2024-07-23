@@ -67,25 +67,19 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
-<a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
-<a href="#72" id="72">72</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>dynlink::{
-    context::{runtime::RuntimeInitInfo, Context},
-    engines::Engine,
-};
+</pre></div><pre class="rust"><code><span class="kw">use </span>dynlink::context::{runtime::RuntimeInitInfo, Context};
 <span class="kw">use </span>twizzler_runtime_api::AuxEntry;
 
 <span class="kw">static </span><span class="kw-2">mut </span>AUX: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>RuntimeInitInfo&gt; = <span class="prelude-val">None</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InitDynlinkContext {
-    <span class="kw">pub </span>ctx: <span class="kw-2">*mut </span>Context&lt;Engine&gt;,
+    <span class="kw">pub </span>ctx: <span class="kw-2">*mut </span>Context,
     <span class="kw">pub </span>root: String,
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>bootstrap_dynlink_context() -&gt; <span class="prelude-ty">Option</span>&lt;InitDynlinkContext&gt; {
     <span class="kw">let </span>info = <span class="kw">unsafe </span>{ AUX.unwrap().as_ref().unwrap() };
-    <span class="kw">let </span>ctx = info.ctx <span class="kw">as </span><span class="kw-2">*mut </span>Context&lt;Engine&gt;;
+    <span class="kw">let </span>ctx = info.ctx <span class="kw">as </span><span class="kw-2">*mut </span>Context;
     <span class="kw">let </span>root = info.root_name.clone();
 
     <span class="prelude-val">Some</span>(InitDynlinkContext { ctx, root })

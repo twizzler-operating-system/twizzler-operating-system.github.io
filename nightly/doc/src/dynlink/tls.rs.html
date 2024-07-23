@@ -266,7 +266,6 @@
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
 <a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements ELF TLS Variant II. I highly recommend reading the Fuchsia docs on thread-local
 //! storage as prep for this code.
 
@@ -280,8 +279,7 @@
 <span class="kw">use </span>twizzler_runtime_api::TlsIndex;
 
 <span class="kw">use crate</span>::{
-    arch::MINIMUM_TLS_ALIGNMENT, compartment::Compartment, library::BackingData, DynlinkError,
-    DynlinkErrorKind,
+    arch::MINIMUM_TLS_ALIGNMENT, compartment::Compartment, DynlinkError, DynlinkErrorKind,
 };
 
 <span class="attr">#[derive(Clone)]
@@ -378,9 +376,9 @@
         id
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>allocate&lt;T, B: BackingData&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>allocate&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _comp: <span class="kw-2">&amp;</span>Compartment&lt;B&gt;,
+        _comp: <span class="kw-2">&amp;</span>Compartment,
         alloc_base: NonNull&lt;u8&gt;,
         tcb: T,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;TlsRegion, DynlinkError&gt; {

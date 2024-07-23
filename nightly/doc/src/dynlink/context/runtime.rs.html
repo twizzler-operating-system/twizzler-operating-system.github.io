@@ -76,7 +76,7 @@
 
 <span class="kw">use </span>twizzler_abi::object::MAX_SIZE;
 
-<span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
+<span class="kw">use super</span>::{Context, LoadedOrUnloaded};
 <span class="kw">use crate</span>::{
     library::{CtorInfo, LibraryId},
     tls::TlsRegion,
@@ -98,9 +98,9 @@
 <span class="kw">unsafe impl </span>Sync <span class="kw">for </span>RuntimeInitInfo {}
 
 <span class="kw">impl </span>RuntimeInitInfo {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new&lt;E: ContextEngine&gt;(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         tls_region: TlsRegion,
-        ctx: <span class="kw-2">&amp;</span>Context&lt;E&gt;,
+        ctx: <span class="kw-2">&amp;</span>Context,
         root_name: String,
         ctors: Vec&lt;CtorInfo&gt;,
     ) -&gt; <span class="self">Self </span>{
@@ -118,7 +118,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
+<span class="kw">impl </span>Context {
     <span class="doccomment">/// Build up a list of constructors to call for a library and its dependencies.
     </span><span class="kw">pub fn </span>build_ctors_list(<span class="kw-2">&amp;</span><span class="self">self</span>, root_id: LibraryId) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;CtorInfo&gt;, DynlinkError&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ctors = <span class="macro">vec!</span>[];

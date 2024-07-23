@@ -58,17 +58,17 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span>elf::abi::DT_NEEDED;
 <span class="kw">use </span>tracing::trace;
 
-<span class="kw">use super</span>::{engine::ContextEngine, Context};
+<span class="kw">use </span><span class="kw">super</span>::Context;
 <span class="kw">use crate</span>::{
     library::{Library, UnloadedLibrary},
     DynlinkError, DynlinkErrorKind,
 };
 
-<span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
+<span class="kw">impl </span>Context {
     <span class="doccomment">/// Get a list of dependencies for this library.
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>enumerate_needed(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        lib: <span class="kw-2">&amp;</span>Library&lt;Engine::Backing&gt;,
+        lib: <span class="kw-2">&amp;</span>Library,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;UnloadedLibrary&gt;, DynlinkError&gt; {
         <span class="macro">trace!</span>(<span class="string">&quot;{}: enumerating dependencies&quot;</span>, lib);
         <span class="kw">let </span>elf = lib.get_elf()<span class="question-mark">?</span>;

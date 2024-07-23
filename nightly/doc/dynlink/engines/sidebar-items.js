@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["twizzler"]};
+window.SIDEBAR_ITEMS = {"mod":["twizzler"],"struct":["Backing","LoadDirective","LoadFlags"],"trait":["ContextEngine"]};

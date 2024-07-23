@@ -126,47 +126,97 @@
 <a href="#126" id="126">126</a>
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     sync::{Arc, Mutex, OnceLock},
 };
 
 <span class="kw">use </span>dynlink::{
-    compartment::Compartment,
+    compartment::{Compartment, MONITOR_COMPARTMENT_ID},
     context::Context,
-    engines::{Backing, Engine},
-    library::BackingData,
+    engines::{Backing, ContextEngine},
+    library::UnloadedLibrary,
+    DynlinkError, DynlinkErrorKind,
 };
 <span class="kw">use </span>secgate::GateCallInfo;
 <span class="kw">use </span>twizzler_abi::object::{MAX_SIZE, NULLPAGE_SIZE};
 <span class="kw">use </span>twizzler_object::ObjID;
-<span class="kw">use </span>twizzler_runtime_api::LibraryId;
-<span class="kw">use </span>twz_rt::preinit_println;
+<span class="kw">use </span>twizzler_runtime_api::{LibraryId, MapFlags};
 
-<span class="kw">use crate</span>::{compartment::Comp, gates::LibraryInfo, init::InitDynlinkContext};
+<span class="kw">use crate</span>::{bootstrap_name_res, compartment::Comp, gates::LibraryInfo, init::InitDynlinkContext};
 
 <span class="kw">pub struct </span>MonitorState {
-    <span class="kw">pub </span>dynlink: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>Context&lt;Engine&gt;,
+    <span class="kw">pub </span>dynlink: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>Context,
     <span class="kw">pub</span>(<span class="kw">crate</span>) root: String,
 
     <span class="kw">pub </span>comps: HashMap&lt;ObjID, Comp&gt;,
 }
 
+<span class="kw">struct </span>Engine;
+
+<span class="kw">impl </span>ContextEngine <span class="kw">for </span>Engine {
+    <span class="kw">fn </span>load_segments(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;</span>Backing,
+        ld: <span class="kw-2">&amp;</span>[dynlink::engines::LoadDirective],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Backing&gt;, dynlink::DynlinkError&gt; {
+        dynlink::engines::twizzler::load_segments(src, ld)
+    }
+
+    <span class="kw">fn </span>load_object(<span class="kw-2">&amp;mut </span><span class="self">self</span>, unlib: <span class="kw-2">&amp;</span>UnloadedLibrary) -&gt; <span class="prelude-ty">Result</span>&lt;Backing, DynlinkError&gt; {
+        bootstrap_name_res(<span class="kw-2">&amp;</span>unlib.name).ok_or(DynlinkErrorKind::NewBackingFail.into())
+    }
+
+    <span class="kw">fn </span>select_compartment(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _unlib: <span class="kw-2">&amp;</span>UnloadedLibrary,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;dynlink::compartment::CompartmentId&gt; {
+        <span class="macro">todo!</span>()
+    }
+}
+
 <span class="kw">impl </span>MonitorState {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(init: InitDynlinkContext) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
+        <span class="kw">let </span>this = <span class="self">Self </span>{
             dynlink: <span class="kw">unsafe </span>{ init.ctx.as_mut().unwrap() },
             root: init.root,
             comps: Default::default(),
-        }
+        };
+        this.dynlink.replace_engine(Box::new(Engine));
+        this
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_monitor_compartment_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Compartment&lt;Backing&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_monitor_compartment_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Compartment {
         <span class="kw">let </span>mid = <span class="self">self</span>.dynlink.lookup_compartment(<span class="string">&quot;monitor&quot;</span>).unwrap();
         <span class="self">self</span>.dynlink.get_compartment_mut(mid).unwrap()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_nth_library(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dynlink::library::Library&lt;Backing&gt;&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_nth_library(<span class="kw-2">&amp;</span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>dynlink::library::Library&gt; {
         <span class="comment">// TODO: this sucks.
         </span><span class="kw">let </span><span class="kw-2">mut </span>all = <span class="macro">vec!</span>[];
         <span class="comment">// TODO
@@ -224,7 +274,7 @@
         <span class="comment">//return None;
     </span>}
 
-    <span class="kw">let </span>handle = lib.full_obj.inner();
+    <span class="kw">let </span>handle = lib.full_obj.object();
 
     <span class="kw">let </span>next_lib = state
         .dynlink

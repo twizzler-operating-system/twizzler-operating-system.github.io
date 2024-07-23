@@ -109,61 +109,7 @@
 <a href="#109" id="109">109</a>
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>itertools::{Either, Itertools};
-<span class="kw">use </span>tracing::warn;
 <span class="kw">use </span>twizzler_abi::{
     object::{MAX_SIZE, NULLPAGE_SIZE},
     syscall::{
@@ -172,47 +118,8 @@
 };
 <span class="kw">use </span>twizzler_runtime_api::MapFlags;
 
-<span class="kw">use crate</span>::{
-    compartment::CompartmentId,
-    context::engine::{ContextEngine, LoadDirective, LoadFlags},
-    library::BackingData,
-    DynlinkError, DynlinkErrorKind,
-};
-
-<span class="attr">#[derive(Clone)]
-</span><span class="kw">pub struct </span>Backing {
-    obj: twizzler_runtime_api::ObjectHandle,
-}
-
-<span class="kw">impl </span>Backing {
-    <span class="kw">pub fn </span>new(inner: twizzler_runtime_api::ObjectHandle) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{ obj: inner }
-    }
-}
-
-<span class="kw">impl </span>BackingData <span class="kw">for </span>Backing {
-    <span class="kw">fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">*mut </span>u8, usize) {
-        (
-            <span class="kw">unsafe </span>{ <span class="self">self</span>.obj.start.add(NULLPAGE_SIZE) },
-            <span class="comment">// one null-page, one meta-page
-            </span>MAX_SIZE - NULLPAGE_SIZE * <span class="number">2</span>,
-        )
-    }
-
-    <span class="kw">fn </span>load_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.obj.start <span class="kw">as </span>usize
-    }
-
-    <span class="kw">type </span>InnerType = twizzler_runtime_api::ObjectHandle;
-
-    <span class="kw">fn </span>to_inner(<span class="self">self</span>) -&gt; <span class="self">Self</span>::InnerType {
-        <span class="self">self</span>.obj
-    }
-
-    <span class="kw">fn </span>inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::InnerType {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.obj
-    }
-}
+<span class="kw">use super</span>::{Backing, LoadDirective, LoadFlags};
+<span class="kw">use crate</span>::{DynlinkError, DynlinkErrorKind};
 
 <span class="kw">pub struct </span>Engine;
 
@@ -220,110 +127,97 @@
     addr &gt;= slot * MAX_SIZE + NULLPAGE_SIZE &amp;&amp; addr &lt; (slot + <span class="number">1</span>) * MAX_SIZE - NULLPAGE_SIZE * <span class="number">2
 </span>}
 
-<span class="kw">impl </span>ContextEngine <span class="kw">for </span>Engine {
-    <span class="kw">type </span>Backing = Backing;
+<span class="doccomment">/// Load segments according to Twizzler requirements. Helper function for implementing a
+/// ContextEngine.
+</span><span class="kw">pub fn </span>load_segments(src: <span class="kw-2">&amp;</span>Backing, ld: <span class="kw-2">&amp;</span>[LoadDirective]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Backing&gt;, DynlinkError&gt; {
+    <span class="kw">let </span>create_spec = ObjectCreate::new(
+        BackingType::Normal,
+        LifetimeType::Volatile,
+        <span class="prelude-val">None</span>,
+        ObjectCreateFlags::empty(),
+    );
 
-    <span class="kw">fn </span>load_segments(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        src: <span class="kw-2">&amp;</span><span class="self">Self</span>::Backing,
-        ld: <span class="kw-2">&amp;</span>[<span class="kw">crate</span>::context::engine::LoadDirective],
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="self">Self</span>::Backing&gt;, DynlinkError&gt; {
-        <span class="kw">let </span>create_spec = ObjectCreate::new(
-            BackingType::Normal,
-            LifetimeType::Volatile,
-            <span class="prelude-val">None</span>,
-            ObjectCreateFlags::empty(),
-        );
+    <span class="kw">let </span>build_copy_cmd = |directive: <span class="kw-2">&amp;</span>LoadDirective| {
+        <span class="kw">if </span>!within_object(
+            <span class="kw">if </span>directive.load_flags.contains(LoadFlags::TARGETS_DATA) {
+                <span class="number">1
+            </span>} <span class="kw">else </span>{
+                <span class="number">0
+            </span>},
+            directive.vaddr,
+        ) || directive.memsz &gt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2
+            </span>|| directive.offset &gt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2
+            </span>|| directive.filesz &gt; directive.memsz
+        {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::new(DynlinkErrorKind::LoadDirectiveFail {
+                dir: <span class="kw-2">*</span>directive,
+            }));
+        }
 
-        <span class="kw">let </span>build_copy_cmd = |directive: <span class="kw-2">&amp;</span>LoadDirective| {
-            <span class="kw">if </span>!within_object(
-                <span class="kw">if </span>directive.load_flags.contains(LoadFlags::TARGETS_DATA) {
-                    <span class="number">1
-                </span>} <span class="kw">else </span>{
-                    <span class="number">0
-                </span>},
-                directive.vaddr,
-            ) || directive.memsz &gt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2
-                </span>|| directive.offset &gt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2
-                </span>|| directive.filesz &gt; directive.memsz
-            {
-                <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::new(DynlinkErrorKind::LoadDirectiveFail {
+        <span class="kw">if </span>directive.filesz != directive.memsz {
+            <span class="macro">todo!</span>()
+        }
+
+        <span class="kw">let </span>src_start = (NULLPAGE_SIZE + directive.offset) &amp; !(directive.align - <span class="number">1</span>);
+        <span class="kw">let </span>dest_start = directive.vaddr &amp; !(directive.align - <span class="number">1</span>);
+        <span class="kw">let </span>len = (directive.vaddr - dest_start) + directive.filesz;
+
+        <span class="kw">if </span>!directive.load_flags.contains(LoadFlags::TARGETS_DATA) {
+            <span class="comment">// Ensure we can direct-map the object for the text directives.
+            </span><span class="kw">if </span>src_start != dest_start || directive.filesz != directive.memsz {
+                <span class="comment">// TODO: check len too.
+                </span><span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::new(DynlinkErrorKind::LoadDirectiveFail {
                     dir: <span class="kw-2">*</span>directive,
                 }));
             }
-
-            <span class="kw">if </span>directive.filesz != directive.memsz {
-                <span class="macro">todo!</span>()
-            }
-
-            <span class="kw">let </span>src_start = (NULLPAGE_SIZE + directive.offset) &amp; !(directive.align - <span class="number">1</span>);
-            <span class="kw">let </span>dest_start = directive.vaddr &amp; !(directive.align - <span class="number">1</span>);
-            <span class="kw">let </span>len = (directive.vaddr - dest_start) + directive.filesz;
-
-            <span class="kw">if </span>!directive.load_flags.contains(LoadFlags::TARGETS_DATA) {
-                <span class="comment">// Ensure we can direct-map the object for the text directives.
-                </span><span class="kw">if </span>src_start != dest_start || directive.filesz != directive.memsz {
-                    <span class="comment">// TODO: check len too.
-                    </span><span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkError::new(DynlinkErrorKind::LoadDirectiveFail {
-                        dir: <span class="kw-2">*</span>directive,
-                    }));
-                }
-            }
-
-            <span class="prelude-val">Ok</span>(ObjectSource::new_copy(
-                src.obj.id,
-                (src_start % MAX_SIZE) <span class="kw">as </span>u64,
-                (dest_start % MAX_SIZE) <span class="kw">as </span>u64,
-                len,
-            ))
-        };
-
-        <span class="kw">let </span>ld = ld.to_vec();
-        <span class="kw">let </span>(data_cmds, text_cmds): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = ld.into_iter().partition_map(|directive| {
-            <span class="kw">if </span>directive.load_flags.contains(LoadFlags::TARGETS_DATA) {
-                Either::Left(build_copy_cmd(<span class="kw-2">&amp;</span>directive))
-            } <span class="kw">else </span>{
-                Either::Right(build_copy_cmd(<span class="kw-2">&amp;</span>directive))
-            }
-        });
-
-        <span class="kw">let </span>data_cmds = DynlinkError::collect(DynlinkErrorKind::NewBackingFail, data_cmds)<span class="question-mark">?</span>;
-        <span class="kw">let </span>text_cmds = DynlinkError::collect(DynlinkErrorKind::NewBackingFail, text_cmds)<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>data_id = sys_object_create(create_spec, <span class="kw-2">&amp;</span>data_cmds, <span class="kw-2">&amp;</span>[])
-            .map_err(|<span class="kw">_</span>| DynlinkErrorKind::NewBackingFail)<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>text_id = sys_object_create(create_spec, <span class="kw-2">&amp;</span>text_cmds, <span class="kw-2">&amp;</span>[])
-            .map_err(|<span class="kw">_</span>| DynlinkErrorKind::NewBackingFail)<span class="question-mark">?</span>;
-
-        <span class="kw">let </span>runtime = twizzler_runtime_api::get_runtime();
-
-        <span class="kw">let </span>(text_handle, data_handle) = runtime
-            .map_two_objects(
-                text_id,
-                MapFlags::READ | MapFlags::EXEC,
-                data_id,
-                MapFlags::READ | MapFlags::WRITE,
-            )
-            .map_err(|<span class="kw">_</span>| DynlinkErrorKind::NewBackingFail)<span class="question-mark">?</span>;
-
-        <span class="kw">if </span>data_handle.start <span class="kw">as </span>usize != text_handle.start <span class="kw">as </span>usize + MAX_SIZE {
-            <span class="macro">tracing::error!</span>(<span class="string">&quot;internal runtime error: failed to map text and data adjacent and in-order ({:p} {:p})&quot;</span>, text_handle.start, data_handle.start);
-            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::NewBackingFail.into());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[Backing::new(text_handle), Backing::new(data_handle)])
+        <span class="prelude-val">Ok</span>(ObjectSource::new_copy(
+            src.obj.id,
+            (src_start % MAX_SIZE) <span class="kw">as </span>u64,
+            (dest_start % MAX_SIZE) <span class="kw">as </span>u64,
+            len,
+        ))
+    };
+
+    <span class="kw">let </span>ld = ld.to_vec();
+    <span class="kw">let </span>(data_cmds, text_cmds): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = ld.into_iter().partition_map(|directive| {
+        <span class="kw">if </span>directive.load_flags.contains(LoadFlags::TARGETS_DATA) {
+            Either::Left(build_copy_cmd(<span class="kw-2">&amp;</span>directive))
+        } <span class="kw">else </span>{
+            Either::Right(build_copy_cmd(<span class="kw-2">&amp;</span>directive))
+        }
+    });
+
+    <span class="kw">let </span>data_cmds = DynlinkError::collect(DynlinkErrorKind::NewBackingFail, data_cmds)<span class="question-mark">?</span>;
+    <span class="kw">let </span>text_cmds = DynlinkError::collect(DynlinkErrorKind::NewBackingFail, text_cmds)<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>data_id = sys_object_create(create_spec, <span class="kw-2">&amp;</span>data_cmds, <span class="kw-2">&amp;</span>[])
+        .map_err(|<span class="kw">_</span>| DynlinkErrorKind::NewBackingFail)<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>text_id = sys_object_create(create_spec, <span class="kw-2">&amp;</span>text_cmds, <span class="kw-2">&amp;</span>[])
+        .map_err(|<span class="kw">_</span>| DynlinkErrorKind::NewBackingFail)<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>runtime = twizzler_runtime_api::get_runtime();
+
+    <span class="kw">let </span>(text_handle, data_handle) = runtime
+        .map_two_objects(
+            text_id,
+            MapFlags::READ | MapFlags::EXEC,
+            data_id,
+            MapFlags::READ | MapFlags::WRITE,
+        )
+        .map_err(|<span class="kw">_</span>| DynlinkErrorKind::NewBackingFail)<span class="question-mark">?</span>;
+
+    <span class="kw">if </span>data_handle.start <span class="kw">as </span>usize != text_handle.start <span class="kw">as </span>usize + MAX_SIZE {
+        <span class="macro">tracing::error!</span>(
+            <span class="string">&quot;internal runtime error: failed to map text and data adjacent and in-order ({:p} {:p})&quot;</span>,
+            text_handle.start,
+            data_handle.start
+        );
+        <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::NewBackingFail.into());
     }
 
-    <span class="kw">fn </span>select_compartment(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        unlib: <span class="kw-2">&amp;</span><span class="kw">crate</span>::library::UnloadedLibrary,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;CompartmentId&gt; {
-        <span class="kw">if </span>unlib.name == <span class="string">&quot;libmonitor.so&quot; </span>{
-            <span class="macro">warn!</span>(<span class="string">&quot;TODO&quot;</span>);
-            <span class="kw">return </span><span class="prelude-val">Some</span>(CompartmentId(<span class="number">0</span>));
-        }
-        <span class="prelude-val">None
-    </span>}
+    <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[Backing::new(text_handle), Backing::new(data_handle)])
 }
 </code></pre></div></section></main></body></html>

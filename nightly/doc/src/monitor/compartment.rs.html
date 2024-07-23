@@ -213,7 +213,7 @@
     ptr::NonNull,
 };
 
-<span class="kw">use </span>dynlink::{compartment::CompartmentId, library::BackingData};
+<span class="kw">use </span>dynlink::compartment::CompartmentId;
 <span class="kw">use </span>monitor_api::{SharedCompConfig, TlsTemplateInfo};
 <span class="kw">use </span>talc::{ErrOnOom, Span, Talc};
 <span class="kw">use </span>twizzler_abi::{
@@ -288,9 +288,9 @@
 <span class="kw">impl </span>Comp {
     <span class="doccomment">/// Construct a new compartment. This can fail, since it allocates memory within the compartment
     /// (for the TLS template and shared config data).
-    </span><span class="kw">pub fn </span>new&lt;Backing: BackingData&gt;(
+    </span><span class="kw">pub fn </span>new(
         sctx_id: ObjID,
-        compartment: <span class="kw-2">&amp;mut </span>dynlink::compartment::Compartment&lt;Backing&gt;,
+        compartment: <span class="kw-2">&amp;mut </span>dynlink::compartment::Compartment,
     ) -&gt; miette::Result&lt;<span class="self">Self</span>&gt; {
         <span class="comment">// First make a new allocation object and initialize it.
         </span><span class="kw">let </span>comp_alloc_obj = make_new_comp_alloc_object();

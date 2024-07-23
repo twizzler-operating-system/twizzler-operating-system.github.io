@@ -336,36 +336,6 @@
 <a href="#336" id="336">336</a>
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
-<a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
-<a href="#346" id="346">346</a>
-<a href="#347" id="347">347</a>
-<a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
-<a href="#356" id="356">356</a>
-<a href="#357" id="357">357</a>
-<a href="#358" id="358">358</a>
-<a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
-<a href="#361" id="361">361</a>
-<a href="#362" id="362">362</a>
-<a href="#363" id="363">363</a>
-<a href="#364" id="364">364</a>
-<a href="#365" id="365">365</a>
-<a href="#366" id="366">366</a>
-<a href="#367" id="367">367</a>
-<a href="#368" id="368">368</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Management of individual libraries.
 
 </span><span class="kw">use </span>std::fmt::{Debug, Display};
@@ -374,7 +344,6 @@
     abi::{PT_PHDR, PT_TLS, STB_WEAK},
     endian::NativeEndian,
     segment::{Elf64_Phdr, ProgramHeader},
-    symbol::Symbol,
     ParseError,
 };
 <span class="kw">use </span>petgraph::stable_graph::NodeIndex;
@@ -382,8 +351,8 @@
 <span class="kw">use </span>twizzler_runtime_api::AuxEntry;
 
 <span class="kw">use crate</span>::{
-    compartment::CompartmentId, symbol::RelocatedSymbol, tls::TlsModId, DynlinkError,
-    DynlinkErrorKind,
+    compartment::CompartmentId, engines::Backing, symbol::RelocatedSymbol, tls::TlsModId,
+    DynlinkError, DynlinkErrorKind,
 };
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>RelocState {
@@ -393,32 +362,6 @@
     </span>PartialRelocation,
     <span class="doccomment">/// Relocation completed successfully.
     </span>Relocated,
-}
-
-<span class="doccomment">/// The core trait that represents loaded or mapped data.
-</span><span class="kw">pub trait </span>BackingData: Clone {
-    <span class="doccomment">/// Get a pointer to the start of a region, and a length, denoting valid memory representing
-    /// this object. The memory region is valid.
-    </span><span class="kw">fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">*mut </span>u8, usize);
-
-    <span class="kw">fn </span>load_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
-
-    <span class="doccomment">/// Get the data as a slice.
-    </span><span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
-        <span class="kw">let </span>data = <span class="self">self</span>.data();
-        <span class="comment">// Safety: a loaded library may have a slice constructed of its backing data.
-        </span><span class="kw">unsafe </span>{ core::slice::from_raw_parts(data.<span class="number">0</span>, data.<span class="number">1</span>) }
-    }
-
-    <span class="kw">type </span>InnerType;
-    <span class="doccomment">/// Get the inner implementation type.
-    </span><span class="kw">fn </span>to_inner(<span class="self">self</span>) -&gt; <span class="self">Self</span>::InnerType;
-    <span class="kw">fn </span>inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::InnerType;
-
-    <span class="doccomment">/// Get the ELF file for this backing.
-    </span><span class="kw">fn </span>get_elf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;elf::ElfBytes&lt;<span class="lifetime">&#39;_</span>, NativeEndian&gt;, ParseError&gt; {
-        elf::ElfBytes::minimal_parse(<span class="self">self</span>.slice())
-    }
 }
 
 <span class="attr">#[repr(C)]
@@ -462,7 +405,7 @@
 
 <span class="attr">#[repr(C)]
 </span><span class="doccomment">/// A loaded library. It may be in various relocation states.
-</span><span class="kw">pub struct </span>Library&lt;Backing: BackingData&gt; {
+</span><span class="kw">pub struct </span>Library {
     <span class="doccomment">/// Name of this library.
     </span><span class="kw">pub </span>name: String,
     <span class="doccomment">/// Node index for the dependency graph.
@@ -487,7 +430,7 @@
 }
 
 <span class="attr">#[allow(dead_code)]
-</span><span class="kw">impl</span>&lt;Backing: BackingData&gt; Library&lt;Backing&gt; {
+</span><span class="kw">impl </span>Library {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
         name: String,
         idx: NodeIndex,
@@ -590,10 +533,7 @@
         }))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lookup_symbol(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        name: <span class="kw-2">&amp;</span>str,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;_</span>, Backing&gt;, DynlinkError&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lookup_symbol(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;_</span>&gt;, DynlinkError&gt; {
         <span class="kw">let </span>elf = <span class="self">self</span>.get_elf()<span class="question-mark">?</span>;
         <span class="kw">let </span>common = elf.find_common_data()<span class="question-mark">?</span>;
 
@@ -672,7 +612,7 @@
         .into())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_local_or_secgate_from(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Library&lt;Backing&gt;, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_local_or_secgate_from(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Library, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
         other.comp_id == <span class="self">self</span>.comp_id || <span class="self">self</span>.is_secgate(name)
     }
 
@@ -693,7 +633,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;B: BackingData&gt; Debug <span class="kw">for </span>Library&lt;B&gt; {
+<span class="kw">impl </span>Debug <span class="kw">for </span>Library {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         f.debug_struct(<span class="string">&quot;Library&quot;</span>)
             .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
@@ -704,7 +644,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;B: BackingData&gt; core::fmt::Display <span class="kw">for </span>Library&lt;B&gt; {
+<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>Library {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
         <span class="macro">write!</span>(f, <span class="string">&quot;{}::{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.comp_name, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
     }

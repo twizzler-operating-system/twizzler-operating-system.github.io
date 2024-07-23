@@ -47,17 +47,17 @@
 <a href="#47" id="47">47</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Definitions for symbols in the dynamic linker.
 
-</span><span class="kw">use </span><span class="kw">crate</span>::library::{BackingData, Library};
+</span><span class="kw">use </span><span class="kw">crate</span>::library::Library;
 
 <span class="doccomment">/// A (relocated) symbol. Contains information about the symbol itself, like value and size, along
 /// with a reference to the library that it comes from.
-</span><span class="kw">pub struct </span>RelocatedSymbol&lt;<span class="lifetime">&#39;lib</span>, Backing: BackingData&gt; {
+</span><span class="kw">pub struct </span>RelocatedSymbol&lt;<span class="lifetime">&#39;lib</span>&gt; {
     sym: elf::symbol::Symbol,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) lib: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lib </span>Library&lt;Backing&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) lib: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lib </span>Library,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;lib</span>, Backing: BackingData&gt; RelocatedSymbol&lt;<span class="lifetime">&#39;lib</span>, Backing&gt; {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(sym: elf::symbol::Symbol, lib: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lib </span>Library&lt;Backing&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;lib</span>&gt; RelocatedSymbol&lt;<span class="lifetime">&#39;lib</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(sym: elf::symbol::Symbol, lib: <span class="kw-2">&amp;</span><span class="lifetime">&#39;lib </span>Library) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ sym, lib }
     }
 

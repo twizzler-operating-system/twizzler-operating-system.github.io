@@ -88,14 +88,14 @@
 <a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>tracing::trace;
 
-<span class="kw">use super</span>::{engine::ContextEngine, Context, LoadedOrUnloaded};
+<span class="kw">use super</span>::{Context, LoadedOrUnloaded};
 <span class="kw">use crate</span>::{
     library::{Library, LibraryId},
     symbol::{LookupFlags, RelocatedSymbol},
     DynlinkError, DynlinkErrorKind,
 };
 
-<span class="kw">impl</span>&lt;Engine: ContextEngine&gt; Context&lt;Engine&gt; {
+<span class="kw">impl </span>Context {
     <span class="doccomment">/// Search for a symbol, starting from library denoted by start_id. For normal symbol lookup,
     /// this should be the ID of the library that needs a symbol looked up. Flags can be
     /// specified which allow control over where to look for the symbol.
@@ -104,7 +104,7 @@
         start_id: LibraryId,
         name: <span class="kw-2">&amp;</span>str,
         lookup_flags: LookupFlags,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;a</span>, Engine::Backing&gt;, DynlinkError&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;a</span>&gt;, DynlinkError&gt; {
         <span class="kw">let </span>start_lib = <span class="self">self</span>.get_library(start_id)<span class="question-mark">?</span>;
         <span class="comment">// First try looking up within ourselves.
         </span><span class="kw">if </span>!lookup_flags.contains(LookupFlags::SKIP_SELF) {
@@ -149,10 +149,10 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lookup_symbol_global&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
-        start_lib: <span class="kw-2">&amp;</span>Library&lt;Engine::Backing&gt;,
+        start_lib: <span class="kw-2">&amp;</span>Library,
         name: <span class="kw-2">&amp;</span>str,
         lookup_flags: LookupFlags,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;a</span>, Engine::Backing&gt;, DynlinkError&gt; {
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;RelocatedSymbol&lt;<span class="lifetime">&#39;a</span>&gt;, DynlinkError&gt; {
         <span class="kw">for </span>idx <span class="kw">in </span><span class="self">self</span>.library_deps.node_indices() {
             <span class="kw">let </span>dep = <span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[idx];
             <span class="kw">match </span>dep {
