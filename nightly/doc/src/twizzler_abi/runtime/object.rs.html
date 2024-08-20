@@ -72,17 +72,25 @@
 <a href="#72" id="72">72</a>
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implementation of the object runtime.
 
-</span><span class="kw">use </span>twizzler_runtime_api::{MapError, ObjectHandle, ObjectRuntime};
+</span><span class="kw">use </span>core::ptr::NonNull;
 
+<span class="kw">use </span>twizzler_runtime_api::{InternalHandleRefs, MapError, ObjectHandle, ObjectRuntime};
+
+<span class="kw">use </span><span class="kw">super</span>::MinimalRuntime;
 <span class="kw">use crate</span>::{
     object::{ObjID, Protections, MAX_SIZE, NULLPAGE_SIZE},
     runtime::object::slot::global_allocate,
-    syscall::{sys_object_map, ObjectMapError},
+    rustc_alloc::boxed::Box,
+    syscall::{sys_object_map, ObjectMapError, UnmapFlags},
 };
-
-<span class="kw">use </span><span class="kw">super</span>::MinimalRuntime;
 
 <span class="kw">mod </span>handle;
 
@@ -132,18 +140,22 @@
         flags: twizzler_runtime_api::MapFlags,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;twizzler_runtime_api::ObjectHandle, twizzler_runtime_api::MapError&gt; {
         <span class="kw">let </span>slot = global_allocate().ok_or(MapError::OutOfResources)<span class="question-mark">?</span>;
-        <span class="kw">let _ </span>= sys_object_map(<span class="prelude-val">None</span>, ObjID::new(id), slot, flags.into(), flags.into())
-            .map_err(|e| e.into())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(ObjectHandle {
+        <span class="kw">let _ </span>= sys_object_map(<span class="prelude-val">None</span>, id, slot, flags.into(), flags.into()).map_err(|e| e.into())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(ObjectHandle::new(
+            NonNull::new(Box::into_raw(Box::new(InternalHandleRefs::default()))).unwrap(),
             id,
             flags,
-            start: (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-            meta: (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-        })
+            (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+            (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+        ))
     }
 
-    <span class="kw">fn </span>unmap_object(<span class="kw-2">&amp;</span><span class="self">self</span>, _handle: <span class="kw-2">&amp;</span>twizzler_runtime_api::ObjectHandle) {}
+    <span class="kw">fn </span>release_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, handle: <span class="kw-2">&amp;mut </span>twizzler_runtime_api::ObjectHandle) {
+        <span class="kw">let </span>slot = (handle.start <span class="kw">as </span>usize) / MAX_SIZE;
 
-    <span class="kw">fn </span>release_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, _handle: <span class="kw-2">&amp;mut </span>twizzler_runtime_api::ObjectHandle) {}
+        <span class="kw">if </span><span class="kw">crate</span>::syscall::sys_object_unmap(<span class="prelude-val">None</span>, slot, UnmapFlags::empty()).is_ok() {
+            slot::global_release(slot);
+        }
+    }
 }
 </code></pre></div></section></main></body></html>

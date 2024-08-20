@@ -119,6 +119,8 @@
 <a href="#119" id="119">119</a>
 <a href="#120" id="120">120</a>
 <a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements a simple unique reusable ID counter.
 
 </span><span class="kw">use </span>core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
@@ -189,7 +191,8 @@
         next
     }
 
-    <span class="doccomment">/// Release an ID to that it may be reused in the future. Note: it may not be immediately reused.
+    <span class="doccomment">/// Release an ID to that it may be reused in the future. Note: it may not be immediately
+    /// reused.
     </span><span class="kw">pub fn </span>release(<span class="kw-2">&amp;</span><span class="self">self</span>, id: u32) {
         <span class="comment">// First see if we can just subtract the next counter.
         </span><span class="kw">if </span><span class="self">self
@@ -203,7 +206,8 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>stack = <span class="self">self</span>.stack.lock();
         stack.push(id);
         <span class="kw">if </span>stack.len() &gt; MAX_BEFORE_UH_OH {
-            <span class="comment">// We hit the high watermark, so make future calls to fresh() try harder to get the lock.
+            <span class="comment">// We hit the high watermark, so make future calls to fresh() try harder to get the
+            // lock.
             </span><span class="self">self</span>.uh_oh.store(<span class="bool-val">true</span>, Ordering::SeqCst);
         }
         <span class="self">self</span>.stack_non_empty.store(<span class="bool-val">true</span>, Ordering::SeqCst);

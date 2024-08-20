@@ -745,6 +745,67 @@
 <a href="#745" id="745">745</a>
 <a href="#746" id="746">746</a>
 <a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
+<a href="#771" id="771">771</a>
+<a href="#772" id="772">772</a>
+<a href="#773" id="773">773</a>
+<a href="#774" id="774">774</a>
+<a href="#775" id="775">775</a>
+<a href="#776" id="776">776</a>
+<a href="#777" id="777">777</a>
+<a href="#778" id="778">778</a>
+<a href="#779" id="779">779</a>
+<a href="#780" id="780">780</a>
+<a href="#781" id="781">781</a>
+<a href="#782" id="782">782</a>
+<a href="#783" id="783">783</a>
+<a href="#784" id="784">784</a>
+<a href="#785" id="785">785</a>
+<a href="#786" id="786">786</a>
+<a href="#787" id="787">787</a>
+<a href="#788" id="788">788</a>
+<a href="#789" id="789">789</a>
+<a href="#790" id="790">790</a>
+<a href="#791" id="791">791</a>
+<a href="#792" id="792">792</a>
+<a href="#793" id="793">793</a>
+<a href="#794" id="794">794</a>
+<a href="#795" id="795">795</a>
+<a href="#796" id="796">796</a>
+<a href="#797" id="797">797</a>
+<a href="#798" id="798">798</a>
+<a href="#799" id="799">799</a>
+<a href="#800" id="800">800</a>
+<a href="#801" id="801">801</a>
+<a href="#802" id="802">802</a>
+<a href="#803" id="803">803</a>
+<a href="#804" id="804">804</a>
+<a href="#805" id="805">805</a>
+<a href="#806" id="806">806</a>
+<a href="#807" id="807">807</a>
+<a href="#808" id="808">808</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including
 //! startup, execution, and libstd support. It defines a set of traits that, when all implemented,
 //! form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
@@ -1241,8 +1302,69 @@
     </span><span class="kw">pub </span>code: i32,
 }
 
-<span class="doccomment">/// Runtime that implements std&#39;s FS support. Currently unimplemented.
-</span><span class="kw">pub trait </span>RustFsRuntime {}
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
+</span><span class="doccomment">/// Possible errors returned by the FsRuntime
+</span><span class="kw">pub enum </span>FsError {
+    <span class="doccomment">/// Error is unclassified.
+    </span>Other,
+    <span class="doccomment">/// Path provided isn&#39;t a valid u128 integer
+    </span>InvalidPath,
+    <span class="doccomment">/// Couldn&#39;t find the file descriptor
+    </span>LookupError,
+    <span class="doccomment">/// Seek is beyond maximum file size or before 0
+    </span>SeekError,
+}
+
+<span class="kw">impl </span>Display <span class="kw">for </span>FsError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            FsError::Other =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;unknown error&quot;</span>),
+            FsError::InvalidPath =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Path is invalid&quot;</span>),
+            FsError::LookupError =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Couldn&#39;t find file descriptor&quot;</span>),
+            FsError::SeekError =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Couldn&#39;t seek to this position&quot;</span>),
+        }
+    }
+}
+
+<span class="kw">impl </span>core::error::Error <span class="kw">for </span>FsError {}
+
+<span class="attr">#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq, Hash)]
+</span><span class="doccomment">/// Enum of the possible ways to seek within a object
+</span><span class="kw">pub enum </span>SeekFrom {
+    <span class="doccomment">/// Sets to the offset in bytes
+    </span>Start(u64),
+    <span class="doccomment">/// Sets to the offset relative to the end of the file
+    </span>End(i64),
+    <span class="doccomment">/// Sets the offset relative to the position of the cursor
+    </span>Current(i64),
+}
+
+<span class="doccomment">/// A identifier for a Twizzler object that allows File-like IO
+/// The data backing RawFd holds the position of the file cursor and a reference to the object that
+/// stores the file&#39;s data.
+</span><span class="kw">pub type </span>RawFd = u32;
+
+<span class="doccomment">/// Runtime that implements STD&#39;s FS support. Currently being implemented.
+</span><span class="kw">pub trait </span>RustFsRuntime {
+    <span class="doccomment">/// Takes in a u128 integer as CStr and emits a File Descriptor that allows File-Like IO on a
+    /// Twizzler Object. Note that the object must already exist to be opened.
+    </span><span class="kw">fn </span>open(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>CStr) -&gt; <span class="prelude-ty">Result</span>&lt;RawFd, FsError&gt;;
+
+    <span class="doccomment">/// Reads bytes from the source twizzler Object into the specified buffer, returns how many
+    /// bytes were read.
+    </span><span class="kw">fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, fd: RawFd, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, FsError&gt;;
+
+    <span class="doccomment">/// Writes bytes from the source twizzler Object into the specified buffer, returns how many
+    /// bytes were written.
+    </span><span class="kw">fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, fd: RawFd, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, FsError&gt;;
+
+    <span class="doccomment">/// Cleans the data associated with the RawFd allowing reuse. Note that this doesn&#39;t
+    /// close/unmap the backing object.
+    </span><span class="kw">fn </span>close(<span class="kw-2">&amp;</span><span class="self">self</span>, fd: RawFd) -&gt; <span class="prelude-ty">Result</span>&lt;(), FsError&gt;;
+
+    <span class="doccomment">/// Moves the cursor to a specified offset within the backed object.
+    </span><span class="kw">fn </span>seek(<span class="kw-2">&amp;</span><span class="self">self</span>, fd: RawFd, pos: SeekFrom) -&gt; <span class="prelude-ty">Result</span>&lt;usize, FsError&gt;;
+}
 
 <span class="doccomment">/// Runtime that implements std&#39;s process and command support. Currently unimplemented.
 </span><span class="kw">pub trait </span>RustProcessRuntime: RustStdioRuntime {}

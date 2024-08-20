@@ -20,32 +20,22 @@
 <a href="#20" id="20">20</a>
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
-<a href="#23" id="23">23</a>
-<a href="#24" id="24">24</a>
-<a href="#25" id="25">25</a>
-<a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the non-arch-specific upcall handling functionality for the runtime.
 
 </span><span class="kw">use </span>core::sync::atomic::{AtomicBool, Ordering};
 
-<span class="kw">use </span><span class="kw">crate</span>::upcall::{UpcallFrame, UpcallInfo};
+<span class="kw">use </span><span class="kw">crate</span>::upcall::{UpcallData, UpcallFrame};
 
 <span class="attr">#[thread_local]
 </span><span class="kw">static </span>UPCALL_PANIC: AtomicBool = AtomicBool::new(<span class="bool-val">false</span>);
 
 <span class="attr">#[allow(dead_code)]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upcall_rust_entry(frame: <span class="kw-2">&amp;</span>UpcallFrame, info: <span class="kw-2">&amp;</span>UpcallInfo) {
-    <span class="kw">crate</span>::syscall::sys_kernel_console_write(
-        <span class="string">b&quot;upcall ent\n&quot;</span>,
-        <span class="kw">crate</span>::syscall::KernelConsoleWriteFlags::empty(),
-    );
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upcall_rust_entry(frame: <span class="kw-2">&amp;</span>UpcallFrame, info: <span class="kw-2">&amp;</span>UpcallData) {
     <span class="kw">if </span>UPCALL_PANIC.load(Ordering::SeqCst) {
         <span class="kw">crate</span>::syscall::sys_thread_exit(<span class="number">127</span>);
     }
     UPCALL_PANIC.store(<span class="bool-val">true</span>, Ordering::SeqCst);
-    <span class="comment">// TODO: check if we have a panic runtime.
-    </span><span class="macro">panic!</span>(
+    <span class="macro">panic!</span>(
         <span class="string">&quot;upcall ip={:x} sp={:x} :: {:?}&quot;</span>,
         frame.ip(),
         frame.sp(),

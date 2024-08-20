@@ -24,16 +24,14 @@
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
-<a href="#27" id="27">27</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the time runtime.
 
 </span><span class="kw">use </span>core::time::Duration;
 
 <span class="kw">use </span>twizzler_runtime_api::{Monotonicity, RustTimeRuntime};
 
-<span class="kw">use </span><span class="kw">crate</span>::syscall::{sys_read_clock_info, ClockSource, ReadClockFlags};
-
 <span class="kw">use </span><span class="kw">super</span>::MinimalRuntime;
+<span class="kw">use </span><span class="kw">crate</span>::syscall::{sys_read_clock_info, ClockSource, ReadClockFlags};
 
 <span class="kw">impl </span>RustTimeRuntime <span class="kw">for </span>MinimalRuntime {
     <span class="kw">fn </span>get_monotonic(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Duration {

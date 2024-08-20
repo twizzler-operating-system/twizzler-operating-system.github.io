@@ -124,19 +124,35 @@
 <a href="#124" id="124">124</a>
 <a href="#125" id="125">125</a>
 <a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>core::{alloc::GlobalAlloc, ptr};
 
 <span class="kw">use </span>twizzler_runtime_api::{AuxEntry, BasicAux, BasicReturn, CoreRuntime};
 
-<span class="kw">use </span><span class="kw">crate</span>::object::ObjID;
-
 <span class="kw">use super</span>::{
     alloc::MinimalAllocator,
     phdrs::{process_phdrs, Phdr},
     tls::init_tls,
     MinimalRuntime,
+};
+<span class="kw">use crate</span>::{
+    object::ObjID,
+    upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget},
 };
 
 <span class="comment">// Just keep a single, simple global allocator.
@@ -190,7 +206,7 @@
                         process_phdrs(core::slice::from_raw_parts(paddr <span class="kw">as </span><span class="kw-2">*const </span>Phdr, pnum))
                     }
                     AuxEntry::ExecId(id) =&gt; {
-                        <span class="kw">super</span>::debug::set_execid(ObjID::new(id));
+                        <span class="kw">super</span>::debug::set_execid(id);
                     }
                     AuxEntry::Arguments(num, ptr) =&gt; {
                         arg_count = num;
@@ -213,7 +229,19 @@
         } <span class="kw">else </span>{
             <span class="kw">crate</span>::print_err(<span class="string">&quot;failed to initialize TLS\n&quot;</span>);
         }
-        <span class="kw">crate</span>::syscall::sys_thread_set_upcall(<span class="kw">crate</span>::arch::upcall::upcall_entry);
+        <span class="kw">let </span>upcall_target = UpcallTarget::new(
+            <span class="prelude-val">Some</span>(<span class="kw">crate</span>::arch::upcall::upcall_entry),
+            <span class="prelude-val">Some</span>(<span class="kw">crate</span>::arch::upcall::upcall_entry),
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>,
+            <span class="number">0</span>.into(),
+            [UpcallOptions {
+                flags: UpcallFlags::empty(),
+                mode: UpcallMode::CallSelf,
+            }; UpcallInfo::NR_UPCALLS],
+        );
+        <span class="kw">crate</span>::syscall::sys_thread_set_upcall(upcall_target);
 
         <span class="kw">unsafe </span>{
             <span class="comment">// Run preinit array

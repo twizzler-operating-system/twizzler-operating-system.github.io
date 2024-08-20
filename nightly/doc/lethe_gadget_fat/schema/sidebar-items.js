@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FATEntry"],"struct":["FileSystem","FileSystemFrame","ONode","ONodeFrame","Superblock","SuperblockFrame"],"type":["ObjLookupBucket"]};

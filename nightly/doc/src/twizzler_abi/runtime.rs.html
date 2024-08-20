@@ -43,12 +43,14 @@
 <a href="#43" id="43">43</a>
 <a href="#44" id="44">44</a>
 <a href="#45" id="45">45</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! This mod implements the [twizzler_runtime_api::Runtime] trait as the &quot;minruntime&quot;, or minimal runtime implementation.
-//! The word minimal is pretty subjective, but here we&#39;re roughly saying &quot;it&#39;s the runtime that you can use to interact with
-//! the kernel and twizzler-abi directly, with no additional support&quot;.
+<a href="#46" id="46">46</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! This mod implements the [twizzler_runtime_api::Runtime] trait as the &quot;minruntime&quot;, or minimal
+//! runtime implementation. The word minimal is pretty subjective, but here we&#39;re roughly saying
+//! &quot;it&#39;s the runtime that you can use to interact with the kernel and twizzler-abi directly, with
+//! no additional support&quot;.
 //!
-//! Additionally, we provide a mechanism for linking our runtime only if no other runtime is linked, via the &quot;extern_weak&quot; linkage
-//! attribute on __twz_get_runtime.
+//! Additionally, we provide a mechanism for linking our runtime only if no other runtime is linked,
+//! via the &quot;extern_weak&quot; linkage attribute on __twz_get_runtime.
 
 </span><span class="kw">use </span>twizzler_runtime_api::Runtime;
 
@@ -87,4 +89,5 @@
 </span><span class="attr">#[used]
 </span><span class="kw">static </span>USE_MARKER: <span class="kw">fn</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>(<span class="kw">dyn </span>Runtime + Sync) = __twz_get_runtime;
 
-<span class="kw">pub use </span>object::slot::get_kernel_init_info;</code></pre></div></section></main></body></html>
+<span class="kw">pub use </span>object::slot::get_kernel_init_info;
+</code></pre></div></section></main></body></html>

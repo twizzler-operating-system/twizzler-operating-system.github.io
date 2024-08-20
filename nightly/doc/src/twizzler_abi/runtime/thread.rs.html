@@ -163,42 +163,29 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implementation of the thread runtime.
 
 </span><span class="kw">use </span>core::alloc::Layout;
 
-<span class="kw">use crate</span>::{
-    object::Protections, runtime::idcounter::IdCounter, rustc_alloc::collections::BTreeMap,
-    thread::ExecutionState,
-};
-
 <span class="kw">use </span>twizzler_runtime_api::{CoreRuntime, JoinError, SpawnError, ThreadRuntime};
 
+<span class="kw">use super</span>::{object::InternalObject, MinimalRuntime};
 <span class="kw">use crate</span>::{
-    runtime::simple_mutex::Mutex,
+    object::Protections,
+    runtime::{idcounter::IdCounter, simple_mutex::Mutex},
+    rustc_alloc::collections::BTreeMap,
     syscall::{
         ThreadSpawnError, ThreadSpawnFlags, ThreadSync, ThreadSyncError, ThreadSyncFlags,
         ThreadSyncReference, ThreadSyncSleep, ThreadSyncWake,
     },
-    thread::ThreadRepr,
+    thread::{ExecutionState, ThreadRepr},
 };
-
-<span class="kw">use super</span>::{object::InternalObject, MinimalRuntime};
 
 <span class="kw">struct </span>InternalThread {
     repr: InternalObject&lt;ThreadRepr&gt;,
     <span class="attr">#[allow(dead_code)]
     </span>int_id: u32,
 }
-
-<span class="kw">unsafe impl </span>Send <span class="kw">for </span>InternalObject&lt;ThreadRepr&gt; {}
-<span class="kw">unsafe impl </span>Sync <span class="kw">for </span>InternalObject&lt;ThreadRepr&gt; {}
 
 <span class="kw">use </span>rustc_alloc::sync::Arc;
 <span class="kw">static </span>THREAD_SLOTS: Mutex&lt;BTreeMap&lt;u32, Arc&lt;InternalThread&gt;&gt;&gt; = Mutex::new(BTreeMap::new());
@@ -282,6 +269,7 @@
                 arg: args.arg,
                 flags: ThreadSpawnFlags::empty(),
                 vm_context_handle: <span class="prelude-val">None</span>,
+                upcall_target: <span class="kw">crate</span>::syscall::UpcallTargetSpawnOption::Inherit,
             })<span class="question-mark">?
         </span>};
 
@@ -326,7 +314,7 @@
         }
     }
 
-    <span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, _tls_index: <span class="kw-2">&amp;</span>twizzler_runtime_api::TlsIndex) -&gt; <span class="kw-2">*const </span>u8 {
+    <span class="kw">fn </span>tls_get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>, _tls_index: <span class="kw-2">&amp;</span>twizzler_runtime_api::TlsIndex) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>u8&gt; {
         <span class="macro">panic!</span>(<span class="string">&quot;minimal runtime only supports LocalExec TLS model&quot;</span>);
     }
 }

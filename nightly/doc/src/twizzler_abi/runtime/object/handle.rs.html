@@ -139,15 +139,30 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements some helper types and functions for working with objects in this runtime.
 
-</span><span class="kw">use </span>core::marker::PhantomData;
+</span><span class="kw">use </span>core::{marker::PhantomData, ptr::NonNull};
 
-<span class="kw">use </span>twizzler_runtime_api::{MapFlags, ObjectHandle};
+<span class="kw">use </span>twizzler_runtime_api::{InternalHandleRefs, MapFlags, ObjectHandle};
 
 <span class="kw">use crate</span>::{
     object::{ObjID, Protections, MAX_SIZE, NULLPAGE_SIZE},
     runtime::object::slot::global_allocate,
+    rustc_alloc::boxed::Box,
     syscall::{
         sys_object_create, sys_object_map, BackingType, LifetimeType, ObjectCreate,
         ObjectCreateFlags,
@@ -155,11 +170,19 @@
 };
 
 <span class="attr">#[allow(dead_code)]
-#[derive(Debug)]
 </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InternalObject&lt;T&gt; {
     slot: usize,
     runtime_handle: ObjectHandle,
     _pd: PhantomData&lt;T&gt;,
+}
+
+<span class="kw">impl</span>&lt;T&gt; core::fmt::Debug <span class="kw">for </span>InternalObject&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        f.debug_struct(<span class="string">&quot;InternalObject&quot;</span>)
+            .field(<span class="string">&quot;slot&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.slot)
+            .field(<span class="string">&quot;runtime_handle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.runtime_handle)
+            .finish()
+    }
 }
 
 <span class="kw">impl</span>&lt;T&gt; InternalObject&lt;T&gt; {
@@ -185,14 +208,18 @@
             <span class="kw">crate</span>::syscall::MapFlags::empty(),
         )
         .ok()<span class="question-mark">?</span>;
+        <span class="kw">let </span>rc = Box::new(InternalHandleRefs::default());
+        <span class="kw">let </span>raw = NonNull::new(Box::into_raw(rc)).unwrap();
+
         <span class="prelude-val">Some</span>(<span class="self">Self </span>{
             slot,
-            runtime_handle: ObjectHandle {
-                id: id.as_u128(),
-                flags: MapFlags::READ | MapFlags::WRITE,
-                start: (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-                meta: (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-            },
+            runtime_handle: ObjectHandle::new(
+                raw,
+                id,
+                MapFlags::READ | MapFlags::WRITE,
+                (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+                (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+            ),
             _pd: PhantomData,
         })
     }
@@ -211,7 +238,7 @@
 
     <span class="attr">#[allow(dead_code)]
     </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ObjID {
-        ObjID::new(<span class="self">self</span>.runtime_handle.id)
+        <span class="self">self</span>.runtime_handle.id
     }
 
     <span class="attr">#[allow(dead_code)]
@@ -226,12 +253,13 @@
             .ok()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="self">Self </span>{
-            runtime_handle: ObjectHandle {
-                id: id.as_u128(),
-                flags: prot.into(),
-                start: (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-                meta: (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
-            },
+            runtime_handle: ObjectHandle::new(
+                NonNull::new(Box::into_raw(Box::new(InternalHandleRefs::default()))).unwrap(),
+                id,
+                prot.into(),
+                (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+                (slot * MAX_SIZE + MAX_SIZE - NULLPAGE_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+            ),
             slot,
             _pd: PhantomData,
         })

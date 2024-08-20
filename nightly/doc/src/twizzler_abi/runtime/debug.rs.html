@@ -61,16 +61,29 @@
 <a href="#61" id="61">61</a>
 <a href="#62" id="62">62</a>
 <a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Null implementation of the debug runtime.
 
-</span><span class="kw">use </span>twizzler_runtime_api::{DebugRuntime, Library, LibraryId, MapFlags};
-
-<span class="kw">use </span><span class="kw">crate</span>::object::{InternalObject, ObjID, Protections, NULLPAGE_SIZE};
+</span><span class="kw">use </span>twizzler_runtime_api::{AddrRange, DebugRuntime, Library, LibraryId, MapFlags};
 
 <span class="kw">use super</span>::{
     MinimalRuntime, __twz_get_runtime,
     load_elf::{ElfObject, PhdrType},
 };
+<span class="kw">use </span><span class="kw">crate</span>::object::{InternalObject, ObjID, Protections, MAX_SIZE, NULLPAGE_SIZE};
 
 <span class="kw">static </span><span class="kw-2">mut </span>EXEC_ID: ObjID = ObjID::new(<span class="number">0</span>);
 
@@ -85,14 +98,20 @@
 <span class="kw">impl </span>DebugRuntime <span class="kw">for </span>MinimalRuntime {
     <span class="kw">fn </span>get_library(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        _id: twizzler_runtime_api::LibraryId,
+        id: twizzler_runtime_api::LibraryId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::Library&gt; {
         <span class="kw">let </span>mapping = __twz_get_runtime()
-            .map_object(get_execid().as_u128(), MapFlags::READ)
+            .map_object(get_execid(), MapFlags::READ)
             .ok()<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(Library {
-            range: (<span class="kw">unsafe </span>{ mapping.start.add(NULLPAGE_SIZE) }, mapping.meta),
+            range: AddrRange {
+                start: mapping.start <span class="kw">as </span>usize + NULLPAGE_SIZE,
+                len: MAX_SIZE - NULLPAGE_SIZE,
+            },
             mapping,
+            dl_info: <span class="prelude-val">None</span>,
+            next_id: <span class="prelude-val">None</span>,
+            id,
         })
     }
 
@@ -123,5 +142,14 @@
     ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::ObjectHandle&gt; {
         <span class="prelude-val">Some</span>(lib.mapping.clone())
     }
+
+    <span class="comment">// The minimal runtime doesn&#39;t provide this, since we can get segment information in a simpler
+    // way for static binaries.
+    </span><span class="kw">fn </span>iterate_phdr(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(twizzler_runtime_api::DlPhdrInfo) -&gt; core::ffi::c_int,
+    ) -&gt; core::ffi::c_int {
+        <span class="number">0
+    </span>}
 }
 </code></pre></div></section></main></body></html>

@@ -84,19 +84,17 @@
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements stdio runtime for rust&#39;s libstd.
 
 </span><span class="kw">use </span>core::fmt::Debug;
 
 <span class="kw">use </span>twizzler_runtime_api::{IoRead, IoWrite, ReadError, RustStdioRuntime, WriteError};
 
+<span class="kw">use </span><span class="kw">super</span>::MinimalRuntime;
 <span class="kw">use </span><span class="kw">crate</span>::syscall::KernelConsoleReadError;
 
-<span class="kw">use </span><span class="kw">super</span>::MinimalRuntime;
-
 <span class="kw">impl </span>RustStdioRuntime <span class="kw">for </span>MinimalRuntime {
-    <span class="kw">fn </span>with_panic_output(<span class="kw-2">&amp;</span><span class="self">self</span>, cb: twizzler_runtime_api::IoWriteDynCallback&lt;<span class="lifetime">&#39;_</span>, ()&gt;) {
+    <span class="kw">fn </span>with_panic_output(<span class="kw-2">&amp;</span><span class="self">self</span>, cb: twizzler_runtime_api::IoWritePanicDynCallback&lt;<span class="lifetime">&#39;_</span>, ()&gt;) {
         <span class="kw">let </span><span class="kw-2">mut </span>wp = WritePoint {};
         cb(<span class="kw-2">&amp;mut </span>wp);
     }
@@ -144,7 +142,7 @@
 </span><span class="kw">pub struct </span>ReadPoint {}
 
 <span class="kw">impl </span>IoWrite <span class="kw">for </span>WritePoint {
-    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, WriteError&gt; {
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, WriteError&gt; {
         <span class="kw">crate</span>::syscall::sys_kernel_console_write(
             buf,
             <span class="kw">crate</span>::syscall::KernelConsoleWriteFlags::empty(),
@@ -152,13 +150,13 @@
         <span class="prelude-val">Ok</span>(buf.len())
     }
 
-    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), WriteError&gt; {
+    <span class="kw">fn </span>flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), WriteError&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 }
 
 <span class="kw">impl </span>IoRead <span class="kw">for </span>ReadPoint {
-    <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ReadError&gt; {
+    <span class="kw">fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ReadError&gt; {
         <span class="kw">crate</span>::syscall::sys_kernel_console_read(
             buf,
             <span class="kw">crate</span>::syscall::KernelConsoleReadFlags::empty(),

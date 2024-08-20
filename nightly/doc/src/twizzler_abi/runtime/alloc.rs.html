@@ -67,16 +67,52 @@
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Implements the allocation part of the core runtime trait. We use talc as our allocator, creating new objects for it to
-//! claim when it runs out of memory.
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+</pre></div><pre class="rust"><code><span class="doccomment">//! Implements the allocation part of the core runtime trait. We use talc as our allocator, creating
+//! new objects for it to claim when it runs out of memory.
 
 </span><span class="kw">use </span>core::{alloc::GlobalAlloc, ptr::NonNull};
 
 <span class="kw">use </span>talc::{OomHandler, Span};
 
+<span class="kw">use </span><span class="kw">super</span>::object::slot::global_allocate;
 <span class="kw">use crate</span>::{
-    object::{InternalObject, MAX_SIZE, NULLPAGE_SIZE},
+    object::{Protections, MAX_SIZE, NULLPAGE_SIZE},
     runtime::simple_mutex::Mutex,
+    syscall::{
+        sys_object_create, sys_object_map, BackingType, LifetimeType, ObjectCreate,
+        ObjectCreateFlags,
+    },
 };
 
 <span class="kw">pub struct </span>MinimalAllocator {
@@ -93,14 +129,40 @@
         <span class="kw">if </span>layout.size() &gt; ALLOC_OBJ_REG_SIZE {
             <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
-        <span class="kw">let </span>obj = InternalObject::&lt;u8&gt;::create_data_and_map().ok_or(())<span class="question-mark">?</span>;
-        <span class="comment">// Save room for base data.
-        </span><span class="kw">let </span>start = <span class="kw">unsafe </span>{ (obj.base_mut() <span class="kw">as </span><span class="kw-2">*mut </span>u8).add(NULLPAGE_SIZE) };
+
+        <span class="comment">// Create a volatile object for our new allocation region.
+        </span><span class="kw">let </span>id = sys_object_create(
+            ObjectCreate::new(
+                BackingType::Normal,
+                LifetimeType::Volatile,
+                <span class="prelude-val">None</span>,
+                ObjectCreateFlags::empty(),
+            ),
+            <span class="kw-2">&amp;</span>[],
+            <span class="kw-2">&amp;</span>[],
+        )
+        .map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
+
+        <span class="comment">// Allocate a slot for it.
+        </span><span class="kw">let </span>slot = global_allocate().ok_or(())<span class="question-mark">?</span>;
+
+        <span class="comment">// ...and map it in.
+        </span><span class="kw">let </span>_map = sys_object_map(
+            <span class="prelude-val">None</span>,
+            id,
+            slot,
+            Protections::READ | Protections::WRITE,
+            <span class="kw">crate</span>::syscall::MapFlags::empty(),
+        )
+        .map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>base = slot * MAX_SIZE + NULLPAGE_SIZE;
+        <span class="comment">// Save room for future base data.
+        </span><span class="kw">let </span>start = <span class="kw">unsafe </span>{ (base <span class="kw">as </span><span class="kw-2">*mut </span>u8).add(NULLPAGE_SIZE) };
         <span class="kw">let </span>span = Span::new(start, <span class="kw">unsafe </span>{ start.add(ALLOC_OBJ_REG_SIZE) });
-        <span class="kw">unsafe </span>{
+        <span class="comment">// Inform the allocator of the new region that it can use.
+        </span><span class="kw">unsafe </span>{
             talc.claim(span)<span class="question-mark">?</span>;
-            <span class="comment">// Drop this because its now in the allocator, unrecoverable
-            </span>core::mem::forget(obj);
         }
 
         <span class="prelude-val">Ok</span>(())

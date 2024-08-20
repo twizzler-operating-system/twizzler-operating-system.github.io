@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"attr":["layout"],"mod":["collections","io","primitive"],"trait":["ApplyLayout","Decode","Encode","Fixed","Frame","FramedDynamic","SourcedDynamic"]};
