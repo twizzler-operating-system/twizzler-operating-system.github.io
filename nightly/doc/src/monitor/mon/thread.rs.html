@@ -146,21 +146,88 @@
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
 <a href="#148" id="148">148</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, mem::MaybeUninit, sync::Arc};
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
+<a href="#162" id="162">162</a>
+<a href="#163" id="163">163</a>
+<a href="#164" id="164">164</a>
+<a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+    cell::OnceCell,
+    collections::HashMap,
+    mem::MaybeUninit,
+    ptr::NonNull,
+    sync::{Arc, OnceLock},
+};
 
-<span class="kw">use </span>dynlink::tls::TlsRegion;
+<span class="kw">use </span>dynlink::{compartment::Compartment, context::Context, tls::TlsRegion};
 <span class="kw">use </span>twizzler_abi::{
     object::NULLPAGE_SIZE,
     syscall::{sys_spawn, sys_thread_exit, ThreadSyncSleep, UpcallTargetSpawnOption},
     thread::{ExecutionState, ThreadRepr},
     upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget},
 };
-<span class="kw">use </span>twizzler_runtime_api::{ObjID, SpawnError};
+<span class="kw">use </span>twizzler_runtime_api::{MapFlags, ObjID, SpawnError};
+<span class="kw">use </span>twz_rt::RuntimeThreadControl;
 
-<span class="kw">use </span><span class="kw">super</span>::space::MapHandle;
+<span class="kw">use </span><span class="kw">super</span>::space::{MapHandle, MapInfo, Space};
 <span class="kw">use </span><span class="kw">crate</span>::api::MONITOR_INSTANCE_ID;
 
 <span class="kw">mod </span>cleaner;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>cleaner::ThreadCleaner;
 
 <span class="doccomment">/// Stack size for the supervisor upcall stack.
 </span><span class="kw">pub const </span>SUPER_UPCALL_STACK_SIZE: usize = <span class="number">8 </span>* <span class="number">1024 </span>* <span class="number">1024</span>; <span class="comment">// 8MB
@@ -176,10 +243,23 @@
 /// cleaner detects when a thread has exited and performs any final thread cleanup logic.
 </span><span class="kw">pub struct </span>ThreadMgr {
     all: HashMap&lt;ObjID, ManagedThread&gt;,
-    cleaner: cleaner::ThreadCleaner,
+    cleaner: OnceLock&lt;cleaner::ThreadCleaner&gt;,
+}
+
+<span class="kw">impl </span>Default <span class="kw">for </span>ThreadMgr {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            all: HashMap::default(),
+            cleaner: OnceLock::new(),
+        }
+    }
 }
 
 <span class="kw">impl </span>ThreadMgr {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_cleaner(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cleaner: cleaner::ThreadCleaner) {
+        <span class="self">self</span>.cleaner.set(cleaner).ok().unwrap();
+    }
+
     <span class="kw">fn </span>do_remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, thread: <span class="kw-2">&amp;</span>ManagedThread) {
         <span class="self">self</span>.all.remove(<span class="kw-2">&amp;</span>thread.id);
     }
@@ -216,13 +296,50 @@
         .map_err(|<span class="kw">_</span>| SpawnError::KernelError)
     }
 
-    <span class="kw">fn </span>do_spawn(start: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(usize) -&gt; !, arg: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SpawnError&gt; {
-        <span class="macro">todo!</span>()
+    <span class="kw">fn </span>do_spawn(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        space: <span class="kw-2">&amp;mut </span>Space,
+        monitor_dynlink_comp: <span class="kw-2">&amp;mut </span>Compartment,
+        start: <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>(usize) -&gt; !,
+        arg: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ManagedThread, SpawnError&gt; {
+        <span class="kw">let </span>super_tls = monitor_dynlink_comp
+            .build_tls_region(RuntimeThreadControl::default(), |layout| <span class="kw">unsafe </span>{
+                NonNull::new(std::alloc::alloc_zeroed(layout))
+            })
+            .map_err(|<span class="kw">_</span>| SpawnError::Other)<span class="question-mark">?</span>;
+        <span class="kw">let </span>super_thread_pointer = super_tls.get_thread_pointer_value();
+        <span class="kw">let </span>super_stack = Box::new_zeroed_slice(SUPER_UPCALL_STACK_SIZE);
+        <span class="kw">let </span>id = <span class="kw">unsafe </span>{
+            <span class="self">Self</span>::spawn_thread(
+                start <span class="kw">as </span><span class="kw-2">*const </span>() <span class="kw">as </span>usize,
+                super_stack.as_ptr() <span class="kw">as </span>usize,
+                super_thread_pointer,
+                arg,
+            )<span class="question-mark">?
+        </span>};
+        <span class="kw">let </span>repr = space
+            .map(MapInfo {
+                id,
+                flags: MapFlags::READ,
+            })
+            .unwrap();
+        <span class="prelude-val">Ok</span>(Arc::new(ManagedThreadInner {
+            id,
+            repr: ManagedThreadRepr::new(repr),
+            super_stack,
+            super_tls,
+        }))
     }
 
     <span class="doccomment">/// Start a thread, running the provided Box&#39;d closure. The thread will be running in
     /// monitor-mode, and will have no connection to any compartment.
-    </span><span class="kw">pub fn </span>start_thread(main: Box&lt;<span class="kw">dyn </span>FnOnce()&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, SpawnError&gt; {
+    </span><span class="kw">pub fn </span>start_thread(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        space: <span class="kw-2">&amp;mut </span>Space,
+        monitor_dynlink_comp: <span class="kw-2">&amp;mut </span>Compartment,
+        main: Box&lt;<span class="kw">dyn </span>FnOnce()&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ManagedThread, SpawnError&gt; {
         <span class="kw">let </span>main_addr = Box::into_raw(Box::new(main)) <span class="kw">as </span>usize;
         <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>managed_thread_entry(main: usize) -&gt; ! {
             {
@@ -233,7 +350,7 @@
             sys_thread_exit(<span class="number">0</span>);
         }
 
-        <span class="self">Self</span>::do_spawn(managed_thread_entry, main_addr)
+        <span class="self">self</span>.do_spawn(space, monitor_dynlink_comp, managed_thread_entry, main_addr)
     }
 }
 
@@ -271,7 +388,8 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>ManagedThreadInner {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
-        <span class="macro">tracing::trace!</span>(<span class="string">&quot;dropping ManagedThread {}&quot;</span>, <span class="self">self</span>.id);
+        <span class="comment">// TODO
+        </span><span class="macro">tracing::trace!</span>(<span class="string">&quot;dropping ManagedThread {}&quot;</span>, <span class="self">self</span>.id);
     }
 }
 

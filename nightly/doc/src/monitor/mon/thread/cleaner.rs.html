@@ -170,7 +170,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::mon::get_monitor;
 
 <span class="doccomment">/// Tracks threads that do not exit cleanly, so their monitor-internal resources can be cleaned up.
-</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ThreadCleaner {
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ThreadCleaner {
     thread: std::thread::JoinHandle&lt;()&gt;,
     send: Sender&lt;WaitOp&gt;,
     inner: Pin&lt;Arc&lt;ThreadCleanerData&gt;&gt;,
@@ -196,7 +196,7 @@
 
 <span class="kw">impl </span>ThreadCleaner {
     <span class="doccomment">/// Makes a new ThreadCleaner.
-    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>(send, recv) = std::sync::mpsc::channel();
         <span class="kw">let </span>data = Arc::pin(ThreadCleanerData::default());
         <span class="kw">let </span>inner = data.clone();

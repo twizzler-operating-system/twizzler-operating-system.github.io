@@ -104,131 +104,21 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
-<a href="#126" id="126">126</a>
-<a href="#127" id="127">127</a>
-<a href="#128" id="128">128</a>
-<a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
-<a href="#134" id="134">134</a>
-<a href="#135" id="135">135</a>
-<a href="#136" id="136">136</a>
-<a href="#137" id="137">137</a>
-<a href="#138" id="138">138</a>
-<a href="#139" id="139">139</a>
-<a href="#140" id="140">140</a>
-<a href="#141" id="141">141</a>
-<a href="#142" id="142">142</a>
-<a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
-<a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
-<a href="#148" id="148">148</a>
-<a href="#149" id="149">149</a>
-<a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
-<a href="#153" id="153">153</a>
-<a href="#154" id="154">154</a>
-<a href="#155" id="155">155</a>
-<a href="#156" id="156">156</a>
-<a href="#157" id="157">157</a>
-<a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
-<a href="#168" id="168">168</a>
-<a href="#169" id="169">169</a>
-<a href="#170" id="170">170</a>
-<a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
-<a href="#177" id="177">177</a>
-<a href="#178" id="178">178</a>
-<a href="#179" id="179">179</a>
-<a href="#180" id="180">180</a>
-<a href="#181" id="181">181</a>
-<a href="#182" id="182">182</a>
-<a href="#183" id="183">183</a>
-<a href="#184" id="184">184</a>
-<a href="#185" id="185">185</a>
-<a href="#186" id="186">186</a>
-<a href="#187" id="187">187</a>
-<a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
-<a href="#196" id="196">196</a>
-<a href="#197" id="197">197</a>
-<a href="#198" id="198">198</a>
-<a href="#199" id="199">199</a>
-<a href="#200" id="200">200</a>
-<a href="#201" id="201">201</a>
-<a href="#202" id="202">202</a>
-<a href="#203" id="203">203</a>
-<a href="#204" id="204">204</a>
-<a href="#205" id="205">205</a>
-<a href="#206" id="206">206</a>
-<a href="#207" id="207">207</a>
-<a href="#208" id="208">208</a>
-<a href="#209" id="209">209</a>
 </pre></div><pre class="rust"><code><span class="attr">#![feature(naked_functions)]
 #![feature(thread_local)]
 #![feature(c_str_literals)]
 #![feature(new_uninit)]
 #![feature(hash_extract_if)]
 
-</span><span class="kw">use </span>std::sync::{Arc, Mutex};
-
-<span class="kw">use </span>dynlink::{engines::Backing, symbol::LookupFlags};
-<span class="kw">use </span>state::MonitorState;
-<span class="kw">use </span>tracing::{debug, info, trace, warn, Level};
+</span><span class="kw">use </span>dynlink::engines::Backing;
+<span class="kw">use </span>tracing::{debug, info, warn, Level};
 <span class="kw">use </span>tracing_subscriber::{fmt::format::FmtSpan, FmtSubscriber};
 <span class="kw">use </span>twizzler_abi::{
     aux::KernelInitInfo,
     object::{MAX_SIZE, NULLPAGE_SIZE},
-    syscall::{sys_object_create, ObjectCreate},
 };
 <span class="kw">use </span>twizzler_object::ObjID;
-<span class="kw">use </span>twizzler_runtime_api::AuxEntry;
-<span class="kw">use </span>twz_rt::{set_upcall_handler, CompartmentInitInfo};
-
-<span class="kw">use crate</span>::{compartment::Comp, state::set_monitor_state};
+<span class="kw">use </span>twz_rt::{set_upcall_handler, OUR_RUNTIME};
 
 <span class="kw">mod </span>compartment;
 <span class="kw">mod </span>init;
@@ -241,6 +131,8 @@
 
 <span class="kw">mod </span>api;
 <span class="kw">mod </span>mon;
+
+<span class="kw">pub use </span>monitor_api::MappedObjectAddrs;
 
 <span class="attr">#[path = <span class="string">&quot;../secapi/gates.rs&quot;</span>]
 </span><span class="kw">mod </span>gates;
@@ -260,131 +152,33 @@
     }))
     .unwrap();
 
-    <span class="macro">trace!</span>(<span class="string">&quot;monitor entered, discovering dynlink context&quot;</span>);
+    <span class="macro">debug!</span>(<span class="string">&quot;monitor entered, discovering dynlink context&quot;</span>);
     <span class="kw">let </span>init =
         init::bootstrap_dynlink_context().expect(<span class="string">&quot;failed to discover initial dynlink context&quot;</span>);
-    <span class="kw">let </span><span class="kw-2">mut </span>state = state::MonitorState::new(init);
 
-    <span class="kw">let </span>monitor_comp_id = state.dynlink.lookup_compartment(<span class="string">&quot;monitor&quot;</span>).unwrap();
-    <span class="kw">let </span>monitor_comp = Comp::new(
-        <span class="number">0</span>.into(),
-        state.dynlink.get_compartment_mut(monitor_comp_id).unwrap(),
-    )
-    .unwrap();
-    state.add_comp(monitor_comp, twizzler_runtime_api::LibraryId(<span class="number">0</span>));
+    <span class="kw">let </span>mon = mon::Monitor::new(init);
+    mon::set_monitor(mon);
 
-    <span class="kw">let </span>state = Arc::new(Mutex::new(state));
-    <span class="macro">tracing::info!</span>(<span class="string">&quot;.. state: {:p}&quot;</span>, state);
-    <span class="macro">debug!</span>(
-        <span class="string">&quot;found dynlink context, with root {}&quot;</span>,
-        state.lock().unwrap().root
-    );
+    <span class="comment">// Safety: the monitor is ready, and so we can set our runtime as ready to use the monitor.
+    </span><span class="kw">unsafe </span>{ OUR_RUNTIME.set_runtime_ready() };
+    <span class="comment">// Had to wait till now to be able to spawn threads.
+    </span>mon::get_monitor().start_background_threads();
 
+    <span class="macro">debug!</span>(<span class="string">&quot;Ok&quot;</span>);
     std::env::set_var(<span class="string">&quot;RUST_BACKTRACE&quot;</span>, <span class="string">&quot;1&quot;</span>);
-
     set_upcall_handler(<span class="kw-2">&amp;</span><span class="kw">crate</span>::upcall::upcall_monitor_handler).unwrap();
-    set_monitor_state(state.clone());
 
-    <span class="kw">let </span>main_thread = std::thread::spawn(|| monitor_init(state));
+    <span class="kw">let </span>main_thread = std::thread::spawn(|| monitor_init());
     <span class="kw">let </span>_r = main_thread.join().unwrap().map_err(|e| {
         <span class="macro">tracing::error!</span>(<span class="string">&quot;{:?}&quot;</span>, e);
     });
     <span class="macro">warn!</span>(<span class="string">&quot;monitor main thread exited&quot;</span>);
 }
 
-<span class="kw">fn </span>monitor_init(state: Arc&lt;Mutex&lt;MonitorState&gt;&gt;) -&gt; miette::Result&lt;()&gt; {
+<span class="kw">fn </span>monitor_init() -&gt; miette::Result&lt;()&gt; {
     <span class="macro">info!</span>(<span class="string">&quot;monitor early init completed, starting init&quot;</span>);
 
-    {
-        <span class="kw">let </span>state = state.lock().unwrap();
-        <span class="kw">let </span>comp = state.dynlink.lookup_compartment(<span class="string">&quot;monitor&quot;</span>).unwrap();
-        <span class="kw">let </span>mon = state.dynlink.lookup_library(comp, <span class="string">&quot;libmonitor.so&quot;</span>).unwrap();
-
-        <span class="kw">let </span>mon = state.dynlink.get_library(mon)<span class="question-mark">?</span>;
-
-        <span class="kw">for </span>gate <span class="kw">in </span>mon.iter_secgates().unwrap() {
-            <span class="kw">let </span>name = gate.name().to_string_lossy();
-            <span class="macro">info!</span>(<span class="string">&quot;secure gate in {} =&gt; {}: {:x}&quot;</span>, mon.name, name, gate.imp);
-        }
-    }
-
-    load_hello_world_test(<span class="kw-2">&amp;</span>state).unwrap();
-
     <span class="prelude-val">Ok</span>(())
-}
-
-<span class="kw">fn </span>load_hello_world_test(state: <span class="kw-2">&amp;</span>Arc&lt;Mutex&lt;MonitorState&gt;&gt;) -&gt; miette::Result&lt;()&gt; {
-    <span class="kw">let </span>lib = dynlink::library::UnloadedLibrary::new(<span class="string">&quot;hello-world&quot;</span>);
-    <span class="kw">let </span>rt_lib = dynlink::library::UnloadedLibrary::new(<span class="string">&quot;libtwz_rt.so&quot;</span>);
-
-    <span class="kw">let </span><span class="kw-2">mut </span>state = state.lock().unwrap();
-    <span class="kw">let </span>test_comp_id = state.dynlink.add_compartment(<span class="string">&quot;test&quot;</span>)<span class="question-mark">?</span>;
-
-    <span class="kw">let </span>libhw_id = state
-        .dynlink
-        .load_library_in_compartment(test_comp_id, lib)<span class="question-mark">?</span>;
-
-    <span class="kw">let </span>rt_id = <span class="kw">match </span>state
-        .dynlink
-        .load_library_in_compartment(test_comp_id, rt_lib)
-    {
-        <span class="prelude-val">Ok</span>(rt_id) =&gt; {
-            state.dynlink.add_manual_dependency(libhw_id, rt_id);
-            rt_id
-        }
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; state
-            .dynlink
-            .lookup_library(test_comp_id, <span class="string">&quot;libtwz_rt.so&quot;</span>)
-            .unwrap(),
-    };
-
-    <span class="macro">println!</span>(<span class="string">&quot;found rt_id: {}&quot;</span>, rt_id);
-    <span class="kw">let </span>rt_lib = state.dynlink.get_library(rt_id).unwrap();
-
-    drop(rt_lib);
-
-    state.dynlink.relocate_all(libhw_id)<span class="question-mark">?</span>;
-
-    <span class="kw">let </span>test_comp = Comp::new(
-        <span class="number">1</span>.into(),
-        state.dynlink.get_compartment_mut(test_comp_id).unwrap(),
-    )
-    .unwrap();
-
-    <span class="macro">info!</span>(<span class="string">&quot;!! root = {}&quot;</span>, libhw_id);
-    <span class="kw">let </span>ctors = state.dynlink.build_ctors_list(libhw_id).unwrap();
-
-    <span class="kw">let </span>rtinfo = CompartmentInitInfo {
-        ctor_array_start: ctors.as_ptr() <span class="kw">as </span>usize,
-        ctor_array_len: ctors.len(),
-        comp_config_addr: test_comp.get_comp_config() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize,
-    };
-    state.add_comp(test_comp, libhw_id.into());
-
-    <span class="macro">info!</span>(<span class="string">&quot;lookup entry&quot;</span>);
-
-    <span class="kw">let </span>rt_lib = state.dynlink.get_library(rt_id).unwrap();
-    <span class="kw">let </span>entry = rt_lib.get_entry_address().unwrap();
-
-    <span class="kw">let </span>aux = [
-        AuxEntry::RuntimeInfo(<span class="kw-2">&amp;</span>rtinfo <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize, <span class="number">1</span>),
-        AuxEntry::Null,
-    ];
-    <span class="macro">println!</span>(<span class="string">&quot;==&gt; {:p}&quot;</span>, entry);
-    drop(state);
-    entry(aux.as_ptr());
-    <span class="comment">/*
-    let sym = state
-        .dynlink
-        .lookup_symbol(libhw_id, &quot;test_sec_call&quot;, LookupFlags::empty())?;
-
-    let addr = sym.reloc_value();
-    info!(&quot;addr = {:x}&quot;, addr);
-    let ptr: extern &quot;C&quot; fn() = unsafe { core::mem::transmute(addr as usize) };
-    (ptr)();
-    */
-
-    </span><span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">fn </span>bootstrap_name_res(<span class="kw-2">mut </span>name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Backing&gt; {

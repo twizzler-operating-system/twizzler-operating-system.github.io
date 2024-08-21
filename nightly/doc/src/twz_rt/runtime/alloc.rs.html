@@ -262,6 +262,7 @@
 <a href="#262" id="262">262</a>
 <a href="#263" id="263">263</a>
 <a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Primary allocator, for compartment-local allocation. One tricky aspect to this is that we need
 //! to support allocation before the runtime is fully ready, so to avoid calling into std, we
 //! implement a manual spinlock around the allocator until the better Mutex is available. Once it
@@ -356,7 +357,7 @@
         .ok();
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(slot) = slot {
-        <span class="prelude-val">Some</span>((slot, id))
+        <span class="prelude-val">Some</span>((slot.slot, id))
     } <span class="kw">else </span>{
         delete_obj(id);
         <span class="prelude-val">None
@@ -381,7 +382,8 @@
                 .is_err()
             {
                 delete_obj(id);
-                monitor_api::monitor_rt_object_unmap(slot).unwrap();
+                monitor_api::monitor_rt_object_unmap(slot, id, MapFlags::READ | MapFlags::WRITE)
+                    .unwrap();
                 <span class="kw">return </span><span class="prelude-val">Err</span>(());
             }
         }

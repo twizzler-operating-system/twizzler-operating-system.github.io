@@ -209,6 +209,7 @@
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements the core runtime functions.
 
 </span><span class="kw">use </span>dynlink::{context::runtime::RuntimeInitInfo, library::CtorInfo};
@@ -333,8 +334,9 @@
         <span class="macro">preinit_println!</span>(<span class="string">&quot;====== {}&quot;</span>, TLS_TEST);
         <span class="kw">if </span><span class="self">self</span>.state().contains(RuntimeState::IS_MONITOR) {
             <span class="self">self</span>.init_slots();
+        } <span class="kw">else </span>{
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.set_runtime_ready() };
         }
-        <span class="self">self</span>.set_runtime_ready();
     }
 
     <span class="kw">fn </span>post_main_hook(<span class="kw-2">&amp;</span><span class="self">self</span>) {}

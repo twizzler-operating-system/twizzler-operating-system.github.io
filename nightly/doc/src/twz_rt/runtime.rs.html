@@ -103,6 +103,9 @@
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Top level runtime module, managing the basic presentation of the runtime.
 
 </span><span class="kw">use </span>std::sync::{
@@ -158,11 +161,14 @@
 }
 
 <span class="kw">impl </span>ReferenceRuntime {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RuntimeState {
+    <span class="doccomment">/// Returns the runtime state flags.
+    </span><span class="kw">pub fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RuntimeState {
         RuntimeState::from_bits_truncate(<span class="self">self</span>.state.load(Ordering::SeqCst))
     }
 
-    <span class="kw">fn </span>set_runtime_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+    <span class="doccomment">/// Set the runtime ready state. If the runtime has not been initialized, the result is
+    /// undefined.
+    </span><span class="kw">pub unsafe fn </span>set_runtime_ready(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="self">self</span>.state
             .fetch_or(RuntimeState::READY.bits(), Ordering::SeqCst);
     }

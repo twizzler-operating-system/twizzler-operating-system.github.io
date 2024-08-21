@@ -23,6 +23,8 @@
 <a href="#23" id="23">23</a>
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! # The Twizzler Reference Runtime
 //! The Reference Runtime implements the Runtime trait from twizzler-runtime-abi, and is designed to
 //! be the primary, fully supported programming environment on Twizzler.
@@ -42,7 +44,9 @@
 <span class="kw">pub use </span>arch::rr_upcall_entry;
 
 <span class="kw">mod </span>runtime;
-<span class="kw">pub use </span>runtime::{set_upcall_handler, CompartmentInitInfo, RuntimeThreadControl, OUR_RUNTIME};
+<span class="kw">pub use </span>runtime::{
+    set_upcall_handler, CompartmentInitInfo, RuntimeState, RuntimeThreadControl, OUR_RUNTIME,
+};
 
 <span class="kw">mod </span>error;
 <span class="kw">pub use </span>error::<span class="kw-2">*</span>;
