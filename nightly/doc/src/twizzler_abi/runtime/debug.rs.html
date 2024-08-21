@@ -75,6 +75,10 @@
 <a href="#75" id="75">75</a>
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Null implementation of the debug runtime.
 
 </span><span class="kw">use </span>twizzler_runtime_api::{AddrRange, DebugRuntime, Library, LibraryId, MapFlags};
@@ -150,6 +154,10 @@
         _f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(twizzler_runtime_api::DlPhdrInfo) -&gt; core::ffi::c_int,
     ) -&gt; core::ffi::c_int {
         <span class="number">0
+    </span>}
+
+    <span class="kw">fn </span>next_library_id(<span class="kw-2">&amp;</span><span class="self">self</span>, _id: LibraryId) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryId&gt; {
+        <span class="prelude-val">None
     </span>}
 }
 </code></pre></div></section></main></body></html>

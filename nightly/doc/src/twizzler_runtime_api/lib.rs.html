@@ -806,6 +806,10 @@
 <a href="#806" id="806">806</a>
 <a href="#807" id="807">807</a>
 <a href="#808" id="808">808</a>
+<a href="#809" id="809">809</a>
+<a href="#810" id="810">810</a>
+<a href="#811" id="811">811</a>
+<a href="#812" id="812">812</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including
 //! startup, execution, and libstd support. It defines a set of traits that, when all implemented,
 //! form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
@@ -1553,6 +1557,10 @@
     </span><span class="kw">fn </span>get_full_mapping(<span class="kw-2">&amp;</span><span class="self">self</span>, lib: <span class="kw-2">&amp;</span>Library) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectHandle&gt;;
     <span class="doccomment">/// Handler for calls to the dl_iterate_phdr call.
     </span><span class="kw">fn </span>iterate_phdr(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>FnMut(DlPhdrInfo) -&gt; core::ffi::c_int) -&gt; core::ffi::c_int;
+    <span class="doccomment">/// Get the library ID immediately following the given one.
+    </span><span class="kw">fn </span>next_library_id(<span class="kw-2">&amp;</span><span class="self">self</span>, id: LibraryId) -&gt; <span class="prelude-ty">Option</span>&lt;LibraryId&gt; {
+        <span class="prelude-val">Some</span>(LibraryId(id.<span class="number">0 </span>+ <span class="number">1</span>))
+    }
 }
 
 <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]

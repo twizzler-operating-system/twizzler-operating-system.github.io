@@ -163,6 +163,24 @@
 <a href="#163" id="163">163</a>
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
+<a href="#166" id="166">166</a>
+<a href="#167" id="167">167</a>
+<a href="#168" id="168">168</a>
+<a href="#169" id="169">169</a>
+<a href="#170" id="170">170</a>
+<a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This crate exists to break a circular dependency between twz-rt and monitor. We use extern
 //! symbols so that we can just call into the monitor without having to have it as an explicit
 //! dependency.
@@ -180,7 +198,7 @@
 };
 
 <span class="kw">use </span>dynlink::tls::{Tcb, TlsRegion};
-<span class="kw">use </span>twizzler_abi::object::ObjID;
+<span class="kw">use </span>twizzler_abi::object::{ObjID, MAX_SIZE, NULLPAGE_SIZE};
 
 <span class="kw">mod </span>gates {
     <span class="macro">include! </span>{<span class="string">&quot;../../monitor/secapi/gates.rs&quot;</span>}
@@ -328,4 +346,22 @@
 }
 
 <span class="kw">pub use </span>gates::LibraryInfo;
+
+<span class="doccomment">/// Contains raw mapping addresses, for use when translating to object handles for the runtime.
+</span><span class="attr">#[derive(Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+</span><span class="kw">pub struct </span>MappedObjectAddrs {
+    <span class="kw">pub </span>slot: usize,
+    <span class="kw">pub </span>start: usize,
+    <span class="kw">pub </span>meta: usize,
+}
+
+<span class="kw">impl </span>MappedObjectAddrs {
+    <span class="kw">pub fn </span>new(slot: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            start: slot * MAX_SIZE,
+            meta: (slot + <span class="number">1</span>) * MAX_SIZE - NULLPAGE_SIZE,
+            slot,
+        }
+    }
+}
 </code></pre></div></section></main></body></html>

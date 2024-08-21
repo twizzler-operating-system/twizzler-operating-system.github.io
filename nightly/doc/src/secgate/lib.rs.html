@@ -235,6 +235,8 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
 </pre></div><pre class="rust"><code><span class="attr">#![feature(fn_traits)]
 #![feature(unboxed_closures)]
 #![feature(tuple_trait)]
@@ -247,6 +249,8 @@
 
 <span class="kw">pub use </span>secgate_macros::<span class="kw-2">*</span>;
 <span class="kw">use </span>twizzler_abi::object::ObjID;
+
+<span class="kw">pub mod </span>util;
 
 <span class="doccomment">/// Enum of possible return codes, similar to [Result], but with specific
 /// variants of possible failures of initializing or invoking the secure gate call.

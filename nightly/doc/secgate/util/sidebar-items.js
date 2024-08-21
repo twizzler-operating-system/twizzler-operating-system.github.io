@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["HandleMgr","SimpleBuffer"],"trait":["Handle"],"type":["Descriptor"]};
