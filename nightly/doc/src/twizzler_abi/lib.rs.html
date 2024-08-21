@@ -87,6 +87,24 @@
 <a href="#87" id="87">87</a>
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This library provides a common interface for applications that want to talk to the Twizzler
 //! kernel, and defines that interface for both applications and the kernel to follow. It&#39;s made of
 //! several parts:
@@ -111,6 +129,7 @@
 #![feature(asm_const)]
 #![feature(linkage)]
 #![feature(error_in_core)]
+#![feature(test)]
 </span><span class="kw">pub mod </span>arch;
 
 <span class="attr">#[allow(unused_extern_crates)]
@@ -174,6 +193,23 @@
         <span class="kw">unsafe </span>{
             internal_abort();
         }
+    }
+}
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">extern crate </span>test;
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">mod </span>tester {
+    <span class="kw">use </span><span class="kw">crate</span>::print_err;
+
+    <span class="attr">#[bench]
+    </span><span class="kw">fn </span>test_bench(bench: <span class="kw-2">&amp;mut </span>test::Bencher) {
+        bench.iter(|| {
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">10000 </span>{
+                core::hint::black_box(i);
+            }
+        });
     }
 }
 </code></pre></div></section></main></body></html>
