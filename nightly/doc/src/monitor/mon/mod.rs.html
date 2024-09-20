@@ -176,23 +176,54 @@
 <a href="#176" id="176">176</a>
 <a href="#177" id="177">177</a>
 <a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
+<a href="#187" id="187">187</a>
+<a href="#188" id="188">188</a>
+<a href="#189" id="189">189</a>
+<a href="#190" id="190">190</a>
+<a href="#191" id="191">191</a>
+<a href="#192" id="192">192</a>
+<a href="#193" id="193">193</a>
+<a href="#194" id="194">194</a>
+<a href="#195" id="195">195</a>
+<a href="#196" id="196">196</a>
+<a href="#197" id="197">197</a>
+<a href="#198" id="198">198</a>
+<a href="#199" id="199">199</a>
+<a href="#200" id="200">200</a>
+<a href="#201" id="201">201</a>
+<a href="#202" id="202">202</a>
+<a href="#203" id="203">203</a>
+<a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
+<a href="#207" id="207">207</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{ptr::NonNull, sync::OnceLock};
 
 <span class="kw">use </span>dynlink::compartment::MONITOR_COMPARTMENT_ID;
 <span class="kw">use </span>happylock::{LockCollection, RwLock, ThreadKey};
 <span class="kw">use </span>monitor_api::{SharedCompConfig, TlsTemplateInfo};
+<span class="kw">use </span>secgate::util::HandleMgr;
 <span class="kw">use </span>twizzler_abi::upcall::UpcallFrame;
 <span class="kw">use </span>twizzler_runtime_api::{MapError, MapFlags, ObjID, SpawnError, ThreadSpawnArgs};
 <span class="kw">use </span>twz_rt::{RuntimeState, RuntimeThreadControl, OUR_RUNTIME};
 
 <span class="kw">use </span><span class="self">self</span>::{
-    compartment::{CompConfigObject, RunComp},
+    compartment::{CompConfigObject, CompartmentHandle, RunComp},
     space::{MapHandle, MapInfo, Unmapper},
     thread::{ManagedThread, ThreadCleaner},
 };
 <span class="kw">use crate</span>::{api::MONITOR_INSTANCE_ID, init::InitDynlinkContext};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>compartment;
+<span class="kw">pub mod </span>library;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>space;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>thread;
 
@@ -213,6 +244,10 @@
     </span><span class="kw">pub </span>comp_mgr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>RwLock&lt;compartment::CompartmentMgr&gt;,
     <span class="doccomment">/// Dynamic linker state.
     </span><span class="kw">pub </span>dynlink: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>RwLock&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>dynlink::context::Context&gt;,
+    <span class="doccomment">/// Open handles to libraries.
+    </span><span class="kw">pub </span>library_handles: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>RwLock&lt;HandleMgr&lt;library::LibraryHandle&gt;&gt;,
+    <span class="doccomment">/// Open handles to compartments.
+    </span><span class="kw">pub </span>compartment_handles: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>RwLock&lt;HandleMgr&lt;CompartmentHandle&gt;&gt;,
 }
 
 <span class="comment">// We allow locking individually, using eg mon.space.write(key), or locking the collection for more
@@ -222,6 +257,8 @@
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RwLock&lt;thread::ThreadMgr&gt;,
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RwLock&lt;compartment::CompartmentMgr&gt;,
     <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RwLock&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw-2">mut </span>dynlink::context::Context&gt;,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RwLock&lt;HandleMgr&lt;library::LibraryHandle&gt;&gt;,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RwLock&lt;HandleMgr&lt;CompartmentHandle&gt;&gt;,
 );
 
 <span class="kw">impl </span>Monitor {
@@ -276,15 +313,27 @@
         <span class="kw">let </span>thread_mgr = Box::leak(Box::new(RwLock::new(thread::ThreadMgr::default())));
         <span class="kw">let </span>comp_mgr = Box::leak(Box::new(RwLock::new(comp_mgr)));
         <span class="kw">let </span>dynlink = Box::leak(Box::new(RwLock::new(<span class="kw">unsafe </span>{ init.ctx.as_mut().unwrap() })));
+        <span class="kw">let </span>library_handles = Box::leak(Box::new(RwLock::new(HandleMgr::new(<span class="prelude-val">None</span>))));
+        <span class="kw">let </span>compartment_handles = Box::leak(Box::new(RwLock::new(HandleMgr::new(<span class="prelude-val">None</span>))));
 
         <span class="comment">// Okay to call try_new here, since it&#39;s not many locks and only happens once.
         </span><span class="self">Self </span>{
-            locks: LockCollection::try_new((<span class="kw-2">&amp;*</span>space, <span class="kw-2">&amp;*</span>thread_mgr, <span class="kw-2">&amp;*</span>comp_mgr, <span class="kw-2">&amp;*</span>dynlink)).unwrap(),
+            locks: LockCollection::try_new((
+                <span class="kw-2">&amp;*</span>space,
+                <span class="kw-2">&amp;*</span>thread_mgr,
+                <span class="kw-2">&amp;*</span>comp_mgr,
+                <span class="kw-2">&amp;*</span>dynlink,
+                <span class="kw-2">&amp;*</span>library_handles,
+                <span class="kw-2">&amp;*</span>compartment_handles,
+            ))
+            .unwrap(),
             unmapper: OnceLock::new(),
             space,
             thread_mgr,
             comp_mgr,
             dynlink,
+            library_handles,
+            compartment_handles,
         }
     }
 
@@ -335,6 +384,15 @@
         <span class="kw">let </span>rc = comp_mgr.get_mut(sctx).ok_or(MapError::InvalidArgument)<span class="question-mark">?</span>;
         <span class="kw">let </span>handle = rc.map_object(info, handle)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(handle)
+    }
+
+    <span class="doccomment">/// Get the object ID for this compartment-thread&#39;s simple buffer.
+    </span><span class="kw">pub fn </span>get_thread_simple_buffer(<span class="kw-2">&amp;</span><span class="self">self</span>, sctx: ObjID, thread: ObjID) -&gt; <span class="prelude-ty">Option</span>&lt;ObjID&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>locks = <span class="self">self</span>.locks.lock(ThreadKey::get().unwrap());
+        <span class="kw">let </span>(<span class="kw-2">ref mut </span>space, <span class="kw">_</span>, <span class="kw-2">ref mut </span>comps, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) = <span class="kw-2">*</span>locks;
+        <span class="kw">let </span>rc = comps.get_mut(sctx)<span class="question-mark">?</span>;
+        <span class="kw">let </span>pt = rc.get_per_thread(thread, <span class="kw-2">&amp;mut *</span>space);
+        pt.simple_buffer_id()
     }
 }
 

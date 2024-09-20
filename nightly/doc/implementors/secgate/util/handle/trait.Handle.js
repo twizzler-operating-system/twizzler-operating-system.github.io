@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"monitor_api":[["impl <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"monitor_api/struct.LibraryHandle.html\" title=\"struct monitor_api::LibraryHandle\">LibraryHandle</a>"],["impl <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"monitor_api/struct.CompartmentHandle.html\" title=\"struct monitor_api::CompartmentHandle\">CompartmentHandle</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

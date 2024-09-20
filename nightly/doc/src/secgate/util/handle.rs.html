@@ -121,7 +121,17 @@
 <a href="#121" id="121">121</a>
 <a href="#122" id="122">122</a>
 <a href="#123" id="123">123</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, num::NonZeroUsize};
 
 <span class="kw">use </span>stable_vec::StableVec;
 <span class="kw">use </span>twizzler_runtime_api::ObjID;
@@ -150,21 +160,29 @@
 </span><span class="attr">#[derive(Default, Clone)]
 </span><span class="kw">pub struct </span>HandleMgr&lt;ServerData&gt; {
     handles: HashMap&lt;ObjID, StableVec&lt;ServerData&gt;&gt;,
-    max: usize,
+    max: <span class="prelude-ty">Option</span>&lt;NonZeroUsize&gt;,
 }
 
 <span class="kw">impl</span>&lt;ServerData&gt; HandleMgr&lt;ServerData&gt; {
     <span class="doccomment">/// Construct a new HandleMgr.
-    </span><span class="kw">pub fn </span>new(max: usize) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(max: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             handles: HashMap::new(),
-            max,
+            max: max.map(|max| NonZeroUsize::new(max)).flatten(),
         }
     }
 
     <span class="doccomment">/// Get the maximum number of open handles.
-    </span><span class="kw">pub fn </span>max(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.max
+    </span><span class="kw">pub fn </span>max(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.max.map(|x| x.get())
+    }
+
+    <span class="doccomment">/// Get the number of currently open handles for a given compartment.
+    </span><span class="kw">pub fn </span>open_count(<span class="kw-2">&amp;</span><span class="self">self</span>, comp: ObjID) -&gt; usize {
+        <span class="self">self</span>.handles
+            .get(<span class="kw-2">&amp;</span>comp)
+            .map(|sv| sv.num_elements())
+            .unwrap_or(<span class="number">0</span>)
     }
 
     <span class="doccomment">/// Lookup the server data associated with a descriptor.
@@ -177,8 +195,10 @@
     </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, comp: ObjID, sd: ServerData) -&gt; <span class="prelude-ty">Option</span>&lt;Descriptor&gt; {
         <span class="kw">let </span>entry = <span class="self">self</span>.handles.entry(comp).or_insert_with(|| StableVec::new());
         <span class="kw">let </span>idx = entry.next_push_index();
-        <span class="kw">if </span>idx &gt;= <span class="self">self</span>.max &amp;&amp; <span class="self">self</span>.max &gt; <span class="number">0 </span>{
-            <span class="kw">return </span><span class="prelude-val">None</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = <span class="self">self</span>.max {
+            <span class="kw">if </span>idx &gt;= max.get() {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
+            }
         }
         <span class="kw">let </span>ds: Descriptor = idx.try_into().ok()<span class="question-mark">?</span>;
         <span class="kw">let </span>pushed_idx = entry.push(sd);
@@ -232,7 +252,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>handle() {
-        <span class="kw">let </span>mgr = RefCell::new(HandleMgr::new(<span class="number">8</span>));
+        <span class="kw">let </span>mgr = RefCell::new(HandleMgr::new(<span class="prelude-val">Some</span>(<span class="number">8</span>)));
         <span class="kw">let </span><span class="kw-2">mut </span>foo = FooHandle::open((<span class="number">42</span>, mgr)).unwrap();
 
         <span class="macro">assert_eq!</span>(foo.x, <span class="number">42</span>);

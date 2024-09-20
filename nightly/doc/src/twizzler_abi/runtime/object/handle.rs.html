@@ -214,7 +214,7 @@
         <span class="prelude-val">Some</span>(<span class="self">Self </span>{
             slot,
             runtime_handle: ObjectHandle::new(
-                raw,
+                <span class="prelude-val">Some</span>(raw),
                 id,
                 MapFlags::READ | MapFlags::WRITE,
                 (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
@@ -254,7 +254,7 @@
 
         <span class="prelude-val">Some</span>(<span class="self">Self </span>{
             runtime_handle: ObjectHandle::new(
-                NonNull::new(Box::into_raw(Box::new(InternalHandleRefs::default()))).unwrap(),
+                <span class="prelude-val">Some</span>(NonNull::new(Box::into_raw(Box::new(InternalHandleRefs::default()))).unwrap()),
                 id,
                 prot.into(),
                 (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,

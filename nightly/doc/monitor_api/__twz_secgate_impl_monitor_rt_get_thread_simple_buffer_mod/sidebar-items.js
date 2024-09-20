@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_thread_simple_buffer"],"type":["Args","Ret"]};

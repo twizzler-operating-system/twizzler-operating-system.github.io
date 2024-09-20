@@ -142,7 +142,7 @@
         <span class="kw">let </span>slot = global_allocate().ok_or(MapError::OutOfResources)<span class="question-mark">?</span>;
         <span class="kw">let _ </span>= sys_object_map(<span class="prelude-val">None</span>, id, slot, flags.into(), flags.into()).map_err(|e| e.into())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(ObjectHandle::new(
-            NonNull::new(Box::into_raw(Box::new(InternalHandleRefs::default()))).unwrap(),
+            <span class="prelude-val">Some</span>(NonNull::new(Box::into_raw(Box::new(InternalHandleRefs::default()))).unwrap()),
             id,
             flags,
             (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,

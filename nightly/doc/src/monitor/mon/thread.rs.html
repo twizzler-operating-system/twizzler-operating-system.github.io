@@ -205,6 +205,11 @@
 <a href="#205" id="205">205</a>
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
+<a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     cell::OnceCell,
     collections::HashMap,
@@ -214,16 +219,21 @@
 };
 
 <span class="kw">use </span>dynlink::{compartment::Compartment, context::Context, tls::TlsRegion};
+<span class="kw">use </span>happylock::ThreadKey;
+<span class="kw">use </span>secgate::util::SimpleBuffer;
 <span class="kw">use </span>twizzler_abi::{
     object::NULLPAGE_SIZE,
-    syscall::{sys_spawn, sys_thread_exit, ThreadSyncSleep, UpcallTargetSpawnOption},
+    syscall::{sys_spawn, sys_thread_exit, ObjectCreate, ThreadSyncSleep, UpcallTargetSpawnOption},
     thread::{ExecutionState, ThreadRepr},
     upcall::{UpcallFlags, UpcallInfo, UpcallMode, UpcallOptions, UpcallTarget},
 };
 <span class="kw">use </span>twizzler_runtime_api::{MapFlags, ObjID, SpawnError};
 <span class="kw">use </span>twz_rt::RuntimeThreadControl;
 
-<span class="kw">use </span><span class="kw">super</span>::space::{MapHandle, MapInfo, Space};
+<span class="kw">use super</span>::{
+    get_monitor,
+    space::{MapHandle, MapInfo, Space},
+};
 <span class="kw">use </span><span class="kw">crate</span>::api::MONITOR_INSTANCE_ID;
 
 <span class="kw">mod </span>cleaner;

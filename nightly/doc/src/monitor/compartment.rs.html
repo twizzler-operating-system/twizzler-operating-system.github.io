@@ -206,6 +206,8 @@
 <a href="#206" id="206">206</a>
 <a href="#207" id="207">207</a>
 <a href="#208" id="208">208</a>
+<a href="#209" id="209">209</a>
+<a href="#210" id="210">210</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     alloc::Layout,
     cell::OnceCell,
@@ -223,6 +225,8 @@
 <span class="kw">use </span>twizzler_object::ObjID;
 <span class="kw">use </span>twizzler_runtime_api::{LibraryId, MapFlags, ObjectHandle};
 <span class="kw">use </span>twz_rt::RuntimeThreadControl;
+
+<span class="kw">use </span><span class="kw">crate</span>::gates::{CompartmentInfo, LoadCompartmentError};
 
 <span class="doccomment">/// The monitor&#39;s representation of a compartment.
 </span><span class="kw">pub struct </span>Comp {

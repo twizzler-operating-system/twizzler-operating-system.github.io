@@ -76,35 +76,32 @@
 <a href="#76" id="76">76</a>
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>elf::segment::Elf64_Phdr;
-<span class="kw">use </span>monitor_api::get_comp_config;
 <span class="kw">use </span>twizzler_runtime_api::{AddrRange, DebugRuntime, Library, MapFlags};
 
 <span class="kw">use super</span>::{object::new_object_handle, ReferenceRuntime};
-<span class="kw">use </span><span class="kw">crate</span>::preinit_println;
 
 <span class="kw">impl </span>DebugRuntime <span class="kw">for </span>ReferenceRuntime {
     <span class="kw">fn </span>get_library(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         id: twizzler_runtime_api::LibraryId,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::Library&gt; {
-        <span class="kw">let </span>info: monitor_api::LibraryInfo =
-            monitor_api::monitor_rt_get_library_info(id).unwrap()<span class="question-mark">?</span>;
+        <span class="kw">let </span>lib = monitor_api::CompartmentHandle::current().libs().nth(id.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>info = lib.info();
         <span class="kw">let </span>handle = new_object_handle(info.objid, info.slot, MapFlags::READ);
         <span class="prelude-val">Some</span>(Library {
             range: info.range,
             dl_info: <span class="prelude-val">Some</span>(info.dl_info),
             id,
             mapping: handle,
-            next_id: info.next_id,
         })
     }
 
     <span class="kw">fn </span>get_exeid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::LibraryId&gt; {
-        <span class="comment">// For now, this will always be the third library, after runtime and libstd.
-        // TODO (dbittman): once the monitor refactor is complete, this API will be fixed
-        // to be more dynamic.
-        </span><span class="prelude-val">Some</span>(twizzler_runtime_api::LibraryId(<span class="number">3</span>))
+        <span class="comment">// root ID is always 0
+        </span><span class="prelude-val">Some</span>(twizzler_runtime_api::LibraryId(<span class="number">0</span>))
     }
 
     <span class="kw">fn </span>get_library_segment(
@@ -139,9 +136,9 @@
     ) -&gt; core::ffi::c_int {
         <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="number">0</span>;
         <span class="comment">// Get the primary library for this compartment.
-        </span><span class="kw">let </span><span class="kw-2">mut </span>id = <span class="self">self</span>.get_exeid();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>id = <span class="self">self</span>.get_exeid().unwrap().<span class="number">0</span>;
         <span class="comment">// Each library contains a field indicating the next library ID in this list.
-        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(library) = id.and_then(|id| <span class="self">self</span>.get_library(id)) {
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(library) = <span class="self">self</span>.get_library(twizzler_runtime_api::LibraryId(id)) {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(info) = library.dl_info {
                 ret = f(info);
                 <span class="comment">// dl_iterate_phdr returns early if the callback returns non-zero.
@@ -149,9 +146,16 @@
                     <span class="kw">return </span>ret;
                 }
             }
-            id = library.next_id;
+            id += <span class="number">1</span>;
         }
         ret
+    }
+
+    <span class="kw">fn </span>next_library_id(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        id: twizzler_runtime_api::LibraryId,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;twizzler_runtime_api::LibraryId&gt; {
+        <span class="prelude-val">Some</span>(twizzler_runtime_api::LibraryId(id.<span class="number">0 </span>+ <span class="number">1</span>))
     }
 }
 </code></pre></div></section></main></body></html>

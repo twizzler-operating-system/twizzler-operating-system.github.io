@@ -209,7 +209,7 @@
     flags: MapFlags,
 ) -&gt; ObjectHandle {
     ObjectHandle::new(
-        NonNull::new(Box::into_raw(Box::default())).unwrap(),
+        <span class="prelude-val">Some</span>(NonNull::new(Box::into_raw(Box::default())).unwrap()),
         id,
         flags,
         (slot * MAX_SIZE) <span class="kw">as </span><span class="kw-2">*mut </span>u8,
@@ -355,7 +355,7 @@
         }
 
         <span class="comment">// Safety: we only create internal refs from Box.
-        </span><span class="kw">let </span>_boxed = <span class="kw">unsafe </span>{ Box::from_raw(handle.internal_refs.as_mut()) };
+        </span><span class="kw">let </span>_boxed = <span class="kw">unsafe </span>{ Box::from_raw(handle.internal_refs.unwrap().as_mut()) };
     }
 }
 </code></pre></div></section></main></body></html>

@@ -66,11 +66,107 @@
 <a href="#66" id="66">66</a>
 <a href="#67" id="67">67</a>
 <a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
+<a href="#71" id="71">71</a>
+<a href="#72" id="72">72</a>
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
+<span class="kw">use </span>happylock::ThreadKey;
+<span class="kw">use </span>secgate::util::Descriptor;
 <span class="kw">use </span>twizzler_runtime_api::ObjID;
 
-<span class="kw">use </span><span class="kw">crate</span>::api::MONITOR_INSTANCE_ID;
+<span class="kw">use crate</span>::{
+    api::MONITOR_INSTANCE_ID,
+    gates::{CompartmentInfo, LoadCompartmentError},
+};
 
 <span class="kw">mod </span>compconfig;
 <span class="kw">mod </span>compthread;
@@ -133,5 +229,91 @@
         <span class="comment">// Unwrap-Ok: this instance is always present.
         </span><span class="self">self</span>.get_mut(MONITOR_INSTANCE_ID).unwrap()
     }
+
+    <span class="doccomment">/// Get an iterator over all compartments.
+    </span><span class="kw">pub fn </span>compartments(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>RunComp&gt; {
+        <span class="self">self</span>.instances.values()
+    }
+
+    <span class="doccomment">/// Get an iterator over all compartments (mutable).
+    </span><span class="kw">pub fn </span>compartments_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;mut </span>RunComp&gt; {
+        <span class="self">self</span>.instances.values_mut()
+    }
+}
+
+<span class="kw">impl </span><span class="kw">super</span>::Monitor {
+    <span class="doccomment">/// Get CompartmentInfo for this caller. Note that this will write to the compartment-thread&#39;s
+    /// simple buffer.
+    </span><span class="kw">pub fn </span>get_compartment_info(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        instance: ObjID,
+        thread: ObjID,
+        desc: <span class="prelude-ty">Option</span>&lt;Descriptor&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;CompartmentInfo&gt; {
+        <span class="kw">let </span>(<span class="kw-2">ref mut </span>space, <span class="kw">_</span>, <span class="kw-2">ref mut </span>comps, <span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref </span>comphandles) =
+            <span class="kw-2">*</span><span class="self">self</span>.locks.lock(ThreadKey::get().unwrap());
+        <span class="kw">let </span>comp_id = desc
+            .map(|comp| comphandles.lookup(instance, comp).map(|ch| ch.instance))
+            .unwrap_or(<span class="prelude-val">Some</span>(instance))<span class="question-mark">?</span>;
+
+        <span class="kw">let </span>name = comps.get(comp_id)<span class="question-mark">?</span>.name.clone();
+        <span class="kw">let </span>pt = comps.get_mut(instance)<span class="question-mark">?</span>.get_per_thread(thread, space);
+        <span class="kw">let </span>name_len = pt.write_bytes(name.as_bytes());
+        <span class="kw">let </span>comp = comps.get(comp_id)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Some</span>(CompartmentInfo {
+            name_len,
+            id: comp_id,
+            sctx: comp.sctx,
+            flags: comp.raw_flags(),
+        })
+    }
+
+    <span class="doccomment">/// Open a compartment handle for this caller compartment.
+    </span><span class="kw">pub fn </span>get_compartment_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, caller: ObjID, compartment: ObjID) -&gt; <span class="prelude-ty">Option</span>&lt;Descriptor&gt; {
+        <span class="self">self</span>.compartment_handles
+            .write(ThreadKey::get().unwrap())
+            .insert(
+                caller,
+                <span class="kw">super</span>::CompartmentHandle {
+                    instance: <span class="kw">if </span>compartment.as_u128() == <span class="number">0 </span>{
+                        caller
+                    } <span class="kw">else </span>{
+                        compartment
+                    },
+                },
+            )
+    }
+
+    <span class="doccomment">/// Open a handle to the n&#39;th dependency compartment of a given compartment.
+    </span><span class="kw">pub fn </span>get_compartment_deps(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        caller: ObjID,
+        desc: <span class="prelude-ty">Option</span>&lt;Descriptor&gt;,
+        dep_n: usize,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Descriptor&gt; {
+        <span class="macro">todo!</span>()
+    }
+
+    <span class="doccomment">/// Load a new compartment with a root library ID, and return a compartment handle.
+    </span><span class="kw">pub fn </span>load_compartment(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        caller: ObjID,
+        root_id: ObjID,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Descriptor, LoadCompartmentError&gt; {
+        <span class="macro">todo!</span>()
+    }
+
+    <span class="doccomment">/// Drop a compartment handle.
+    </span><span class="kw">pub fn </span>drop_compartment_handle(<span class="kw-2">&amp;</span><span class="self">self</span>, caller: ObjID, desc: Descriptor) {
+        <span class="self">self</span>.compartment_handles
+            .write(ThreadKey::get().unwrap())
+            .remove(caller, desc);
+    }
+}
+
+<span class="doccomment">/// A handle to a compartment.
+</span><span class="kw">pub struct </span>CompartmentHandle {
+    <span class="kw">pub </span>instance: ObjID,
 }
 </code></pre></div></section></main></body></html>

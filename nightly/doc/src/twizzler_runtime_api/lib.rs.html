@@ -810,6 +810,10 @@
 <a href="#810" id="810">810</a>
 <a href="#811" id="811">811</a>
 <a href="#812" id="812">812</a>
+<a href="#813" id="813">813</a>
+<a href="#814" id="814">814</a>
+<a href="#815" id="815">815</a>
+<a href="#816" id="816">816</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! The Twizzler Runtime API is the core interface definition for Twizzler programs, including
 //! startup, execution, and libstd support. It defines a set of traits that, when all implemented,
 //! form the full interface that Rust&#39;s libstd expects from a Twizzler runtime.
@@ -1168,7 +1172,7 @@
 /// must be #[no_std], we need to implement refcounting ourselves.
 </span><span class="kw">pub struct </span>ObjectHandle {
     <span class="doccomment">/// Pointer to refcounter.
-    </span><span class="kw">pub </span>internal_refs: NonNull&lt;InternalHandleRefs&gt;,
+    </span><span class="kw">pub </span>internal_refs: <span class="prelude-ty">Option</span>&lt;NonNull&lt;InternalHandleRefs&gt;&gt;,
     <span class="doccomment">/// The ID of the object.
     </span><span class="kw">pub </span>id: ObjID,
     <span class="doccomment">/// The flags of this handle.
@@ -1207,7 +1211,7 @@
 
 <span class="kw">impl </span>ObjectHandle {
     <span class="kw">pub fn </span>new(
-        internal_refs: NonNull&lt;InternalHandleRefs&gt;,
+        internal_refs: <span class="prelude-ty">Option</span>&lt;NonNull&lt;InternalHandleRefs&gt;&gt;,
         id: ObjID,
         flags: MapFlags,
         start: <span class="kw-2">*mut </span>u8,
@@ -1225,7 +1229,10 @@
 
 <span class="kw">impl </span>Clone <span class="kw">for </span>ObjectHandle {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ <span class="self">self</span>.internal_refs.as_ref() };
+        <span class="kw">let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>refs) = <span class="self">self</span>.internal_refs <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;cannot clone an unsafe object handle&quot;</span>);
+        };
+        <span class="kw">let </span>rc = <span class="kw">unsafe </span>{ refs.as_ref() };
         <span class="comment">// This use of Relaxed ordering is justified by https://doc.rust-lang.org/nomicon/arc-mutex/arc-clone.html.
         </span><span class="kw">let </span>old_count = rc.count.fetch_add(<span class="number">1</span>, Ordering::Relaxed);
         <span class="comment">// The above link also justifies the following behavior. If our count gets this high, we
@@ -1245,8 +1252,11 @@
 
 <span class="kw">impl </span>Drop <span class="kw">for </span>ObjectHandle {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>refs) = <span class="self">self</span>.internal_refs <span class="kw">else </span>{
+            <span class="kw">return</span>;
+        };
         <span class="comment">// This use of Release ordering is justified by https://doc.rust-lang.org/nomicon/arc-mutex/arc-clone.html.
-        </span><span class="kw">let </span>rc = <span class="kw">unsafe </span>{ <span class="self">self</span>.internal_refs.as_ref() };
+        </span><span class="kw">let </span>rc = <span class="kw">unsafe </span>{ refs.as_ref() };
         <span class="kw">if </span>rc.count.fetch_sub(<span class="number">1</span>, Ordering::Release) != <span class="number">1 </span>{
             <span class="kw">return</span>;
         }
@@ -1501,8 +1511,6 @@
     </span><span class="kw">pub </span>range: AddrRange,
     <span class="doccomment">/// Information for dl_iterate_phdr
     </span><span class="kw">pub </span>dl_info: <span class="prelude-ty">Option</span>&lt;DlPhdrInfo&gt;,
-    <span class="doccomment">/// The Library ID of first dependency.
-    </span><span class="kw">pub </span>next_id: <span class="prelude-ty">Option</span>&lt;LibraryId&gt;,
 }
 
 <span class="kw">impl </span>AsRef&lt;Library&gt; <span class="kw">for </span>Library {

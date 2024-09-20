@@ -149,6 +149,12 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     collections::HashMap,
     marker::PhantomPinned,
@@ -286,8 +292,14 @@
         </span><span class="kw">for </span>(<span class="kw">_</span>, th) <span class="kw">in </span>cleanups.drain(..) {
             <span class="macro">tracing::debug!</span>(<span class="string">&quot;cleaning thread: {}&quot;</span>, th.id);
             <span class="kw">let </span>monitor = get_monitor();
-            <span class="kw">let </span><span class="kw-2">mut </span>tmgr = monitor.thread_mgr.write(<span class="kw-2">&amp;mut </span>key);
-            tmgr.do_remove(<span class="kw-2">&amp;</span>th);
+            {
+                <span class="kw">let </span><span class="kw-2">mut </span>tmgr = monitor.thread_mgr.write(<span class="kw-2">&amp;mut </span>key);
+                tmgr.do_remove(<span class="kw-2">&amp;</span>th);
+            }
+            <span class="kw">let </span><span class="kw-2">mut </span>cmgr = monitor.comp_mgr.write(<span class="kw-2">&amp;mut </span>key);
+            <span class="kw">for </span>comp <span class="kw">in </span>cmgr.compartments_mut() {
+                comp.clean_per_thread_data(th.id);
+            }
         }
 
         <span class="comment">// Check for notifications, and sleep.
