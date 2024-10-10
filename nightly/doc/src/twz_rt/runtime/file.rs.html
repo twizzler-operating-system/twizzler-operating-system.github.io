@@ -169,11 +169,6 @@
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
-<a href="#172" id="172">172</a>
-<a href="#173" id="173">173</a>
-<a href="#174" id="174">174</a>
-<a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>core::{intrinsics::size_of, ptr::NonNull};
 <span class="kw">use </span>std::{
     borrow::ToOwned,
@@ -200,7 +195,6 @@
 <span class="kw">use </span><span class="kw">super</span>::ReferenceRuntime;
 
 <span class="kw">struct </span>FileDesc {
-    slot_id: u32,
     pos: u64,
     handle: ObjectHandle,
 }
@@ -227,15 +221,15 @@
     <span class="kw">fn </span>open(<span class="kw-2">&amp;</span><span class="self">self</span>, path: <span class="kw-2">&amp;</span>core::ffi::CStr) -&gt; <span class="prelude-ty">Result</span>&lt;RawFd, FsError&gt; {
         <span class="kw">let </span>obj_id = ObjID::new(
             path.to_str()
-                .map_err(|err| (FsError::InvalidPath))<span class="question-mark">?
+                .map_err(|_err| (FsError::InvalidPath))<span class="question-mark">?
                 </span>.parse::&lt;u128&gt;()
-                .map_err(|err| (FsError::InvalidPath))<span class="question-mark">?</span>,
+                .map_err(|_err| (FsError::InvalidPath))<span class="question-mark">?</span>,
         );
         <span class="kw">let </span>flags = twizzler_runtime_api::MapFlags::READ | twizzler_runtime_api::MapFlags::WRITE;
 
         <span class="kw">let </span>handle = <span class="self">self</span>.map_object(obj_id, flags).unwrap();
 
-        <span class="kw">let </span><span class="kw-2">mut </span>metadata_handle = <span class="kw">unsafe </span>{
+        <span class="kw">let </span>metadata_handle = <span class="kw">unsafe </span>{
             handle
                 .start
                 .offset(NULLPAGE_SIZE <span class="kw">as </span>isize)
@@ -254,18 +248,14 @@
         <span class="kw">let </span>fd = get_fd_slots()
             .lock()
             .unwrap()
-            .push(Arc::new(Mutex::new(FileDesc {
-                slot_id: <span class="number">0</span>,
-                pos: <span class="number">0</span>,
-                handle,
-            })));
+            .push(Arc::new(Mutex::new(FileDesc { pos: <span class="number">0</span>, handle })));
 
         <span class="prelude-val">Ok</span>(fd.try_into().unwrap())
     }
 
     <span class="kw">fn </span>read(<span class="kw-2">&amp;</span><span class="self">self</span>, fd: RawFd, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, FsError&gt; {
         <span class="kw">let </span>binding = get_fd_slots().lock().unwrap();
-        <span class="kw">let </span><span class="kw-2">mut </span>file_desc = binding
+        <span class="kw">let </span>file_desc = binding
             .get(fd.try_into().unwrap())
             .ok_or(FsError::LookupError)<span class="question-mark">?</span>;
 
@@ -334,7 +324,7 @@
             .ok_or(FsError::LookupError)<span class="question-mark">?</span>;
 
         <span class="kw">let </span><span class="kw-2">mut </span>binding = file_desc.lock().unwrap();
-        <span class="kw">let </span><span class="kw-2">mut </span>metadata_handle = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>binding.handle.start.cast::&lt;FileMetadata&gt;() };
+        <span class="kw">let </span>metadata_handle = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>binding.handle.start.cast::&lt;FileMetadata&gt;() };
 
         <span class="kw">let </span>new_pos: i64 = <span class="kw">match </span>pos {
             SeekFrom::Start(x) =&gt; x <span class="kw">as </span>i64,
