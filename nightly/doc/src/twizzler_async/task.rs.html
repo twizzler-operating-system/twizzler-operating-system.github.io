@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-async/src/task.rs`."><title>task.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="twizzler_async" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-dev" data-channel="nightly" data-search-js="search-cfcb9d78f851226e.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../twizzler_async/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-async/src/task.rs`."><title>task.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="twizzler_async" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-dev" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">twizzler_async/</div>task.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -117,8 +118,7 @@
 <a href="#117" id="117">117</a>
 <a href="#118" id="118">118</a>
 <a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::{
+<a href="#120" id="120">120</a></pre></div><pre class="rust"><code><span class="kw">use </span>std::{
     future::Future,
     pin::Pin,
     task::{Context, Poll},
@@ -130,39 +130,39 @@
 
 <span class="doccomment">/// A spawned future. Tasks are futures themselves and yield the output of the spawned future.
 ///
-/// When a task is dropped, it is automatically canceled and it won&#39;t be polled again. You can also
+/// When a task is dropped, it is automatically canceled and it won't be polled again. You can also
 /// cancel a task explicitly with the [`cancel()`][Task::cancel()] method.
 ///
 /// Tasks that panic are immediately canceled, and awaiting a canceled task causes a panic. If the
 /// future panics, the panic will be unwound into the [`run()`][crate::run()] invocation that polled
-/// it, but this doesn&#39;t apply to the blocking executor, which will simply ignore panics and
+/// it, but this doesn't apply to the blocking executor, which will simply ignore panics and
 /// continue running.
-</span><span class="attr">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them; tasks, specifically, get canceled if you drop them, use `.detach()` to run them in the background&quot;</span>]
+</span><span class="attr">#[must_use = <span class="string">"futures do nothing unless you `.await` or poll them; tasks, specifically, get canceled if you drop them, use `.detach()` to run them in the background"</span>]
 </span><span class="kw">pub struct </span>Task&lt;T&gt;(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="prelude-ty">Option</span>&lt;async_task::JoinHandle&lt;T, u32&gt;&gt;);
 
-<span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>&gt; Task&lt;T&gt; {
+<span class="kw">impl</span>&lt;T: <span class="lifetime">'static</span>&gt; Task&lt;T&gt; {
     <span class="doccomment">/// Spawns a future onto the thread-local executor.
     ///
     /// Panics if the current thread is not inside an invocation of [`run()`][crate::run()].
-    </span><span class="kw">pub fn </span>local(future: <span class="kw">impl </span>Future&lt;Output = T&gt; + <span class="lifetime">&#39;static</span>) -&gt; Task&lt;T&gt; {
+    </span><span class="kw">pub fn </span>local(future: <span class="kw">impl </span>Future&lt;Output = T&gt; + <span class="lifetime">'static</span>) -&gt; Task&lt;T&gt; {
         ThreadLocalExecutor::spawn(future)
     }
 }
 
-<span class="kw">impl</span>&lt;T: Send + <span class="lifetime">&#39;static</span>&gt; Task&lt;T&gt; {
+<span class="kw">impl</span>&lt;T: Send + <span class="lifetime">'static</span>&gt; Task&lt;T&gt; {
     <span class="doccomment">/// Spawns a future onto the global executor.
     ///
     /// This future may be stolen and polled by any thread calling [`run()`][crate::run()], and thus
     /// the future (and its output) must be Send.
-    </span><span class="kw">pub fn </span>spawn(future: <span class="kw">impl </span>Future&lt;Output = T&gt; + Send + <span class="lifetime">&#39;static</span>) -&gt; Task&lt;T&gt; {
+    </span><span class="kw">pub fn </span>spawn(future: <span class="kw">impl </span>Future&lt;Output = T&gt; + Send + <span class="lifetime">'static</span>) -&gt; Task&lt;T&gt; {
         <span class="kw">crate</span>::exec::Executor::get().spawn(future)
     }
 }
 
 <span class="kw">impl</span>&lt;T, E&gt; Task&lt;<span class="prelude-ty">Result</span>&lt;T, E&gt;&gt;
 <span class="kw">where
-    </span>T: Send + <span class="lifetime">&#39;static</span>,
-    E: std::fmt::Debug + Send + <span class="lifetime">&#39;static</span>,
+    </span>T: Send + <span class="lifetime">'static</span>,
+    E: std::fmt::Debug + Send + <span class="lifetime">'static</span>,
 {
     <span class="doccomment">/// Spawns a new task and awaits and unwraps the result.
     </span><span class="kw">pub fn </span>unwrap(<span class="self">self</span>) -&gt; Task&lt;T&gt; {
@@ -189,7 +189,7 @@
     /// # twizzler_async::run(async {
     /// Task::spawn(async {
     ///     loop {
-    ///         println!(&quot;I&#39;m a daemon task looping forever.&quot;);
+    ///         println!("I'm a daemon task looping forever.");
     ///         Timer::after(Duration::from_secs(1)).await;
     ///     }
     /// })
@@ -203,7 +203,7 @@
 
 <span class="kw">impl</span>&lt;T&gt; Task&lt;T&gt; {
     <span class="doccomment">/// Cancels the task and waits for it to stop running. If the task completed before canceling,
-    /// return the task&#39;s output, or `None` if it wasn&#39;t complete. The advantage of calling
+    /// return the task's output, or `None` if it wasn't complete. The advantage of calling
     /// `cancel()` explicitly over jus dropping the task is that it, one, waits for the task to stop
     /// running before returning, and two, it returns the result if the task _did_ successfully
     /// complete.
@@ -225,9 +225,9 @@
 <span class="kw">impl</span>&lt;T&gt; Future <span class="kw">for </span>Task&lt;T&gt; {
     <span class="kw">type </span>Output = T;
 
-    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">'_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
         <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>.as_mut().unwrap()).poll(cx) {
-            Poll::Ready(output) =&gt; Poll::Ready(output.expect(<span class="string">&quot;task failed&quot;</span>)),
+            Poll::Ready(output) =&gt; Poll::Ready(output.expect(<span class="string">"task failed"</span>)),
             Poll::Pending =&gt; Poll::Pending,
         }
     }
@@ -235,7 +235,7 @@
 
 <span class="kw">impl</span>&lt;T&gt; From&lt;Task&lt;T&gt;&gt; <span class="kw">for </span>async_task::JoinHandle&lt;T, u32&gt; {
     <span class="kw">fn </span>from(<span class="kw-2">mut </span>t: Task&lt;T&gt;) -&gt; <span class="self">Self </span>{
-        t.<span class="number">0</span>.take().expect(<span class="string">&quot;task was already canceled or failed&quot;</span>)
+        t.<span class="number">0</span>.take().expect(<span class="string">"task was already canceled or failed"</span>)
     }
 }
 </code></pre></div></section></main></body></html>

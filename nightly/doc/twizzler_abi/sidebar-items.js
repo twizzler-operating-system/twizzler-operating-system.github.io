@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["arch","aux","device","kso","marker","meta","object","pager","runtime","security","slot","syscall","thread","upcall"]};
+window.SIDEBAR_ITEMS = {"macro":["klog_print","klog_println"],"mod":["arch","aux","device","klog","kso","marker","meta","object","pager","runtime","security","slot","syscall","thread","upcall"]};

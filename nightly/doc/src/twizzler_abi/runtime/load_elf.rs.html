@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/runtime/load_elf.rs`."><title>load_elf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="twizzler_abi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-dev" data-channel="nightly" data-search-js="search-cfcb9d78f851226e.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../twizzler_abi/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-abi/src/runtime/load_elf.rs`."><title>load_elf.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="twizzler_abi" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-dev" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">twizzler_abi/runtime/</div>load_elf.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -385,15 +386,26 @@
 <a href="#385" id="385">385</a>
 <a href="#386" id="386">386</a>
 <a href="#387" id="387">387</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! Functions to start new executable programs.
+<a href="#388" id="388">388</a>
+<a href="#389" id="389">389</a>
+<a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
+<a href="#399" id="399">399</a></pre></div><pre class="rust"><code><span class="doccomment">//! Functions to start new executable programs.
 
 </span><span class="kw">use </span>core::{intrinsics::copy_nonoverlapping, mem::size_of};
 
-<span class="kw">use </span>twizzler_runtime_api::AuxEntry;
+<span class="kw">use </span>twizzler_rt_abi::core::{InitInfoPtrs, MinimalInitInfo, RuntimeInfo, RUNTIME_INIT_MIN};
 
 <span class="kw">use crate</span>::{
     object::{InternalObject, ObjID, Protections, MAX_SIZE, NULLPAGE_SIZE},
-    slot::{RESERVED_DATA, RESERVED_STACK, RESERVED_TEXT},
+    slot::{RESERVED_DATA, RESERVED_IMAGE, RESERVED_STACK, RESERVED_TEXT},
     syscall::{
         sys_unbind_handle, BackingType, HandleType, LifetimeType, MapFlags, NewHandleFlags,
         ObjectCreate, ObjectCreateFlags, ObjectSource, ThreadSpawnArgs, ThreadSpawnFlags,
@@ -428,7 +440,7 @@
 
 <span class="kw">impl </span>ElfHeader {
     <span class="kw">pub fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="self">self</span>.magic == [<span class="number">0x7f</span>, <span class="string">b&#39;E&#39;</span>, <span class="string">b&#39;L&#39;</span>, <span class="string">b&#39;F&#39;</span>]
+        <span class="self">self</span>.magic == [<span class="number">0x7f</span>, <span class="string">b'E'</span>, <span class="string">b'L'</span>, <span class="string">b'F'</span>]
             &amp;&amp; <span class="self">self</span>.version == <span class="number">1
             </span>&amp;&amp; <span class="self">self</span>.ident_version == <span class="number">1
             </span>&amp;&amp; <span class="self">self</span>.class == <span class="number">2 </span><span class="comment">/* 64-bit */
@@ -495,20 +507,20 @@
 
 <span class="doccomment">/// An object that contains an ELF file.
 </span><span class="attr">#[derive(Debug)]
-</span><span class="kw">pub struct </span>ElfObject&lt;<span class="lifetime">&#39;a</span>&gt; {
-    hdr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ElfHeader,
+</span><span class="kw">pub struct </span>ElfObject&lt;<span class="lifetime">'a</span>&gt; {
+    hdr: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>ElfHeader,
     base_raw: <span class="kw-2">*const </span>u8,
     <span class="attr">#[allow(dead_code)]
-    </span>obj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InternalObject&lt;ElfHeader&gt;,
+    </span>obj: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>InternalObject&lt;ElfHeader&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PhdrIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    elf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ElfObject&lt;<span class="lifetime">&#39;a</span>&gt;,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>PhdrIter&lt;<span class="lifetime">'a</span>&gt; {
+    elf: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>ElfObject&lt;<span class="lifetime">'a</span>&gt;,
     pos: usize,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>PhdrIter&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ElfPhdr;
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Iterator <span class="kw">for </span>PhdrIter&lt;<span class="lifetime">'a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">'a </span>ElfPhdr;
 
     <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
         <span class="kw">let </span>n = <span class="self">self</span>.pos;
@@ -517,7 +529,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ElfObject&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; ElfObject&lt;<span class="lifetime">'a</span>&gt; {
     <span class="kw">fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
         <span class="self">self</span>.hdr.verify()
     }
@@ -526,7 +538,7 @@
         <span class="self">self</span>.hdr.entry
     }
 
-    <span class="kw">fn </span>get_phdr(<span class="kw-2">&amp;</span><span class="self">self</span>, pos: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ElfPhdr&gt; {
+    <span class="kw">fn </span>get_phdr(<span class="kw-2">&amp;</span><span class="self">self</span>, pos: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>ElfPhdr&gt; {
         <span class="kw">if </span>pos &gt;= <span class="self">self</span>.hdr.phnum <span class="kw">as </span>usize {
             <span class="kw">return </span><span class="prelude-val">None</span>;
         }
@@ -534,7 +546,7 @@
         <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(<span class="self">self</span>.base_raw.add(offset) <span class="kw">as </span><span class="kw-2">*const </span>ElfPhdr) })
     }
 
-    <span class="kw">fn </span>from_raw_memory(obj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InternalObject&lt;ElfHeader&gt;, mem: <span class="kw-2">*const </span>u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>from_raw_memory(obj: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>InternalObject&lt;ElfHeader&gt;, mem: <span class="kw-2">*const </span>u8) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>elf = <span class="self">Self </span>{
             hdr: <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(mem <span class="kw">as </span><span class="kw-2">*const </span>ElfHeader) },
             base_raw: mem,
@@ -547,7 +559,7 @@
         </span>}
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_obj(obj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InternalObject&lt;ElfHeader&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_obj(obj: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>InternalObject&lt;ElfHeader&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>start = obj.base();
         <span class="self">Self</span>::from_raw_memory(obj, start <span class="kw">as </span><span class="kw-2">*const </span>ElfHeader <span class="kw">as </span><span class="kw-2">*const </span>u8)
     }
@@ -616,7 +628,7 @@
                 </span>|| offset &gt; MAX_SIZE - NULLPAGE_SIZE * <span class="number">2
                 </span>|| filesz &gt; memsz
             {
-                <span class="macro">panic!</span>(<span class="string">&quot;address not within object&quot;</span>)
+                <span class="macro">panic!</span>(<span class="string">"address not within object"</span>)
             }
 
             <span class="comment">// the offset from the base of the object with the ELF executable data
@@ -683,13 +695,20 @@
         MapFlags::empty(),
     )
     .map_err(|<span class="kw">_</span>| SpawnExecutableError::MapFailed)<span class="question-mark">?</span>;
+    <span class="kw">crate</span>::syscall::sys_object_map(
+        <span class="prelude-val">Some</span>(vm_handle),
+        exe.id(),
+        RESERVED_IMAGE,
+        Protections::READ,
+        MapFlags::empty(),
+    )
+    .map_err(|<span class="kw">_</span>| SpawnExecutableError::MapFailed)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>stack_nullpage = RESERVED_STACK * MAX_SIZE;
-    <span class="kw">let </span>spawnaux_start = stack_nullpage + AUX_OFFSET;
     <span class="kw">const </span>STACK_OFFSET: usize = NULLPAGE_SIZE;
-    <span class="kw">const </span>AUX_OFFSET: usize = STACK_OFFSET + INITIAL_STACK_SIZE;
-    <span class="kw">const </span>MAX_AUX: usize = <span class="number">32</span>;
-    <span class="kw">const </span>ARGS_OFFSET: usize = AUX_OFFSET + MAX_AUX * size_of::&lt;AuxEntry&gt;();
+    <span class="kw">const </span>RT_INFO_OFFSET: usize = STACK_OFFSET + INITIAL_STACK_SIZE;
+    <span class="kw">const </span>MIN_INIT_OFFSET: usize = RT_INFO_OFFSET + size_of::&lt;RuntimeInfo&gt;();
+    <span class="kw">const </span>ARGS_OFFSET: usize = MIN_INIT_OFFSET + size_of::&lt;MinimalInitInfo&gt;();
 
     <span class="kw">fn </span>copy_strings&lt;T&gt;(
         stack: <span class="kw-2">&amp;mut </span>InternalObject&lt;T&gt;,
@@ -731,33 +750,38 @@
     <span class="kw">let </span>(spawnargs_start, args_len) = copy_strings(<span class="kw-2">&amp;mut </span>stack, args, <span class="number">0</span>);
     <span class="kw">let </span>(spawnenv_start, <span class="kw">_</span>) = copy_strings(<span class="kw-2">&amp;mut </span>stack, env, args_len);
 
-    <span class="kw">let </span>aux_array = <span class="kw">unsafe </span>{
-        stack
-            .offset_mut::&lt;[AuxEntry; <span class="number">32</span>]&gt;(AUX_OFFSET)
-            .unwrap()
-            .as_mut()
-    }
-    .unwrap();
-    <span class="kw">let </span><span class="kw-2">mut </span>idx = <span class="number">0</span>;
+    <span class="kw">let </span>rt_info_ptr = stack.offset_mut::&lt;RuntimeInfo&gt;(RT_INFO_OFFSET).unwrap();
+    <span class="kw">let </span>min_init_ptr = stack
+        .offset_mut::&lt;MinimalInitInfo&gt;(MIN_INIT_OFFSET)
+        .unwrap();
 
-    aux_array[idx] = AuxEntry::ExecId(exe.id());
-    idx += <span class="number">1</span>;
-    aux_array[idx] = AuxEntry::Arguments(args.len(), spawnargs_start <span class="kw">as </span>u64);
-    idx += <span class="number">1</span>;
-    aux_array[idx] = AuxEntry::Environment(spawnenv_start <span class="kw">as </span>u64);
-    idx += <span class="number">1</span>;
-    <span class="kw">if let </span><span class="prelude-val">Some</span>(phdr_vaddr) = phdr_vaddr {
-        aux_array[idx] = AuxEntry::ProgramHeaders(phdr_vaddr, elf.hdr.phnum.into());
-        idx += <span class="number">1</span>;
+    <span class="kw">let </span>min_init = MinimalInitInfo {
+        args: spawnargs_start <span class="kw">as </span><span class="kw-2">*mut *mut </span>i8,
+        argc: args.len(),
+        envp: spawnenv_start <span class="kw">as </span><span class="kw-2">*mut *mut </span>i8,
+        phdrs: phdr_vaddr.unwrap_or(<span class="number">0</span>) <span class="kw">as </span>usize <span class="kw">as </span><span class="kw-2">*mut </span>core::ffi::c_void,
+        nr_phdrs: elf.hdr.phnum <span class="kw">as </span>usize,
+    };
+
+    <span class="kw">let </span>rt_info = RuntimeInfo {
+        flags: <span class="number">0</span>,
+        kind: RUNTIME_INIT_MIN,
+        init_info: InitInfoPtrs {
+            min: (stack_nullpage + MIN_INIT_OFFSET) <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>,
+        },
+    };
+
+    <span class="kw">unsafe </span>{
+        min_init_ptr.write(min_init);
+        rt_info_ptr.write(rt_info);
     }
-    aux_array[idx] = AuxEntry::Null;
 
     <span class="kw">let </span>ts = ThreadSpawnArgs::new(
         elf.entry() <span class="kw">as </span>usize,
         stack_nullpage + STACK_OFFSET,
         INITIAL_STACK_SIZE,
         <span class="number">0</span>,
-        spawnaux_start,
+        stack_nullpage + RT_INFO_OFFSET,
         ThreadSpawnFlags::empty(),
         <span class="prelude-val">Some</span>(vm_handle),
         UpcallTargetSpawnOption::DefaultAbort,

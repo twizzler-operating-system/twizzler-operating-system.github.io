@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">11.</strong> Twizzler Build System Crate Metadata</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">11.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">12.</strong> Assorted Notes</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -276,11 +276,50 @@ object, further explained on <a href="./KSO.html">kernel state objects</a>. Ofte
 <h2 id="late-binding-access-control"><a class="header" href="#late-binding-access-control">Late Binding Access Control</a></h2>
 <p>Rather than checking an object when it is initially accessed, such as in Unix with a call to <code>open()</code>, Twizzler checks access at the time when the operation is done, such as a read or write. This means that a thread can open an object with more permissions than allowed and not cause a fault, and only once that illegal operation is attempted will the fault occur.</p>
 <p>This method for enforcing access control is different from Unix systems because the kernel is not involved for memory access, which is how Twizzler formats all data. However protection still exists because when loading a security context, the MMU is programmed to limit access.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="the-twizzler-reference-runtime"><a class="header" href="#the-twizzler-reference-runtime">The Twizzler Reference Runtime</a></h1>
-<p>The primary runtime environment supported by Twizzler is the <em>Reference Runtime</em>. It provides userspace functionality for programs, the ability to load programs and libraries, and the ability to isolate those programs and libraries from each other.</p>
-<p>It is a work in progress.</p>
-<h2 id="stdio"><a class="header" href="#stdio">Stdio</a></h2>
-<p>The runtime provides three types of stream-like interfaces for basic IO, which should be familiar to most: stdin (for reading input), stdout (for writing output), and stderr (for reporting errors). Each of these can be handled by either a thread-local path, or a global path. When writing to stdout, for example, the runtime first checks if the thread-local path has a handler. If so, the output gets sent to that handler. If not, the runtime checks if there is a global handler registered for stdout. If so, the output goes there. If not, it gets sent to the fallback handler, which can be configured to either drop the output or send it to the kernel log.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="runtime"><a class="header" href="#runtime">Runtime</a></h1>
+<h2 id="programs-in-twizzler"><a class="header" href="#programs-in-twizzler">Programs in Twizzler</a></h2>
+<p>A standard Rust program running on Twizzler links to two libraries (at a minimum):</p>
+<ul>
+<li>libstd.so, the Rust standard library</li>
+<li>A Twizzler Runtime, exporting the Twizzler Runtime ABI</li>
+</ul>
+<p>The Rust standard library, when targeting Twizzler, expects the Twizzler Runtime
+to exist (in particular, a number of functions defined prefixed by twz_rt_). Thus
+programs targeting Twizzler will need to pick a runtime to use, and a compilation
+method. Right now there are really only two options: minimal runtime (with static
+compilation) or the reference runtime (with dynamic compilation). </p>
+<p>The reference runtime is more featureful and is the default. The default Twizzler
+target will compile programs as dynamic executables that can link (dynamically) to
+the standard library, the reference runtime (and the monitor), and any other
+dynamic libraries. No additional setup is needed for this.</p>
+<p>Another option is the minimal runtime. This runtime doesn't depend on libstd, nor
+on the security monitor or other OS features other than the kernel. Currently, this
+runtime option only supports static linking, and as a result, some additional work
+is needed to make it happen. This is not officially supported, however, and I suggest
+you stick to the default, above. If you insist that you want this, however, take a
+look at src/bin/bootstrap's Cargo.toml.</p>
+<h2 id="the-runtime-abi"><a class="header" href="#the-runtime-abi">The Runtime ABI</a></h2>
+<p>The ABI for the runtimes is defined in the src/abi submodule. This submodule contains
+header files that are fed into bindgen to generate the actual ABI and API definitions.
+The reason is that this way we can support additional languages in the future, as long
+at they can talk C ABI. In any case, the src/abi/rt-abi crate contains the bindings for
+the generated runtime ABI as well as a set of convenience functions for calling those
+with a more Rust-like interface.</p>
+<h2 id="abi-version-compatibility"><a class="header" href="#abi-version-compatibility">ABI Version Compatibility</a></h2>
+<p>When compiling, the build system will check the version of the installed toolchain
+(the one built and installed by cargo bootstrap) and compare it to the version in
+the source tree. If either the Rust commit ID or the crate version of twizzlert-rt-abi
+differ between the source tree and the installed version, the build system will error
+out and refuse to compile.</p>
+<p>In the future, we plan to use semver to make this check less strict.</p>
+<h1 id="the-twizzler-reference-runtime"><a class="header" href="#the-twizzler-reference-runtime">The Twizzler Reference Runtime</a></h1>
+<p>The primary runtime environment supported by Twizzler is the <em>Reference
+Runtime</em>. It provides userspace functionality for programs, the ability to load
+programs and libraries, and the ability to isolate those programs and libraries
+from each other.</p>
+<p>TODO</p>
+<h1 id="the-twizzler-minimal-runtime"><a class="header" href="#the-twizzler-minimal-runtime">The Twizzler Minimal Runtime</a></h1>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="views"><a class="header" href="#views">Views</a></h1>
 <p>Views are an address space abstraction that sets an environment for threads to run in. Persistent objects are mapped into the view and given dereferenceable virtual pointers. These virtual pointers allow access to the object inside the view.</p>
 <p>Because views are normal objects, they can be written on persistent memory and allow recovery of application state in the event of a crash or power cycle. The abstraction ov views also allows easy sharing of thread state, such as references to data. This is convient as it allows for sharing of data without requiring serialization through a construct like a pipe or file, and without the need of a call to <code>mmap</code>. Sharing views with other threads does provide a security threat, as one thread could corrupt the view for both. To deal with this security vulnerability, there is the abstraction of <a href="./Gates.html">secure API calls/gates</a> which allows communication between threads without allowing one or the other to corrupt another's data.</p>
@@ -431,6 +470,23 @@ twizzler-build = &quot;tool&quot;
 </code></pre>
 <h2 id="the-kernel-and-xtask"><a class="header" href="#the-kernel-and-xtask">The kernel and xtask</a></h2>
 <p>Both the kernel and xtask themselves set the <code>package.metadata.twizzler-build</code> key to &quot;kernel&quot; or &quot;xtask&quot;. Programs should not use these values. </p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="assorted-notes"><a class="header" href="#assorted-notes">Assorted Notes</a></h1>
+<h2 id="updating-the-toolchain"><a class="header" href="#updating-the-toolchain">Updating the toolchain</a></h2>
+<ol>
+<li>Update the repos. Go into toolchain/src/rust and, for each of ., library/libc, library/backtrace, and src/llvm-project, you'll need to:
+a. Add the upstream remote (usually github rust-lang/<name of repo>, though backtrace is called &quot;backtrace-rs&quot; there)
+b. Ensure you've fetched the twizzler branch from origin, and the following branches from upstream:
+- libc: &quot;libc-2.0&quot;
+- bracktrace: &quot;master&quot;
+- llvm-project: you'll need to look at the upstream repo and determine the latest version number, looking at the branches on github.
+- .: master</li>
+<li>Checkout master for rust (.), ensure that this checks out the new submodule commits too.</li>
+<li>Rebase the submodules. For each of libc, backtrace, and llvm-project, you'll need to go into that directory and rebase the twizzler branch onto the current commit.</li>
+<li>Rebase the twizzler branch onto master in the rust repo. There will probably be conflicts and compile errors.</li>
+<li>Commit all the submodules, push, and do the same for the rust repo.</li>
+<li>Test...
+Done!</li>
+</ol>
 
                     </main>
 

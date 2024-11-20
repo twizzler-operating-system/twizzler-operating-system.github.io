@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["MapError"],"fn":["twz_rt_map_object","twz_rt_map_two_objects","twz_rt_release_handle"],"struct":["MapFlags","ObjID","ObjectHandle"]};

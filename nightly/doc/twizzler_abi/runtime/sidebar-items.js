@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["__twz_get_runtime","get_kernel_init_info"],"mod":["load_elf"],"struct":["MinimalRuntime"]};
+window.SIDEBAR_ITEMS = {"fn":["get_kernel_init_info"],"mod":["load_elf","syms"],"struct":["MinimalRuntime"]};

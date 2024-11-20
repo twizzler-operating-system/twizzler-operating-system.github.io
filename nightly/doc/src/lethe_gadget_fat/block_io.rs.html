@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bin/mnemosyne/fat/src/block_io.rs`."><title>block_io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lethe_gadget_fat" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-dev" data-channel="nightly" data-search-js="search-cfcb9d78f851226e.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../lethe_gadget_fat/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bin/mnemosyne/fat/src/block_io.rs`."><title>block_io.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="lethe_gadget_fat" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-dev" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">lethe_gadget_fat/</div>block_io.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -284,8 +285,7 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>alloc::{vec, vec::Vec};
+<a href="#287" id="287">287</a></pre></div><pre class="rust"><code><span class="kw">use </span>alloc::{vec, vec::Vec};
 
 <span class="kw">use </span>layout::{io::SeekFrom, ApplyLayout, Read, Seek, Write, IO};
 
@@ -294,8 +294,8 @@
     schema::FATEntry,
 };
 
-<span class="kw">pub struct </span>BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
-    fs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>FileSystem&lt;S&gt;,
+<span class="kw">pub struct </span>BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
+    fs: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>FileSystem&lt;S&gt;,
     block_size: u64,
 
     blocks: Vec&lt;u64&gt;,
@@ -306,9 +306,9 @@
     fixed_size: bool,
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: Read + Write + Seek + IO&gt; BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: Read + Write + Seek + IO&gt; BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
     <span class="kw">pub fn </span>from_block(
-        fs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>FileSystem&lt;S&gt;,
+        fs: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>FileSystem&lt;S&gt;,
         start_block: u64,
         fixed_size: bool,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FSError&lt;S::Error&gt;&gt; {
@@ -332,7 +332,7 @@
     }
 
     <span class="kw">pub fn </span>create(
-        fs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>FileSystem&lt;S&gt;,
+        fs: <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span>FileSystem&lt;S&gt;,
         fixed_size: <span class="prelude-ty">Option</span>&lt;u64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FSError&lt;S::Error&gt;&gt; {
         <span class="kw">let </span>block_size = fs.frame()<span class="question-mark">?</span>.super_block()<span class="question-mark">?</span>.block_size()<span class="question-mark">? </span><span class="kw">as </span>u64;
@@ -363,15 +363,15 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: IO&gt; BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
-    <span class="kw">pub fn </span>as_frame&lt;L: ApplyLayout&lt;<span class="lifetime">&#39;a</span>, <span class="self">Self</span>&gt;&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: IO&gt; BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
+    <span class="kw">pub fn </span>as_frame&lt;L: ApplyLayout&lt;<span class="lifetime">'a</span>, <span class="self">Self</span>&gt;&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="kw-2">mut </span><span class="self">self</span>,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;L::Frame, &lt;<span class="self">Self </span><span class="kw">as </span>IO&gt;::Error&gt; {
         L::apply_layout(<span class="self">self</span>, <span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: Read + Write + Seek + IO&gt; BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: Read + Write + Seek + IO&gt; BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
     <span class="comment">// warning: this ruins the current position in the stream
     </span><span class="kw">fn </span>fill_blocks_to(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
@@ -406,11 +406,11 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: IO&gt; IO <span class="kw">for </span>BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: IO&gt; IO <span class="kw">for </span>BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
     <span class="kw">type </span>Error = FSError&lt;S::Error&gt;;
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: Read + Write + Seek + IO&gt; Seek <span class="kw">for </span>BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: Read + Write + Seek + IO&gt; Seek <span class="kw">for </span>BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
     <span class="kw">fn </span>seek(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pos: SeekFrom) -&gt; <span class="prelude-ty">Result</span>&lt;u64, <span class="self">Self</span>::Error&gt; {
         <span class="kw">let </span>(target_idx, next_offset) = <span class="kw">match </span>pos {
             SeekFrom::Start(off) =&gt; {
@@ -479,7 +479,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: Read + Write + Seek + IO&gt; Read <span class="kw">for </span>BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: Read + Write + Seek + IO&gt; Read <span class="kw">for </span>BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
     <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, <span class="self">Self</span>::Error&gt; {
         <span class="comment">// todo: lol no eof on growable things
         </span><span class="kw">if </span><span class="self">self</span>.cur_block_idx == <span class="self">self</span>.blocks.len() <span class="kw">as </span>u64 {
@@ -505,8 +505,8 @@
         <span class="prelude-val">Ok</span>(read)
     }
 
-    <span class="comment">// modified from std::io::Read&#39;s provided definition for the corollary function
-    // TODO: ignore interrupted reads by using underlying IO&#39;s read_exact definition
+    <span class="comment">// modified from std::io::Read's provided definition for the corollary function
+    // TODO: ignore interrupted reads by using underlying IO's read_exact definition
     </span><span class="kw">fn </span>read_exact(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
         <span class="kw">while </span>!buf.is_empty() {
             <span class="kw">match </span><span class="self">self</span>.read(buf) {
@@ -527,7 +527,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: Read + Write + Seek + IO&gt; Write <span class="kw">for </span>BlockIO&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+<span class="kw">impl</span>&lt;<span class="lifetime">'a</span>, S: Read + Write + Seek + IO&gt; Write <span class="kw">for </span>BlockIO&lt;<span class="lifetime">'a</span>, S&gt; {
     <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, <span class="self">Self</span>::Error&gt; {
         <span class="kw">if </span><span class="self">self</span>.cur_block_idx == <span class="self">self</span>.blocks.len() <span class="kw">as </span>u64 {
             <span class="self">self</span>.fill_blocks_to(<span class="prelude-val">Some</span>(<span class="self">self</span>.blocks.len() <span class="kw">as </span>u64 + <span class="number">1</span>), !<span class="self">self</span>.fixed_size)<span class="question-mark">?</span>;
@@ -553,8 +553,8 @@
         <span class="prelude-val">Ok</span>(written)
     }
 
-    <span class="comment">// modified from std::io::Writes&#39;s provided definition for the corollary function
-    // TODO: ignore interrupted writes by using underlying IO&#39;s write_all definition
+    <span class="comment">// modified from std::io::Writes's provided definition for the corollary function
+    // TODO: ignore interrupted writes by using underlying IO's write_all definition
     </span><span class="kw">fn </span>write_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
         <span class="kw">while </span>!buf.is_empty() {
             <span class="kw">match </span><span class="self">self</span>.write(buf) {

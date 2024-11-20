@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-queue-raw/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-085727c29c2fa99e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="twizzler_queue_raw" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-dev" data-channel="nightly" data-search-js="search-cfcb9d78f851226e.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../twizzler_queue_raw/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lib/twizzler-queue-raw/src/lib.rs`."><title>lib.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-b0742ba02757f159.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="twizzler_queue_raw" data-themes="" data-resource-suffix="" data-rustdoc-version="1.84.0-dev" data-channel="nightly" data-search-js="search-e056c65ede92db13.js" data-settings-js="settings-805db61a62df4bd2.js" ><script src="../../static.files/storage-1d39b6787ed640ff.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-f070b9041d14864c.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-0111fcff984fae8f.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">twizzler_queue_raw/</div>lib.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers">
+<a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -729,9 +730,8 @@
 <a href="#729" id="729">729</a>
 <a href="#730" id="730">730</a>
 <a href="#731" id="731">731</a>
-<a href="#732" id="732">732</a>
-</pre></div><pre class="rust"><code><span class="doccomment">//! A raw queue interface for Twizzler, making no assumptions about where the underlying headers and
-//! circular buffers are located. This means you probably don&#39;t want to use this --- instead, I
+<a href="#732" id="732">732</a></pre></div><pre class="rust"><code><span class="doccomment">//! A raw queue interface for Twizzler, making no assumptions about where the underlying headers and
+//! circular buffers are located. This means you probably don't want to use this --- instead, I
 //! suggest you use the wrapped version of this library, twizzler-queue, since that actually
 //! interacts with the object system.
 //!
@@ -747,10 +747,10 @@
 //! The queue is an MPSC lock-free blocking data structure. Any thread may submit to a queue, but
 //! only one thread may receive on that queue at a time. The queue is implemented with a head
 //! pointer, a tail pointer, a doorbell, and a waiters counter. Additionally, the queue is
-//! maintained in terms of &quot;turns&quot;, that indicate which &quot;go around&quot; of the queue we are on (mod 2).
+//! maintained in terms of "turns", that indicate which "go around" of the queue we are on (mod 2).
 //!
-//! # Let&#39;s look at an insert
-//! Here&#39;s what the queue looks like to start with. The 0_ indicates that it&#39;s empty, and turn is
+//! # Let's look at an insert
+//! Here's what the queue looks like to start with. The 0_ indicates that it's empty, and turn is
 //! set to 0.
 //! ```text
 //!  b
@@ -787,8 +787,8 @@
 //! [1X, 0_, 0_]
 //! ```
 //!
-//! Now, let&#39;s say the consumer comes along and dequeues. First, it checks if it&#39;s empty by
-//! comparing tail and bell, and finds it&#39;s not empty. Then it checks if it&#39;s the correct turn. This
+//! Now, let's say the consumer comes along and dequeues. First, it checks if it's empty by
+//! comparing tail and bell, and finds it's not empty. Then it checks if it's the correct turn. This
 //! turn is 1, so yes. Next, it remove the data from the queue:
 //! ```text
 //!      b
@@ -805,7 +805,7 @@
 //! ```
 
 </span><span class="attr">#![cfg_attr(test, feature(test))]
-#![cfg_attr(not(any(feature = <span class="string">&quot;std&quot;</span>, test)), no_std)]
+#![cfg_attr(not(any(feature = <span class="string">"std"</span>, test)), no_std)]
 
 </span><span class="kw">use </span>core::{
     cell::UnsafeCell,
@@ -878,7 +878,7 @@
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">fn </span>tags() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(
+    <span class="kw">fn </span>tags() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">'static </span>[(
         twizzler_abi::marker::BaseVersion,
         twizzler_abi::marker::BaseTag,
     )] {
@@ -1072,11 +1072,11 @@
         (<span class="kw-2">&amp;</span><span class="self">self</span>.tail, t)
     }
 
-    <span class="kw">fn </span>setup_rec_sleep&lt;<span class="lifetime">&#39;a</span>, T&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+    <span class="kw">fn </span>setup_rec_sleep&lt;<span class="lifetime">'a</span>, T&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
         sleep: bool,
         raw_buf: <span class="kw-2">*const </span>QueueEntry&lt;T&gt;,
-        waiter: <span class="kw-2">&amp;mut </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;, u64),
+        waiter: <span class="kw-2">&amp;mut </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>AtomicU64&gt;, u64),
     ) -&gt; <span class="prelude-ty">Result</span>&lt;u64, QueueError&gt; {
         <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst) &amp; <span class="number">0x7fffffff</span>;
         <span class="kw">let </span>b = <span class="self">self</span>.bell.load(Ordering::SeqCst);
@@ -1107,7 +1107,7 @@
     }
 
     <span class="attr">#[inline]
-    </span><span class="kw">fn </span>advance_tail_setup&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, ringer: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;) {
+    </span><span class="kw">fn </span>advance_tail_setup&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, ringer: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>AtomicU64&gt;) {
         <span class="kw">let </span>t = <span class="self">self</span>.tail.load(Ordering::SeqCst);
         <span class="self">self</span>.tail.store((t + <span class="number">1</span>) &amp; <span class="number">0x7fffffff</span>, Ordering::SeqCst);
         <span class="kw">if </span><span class="self">self</span>.submitter_waiting() {
@@ -1122,7 +1122,7 @@
     buf: UnsafeCell&lt;<span class="kw-2">*mut </span>QueueEntry&lt;T&gt;&gt;,
 }
 
-<span class="macro">bitflags::bitflags! </span>{
+<span class="macro">bitflags::bitflags!</span> {
     <span class="doccomment">/// Flags to control how queue submission works.
     </span><span class="kw">pub struct </span>SubmissionFlags: u32 {
         <span class="doccomment">/// If the request would block, return Err([SubmissionError::WouldBlock]) instead.
@@ -1162,7 +1162,7 @@
         <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span><span class="self">self</span>.hdr }
     }
 
-    <span class="comment">// This is a bit unsafe, but it&#39;s because we&#39;re managing concurrency ourselves.
+    <span class="comment">// This is a bit unsafe, but it's because we're managing concurrency ourselves.
     </span><span class="attr">#[allow(clippy::mut_from_ref)]
     #[inline]
     </span><span class="kw">fn </span>get_buf(<span class="kw-2">&amp;</span><span class="self">self</span>, off: usize) -&gt; <span class="kw-2">&amp;mut </span>QueueEntry&lt;T&gt; {
@@ -1176,7 +1176,7 @@
 
     <span class="doccomment">/// Submit a data item of type T, wrapped in a QueueEntry, to the queue. The two callbacks,
     /// wait, and ring, are for implementing a rudimentary condvar, wherein if the queue needs to
-    /// block, we&#39;ll call wait(x, y), where we are supposed to wait until *x != y. Once we are done
+    /// block, we'll call wait(x, y), where we are supposed to wait until *x != y. Once we are done
     /// inserting, if we need to wake up a consumer, we will call ring, which should wake up anyone
     /// waiting on that word of memory.
     </span><span class="kw">pub fn </span>submit&lt;W: Fn(<span class="kw-2">&amp;</span>AtomicU64, u64), R: Fn(<span class="kw-2">&amp;</span>AtomicU64)&gt;(
@@ -1213,12 +1213,12 @@
         <span class="prelude-val">Ok</span>(item)
     }
 
-    <span class="kw">pub fn </span>setup_sleep&lt;<span class="lifetime">&#39;a</span>&gt;(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+    <span class="kw">pub fn </span>setup_sleep&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
         sleep: bool,
         output: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;QueueEntry&lt;T&gt;&gt;,
-        waiter: <span class="kw-2">&amp;mut </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;, u64),
-        ringer: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AtomicU64&gt;,
+        waiter: <span class="kw-2">&amp;mut </span>(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>AtomicU64&gt;, u64),
+        ringer: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">'a </span>AtomicU64&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;(), QueueError&gt; {
         <span class="kw">let </span>t = <span class="self">self
             </span>.hdr()
@@ -1244,7 +1244,7 @@
 <span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>RawQueue&lt;T&gt; {}
 <span class="kw">unsafe impl</span>&lt;T: Send&gt; Sync <span class="kw">for </span>RawQueue&lt;T&gt; {}
 
-<span class="attr">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, test))]
+<span class="attr">#[cfg(any(feature = <span class="string">"std"</span>, test))]
 </span><span class="doccomment">/// Wait for receiving on multiple raw queues. If any of the passed raw queues can return data, they
 /// will do so by writing it into the output array at the same index that they are in the `queues`
 /// variable. The queues and output arrays must be the same length. If no data is available in any
@@ -1322,14 +1322,14 @@
     <span class="kw">use crate</span>::{QueueEntry, QueueError, RawQueue, RawQueueHdr, ReceiveFlags, SubmissionFlags};
 
     <span class="kw">fn </span>wait(x: <span class="kw-2">&amp;</span>AtomicU64, v: u64) {
-        <span class="comment">// println!(&quot;wait&quot;);
+        <span class="comment">// println!("wait");
         </span><span class="kw">while </span>x.load(Ordering::SeqCst) == v {
             core::hint::spin_loop();
         }
     }
 
     <span class="kw">fn </span>wake(_x: <span class="kw-2">&amp;</span>AtomicU64) {
-        <span class="comment">//   println!(&quot;wake&quot;);
+        <span class="comment">//   println!("wake");
     </span>}
 
     <span class="attr">#[test]
@@ -1423,18 +1423,18 @@
     }
 
     <span class="comment">/*
-        #[cfg(not(target_os = &quot;twizzler&quot;))]
+        #[cfg(not(target_os = "twizzler"))]
         extern crate crossbeam;
-        #[cfg(not(target_os = &quot;twizzler&quot;))]
+        #[cfg(not(target_os = "twizzler"))]
         extern crate test;
-        #[cfg(not(target_os = &quot;twizzler&quot;))]
+        #[cfg(not(target_os = "twizzler"))]
         #[bench]
         fn two_threads(b: &amp;mut test::Bencher) -&gt; impl Termination {
             let qh = RawQueueHdr::new(4, std::mem::size_of::&lt;QueueEntry&lt;u32&gt;&gt;());
             let mut buffer = [QueueEntry::&lt;i32&gt;::default(); 1 &lt;&lt; 4];
             let q = unsafe {
                 RawQueue::new(
-                    std::mem::transmute::&lt;&amp;RawQueueHdr, &amp;&#39;static RawQueueHdr&gt;(&amp;qh),
+                    std::mem::transmute::&lt;&amp;RawQueueHdr, &amp;'static RawQueueHdr&gt;(&amp;qh),
                     buffer.as_mut_ptr(),
                 )
             };
