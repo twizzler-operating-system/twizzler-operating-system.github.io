@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["IoError","SeekFrom"],"fn":["twz_rt_fd_pread","twz_rt_fd_preadv","twz_rt_fd_pwrite","twz_rt_fd_pwritev","twz_rt_fd_seek"],"struct":["IoFlags"],"type":["IoSlice"]};
+window.SIDEBAR_ITEMS = {"enum":["EndpointKind","SeekFrom"],"fn":["twz_rt_fd_pread","twz_rt_fd_pread_from","twz_rt_fd_preadv","twz_rt_fd_pwrite","twz_rt_fd_pwrite_to","twz_rt_fd_pwritev","twz_rt_fd_seek"],"struct":["Endpoint","IoCtx","IoFlags"],"type":["IoSlice"]};

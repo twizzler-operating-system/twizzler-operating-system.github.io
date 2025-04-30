@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["dynamic_test"],"static":["DYNAMIC_TEST_INFO"],"type":["Args","Ret","dynamic_test_EntryType"]};

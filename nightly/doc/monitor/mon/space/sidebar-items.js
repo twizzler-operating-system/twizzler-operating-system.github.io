@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["__monitor_get_slot","__monitor_get_slot_pair","__monitor_release_pair","__monitor_release_slot","early_object_map","mapflags_into_prot"],"mod":["handle","unmapper"],"struct":["MapInfo","MappedObject","Space","UnmapOnDrop"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["test_was_ctor_run"],"static":["TEST_WAS_CTOR_RUN_INFO"],"type":["Args","Ret","test_was_ctor_run_EntryType"]};

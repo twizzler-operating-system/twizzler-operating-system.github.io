@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["twizzler",[["impl&lt;'obj, T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"twizzler/ptr/struct.Ref.html\" title=\"struct twizzler::ptr::Ref\">Ref</a>&lt;'obj, T&gt;"],["impl&lt;'obj, T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"twizzler/ptr/struct.RefMut.html\" title=\"struct twizzler::ptr::RefMut\">RefMut</a>&lt;'obj, T&gt;"],["impl&lt;T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"twizzler/tx/struct.TxCell.html\" title=\"struct twizzler::tx::TxCell\">TxCell</a>&lt;T&gt;"],["impl&lt;T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"twizzler/tx/struct.TxRef.html\" title=\"struct twizzler::tx::TxRef\">TxRef</a>&lt;T&gt;"]]],["twizzler_abi",[["impl&lt;T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"twizzler_abi/simple_mutex/struct.LockGuard.html\" title=\"struct twizzler_abi::simple_mutex::LockGuard\">LockGuard</a>&lt;'_, T&gt;"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1166,344]}

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["HandleIdx","TxBatch","TxCell","TxObject","TxRef","UnsafeTxHandle"],"trait":["TxHandle"],"type":["Result"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["namer_start"],"static":["NAMER_START_INFO"],"type":["Args","Ret","namer_start_EntryType"]};

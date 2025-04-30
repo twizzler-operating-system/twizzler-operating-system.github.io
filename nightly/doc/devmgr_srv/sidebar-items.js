@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["devmgr_start","devmgr_start_direct","get_devices","get_devices_direct"],"mod":["__twz_secgate_impl_devmgr_start_mod","__twz_secgate_impl_get_devices_mod"]};

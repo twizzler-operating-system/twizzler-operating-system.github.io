@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["DMA_PAGE_SIZE"],"enum":["Access","PinError","SyncMode"],"struct":["DmaObject","DmaOptions","DmaPin","DmaPool","DmaRegion","DmaSliceRegion"],"trait":["DeviceSync"]};
+window.SIDEBAR_ITEMS = {"constant":["DMA_PAGE_SIZE"],"enum":["Access","PinError","SyncMode"],"struct":["DmaObject","DmaOptions","DmaPin","DmaPool","DmaRegion","DmaSliceRegion","PhysAddr","PhysInfo"],"trait":["DeviceSync"]};

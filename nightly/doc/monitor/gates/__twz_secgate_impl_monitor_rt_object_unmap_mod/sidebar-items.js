@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_object_unmap","monitor_rt_object_unmap_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_OBJECT_UNMAP_INFO"],"type":["Args","Ret","monitor_rt_object_unmap_EntryType"]};

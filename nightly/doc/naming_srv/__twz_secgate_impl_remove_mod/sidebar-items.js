@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["remove"],"static":["REMOVE_INFO"],"type":["Args","Ret","remove_EntryType"]};

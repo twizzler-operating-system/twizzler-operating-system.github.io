@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_KEY_SIZE","PATH_MAX"],"enum":["NsNodeKind"],"mod":["api","dynamic","handle"],"struct":["GetFlags","NameSession","NameStore","NsNode"],"type":["Result"]};

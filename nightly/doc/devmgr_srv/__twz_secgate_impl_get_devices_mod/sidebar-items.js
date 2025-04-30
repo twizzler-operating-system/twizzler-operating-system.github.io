@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["get_devices"],"static":["GET_DEVICES_INFO"],"type":["Args","Ret","get_devices_EntryType"]};

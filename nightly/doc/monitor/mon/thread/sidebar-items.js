@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_STACK_SIZE","STACK_SIZE_MIN_ALIGN","SUPER_UPCALL_STACK_SIZE"],"mod":["cleaner"],"struct":["IdDropper","ManagedThreadInner","ManagedThreadRepr","ThreadMgr"],"type":["ManagedThread"]};

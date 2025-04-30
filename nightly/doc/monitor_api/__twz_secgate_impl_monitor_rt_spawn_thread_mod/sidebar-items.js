@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_spawn_thread"],"type":["Args","Ret"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_spawn_thread"],"type":["Args","Ret","monitor_rt_spawn_thread_EntryType"]};

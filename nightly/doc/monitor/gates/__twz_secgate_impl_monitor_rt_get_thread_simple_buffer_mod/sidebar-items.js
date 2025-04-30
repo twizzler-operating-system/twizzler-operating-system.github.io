@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_thread_simple_buffer","monitor_rt_get_thread_simple_buffer_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_THREAD_SIMPLE_BUFFER_INFO"],"type":["Args","Ret","monitor_rt_get_thread_simple_buffer_EntryType"]};

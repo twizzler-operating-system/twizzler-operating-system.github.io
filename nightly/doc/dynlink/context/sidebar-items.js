@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["LoadedOrUnloaded"],"mod":["runtime"],"struct":["Context","LibraryIter"]};
+window.SIDEBAR_ITEMS = {"enum":["LoadedOrUnloaded"],"mod":["runtime"],"struct":["Context","LibraryIter","LoadIds","NewCompartmentFlags"]};

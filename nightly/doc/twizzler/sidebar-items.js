@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["object",""]]});
+window.SIDEBAR_ITEMS = {"mod":["alloc","collections","marker","object","ptr","tx"]};

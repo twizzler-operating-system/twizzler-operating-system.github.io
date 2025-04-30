@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["dynamic_namer_api","dynamic_naming_factory"],"struct":["DynamicNamerAPI"],"type":["DynamicNamingHandle"]};

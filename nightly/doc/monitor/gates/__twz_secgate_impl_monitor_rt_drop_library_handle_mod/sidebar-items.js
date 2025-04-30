@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_drop_library_handle","monitor_rt_drop_library_handle_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_DROP_LIBRARY_HANDLE_INFO"],"type":["Args","Ret","monitor_rt_drop_library_handle_EntryType"]};

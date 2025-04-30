@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_load_compartment"],"type":["Args","Ret"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_load_compartment"],"type":["Args","Ret","monitor_rt_load_compartment_EntryType"]};

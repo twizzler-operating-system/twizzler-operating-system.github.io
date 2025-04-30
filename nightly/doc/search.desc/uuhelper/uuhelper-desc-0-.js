@@ -1,0 +1,1 @@
+searchState.loadedDescShard("uuhelper", 0, "Panics\nPrints completions for the utility in the first parameter …\nPanics\nGenerate the manpage for the utility in the first parameter")

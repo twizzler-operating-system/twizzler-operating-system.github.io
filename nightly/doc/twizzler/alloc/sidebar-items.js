@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["arena","invbox"],"struct":["OwnedGlobalPtr"],"trait":["Allocator","SingleObjectAllocator"]};

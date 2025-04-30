@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ArgumentError","ErrorCategory","GenericError","IoError","NamingError","ObjectError","ResourceError","TwzError"],"struct":["RawTwzError"]};

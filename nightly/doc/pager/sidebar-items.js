@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["handle_request",""],["main",""],["quick_random",""]],"mod":[["nvme",""],["store",""]],"static":[["RAND_STATE",""]],"struct":[["Foo",""],["Tester",""]]};
+window.SIDEBAR_ITEMS = {"fn":["adv_lethe","pager_start","sync_object"]};

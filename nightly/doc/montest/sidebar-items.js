@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["c_with_alloca","cons_test","main","setup_logging"],"static":["WAS_CTOR_RUN"]};

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["alloc","bindings","core","debug","fd","info","io","object","random","thread","time"]};
+window.SIDEBAR_ITEMS = {"mod":["alloc","arch","bindings","core","debug","error","fd","info","io","object","random","thread","time"],"type":["Result"]};

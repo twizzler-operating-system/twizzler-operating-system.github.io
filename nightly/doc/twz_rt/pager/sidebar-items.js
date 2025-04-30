@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_EXTERNAL_PATH","NAME_MAX"],"enum":["ExternalKind"],"fn":["sync_object"],"struct":["ExternalFile","PagerHandle"]};

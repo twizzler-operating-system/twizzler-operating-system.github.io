@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["InterruptAllocationError"],"struct":["DeviceEventStream","InterruptInfo"]};
+window.SIDEBAR_ITEMS = {"struct":["DeviceEventStream","InterruptInfo"]};

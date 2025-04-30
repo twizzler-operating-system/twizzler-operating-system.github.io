@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["full_object_sync"],"static":["FULL_OBJECT_SYNC_INFO"],"type":["Args","Ret","full_object_sync_EntryType"]};

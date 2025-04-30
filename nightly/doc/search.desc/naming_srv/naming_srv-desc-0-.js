@@ -1,0 +1,1 @@
+searchState.loadedDescShard("naming_srv", 0, "")

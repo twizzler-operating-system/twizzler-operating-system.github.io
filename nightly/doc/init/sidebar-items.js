@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["enumerate_children",""],["exec",""],["exec2",""],["exec_n",""],["find_init_name",""],["get_user_input",""],["list_subobjs",""],["main",""],["test_kaction",""],["test_mutex",""],["test_thread_sync",""],["test_thread_sync_timeout",""]],"static":[["BAR",""],["BAZ",""],["FOO",""]],"struct":[["Foo",""]]};
+window.SIDEBAR_ITEMS = {"fn":["find_init_name","get_kernel_init_info","initialize_devmgr","initialize_namer","initialize_pager","main","run_tests"],"struct":["TwzIo"]};

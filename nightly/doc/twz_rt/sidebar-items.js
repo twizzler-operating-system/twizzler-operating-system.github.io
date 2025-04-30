@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["RuntimeError"],"fn":["rr_upcall_entry","set_upcall_handler"],"macro":["preinit_print","preinit_println"],"mod":["preinit"],"static":["OUR_RUNTIME"],"struct":["CompartmentInitInfo","RuntimeState","RuntimeThreadControl"]};
+window.SIDEBAR_ITEMS = {"enum":["RuntimeError"],"fn":["set_upcall_handler"],"macro":["preinit_print","preinit_println"],"mod":["pager","preinit","syms"],"static":["OUR_RUNTIME"],"struct":["RuntimeState"]};

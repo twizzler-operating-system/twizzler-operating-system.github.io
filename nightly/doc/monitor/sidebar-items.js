@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["get_kernel_init_info","main"],"mod":["secgate_test"],"struct":["MappedObjectAddrs"]};
+window.SIDEBAR_ITEMS = {"fn":["__monitor_ready","main","monitor_init"],"mod":["dlengine","gates","init","mon","upcall"],"struct":["MappedObjectAddrs"]};

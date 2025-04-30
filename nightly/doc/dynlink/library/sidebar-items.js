@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["CtorInfo","Library","LibraryId","SecgateInfo","UnloadedLibrary"]};
+window.SIDEBAR_ITEMS = {"enum":["AllowedGates"],"struct":["Library","LibraryId","SecgateInfo","UnloadedLibrary"]};

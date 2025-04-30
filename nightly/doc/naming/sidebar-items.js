@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["NsNodeKind"],"fn":["dynamic_namer_api","dynamic_naming_factory","static_naming_factory"],"struct":["DynamicNamerAPI","GetFlags","NsNode","StaticNamingAPI"],"type":["DynamicNamingHandle","StaticNamingHandle"]};

@@ -1,0 +1,1 @@
+searchState.loadedDescShard("logboi", 0, "An open handle to the logging service.\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nSend a log message via this logging handle.\nOpen a new logging handle.")

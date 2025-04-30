@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["test_global_call_count"],"static":["TEST_GLOBAL_CALL_COUNT_INFO"],"type":["Args","Ret","test_global_call_count_EntryType"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_set_nameroot","monitor_rt_set_nameroot_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_SET_NAMEROOT_INFO"],"type":["Args","Ret","monitor_rt_set_nameroot_EntryType"]};

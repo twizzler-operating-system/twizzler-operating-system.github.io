@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["close_handle"],"static":["CLOSE_HANDLE_INFO"],"type":["Args","Ret","close_handle_EntryType"]};

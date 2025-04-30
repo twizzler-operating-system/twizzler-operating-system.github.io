@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["BaseTag","BaseVersion"],"trait":["BaseType","ObjSafe"]};
+window.SIDEBAR_ITEMS = {"trait":["ObjSafe"]};

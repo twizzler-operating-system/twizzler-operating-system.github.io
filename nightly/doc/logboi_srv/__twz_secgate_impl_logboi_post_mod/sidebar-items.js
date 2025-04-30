@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["logboi_post"],"static":["LOGBOI_POST_INFO"],"type":["Args","Ret","logboi_post_EntryType"]};

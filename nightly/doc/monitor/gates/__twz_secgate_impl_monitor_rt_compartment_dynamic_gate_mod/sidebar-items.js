@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_compartment_dynamic_gate","monitor_rt_compartment_dynamic_gate_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_COMPARTMENT_DYNAMIC_GATE_INFO"],"type":["Args","Ret","monitor_rt_compartment_dynamic_gate_EntryType"]};

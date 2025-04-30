@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["logboi",[["impl <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"logboi/struct.LogHandle.html\" title=\"struct logboi::LogHandle\">LogHandle</a>"]]],["monitor_api",[["impl <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"monitor_api/struct.CompartmentHandle.html\" title=\"struct monitor_api::CompartmentHandle\">CompartmentHandle</a>"],["impl <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"monitor_api/struct.LibraryHandle.html\" title=\"struct monitor_api::LibraryHandle\">LibraryHandle</a>"]]],["naming_core",[["impl&lt;'a, API: <a class=\"trait\" href=\"naming_core/api/trait.NamerAPI.html\" title=\"trait naming_core::api::NamerAPI\">NamerAPI</a>&gt; <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"naming_core/handle/struct.NamingHandle.html\" title=\"struct naming_core::handle::NamingHandle\">NamingHandle</a>&lt;'a, API&gt;"]]],["pager_dynamic",[["impl <a class=\"trait\" href=\"secgate/util/handle/trait.Handle.html\" title=\"trait secgate::util::handle::Handle\">Handle</a> for <a class=\"struct\" href=\"pager_dynamic/struct.PagerHandle.html\" title=\"struct pager_dynamic::PagerHandle\">PagerHandle</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[255,560,446,283]}

@@ -159,13 +159,15 @@ code to help boot Twizzler through their boot protocol.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>Installing the tools:</p>
 <ol>
-<li>sudo apt install build-essential</li>
-<li>sudo apt install python</li>
-<li>sudo apt install cmake</li>
-<li>sudo apt install ninja-build</li>
+<li>sudo apt install build-essential python3 python3-pip cmake ninja-build llvm-18</li>
 <li>Install Rust https://www.rust-lang.org/tools/install</li>
-<li>Clone submodules: <code>git submodule update --init --recursive</code></li>
+<li>Install meson (needed to build libc): pip3 install meson
+note: you'll need the pip bin directory in your path.</li>
 </ol>
+<p>Note that you'll need mke2fs (typically found in e2fsprogs). Most Linux installations should already have this
+command available. On MacOS, with brew, it can be installed with <code>brew install e2fsprogs</code>.</p>
+<p>Note that we depend on the system LLVM for some initial bindgen commands. The minimum version for this is 18.
+On ubuntu, this can be selected for building twizzler by env vars: <code>export LLVM_CONFIG_PATH=/usr/bin/llvm-config-18</code>.</p>
 <p>Building Twizzler is done in several steps:</p>
 <ol start="0">
 <li>Building xtask.</li>
@@ -182,6 +184,7 @@ everything through xtask.</p>
 <h2 id="step-1-building-the-toolchain"><a class="header" href="#step-1-building-the-toolchain">Step 1: Building the Toolchain</a></h2>
 <p>This step takes the longest, but only has to happen once. Run</p>
 <pre><code>cd where/you/cloned/twizzler
+git submodule update --init --recursive
 cargo bootstrap
 </code></pre>
 <p>and then wait, while you sip your tea. This will compile llvm and bootstrap the rust compiler, both
@@ -205,7 +208,7 @@ with:</p>
 <p>You can start Twizzler in Qemu by running</p>
 <pre><code>cargo start-qemu
 </code></pre>
-<p>which will bootup a qemu instance. If you want to run the release mode version, you can run </p>
+<p>which will bootup a qemu instance. If you want to run the release mode version, you can run</p>
 <pre><code>cargo start-qemu --profile release
 </code></pre>
 <h2 id="step-4-exiting-twizzler"><a class="header" href="#step-4-exiting-twizzler">Step 4: Exiting Twizzler</a></h2>

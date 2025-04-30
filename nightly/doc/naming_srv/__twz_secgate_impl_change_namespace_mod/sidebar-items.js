@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["change_namespace"],"static":["CHANGE_NAMESPACE_INFO"],"type":["Args","Ret","change_namespace_EntryType"]};

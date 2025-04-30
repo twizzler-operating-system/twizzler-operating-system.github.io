@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_compartment_deps","monitor_rt_get_compartment_deps_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_COMPARTMENT_DEPS_INFO"],"type":["Args","Ret","monitor_rt_get_compartment_deps_EntryType"]};
