@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["io_heartbeat","main"],"static":["RESULT"]};
+window.SIDEBAR_ITEMS = {"fn":["io_heartbeat","main","try_bench"],"static":["RESULT"]};

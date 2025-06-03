@@ -273,7 +273,7 @@
 <a href=#273 id=273 data-nosnippet>273</a>    }
 <a href=#274 id=274 data-nosnippet>274</a>
 <a href=#275 id=275 data-nosnippet>275</a>    <span class="kw">fn </span>new_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Arc&lt;AllocatableDmaObject&gt;, AllocationError&gt; {
-<a href=#276 id=276 data-nosnippet>276</a>        <span class="kw">let </span>obj = Arc::new(AllocatableDmaObject::new(<span class="self">self</span>.spec)<span class="question-mark">?</span>);
+<a href=#276 id=276 data-nosnippet>276</a>        <span class="kw">let </span>obj = Arc::new(AllocatableDmaObject::new(<span class="self">self</span>.spec.clone())<span class="question-mark">?</span>);
 <a href=#277 id=277 data-nosnippet>277</a>        <span class="prelude-val">Ok</span>(obj)
 <a href=#278 id=278 data-nosnippet>278</a>    }
 <a href=#279 id=279 data-nosnippet>279</a>

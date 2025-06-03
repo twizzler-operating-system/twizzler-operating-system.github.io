@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["find_init_name","get_kernel_init_info","initialize_devmgr","initialize_namer","initialize_pager","main","run_tests"],"struct":["TwzIo"]};
+window.SIDEBAR_ITEMS = {"fn":["initialize_devmgr","initialize_namer","initialize_pager","main","run_tests"],"struct":["TwzIo"]};

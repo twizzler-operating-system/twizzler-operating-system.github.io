@@ -159,15 +159,17 @@ code to help boot Twizzler through their boot protocol.</p>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>Installing the tools:</p>
 <ol>
-<li>sudo apt install build-essential python3 python3-pip cmake ninja-build llvm-18</li>
+<li>sudo apt install build-essential python3 python3-pip cmake ninja-build</li>
 <li>Install Rust https://www.rust-lang.org/tools/install</li>
-<li>Install meson (needed to build libc): pip3 install meson
-note: you'll need the pip bin directory in your path.</li>
 </ol>
 <p>Note that you'll need mke2fs (typically found in e2fsprogs). Most Linux installations should already have this
 command available. On MacOS, with brew, it can be installed with <code>brew install e2fsprogs</code>.</p>
-<p>Note that we depend on the system LLVM for some initial bindgen commands. The minimum version for this is 18.
-On ubuntu, this can be selected for building twizzler by env vars: <code>export LLVM_CONFIG_PATH=/usr/bin/llvm-config-18</code>.</p>
+<p>Note that we depend on the system LLVM for some initial bindgen commands. The minimum version for this is 18.</p>
+<p>On ubuntu, this can be selected for building twizzler by env vars: <code>export LLVM_CONFIG_PATH=/usr/bin/llvm-config-18</code>.</p>
+<ul>
+<li>Note that its possible for the build system to work without this export, but if something is broken and you havent done this step, its best to start here.</li>
+</ul>
+<p>See here: https://apt.llvm.org/ for install instructions. You may need to <code>export LLVM_CONFIG_PATH=/usr/bin/llvm-config-18</code>.</p>
 <p>Building Twizzler is done in several steps:</p>
 <ol start="0">
 <li>Building xtask.</li>
@@ -211,6 +213,7 @@ with:</p>
 <p>which will bootup a qemu instance. If you want to run the release mode version, you can run</p>
 <pre><code>cargo start-qemu --profile release
 </code></pre>
+<p>When running from command line, if you don't have access to a screen, QEMU may require you add <code>-q=-nographic</code> to the command.</p>
 <h2 id="step-4-exiting-twizzler"><a class="header" href="#step-4-exiting-twizzler">Step 4: Exiting Twizzler</a></h2>
 <p>At the moment Twizzler does not have a shutdown command.  To exit the QEMU based simulation use the <code>Ctrl-a X</code> command which is a part of the simulator.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="objects"><a class="header" href="#objects">Objects</a></h1>
