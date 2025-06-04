@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DelInner","GatesError","HashingAlgo","SigningScheme"],"mod":["sec_ctx"],"struct":["Cap","CapFlags","Del","Gates","Revoc","Signature","SigningKey","VerifyingKey"]};
+window.SIDEBAR_ITEMS = {"constant":["MAP_ITEMS_PER_OBJ","MASKS_MAX","OBJECT_ROOT_OFFSET","SEC_CTX_MAP_LEN"],"enum":["CtxMapItemType","DelInner","GatesError","HashingAlgo","InsertType","SigningScheme"],"struct":["Cap","CapFlags","CtxMapItem","Del","Gates","Mask","PermsInfo","Revoc","SecCtx","SecCtxBase","SecCtxFlags","Signature","SigningKey","VerifyingKey"]};
