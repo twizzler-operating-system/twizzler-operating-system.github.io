@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["MEXT_EMPTY","MEXT_SIZED"],"enum":["FotError"],"struct":["FotEntry","FotFlags","FotResolve","MetaExt","MetaExtTag","MetaFlags","MetaInfo","ObjID","Object","ObjectBuilder","ResolveRequest"],"trait":["RawObject","TypedObject"]};
+window.SIDEBAR_ITEMS = {"constant":["MEXT_EMPTY","MEXT_SIZED"],"struct":["FotEntry","FotFlags","FotResolve","MapFlags","MetaExt","MetaExtTag","MetaFlags","MetaInfo","ObjID","Object","ObjectBuilder","ResolveRequest"],"trait":["RawObject","TypedObject"]};

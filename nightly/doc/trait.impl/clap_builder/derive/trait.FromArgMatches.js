@@ -1,9 +1,9 @@
 (function() {
-    var implementors = Object.fromEntries([["sec_test",[["impl FromArgMatches for <a class=\"enum\" href=\"sec_test/enum.Commands.html\" title=\"enum sec_test::Commands\">Commands</a>"],["impl FromArgMatches for <a class=\"struct\" href=\"sec_test/struct.Args.html\" title=\"struct sec_test::Args\">Args</a>"]]]]);
+    var implementors = Object.fromEntries([["ptest",[["impl FromArgMatches for <a class=\"enum\" href=\"ptest/enum.SubCommand.html\" title=\"enum ptest::SubCommand\">SubCommand</a>"],["impl FromArgMatches for <a class=\"enum\" href=\"ptest/enum.VecTy.html\" title=\"enum ptest::VecTy\">VecTy</a>"],["impl FromArgMatches for <a class=\"struct\" href=\"ptest/struct.Cli.html\" title=\"struct ptest::Cli\">Cli</a>"]]]]);
     if (window.register_implementors) {
         window.register_implementors(implementors);
     } else {
         window.pending_implementors = implementors;
     }
 })()
-//{"start":57,"fragment_lengths":[268]}
+//{"start":57,"fragment_lengths":[371]}

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["adv_lethe","pager_start","sync_object"]};
+window.SIDEBAR_ITEMS = {"fn":["adv_lethe","pager_start"]};

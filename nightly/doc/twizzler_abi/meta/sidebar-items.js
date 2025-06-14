@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["MEXT_EMPTY","MEXT_SIZED"],"struct":["MetaExt","MetaExtTag","MetaFlags","MetaInfo"]};
+window.SIDEBAR_ITEMS = {"constant":["MEXT_EMPTY","MEXT_SIZED"],"struct":["FotEntry","FotFlags","MetaExt","MetaExtTag","MetaFlags","MetaInfo"]};

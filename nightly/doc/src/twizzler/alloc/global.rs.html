@@ -24,7 +24,11 @@
 <a href=#24 id=24 data-nosnippet>24</a>        <span class="self">Self </span>{ global, alloc }
 <a href=#25 id=25 data-nosnippet>25</a>    }
 <a href=#26 id=26 data-nosnippet>26</a>
-<a href=#27 id=27 data-nosnippet>27</a>    <span class="kw">pub fn </span>resolve&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ref&lt;<span class="lifetime">'a</span>, T&gt; {
-<a href=#28 id=28 data-nosnippet>28</a>        <span class="macro">todo!</span>()
+<a href=#27 id=27 data-nosnippet>27</a>    <span class="kw">pub fn </span>resolve&lt;<span class="lifetime">'a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>) -&gt; Ref&lt;<span class="lifetime">'a</span>, T&gt; {
+<a href=#28 id=28 data-nosnippet>28</a>        <span class="kw">unsafe </span>{ <span class="self">self</span>.global.resolve() }
 <a href=#29 id=29 data-nosnippet>29</a>    }
-<a href=#30 id=30 data-nosnippet>30</a>}</code></pre></div></section></main></body></html>
+<a href=#30 id=30 data-nosnippet>30</a>
+<a href=#31 id=31 data-nosnippet>31</a>    <span class="kw">pub fn </span>allocator(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>A {
+<a href=#32 id=32 data-nosnippet>32</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.alloc
+<a href=#33 id=33 data-nosnippet>33</a>    }
+<a href=#34 id=34 data-nosnippet>34</a>}</code></pre></div></section></main></body></html>

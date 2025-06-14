@@ -23,7 +23,7 @@
 <a href=#23 id=23 data-nosnippet>23</a><span class="kw">use super</span>::{compconfig::CompConfigObject, compthread::CompThread, StackObject};
 <a href=#24 id=24 data-nosnippet>24</a><span class="kw">use </span><span class="kw">crate</span>::mon::{
 <a href=#25 id=25 data-nosnippet>25</a>    get_monitor,
-<a href=#26 id=26 data-nosnippet>26</a>    space::{MapHandle, MapInfo},
+<a href=#26 id=26 data-nosnippet>26</a>    space::{MapHandle, MapInfo, Space},
 <a href=#27 id=27 data-nosnippet>27</a>    thread::ThreadMgr,
 <a href=#28 id=28 data-nosnippet>28</a>};
 <a href=#29 id=29 data-nosnippet>29</a>
@@ -96,12 +96,12 @@
 <a href=#96 id=96 data-nosnippet>96</a>    /// will just forego having one. This may cause a failure down the line, but it's the best we
 <a href=#97 id=97 data-nosnippet>97</a>    /// can do without panicing.
 <a href=#98 id=98 data-nosnippet>98</a>    </span><span class="kw">fn </span>new(instance: ObjID, _th: ObjID) -&gt; <span class="self">Self </span>{
-<a href=#99 id=99 data-nosnippet>99</a>        <span class="kw">let </span>handle = get_monitor()
-<a href=#100 id=100 data-nosnippet>100</a>            .space
-<a href=#101 id=101 data-nosnippet>101</a>            .lock()
-<a href=#102 id=102 data-nosnippet>102</a>            .unwrap()
-<a href=#103 id=103 data-nosnippet>103</a>            .safe_create_and_map_runtime_object(instance, MapFlags::READ | MapFlags::WRITE)
-<a href=#104 id=104 data-nosnippet>104</a>            .ok();
+<a href=#99 id=99 data-nosnippet>99</a>        <span class="kw">let </span>handle = Space::safe_create_and_map_runtime_object(
+<a href=#100 id=100 data-nosnippet>100</a>            <span class="kw-2">&amp;</span>get_monitor().space,
+<a href=#101 id=101 data-nosnippet>101</a>            instance,
+<a href=#102 id=102 data-nosnippet>102</a>            MapFlags::READ | MapFlags::WRITE,
+<a href=#103 id=103 data-nosnippet>103</a>        )
+<a href=#104 id=104 data-nosnippet>104</a>        .ok();
 <a href=#105 id=105 data-nosnippet>105</a>
 <a href=#106 id=106 data-nosnippet>106</a>        <span class="self">Self </span>{
 <a href=#107 id=107 data-nosnippet>107</a>            simple_buffer: handle
