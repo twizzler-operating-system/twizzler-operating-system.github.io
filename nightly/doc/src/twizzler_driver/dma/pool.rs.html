@@ -257,7 +257,7 @@
 <a href=#257 id=257 data-nosnippet>257</a>
 <a href=#258 id=258 data-nosnippet>258</a><span class="kw">impl </span>DmaPool {
 <a href=#259 id=259 data-nosnippet>259</a>    <span class="doccomment">/// Create a new DmaPool with access and DMA options, where each created underlying Twizzler
-<a href=#260 id=260 data-nosnippet>260</a>    /// object is created using the provided [CreateSpec]. If default (volatile) options are
+<a href=#260 id=260 data-nosnippet>260</a>    /// object is created using the provided [ObjectBuilder]. If default (volatile) options are
 <a href=#261 id=261 data-nosnippet>261</a>    /// acceptable for the create spec, use the [crate::dma::DmaPool::default_spec] function.
 <a href=#262 id=262 data-nosnippet>262</a>    </span><span class="kw">pub fn </span>new(spec: ObjectBuilder&lt;()&gt;, access: Access, opts: DmaOptions) -&gt; <span class="self">Self </span>{
 <a href=#263 id=263 data-nosnippet>263</a>        <span class="self">Self </span>{
@@ -296,7 +296,7 @@
 <a href=#296 id=296 data-nosnippet>296</a>        <span class="self">self</span>.do_allocate(len)
 <a href=#297 id=297 data-nosnippet>297</a>    }
 <a href=#298 id=298 data-nosnippet>298</a>
-<a href=#299 id=299 data-nosnippet>299</a>    <span class="doccomment">/// Allocate a new [DmaRegion&lt;T&gt;] from the pool. The region will be initialized with the
+<a href=#299 id=299 data-nosnippet>299</a>    <span class="doccomment">/// Allocate a new `[DmaRegion]` from the pool. The region will be initialized with the
 <a href=#300 id=300 data-nosnippet>300</a>    /// provided initial value.
 <a href=#301 id=301 data-nosnippet>301</a>    </span><span class="kw">pub fn </span>allocate&lt;<span class="lifetime">'a</span>, T: DeviceSync&gt;(<span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>, init: T) -&gt; <span class="prelude-ty">Result</span>&lt;DmaRegion&lt;T&gt;, AllocationError&gt; {
 <a href=#302 id=302 data-nosnippet>302</a>        <span class="kw">let </span>len = core::mem::size_of::&lt;T&gt;();
@@ -312,7 +312,7 @@
 <a href=#312 id=312 data-nosnippet>312</a>        <span class="prelude-val">Ok</span>(reg)
 <a href=#313 id=313 data-nosnippet>313</a>    }
 <a href=#314 id=314 data-nosnippet>314</a>
-<a href=#315 id=315 data-nosnippet>315</a>    <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region's slice will
+<a href=#315 id=315 data-nosnippet>315</a>    <span class="doccomment">/// Allocate a new `[DmaSliceRegion]` from the pool. Each entry in the region's slice will
 <a href=#316 id=316 data-nosnippet>316</a>    /// be initialized with the provided initial value.
 <a href=#317 id=317 data-nosnippet>317</a>    </span><span class="kw">pub fn </span>allocate_array&lt;<span class="lifetime">'a</span>, T: DeviceSync + Clone&gt;(
 <a href=#318 id=318 data-nosnippet>318</a>        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
@@ -333,7 +333,7 @@
 <a href=#333 id=333 data-nosnippet>333</a>        <span class="prelude-val">Ok</span>(reg)
 <a href=#334 id=334 data-nosnippet>334</a>    }
 <a href=#335 id=335 data-nosnippet>335</a>
-<a href=#336 id=336 data-nosnippet>336</a>    <span class="doccomment">/// Allocate a new [DmaSliceRegion&lt;T&gt;] from the pool. Each entry in the region's slice will
+<a href=#336 id=336 data-nosnippet>336</a>    <span class="doccomment">/// Allocate a new `[DmaSliceRegion]` from the pool. Each entry in the region's slice will
 <a href=#337 id=337 data-nosnippet>337</a>    /// be initialized by running the provided closure.
 <a href=#338 id=338 data-nosnippet>338</a>    </span><span class="kw">pub fn </span>allocate_array_with&lt;<span class="lifetime">'a</span>, T: DeviceSync&gt;(
 <a href=#339 id=339 data-nosnippet>339</a>        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,

@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["twizzler",[["impl&lt;'a, T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/borrow/trait.BorrowMut.html\" title=\"trait core::borrow::BorrowMut\">BorrowMut</a>&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.slice.html\">[T]</a>&gt; for <a class=\"struct\" href=\"twizzler/ptr/struct.RefSliceMut.html\" title=\"struct twizzler::ptr::RefSliceMut\">RefSliceMut</a>&lt;'a, T&gt;"],["impl&lt;'a, T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/borrow/trait.BorrowMut.html\" title=\"trait core::borrow::BorrowMut\">BorrowMut</a>&lt;T&gt; for <a class=\"struct\" href=\"twizzler/ptr/struct.RefMut.html\" title=\"struct twizzler::ptr::RefMut\">RefMut</a>&lt;'a, T&gt;"],["impl&lt;T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/borrow/trait.BorrowMut.html\" title=\"trait core::borrow::BorrowMut\">BorrowMut</a>&lt;<a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/std/primitive.slice.html\">[T]</a>&gt; for <a class=\"struct\" href=\"twizzler/ptr/struct.TxRefSlice.html\" title=\"struct twizzler::ptr::TxRefSlice\">TxRefSlice</a>&lt;T&gt;"],["impl&lt;T&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/borrow/trait.BorrowMut.html\" title=\"trait core::borrow::BorrowMut\">BorrowMut</a>&lt;T&gt; for <a class=\"struct\" href=\"twizzler/ptr/struct.TxRef.html\" title=\"struct twizzler::ptr::TxRef\">TxRef</a>&lt;T&gt;"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1448]}

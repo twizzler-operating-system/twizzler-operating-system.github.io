@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["GlobalPtr","InvPtr","Ref","RefMut","RefSlice","RefSliceMut"]};
+window.SIDEBAR_ITEMS = {"struct":["GlobalPtr","InvPtr","Ref","RefMut","RefSlice","RefSliceMut","TxRef","TxRefSlice"]};

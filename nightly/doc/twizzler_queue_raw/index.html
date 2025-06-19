@@ -53,7 +53,7 @@ turn is 1, so yes. Next, it remove the data from the queue:</p>
      t
      h
 [1_, 0_, 0_]</code></pre></div></div></details><h2 id="structs" class="section-header">Structs<a href="#structs" class="anchor">§</a></h2><dl class="item-table"><dt><a class="struct" href="struct.QueueBase.html" title="struct twizzler_queue_raw::QueueBase">Queue<wbr>Base</a></dt><dd>The base info structure stored in a Twizzler queue object. Used to open Twizzler queue objects
-and create a [Queue].</dd><dt><a class="struct" href="struct.QueueEntry.html" title="struct twizzler_queue_raw::QueueEntry">Queue<wbr>Entry</a></dt><dd>A queue entry. All queues must be formed of these, as the queue algorithm uses data inside this
+and create a Queue.</dd><dt><a class="struct" href="struct.QueueEntry.html" title="struct twizzler_queue_raw::QueueEntry">Queue<wbr>Entry</a></dt><dd>A queue entry. All queues must be formed of these, as the queue algorithm uses data inside this
 struct as part of its operation. The cmd_slot is used internally to track turn, and the info is
 used by the full queue structure to manage completion. The data T is user data passed around the
 queue.</dd><dt><a class="struct" href="struct.RawQueue.html" title="struct twizzler_queue_raw::RawQueue">RawQueue</a></dt><dd>A raw queue, comprising of a header to track the algorithm and a buffer to hold queue entries.</dd><dt><a class="struct" href="struct.RawQueueHdr.html" title="struct twizzler_queue_raw::RawQueueHdr">RawQueue<wbr>Hdr</a></dt><dd>A raw queue header. This contains all the necessary counters and info to run the queue

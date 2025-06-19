@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["MEXT_EMPTY","MEXT_SIZED"],"struct":["FotEntry","FotFlags","FotResolve","MapFlags","MetaExt","MetaExtTag","MetaFlags","MetaInfo","ObjID","Object","ObjectBuilder","ResolveRequest"],"trait":["RawObject","TypedObject"]};
+window.SIDEBAR_ITEMS = {"constant":["MEXT_EMPTY","MEXT_SIZED"],"struct":["FotEntry","FotFlags","FotResolve","MapFlags","MetaExt","MetaExtTag","MetaFlags","MetaInfo","MutObject","ObjID","Object","ObjectBuilder","ObjectHandle","ResolveRequest","TxObject"],"trait":["RawObject","TypedObject"]};

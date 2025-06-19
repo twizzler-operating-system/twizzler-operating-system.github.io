@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["SubCommand","VecTy"],"fn":["create_vector_object","do_append","do_push","do_read","main","open_or_create_vector_object","open_vector_object"],"struct":["Cli","Foo"]};
+window.SIDEBAR_ITEMS = {"enum":["SubCommand","VecTy"],"fn":["create_arena","create_vector_object","do_append","do_append_foo","do_push","do_push_foo","do_read","main","open_arena","open_or_create_arena","open_or_create_vector_object","open_vector_object"],"struct":["Cli","Foo"]};

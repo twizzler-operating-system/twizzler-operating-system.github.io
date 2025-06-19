@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"derive":["BaseType","Invariant","NewStorer"],"mod":["alloc","collections","marker","object","ptr","tx"]};
+window.SIDEBAR_ITEMS = {"derive":["BaseType","Invariant"],"mod":["alloc","collections","error","marker","object","ptr"],"type":["Result"]};

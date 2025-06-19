@@ -188,7 +188,7 @@
 <a href=#188 id=188 data-nosnippet>188</a>/// sleep until the timeout expires.
 <a href=#189 id=189 data-nosnippet>189</a>///
 <a href=#190 id=190 data-nosnippet>190</a>/// Returns either Ok(ready_count), indicating how many operations were immediately ready, or
-<a href=#191 id=191 data-nosnippet>191</a>/// Err([ThreadSyncError]), indicating failure. After return, the kernel may have modified the
+<a href=#191 id=191 data-nosnippet>191</a>/// Err([TwzError]), indicating failure. After return, the kernel may have modified the
 <a href=#192 id=192 data-nosnippet>192</a>/// ThreadSync entries to indicate additional information about each request, with Err to indicate
 <a href=#193 id=193 data-nosnippet>193</a>/// error and Ok(n) to indicate success. For sleep requests, n is 0 if the operation went to sleep
 <a href=#194 id=194 data-nosnippet>194</a>/// or 1 otherwise. For wakeup requests, n indicates the number of threads woken up by this

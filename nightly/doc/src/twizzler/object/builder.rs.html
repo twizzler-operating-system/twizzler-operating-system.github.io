@@ -8,10 +8,10 @@
 <a href=#8 id=8 data-nosnippet>8</a>};
 <a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>twizzler_rt_abi::object::MapFlags;
 <a href=#10 id=10 data-nosnippet>10</a>
-<a href=#11 id=11 data-nosnippet>11</a><span class="kw">use </span><span class="kw">super</span>::Object;
+<a href=#11 id=11 data-nosnippet>11</a><span class="kw">use super</span>::{Object, TxObject};
 <a href=#12 id=12 data-nosnippet>12</a><span class="kw">use crate</span>::{
 <a href=#13 id=13 data-nosnippet>13</a>    marker::{BaseType, StoreCopy},
-<a href=#14 id=14 data-nosnippet>14</a>    tx::TxObject,
+<a href=#14 id=14 data-nosnippet>14</a>    <span class="prelude-ty">Result</span>,
 <a href=#15 id=15 data-nosnippet>15</a>};
 <a href=#16 id=16 data-nosnippet>16</a>
 <a href=#17 id=17 data-nosnippet>17</a><span class="doccomment">/// An object builder, for constructing objects using a builder API.
@@ -59,98 +59,127 @@
 <a href=#59 id=59 data-nosnippet>59</a>}
 <a href=#60 id=60 data-nosnippet>60</a>
 <a href=#61 id=61 data-nosnippet>61</a><span class="kw">impl</span>&lt;Base: BaseType + StoreCopy&gt; ObjectBuilder&lt;Base&gt; {
-<a href=#62 id=62 data-nosnippet>62</a>    <span class="kw">pub fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, base: Base) -&gt; <span class="kw">crate</span>::tx::Result&lt;Object&lt;Base&gt;&gt; {
-<a href=#63 id=63 data-nosnippet>63</a>        <span class="self">self</span>.build_inplace(|tx| tx.write(base))
-<a href=#64 id=64 data-nosnippet>64</a>    }
-<a href=#65 id=65 data-nosnippet>65</a>}
-<a href=#66 id=66 data-nosnippet>66</a>
-<a href=#67 id=67 data-nosnippet>67</a><span class="kw">impl</span>&lt;Base: BaseType&gt; ObjectBuilder&lt;Base&gt; {
-<a href=#68 id=68 data-nosnippet>68</a>    <span class="kw">pub fn </span>build_inplace&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctor: F) -&gt; <span class="kw">crate</span>::tx::Result&lt;Object&lt;Base&gt;&gt;
-<a href=#69 id=69 data-nosnippet>69</a>    <span class="kw">where
-<a href=#70 id=70 data-nosnippet>70</a>        </span>F: FnOnce(TxObject&lt;MaybeUninit&lt;Base&gt;&gt;) -&gt; <span class="kw">crate</span>::tx::Result&lt;TxObject&lt;Base&gt;&gt;,
-<a href=#71 id=71 data-nosnippet>71</a>    {
-<a href=#72 id=72 data-nosnippet>72</a>        <span class="kw">let </span>id = twizzler_abi::syscall::sys_object_create(
-<a href=#73 id=73 data-nosnippet>73</a>            <span class="self">self</span>.spec,
-<a href=#74 id=74 data-nosnippet>74</a>            <span class="self">self</span>.src_objs.as_slice(),
-<a href=#75 id=75 data-nosnippet>75</a>            <span class="self">self</span>.ties.as_slice(),
-<a href=#76 id=76 data-nosnippet>76</a>        )<span class="question-mark">?</span>;
-<a href=#77 id=77 data-nosnippet>77</a>        <span class="kw">let </span><span class="kw-2">mut </span>flags = MapFlags::READ | MapFlags::WRITE;
-<a href=#78 id=78 data-nosnippet>78</a>        <span class="kw">if </span><span class="self">self</span>.spec.lt == LifetimeType::Persistent {
-<a href=#79 id=79 data-nosnippet>79</a>            flags.insert(MapFlags::PERSIST);
-<a href=#80 id=80 data-nosnippet>80</a>        }
-<a href=#81 id=81 data-nosnippet>81</a>        <span class="kw">let </span>mu_object = <span class="kw">unsafe </span>{ Object::&lt;MaybeUninit&lt;Base&gt;&gt;::map_unchecked(id, flags) }<span class="question-mark">?</span>;
-<a href=#82 id=82 data-nosnippet>82</a>        <span class="kw">let </span>object = ctor(mu_object.tx()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-<a href=#83 id=83 data-nosnippet>83</a>        object.commit()
-<a href=#84 id=84 data-nosnippet>84</a>    }
-<a href=#85 id=85 data-nosnippet>85</a>
-<a href=#86 id=86 data-nosnippet>86</a>    <span class="kw">pub fn </span>build_ctor&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctor: F) -&gt; <span class="kw">crate</span>::tx::Result&lt;Object&lt;Base&gt;&gt;
-<a href=#87 id=87 data-nosnippet>87</a>    <span class="kw">where
-<a href=#88 id=88 data-nosnippet>88</a>        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>TxObject&lt;MaybeUninit&lt;Base&gt;&gt;),
-<a href=#89 id=89 data-nosnippet>89</a>    {
-<a href=#90 id=90 data-nosnippet>90</a>        <span class="kw">let </span>id = twizzler_abi::syscall::sys_object_create(
-<a href=#91 id=91 data-nosnippet>91</a>            <span class="self">self</span>.spec,
-<a href=#92 id=92 data-nosnippet>92</a>            <span class="self">self</span>.src_objs.as_slice(),
-<a href=#93 id=93 data-nosnippet>93</a>            <span class="self">self</span>.ties.as_slice(),
-<a href=#94 id=94 data-nosnippet>94</a>        )<span class="question-mark">?</span>;
-<a href=#95 id=95 data-nosnippet>95</a>        <span class="kw">let </span><span class="kw-2">mut </span>flags = MapFlags::READ | MapFlags::WRITE;
-<a href=#96 id=96 data-nosnippet>96</a>        <span class="kw">if </span><span class="self">self</span>.spec.lt == LifetimeType::Persistent {
-<a href=#97 id=97 data-nosnippet>97</a>            flags.insert(MapFlags::PERSIST);
-<a href=#98 id=98 data-nosnippet>98</a>        }
-<a href=#99 id=99 data-nosnippet>99</a>        <span class="kw">let </span>mu_object = <span class="kw">unsafe </span>{ Object::&lt;MaybeUninit&lt;Base&gt;&gt;::map_unchecked(id, flags) }<span class="question-mark">?</span>;
-<a href=#100 id=100 data-nosnippet>100</a>        <span class="kw">let </span><span class="kw-2">mut </span>tx = mu_object.tx()<span class="question-mark">?</span>;
-<a href=#101 id=101 data-nosnippet>101</a>        ctor(<span class="kw-2">&amp;mut </span>tx);
-<a href=#102 id=102 data-nosnippet>102</a>        <span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ tx.commit()<span class="question-mark">?</span>.cast() })
-<a href=#103 id=103 data-nosnippet>103</a>    }
-<a href=#104 id=104 data-nosnippet>104</a>}
-<a href=#105 id=105 data-nosnippet>105</a>
-<a href=#106 id=106 data-nosnippet>106</a><span class="kw">impl</span>&lt;Base: BaseType&gt; Default <span class="kw">for </span>ObjectBuilder&lt;Base&gt; {
-<a href=#107 id=107 data-nosnippet>107</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#108 id=108 data-nosnippet>108</a>        <span class="self">Self</span>::new(ObjectCreate::new(
-<a href=#109 id=109 data-nosnippet>109</a>            BackingType::Normal,
-<a href=#110 id=110 data-nosnippet>110</a>            LifetimeType::Volatile,
-<a href=#111 id=111 data-nosnippet>111</a>            <span class="prelude-val">None</span>,
-<a href=#112 id=112 data-nosnippet>112</a>            ObjectCreateFlags::empty(),
-<a href=#113 id=113 data-nosnippet>113</a>            Protections::all(),
-<a href=#114 id=114 data-nosnippet>114</a>        ))
-<a href=#115 id=115 data-nosnippet>115</a>    }
-<a href=#116 id=116 data-nosnippet>116</a>}
-<a href=#117 id=117 data-nosnippet>117</a>
-<a href=#118 id=118 data-nosnippet>118</a><span class="attr">#[cfg(test)]
-<a href=#119 id=119 data-nosnippet>119</a></span><span class="kw">mod </span>tests {
-<a href=#120 id=120 data-nosnippet>120</a>    <span class="kw">use </span><span class="kw">super</span>::ObjectBuilder;
-<a href=#121 id=121 data-nosnippet>121</a>    <span class="kw">use crate</span>::{marker::BaseType, object::TypedObject, ptr::InvPtr};
-<a href=#122 id=122 data-nosnippet>122</a>
-<a href=#123 id=123 data-nosnippet>123</a>    <span class="attr">#[test]
-<a href=#124 id=124 data-nosnippet>124</a>    </span><span class="kw">fn </span>builder_simple() {
-<a href=#125 id=125 data-nosnippet>125</a>        <span class="kw">let </span>builder = ObjectBuilder::default();
-<a href=#126 id=126 data-nosnippet>126</a>        <span class="kw">let </span>obj = builder.build(<span class="number">42u32</span>).unwrap();
-<a href=#127 id=127 data-nosnippet>127</a>        <span class="kw">let </span>base = obj.base();
-<a href=#128 id=128 data-nosnippet>128</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>base, <span class="number">42</span>);
-<a href=#129 id=129 data-nosnippet>129</a>    }
-<a href=#130 id=130 data-nosnippet>130</a>
-<a href=#131 id=131 data-nosnippet>131</a>    <span class="kw">struct </span>Foo {
-<a href=#132 id=132 data-nosnippet>132</a>        ptr: InvPtr&lt;u32&gt;,
-<a href=#133 id=133 data-nosnippet>133</a>    }
-<a href=#134 id=134 data-nosnippet>134</a>    <span class="kw">impl </span>BaseType <span class="kw">for </span>Foo {}
-<a href=#135 id=135 data-nosnippet>135</a>
-<a href=#136 id=136 data-nosnippet>136</a>    <span class="attr">#[test]
-<a href=#137 id=137 data-nosnippet>137</a>    </span><span class="kw">fn </span>builder_complex() {
-<a href=#138 id=138 data-nosnippet>138</a>        <span class="kw">let </span>builder = ObjectBuilder::default();
-<a href=#139 id=139 data-nosnippet>139</a>        <span class="kw">let </span>obj_1 = builder.build(<span class="number">42u32</span>).unwrap();
-<a href=#140 id=140 data-nosnippet>140</a>        <span class="kw">let </span>base = obj_1.base_ref();
-<a href=#141 id=141 data-nosnippet>141</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>base, <span class="number">42</span>);
-<a href=#142 id=142 data-nosnippet>142</a>
-<a href=#143 id=143 data-nosnippet>143</a>        <span class="kw">let </span>builder = ObjectBuilder::&lt;Foo&gt;::default();
-<a href=#144 id=144 data-nosnippet>144</a>        <span class="kw">let </span>obj = builder
-<a href=#145 id=145 data-nosnippet>145</a>            .build_inplace(|tx| {
-<a href=#146 id=146 data-nosnippet>146</a>                <span class="kw">let </span>foo = Foo {
-<a href=#147 id=147 data-nosnippet>147</a>                    ptr: InvPtr::new(<span class="kw-2">&amp;</span>tx, base)<span class="question-mark">?</span>,
-<a href=#148 id=148 data-nosnippet>148</a>                };
-<a href=#149 id=149 data-nosnippet>149</a>                tx.write(foo)
-<a href=#150 id=150 data-nosnippet>150</a>            })
-<a href=#151 id=151 data-nosnippet>151</a>            .unwrap();
-<a href=#152 id=152 data-nosnippet>152</a>        <span class="kw">let </span>base_foo = obj.base();
-<a href=#153 id=153 data-nosnippet>153</a>        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ base_foo.ptr.resolve() };
-<a href=#154 id=154 data-nosnippet>154</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>r, <span class="number">42</span>);
-<a href=#155 id=155 data-nosnippet>155</a>    }
-<a href=#156 id=156 data-nosnippet>156</a>}</code></pre></div></section></main></body></html>
+<a href=#62 id=62 data-nosnippet>62</a>    <span class="doccomment">/// Build an object using the provided base vale.
+<a href=#63 id=63 data-nosnippet>63</a>    /// # Example
+<a href=#64 id=64 data-nosnippet>64</a>    /// ```
+<a href=#65 id=65 data-nosnippet>65</a>    /// # use twizzler::object::ObjectBuilder;
+<a href=#66 id=66 data-nosnippet>66</a>    /// let builder = ObjectBuilder::default();
+<a href=#67 id=67 data-nosnippet>67</a>    /// let obj = builder.build(42u32).unwrap();
+<a href=#68 id=68 data-nosnippet>68</a>    /// ```
+<a href=#69 id=69 data-nosnippet>69</a>    </span><span class="kw">pub fn </span>build(<span class="kw-2">&amp;</span><span class="self">self</span>, base: Base) -&gt; <span class="prelude-ty">Result</span>&lt;Object&lt;Base&gt;&gt; {
+<a href=#70 id=70 data-nosnippet>70</a>        <span class="self">self</span>.build_inplace(|tx| tx.write(base))
+<a href=#71 id=71 data-nosnippet>71</a>    }
+<a href=#72 id=72 data-nosnippet>72</a>}
+<a href=#73 id=73 data-nosnippet>73</a>
+<a href=#74 id=74 data-nosnippet>74</a><span class="kw">impl</span>&lt;Base: BaseType&gt; ObjectBuilder&lt;Base&gt; {
+<a href=#75 id=75 data-nosnippet>75</a>    <span class="doccomment">/// Build an object using the provided constructor function.
+<a href=#76 id=76 data-nosnippet>76</a>    ///
+<a href=#77 id=77 data-nosnippet>77</a>    /// The constructor should call the .write() method on the TxObject, and
+<a href=#78 id=78 data-nosnippet>78</a>    /// return the result.
+<a href=#79 id=79 data-nosnippet>79</a>    /// # Example
+<a href=#80 id=80 data-nosnippet>80</a>    /// ```
+<a href=#81 id=81 data-nosnippet>81</a>    /// # use twizzler::object::ObjectBuilder;
+<a href=#82 id=82 data-nosnippet>82</a>    /// let builder = ObjectBuilder::default();
+<a href=#83 id=83 data-nosnippet>83</a>    /// let obj = builder.build_inplace(|tx| tx.write(42u32)).unwrap();
+<a href=#84 id=84 data-nosnippet>84</a>    /// ```
+<a href=#85 id=85 data-nosnippet>85</a>    </span><span class="kw">pub fn </span>build_inplace&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctor: F) -&gt; <span class="prelude-ty">Result</span>&lt;Object&lt;Base&gt;&gt;
+<a href=#86 id=86 data-nosnippet>86</a>    <span class="kw">where
+<a href=#87 id=87 data-nosnippet>87</a>        </span>F: FnOnce(TxObject&lt;MaybeUninit&lt;Base&gt;&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;TxObject&lt;Base&gt;&gt;,
+<a href=#88 id=88 data-nosnippet>88</a>    {
+<a href=#89 id=89 data-nosnippet>89</a>        <span class="kw">let </span>id = twizzler_abi::syscall::sys_object_create(
+<a href=#90 id=90 data-nosnippet>90</a>            <span class="self">self</span>.spec,
+<a href=#91 id=91 data-nosnippet>91</a>            <span class="self">self</span>.src_objs.as_slice(),
+<a href=#92 id=92 data-nosnippet>92</a>            <span class="self">self</span>.ties.as_slice(),
+<a href=#93 id=93 data-nosnippet>93</a>        )<span class="question-mark">?</span>;
+<a href=#94 id=94 data-nosnippet>94</a>        <span class="kw">let </span><span class="kw-2">mut </span>flags = MapFlags::READ | MapFlags::WRITE;
+<a href=#95 id=95 data-nosnippet>95</a>        <span class="kw">if </span><span class="self">self</span>.spec.lt == LifetimeType::Persistent {
+<a href=#96 id=96 data-nosnippet>96</a>            flags.insert(MapFlags::PERSIST);
+<a href=#97 id=97 data-nosnippet>97</a>        }
+<a href=#98 id=98 data-nosnippet>98</a>        <span class="kw">let </span>mu_object = <span class="kw">unsafe </span>{ Object::&lt;MaybeUninit&lt;Base&gt;&gt;::map_unchecked(id, flags) }<span class="question-mark">?</span>;
+<a href=#99 id=99 data-nosnippet>99</a>        <span class="kw">let </span>object = ctor(mu_object.into_tx()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+<a href=#100 id=100 data-nosnippet>100</a>        object.into_object()
+<a href=#101 id=101 data-nosnippet>101</a>    }
+<a href=#102 id=102 data-nosnippet>102</a>
+<a href=#103 id=103 data-nosnippet>103</a>    <span class="doccomment">/// Build an object using the provided constructor function.
+<a href=#104 id=104 data-nosnippet>104</a>    ///
+<a href=#105 id=105 data-nosnippet>105</a>    /// The constructor should call the .write() method on the TxObject or
+<a href=#106 id=106 data-nosnippet>106</a>    /// otherwise ensure that it is safe to call .assume_init on the underlying
+<a href=#107 id=107 data-nosnippet>107</a>    /// MaybeUninit.
+<a href=#108 id=108 data-nosnippet>108</a>    ///
+<a href=#109 id=109 data-nosnippet>109</a>    /// # Safety
+<a href=#110 id=110 data-nosnippet>110</a>    /// The caller must ensure that the base is initialized, see MaybeUninit::assume_init.
+<a href=#111 id=111 data-nosnippet>111</a>    ///
+<a href=#112 id=112 data-nosnippet>112</a>    /// # Example
+<a href=#113 id=113 data-nosnippet>113</a>    /// ```
+<a href=#114 id=114 data-nosnippet>114</a>    /// # use twizzler::object::ObjectBuilder;
+<a href=#115 id=115 data-nosnippet>115</a>    /// let builder = ObjectBuilder::default();
+<a href=#116 id=116 data-nosnippet>116</a>    /// let obj = unsafe {
+<a href=#117 id=117 data-nosnippet>117</a>    ///     builder
+<a href=#118 id=118 data-nosnippet>118</a>    ///         .build_ctor(|tx| {
+<a href=#119 id=119 data-nosnippet>119</a>    ///             tx.write(42u32);
+<a href=#120 id=120 data-nosnippet>120</a>    ///         })
+<a href=#121 id=121 data-nosnippet>121</a>    ///         .unwrap()
+<a href=#122 id=122 data-nosnippet>122</a>    /// };
+<a href=#123 id=123 data-nosnippet>123</a>    /// ```
+<a href=#124 id=124 data-nosnippet>124</a>    </span><span class="kw">pub unsafe fn </span>build_ctor&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ctor: F) -&gt; <span class="prelude-ty">Result</span>&lt;Object&lt;Base&gt;&gt;
+<a href=#125 id=125 data-nosnippet>125</a>    <span class="kw">where
+<a href=#126 id=126 data-nosnippet>126</a>        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>TxObject&lt;MaybeUninit&lt;Base&gt;&gt;),
+<a href=#127 id=127 data-nosnippet>127</a>    {
+<a href=#128 id=128 data-nosnippet>128</a>        <span class="self">self</span>.build_inplace(|<span class="kw-2">mut </span>tx| {
+<a href=#129 id=129 data-nosnippet>129</a>            ctor(<span class="kw-2">&amp;mut </span>tx);
+<a href=#130 id=130 data-nosnippet>130</a>            <span class="prelude-val">Ok</span>(tx.assume_init())
+<a href=#131 id=131 data-nosnippet>131</a>        })
+<a href=#132 id=132 data-nosnippet>132</a>    }
+<a href=#133 id=133 data-nosnippet>133</a>}
+<a href=#134 id=134 data-nosnippet>134</a>
+<a href=#135 id=135 data-nosnippet>135</a><span class="kw">impl</span>&lt;Base: BaseType&gt; Default <span class="kw">for </span>ObjectBuilder&lt;Base&gt; {
+<a href=#136 id=136 data-nosnippet>136</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<a href=#137 id=137 data-nosnippet>137</a>        <span class="self">Self</span>::new(ObjectCreate::new(
+<a href=#138 id=138 data-nosnippet>138</a>            BackingType::Normal,
+<a href=#139 id=139 data-nosnippet>139</a>            LifetimeType::Volatile,
+<a href=#140 id=140 data-nosnippet>140</a>            <span class="prelude-val">None</span>,
+<a href=#141 id=141 data-nosnippet>141</a>            ObjectCreateFlags::empty(),
+<a href=#142 id=142 data-nosnippet>142</a>            Protections::all(),
+<a href=#143 id=143 data-nosnippet>143</a>        ))
+<a href=#144 id=144 data-nosnippet>144</a>    }
+<a href=#145 id=145 data-nosnippet>145</a>}
+<a href=#146 id=146 data-nosnippet>146</a>
+<a href=#147 id=147 data-nosnippet>147</a><span class="attr">#[cfg(test)]
+<a href=#148 id=148 data-nosnippet>148</a></span><span class="kw">mod </span>tests {
+<a href=#149 id=149 data-nosnippet>149</a>    <span class="kw">use </span><span class="kw">super</span>::ObjectBuilder;
+<a href=#150 id=150 data-nosnippet>150</a>    <span class="kw">use crate</span>::{marker::BaseType, object::TypedObject, ptr::InvPtr};
+<a href=#151 id=151 data-nosnippet>151</a>
+<a href=#152 id=152 data-nosnippet>152</a>    <span class="attr">#[test]
+<a href=#153 id=153 data-nosnippet>153</a>    </span><span class="kw">fn </span>builder_simple() {
+<a href=#154 id=154 data-nosnippet>154</a>        <span class="kw">let </span>builder = ObjectBuilder::default();
+<a href=#155 id=155 data-nosnippet>155</a>        <span class="kw">let </span>obj = builder.build(<span class="number">42u32</span>).unwrap();
+<a href=#156 id=156 data-nosnippet>156</a>        <span class="kw">let </span>base = obj.base();
+<a href=#157 id=157 data-nosnippet>157</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>base, <span class="number">42</span>);
+<a href=#158 id=158 data-nosnippet>158</a>    }
+<a href=#159 id=159 data-nosnippet>159</a>
+<a href=#160 id=160 data-nosnippet>160</a>    <span class="kw">struct </span>Foo {
+<a href=#161 id=161 data-nosnippet>161</a>        ptr: InvPtr&lt;u32&gt;,
+<a href=#162 id=162 data-nosnippet>162</a>    }
+<a href=#163 id=163 data-nosnippet>163</a>    <span class="kw">impl </span>BaseType <span class="kw">for </span>Foo {}
+<a href=#164 id=164 data-nosnippet>164</a>
+<a href=#165 id=165 data-nosnippet>165</a>    <span class="attr">#[test]
+<a href=#166 id=166 data-nosnippet>166</a>    </span><span class="kw">fn </span>builder_complex() {
+<a href=#167 id=167 data-nosnippet>167</a>        <span class="kw">let </span>builder = ObjectBuilder::default();
+<a href=#168 id=168 data-nosnippet>168</a>        <span class="kw">let </span>obj_1 = builder.build(<span class="number">42u32</span>).unwrap();
+<a href=#169 id=169 data-nosnippet>169</a>        <span class="kw">let </span>base = obj_1.base_ref();
+<a href=#170 id=170 data-nosnippet>170</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>base, <span class="number">42</span>);
+<a href=#171 id=171 data-nosnippet>171</a>
+<a href=#172 id=172 data-nosnippet>172</a>        <span class="kw">let </span>builder = ObjectBuilder::&lt;Foo&gt;::default();
+<a href=#173 id=173 data-nosnippet>173</a>        <span class="kw">let </span>obj = builder
+<a href=#174 id=174 data-nosnippet>174</a>            .build_inplace(|tx| {
+<a href=#175 id=175 data-nosnippet>175</a>                <span class="kw">let </span>foo = Foo {
+<a href=#176 id=176 data-nosnippet>176</a>                    ptr: InvPtr::new(<span class="kw-2">&amp;</span>tx, base)<span class="question-mark">?</span>,
+<a href=#177 id=177 data-nosnippet>177</a>                };
+<a href=#178 id=178 data-nosnippet>178</a>                tx.write(foo)
+<a href=#179 id=179 data-nosnippet>179</a>            })
+<a href=#180 id=180 data-nosnippet>180</a>            .unwrap();
+<a href=#181 id=181 data-nosnippet>181</a>        <span class="kw">let </span>base_foo = obj.base();
+<a href=#182 id=182 data-nosnippet>182</a>        <span class="kw">let </span>r = <span class="kw">unsafe </span>{ base_foo.ptr.resolve() };
+<a href=#183 id=183 data-nosnippet>183</a>        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>r, <span class="number">42</span>);
+<a href=#184 id=184 data-nosnippet>184</a>    }
+<a href=#185 id=185 data-nosnippet>185</a>}</code></pre></div></section></main></body></html>
