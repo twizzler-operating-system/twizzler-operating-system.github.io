@@ -144,6 +144,32 @@ compiler.</p>
 <p>To build a boot image, you'll need the limine bootloader installed. In particular, we need the EFI
 code to help boot Twizzler through their boot protocol.</p>
 <p>To run qemu through the build system, you'll need qemu installed.</p>
+<h2 id="wsl-setup"><a class="header" href="#wsl-setup">WSL Setup</a></h2>
+<p>WSL needs additional setup to enable KVM virtualization:</p>
+<ol>
+<li>
+<p><strong>Enable nested virtualization</strong> - Add to <code>.wslconfig</code> in your Windows user directory (you may have to create the file):</p>
+<pre><code>[wsl2]
+nestedVirtualization=true
+</code></pre>
+</li>
+<li>
+<p><strong>Add yourself to <code>kvm</code> group</strong> - In WSL:</p>
+<pre><code>sudo usermod -a -G kvm ${USER}
+</code></pre>
+</li>
+<li>
+<p><strong>Change default group of <code>/dev/kvm</code></strong> - Add to <code>/etc/wsl.conf</code> in WSL:</p>
+<pre><code>[boot]
+command = /bin/bash -c 'chown -v root:kvm /dev/kvm &amp;&amp; chmod 660 /dev/kvm'
+</code></pre>
+</li>
+<li>
+<p><strong>Restart WSL</strong></p>
+<pre><code>wsl --shutdown
+</code></pre>
+</li>
+</ol>
 <h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
 <p>Installing the tools:</p>
 <ol>
