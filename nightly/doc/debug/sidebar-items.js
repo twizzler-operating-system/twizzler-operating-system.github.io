@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Commands"],"fn":["main","run_debug_program"],"mod":["gdb"],"struct":["Cli","RunCli"]};

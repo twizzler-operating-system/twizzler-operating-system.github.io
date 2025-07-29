@@ -9,8 +9,8 @@
 <a href=#9 id=9 data-nosnippet>9</a><span class="kw">use </span>twizzler_abi::{
 <a href=#10 id=10 data-nosnippet>10</a>    object::{ObjID, Protections},
 <a href=#11 id=11 data-nosnippet>11</a>    syscall::{
-<a href=#12 id=12 data-nosnippet>12</a>        sys_kernel_console_write, sys_object_create, BackingType, KernelConsoleWriteFlags,
-<a href=#13 id=13 data-nosnippet>13</a>        LifetimeType, ObjectCreate, ObjectCreateFlags,
+<a href=#12 id=12 data-nosnippet>12</a>        sys_kernel_console_write, sys_object_create, BackingType, KernelConsoleSource,
+<a href=#13 id=13 data-nosnippet>13</a>        KernelConsoleWriteFlags, LifetimeType, ObjectCreate, ObjectCreateFlags,
 <a href=#14 id=14 data-nosnippet>14</a>    },
 <a href=#15 id=15 data-nosnippet>15</a>};
 <a href=#16 id=16 data-nosnippet>16</a><span class="kw">use </span>twizzler_rt_abi::{
@@ -118,6 +118,10 @@
 <a href=#118 id=118 data-nosnippet>118</a>        String::from_utf8_lossy(<span class="kw-2">&amp;</span>buf[<span class="number">0</span>..len])
 <a href=#119 id=119 data-nosnippet>119</a>    );
 <a href=#120 id=120 data-nosnippet>120</a>    logger.count += <span class="number">1</span>;
-<a href=#121 id=121 data-nosnippet>121</a>    <span class="kw">let _ </span>= sys_kernel_console_write(msg.as_bytes(), KernelConsoleWriteFlags::DISCARD_ON_FULL);
-<a href=#122 id=122 data-nosnippet>122</a>    <span class="prelude-val">Ok</span>(())
-<a href=#123 id=123 data-nosnippet>123</a>}</code></pre></div></section></main></body></html>
+<a href=#121 id=121 data-nosnippet>121</a>    <span class="kw">let _ </span>= sys_kernel_console_write(
+<a href=#122 id=122 data-nosnippet>122</a>        KernelConsoleSource::Console,
+<a href=#123 id=123 data-nosnippet>123</a>        msg.as_bytes(),
+<a href=#124 id=124 data-nosnippet>124</a>        KernelConsoleWriteFlags::DISCARD_ON_FULL,
+<a href=#125 id=125 data-nosnippet>125</a>    );
+<a href=#126 id=126 data-nosnippet>126</a>    <span class="prelude-val">Ok</span>(())
+<a href=#127 id=127 data-nosnippet>127</a>}</code></pre></div></section></main></body></html>

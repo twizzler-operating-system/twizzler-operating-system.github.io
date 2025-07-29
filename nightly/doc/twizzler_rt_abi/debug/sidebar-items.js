@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["twz_rt_get_loaded_image"],"struct":["LoadedImage"],"type":["DlPhdrInfo","LoadedImageId"]};
+window.SIDEBAR_ITEMS = {"fn":["twz_rt_get_loaded_image"],"struct":["LinkMap","LoadedImage"],"type":["DlPhdrInfo","LoadedImageId"]};

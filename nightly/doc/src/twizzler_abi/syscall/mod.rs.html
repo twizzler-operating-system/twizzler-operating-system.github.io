@@ -102,9 +102,9 @@
 <a href=#102 id=102 data-nosnippet>102</a><span class="attr">#[inline]
 <a href=#103 id=103 data-nosnippet>103</a></span><span class="kw">fn </span>convert_codes_to_result&lt;T, E, D, F, G&gt;(code: u64, val: u64, d: D, f: F, g: G) -&gt; <span class="prelude-ty">Result</span>&lt;T, E&gt;
 <a href=#104 id=104 data-nosnippet>104</a><span class="kw">where
-<a href=#105 id=105 data-nosnippet>105</a>    </span>F: Fn(u64, u64) -&gt; T,
-<a href=#106 id=106 data-nosnippet>106</a>    G: Fn(u64, u64) -&gt; E,
-<a href=#107 id=107 data-nosnippet>107</a>    D: Fn(u64, u64) -&gt; bool,
+<a href=#105 id=105 data-nosnippet>105</a>    </span>F: FnOnce(u64, u64) -&gt; T,
+<a href=#106 id=106 data-nosnippet>106</a>    G: FnOnce(u64, u64) -&gt; E,
+<a href=#107 id=107 data-nosnippet>107</a>    D: FnOnce(u64, u64) -&gt; bool,
 <a href=#108 id=108 data-nosnippet>108</a>{
 <a href=#109 id=109 data-nosnippet>109</a>    <span class="kw">if </span>d(code, val) {
 <a href=#110 id=110 data-nosnippet>110</a>        <span class="prelude-val">Err</span>(g(code, val))

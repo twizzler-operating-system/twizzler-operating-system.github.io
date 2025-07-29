@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">11.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">12.</strong> Assorted Notes</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">11.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">12.</strong> Assorted Notes</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -242,6 +242,148 @@ with:</p>
 <p>When running from command line, if you don't have access to a screen, QEMU may require you add <code>-q=-nographic</code> to the command.</p>
 <h2 id="step-4-exiting-twizzler"><a class="header" href="#step-4-exiting-twizzler">Step 4: Exiting Twizzler</a></h2>
 <p>At the moment Twizzler does not have a shutdown command.  To exit the QEMU based simulation use the <code>Ctrl-a X</code> command which is a part of the simulator.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="developing-for-twizzler"><a class="header" href="#developing-for-twizzler">Developing for Twizzler</a></h1>
+<p>The Twizzler project welcomes people to contribute to this open source
+operating system.  We follow a branch and pull-request process.  For
+those without write access to the repo you will first have to fork the
+Twizzler repo, for those with write access it's easier to work within
+the main repo in your own branches.</p>
+<h2 id="writing-your-first-twizzler-program"><a class="header" href="#writing-your-first-twizzler-program">Writing your First Twizzler Program</a></h2>
+<p>Twizzler makes heavy use of Rust's Cargo system of crates in order to manage both kernel and user space programs.  To create a new program that
+runs on the Twizzler operating system you can follow these steps:</p>
+<ol>
+<li>Change directories into the bin directory:</li>
+</ol>
+<p><code>cd twizzler/src/bin</code></p>
+<ol start="2">
+<li>
+<p>Create a new program, named <code>hello</code>.  The <code>Cargo</code> command will actually create the canonical <code>Hello world</code> program for you.
+<code>cargo new --bin hello</code></p>
+</li>
+<li>
+<p>Change directory back to the project root, and edit the Cargo.toml file in the root directory to add the program to the Twizzler build system.</p>
+</li>
+</ol>
+<p>The following diff shows the two lines you need to add:</p>
+<pre><code class="language-diff">diff --git a/Cargo.toml b/Cargo.toml
+index 338455b..cb38fb5 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -7,6 +7,7 @@ members = [
+     &quot;src/bin/devmgr&quot;,
+     &quot;src/bin/netmgr&quot;,
+     &quot;src/bin/nettest&quot;,
++    &quot;src/bin/hello&quot;,
+     &quot;src/kernel&quot;,
+     &quot;src/lib/twizzler-queue-raw&quot;,
+     &quot;src/lib/twizzler-queue&quot;,
+@@ -21,10 +22,11 @@ initrd = [
+     &quot;crate:devmgr&quot;,
+     &quot;crate:netmgr&quot;,
+     &quot;crate:nettest&quot;,
++    &quot;crate:hello&quot;,
+ ]
+</code></pre>
+<ol start="4">
+<li>Rebuild the system and start QEMU</li>
+</ol>
+<p><code>cargo start-qemu</code></p>
+<ol start="5">
+<li>From within Twizzler run your new program</li>
+</ol>
+<pre><code>run hello
+got: &lt;run hello&gt;
+&gt; Hello, world!
+</code></pre>
+<ol start="6">
+<li>Exit the simulator with <code>Ctrl-a x</code></li>
+</ol>
+<h2 id="picking-an-issue-to-work"><a class="header" href="#picking-an-issue-to-work">Picking an Issue to Work</a></h2>
+<p>Before reading this document make sure that you have worked through the build process, which is documented
+<a href="https://github.com/twizzler-operating-system/twizzler/doc/src/BUILD.md">here</a>.</p>
+<p>After reading this document, if you would like to work on an open issue,
+you can take a look at a
+<a href="https://github.com/twizzler-operating-system/twizzler/issues">list of issues</a>.
+For newer contributors, easier issues are tagged
+<a href="https://github.com/twizzler-operating-system/twizzler/labels/good%20first%20issue">good first issue</a>
+and are a good place to dive in.</p>
+<h2 id="branch-naming"><a class="header" href="#branch-naming">Branch Naming</a></h2>
+<p>Branch names should be short and descriptive, containing the user's
+github or other short name, following by a dash and then a feature
+name, e.g. gnn-icmp.  Names must not violate the Twizzler project's
+Code of Conduct.  Please keep it classy.</p>
+<h2 id="submitting-a-pull-request"><a class="header" href="#submitting-a-pull-request">Submitting a Pull Request</a></h2>
+<p>All pull requests should be against the 'main' branch.  From time to
+time there may be special exceptions but these must be coordinated
+with the project owners, listed on the main github page.</p>
+<h2 id="example-workflow"><a class="header" href="#example-workflow">Example Workflow</a></h2>
+<p>In order to create this set of documentation the following steps were
+carried out.</p>
+<pre><code>&gt; git clone git@github.com:twizzler-operating-system/twizzler.git
+</code></pre>
+<p>Create and edit file in doc/src/develop.md</p>
+<pre><code>&gt; git branch -b gnn-docs
+&gt; git add doc/src/develop.md
+&gt; git commit
+&gt; git push --set-upstream origin gnn-docs
+</code></pre>
+<p>The pull request was then submitted from the github page for the
+Twizzer project.</p>
+<p>Two reviewers were added at the time the PR was committed.</p>
+<h1 id="coding-standards"><a class="header" href="#coding-standards">Coding Standards</a></h1>
+<p>Code submitted to Twizzler must follow these guidelines:</p>
+<ul>
+<li>Follow the Rust style guide. This is just the default style for all rust code established by <code>rustfmt</code>, explained at <a href="https://github.com/rust-lang/rustfmt#readme">this GitHub repository</a>.</li>
+<li>Be well documented. Please add documentation to explain your code. For more information on this, see below.</li>
+<li>For unsafe code, have special safety documentation to explain why the code must be unsafe, and extra scrutiny on that code to ensure its correctness.</li>
+<li>Pass <a href="https://github.com/rust-lang/rust-clippy#readme">clippy</a>, the rust linter. It is useful for finding common mistakes and improving code.</li>
+</ul>
+<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
+<p>If you want to document code instead of writing it, thank you! Rust has a built-in documentation tool <code>rustdoc</code> which makes compiling documentation easier, and writing it directly in the code more natural. <a href="https://doc.rust-lang.org/cargo/index.html">Documentation explanation</a>. Contributions can be made through pull requests, just like for code, explained above.</p>
+<h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
+<p>Twizzler supports an integrated testing system, where kernel test harnesses and userspace test
+programs for libraries and binaries are run on start-up. You can run Twizzler in test mode by adding
+the <code>--tests</code> argument to your cargo run commands.</p>
+<p>When developing for Twizzler, you should write tests that cover code you wrote. This includes both
+userspace and kernelspace code. Note that writing tests for the kernel is slightly different, in
+that a test-case failing causes the whole system to stop, and you need to use the <code>#[kernel_test]</code>
+attribute from the <code>twizzler-kernel-macros</code> crate instead of <code>#[test]</code>.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="debugging"><a class="header" href="#debugging">Debugging</a></h1>
+<p>Debugging support is in-progress on Twizzler. Currently, you can debug userspace programs via GDB in a limited way.</p>
+<h2 id="using-the-debug-stub-in-qemu"><a class="header" href="#using-the-debug-stub-in-qemu">Using the debug stub in QEMU</a></h2>
+<p>To debug a program in Twizzler from within QEMU, you can run it under the debug stub program:</p>
+<pre><code>debug run &lt;your-program&gt;
+</code></pre>
+<p>The program will start in a suspended state and wait for a debugger connection. From the host machine,
+start GDB in the twizzler source directory. This will run the .gdbinit script and will configure GDB for
+debugging Twizzler userspace programs. Note that this file may trigger a warning that it needs to be allowed
+to run. If that warning pops up, follow its instructions.</p>
+<p>At this point, you should see the (gdb) prompt and it should have connected to the debug stub. If not, you can
+try connecting manually via <code>target remote :2159</code>. Note that many features are missing, but are in the process
+of being added.</p>
+<h2 id="using-the-debug-stub-to-attach-to-a-crashed-compartment"><a class="header" href="#using-the-debug-stub-to-attach-to-a-crashed-compartment">Using the debug stub to attach to a crashed compartment</a></h2>
+<p>TODO</p>
+<h2 id="some-other-debugging-techniques"><a class="header" href="#some-other-debugging-techniques">Some other debugging techniques</a></h2>
+<ul>
+<li>Loading of compartments and libraries can be printed by specifying MONDEBUG=1 as an environment variable when starting programs.</li>
+<li>Many system services use the tracing crate for logging. You can increase the verbosity by changing the log level in the relevant initialization routines. TODO: get these from environment variables.</li>
+<li>The kernel uses the log crate, and its verbosity is controlled in main.rs.</li>
+</ul>
+<h2 id="working-features"><a class="header" href="#working-features">Working features</a></h2>
+<ul>
+<li>Reading registers</li>
+<li>Reading and poking memory</li>
+<li>Tracing stopped threads</li>
+</ul>
+<h2 id="planned-additional-features"><a class="header" href="#planned-additional-features">Planned additional features</a></h2>
+<ul>
+<li>Setting / clearing breakpoints (in-progress)</li>
+<li>Single stepping (in-progress)</li>
+<li>Memory map reading</li>
+<li>Multithreaded debugging</li>
+<li>Signals</li>
+<li>Support for aarch64</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="objects"><a class="header" href="#objects">Objects</a></h1>
 <h2 id="definition"><a class="header" href="#definition">Definition</a></h2>
 <p>Objects are an abstraction of a set of related data with the same lifetime and permissions. This vague definition allows for applications to define what data is contained in a single object in a way that is most reasonable for the particular use case. For example, a B-Tree could contain all nodes in the same object given that the nodes likely have the same permissions and lifetime. However, another tree with different permissions for children could separate these nodes into different objects. For this second example, managing their lifetime can be done with <a href="./Lifetime.html#Ties">ties</a>.</p>
