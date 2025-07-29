@@ -431,29 +431,29 @@
 <a href=#431 id=431 data-nosnippet>431</a>                    <span class="kw">let </span><span class="kw-2">mut </span>recs = <span class="self">self
 <a href=#432 id=432 data-nosnippet>432</a>                        </span>.load_library(load_comp, dep_unlib.clone(), idx, allowed_gates, load_ctx)
 <a href=#433 id=433 data-nosnippet>433</a>                        .map_err(|e| {
-<a href=#434 id=434 data-nosnippet>434</a>                            DynlinkError::new_collect(
-<a href=#435 id=435 data-nosnippet>435</a>                                DynlinkErrorKind::LibraryLoadFail {
-<a href=#436 id=436 data-nosnippet>436</a>                                    library: dep_unlib.clone(),
-<a href=#437 id=437 data-nosnippet>437</a>                                },
-<a href=#438 id=438 data-nosnippet>438</a>                                <span class="macro">vec!</span>[e],
-<a href=#439 id=439 data-nosnippet>439</a>                            )
-<a href=#440 id=440 data-nosnippet>440</a>                        })<span class="question-mark">?</span>;
-<a href=#441 id=441 data-nosnippet>441</a>                    ids.append(<span class="kw-2">&amp;mut </span>recs);
-<a href=#442 id=442 data-nosnippet>442</a>                    idx
-<a href=#443 id=443 data-nosnippet>443</a>                };
-<a href=#444 id=444 data-nosnippet>444</a>                <span class="self">self</span>.add_dep(lib.idx, idx);
-<a href=#445 id=445 data-nosnippet>445</a>                <span class="prelude-val">Ok</span>(idx)
-<a href=#446 id=446 data-nosnippet>446</a>            })
-<a href=#447 id=447 data-nosnippet>447</a>            .collect::&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, DynlinkError&gt;&gt;&gt;();
-<a href=#448 id=448 data-nosnippet>448</a>
-<a href=#449 id=449 data-nosnippet>449</a>        <span class="kw">let _ </span>= DynlinkError::collect(
-<a href=#450 id=450 data-nosnippet>450</a>            DynlinkErrorKind::LibraryLoadFail {
-<a href=#451 id=451 data-nosnippet>451</a>                library: root_unlib,
-<a href=#452 id=452 data-nosnippet>452</a>            },
-<a href=#453 id=453 data-nosnippet>453</a>            deps,
-<a href=#454 id=454 data-nosnippet>454</a>        )<span class="question-mark">?</span>;
-<a href=#455 id=455 data-nosnippet>455</a>
-<a href=#456 id=456 data-nosnippet>456</a>        <span class="macro">tracing::debug!</span>(<span class="string">"HERE"</span>);
+<a href=#434 id=434 data-nosnippet>434</a>                            <span class="macro">tracing::error!</span>(<span class="string">"failed to load dependency for {}: {}"</span>, lib, e);
+<a href=#435 id=435 data-nosnippet>435</a>                            DynlinkError::new_collect(
+<a href=#436 id=436 data-nosnippet>436</a>                                DynlinkErrorKind::LibraryLoadFail {
+<a href=#437 id=437 data-nosnippet>437</a>                                    library: dep_unlib.clone(),
+<a href=#438 id=438 data-nosnippet>438</a>                                },
+<a href=#439 id=439 data-nosnippet>439</a>                                <span class="macro">vec!</span>[e],
+<a href=#440 id=440 data-nosnippet>440</a>                            )
+<a href=#441 id=441 data-nosnippet>441</a>                        })<span class="question-mark">?</span>;
+<a href=#442 id=442 data-nosnippet>442</a>                    ids.append(<span class="kw-2">&amp;mut </span>recs);
+<a href=#443 id=443 data-nosnippet>443</a>                    idx
+<a href=#444 id=444 data-nosnippet>444</a>                };
+<a href=#445 id=445 data-nosnippet>445</a>                <span class="self">self</span>.add_dep(lib.idx, idx);
+<a href=#446 id=446 data-nosnippet>446</a>                <span class="prelude-val">Ok</span>(idx)
+<a href=#447 id=447 data-nosnippet>447</a>            })
+<a href=#448 id=448 data-nosnippet>448</a>            .collect::&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, DynlinkError&gt;&gt;&gt;();
+<a href=#449 id=449 data-nosnippet>449</a>
+<a href=#450 id=450 data-nosnippet>450</a>        <span class="kw">let _ </span>= DynlinkError::collect(
+<a href=#451 id=451 data-nosnippet>451</a>            DynlinkErrorKind::LibraryLoadFail {
+<a href=#452 id=452 data-nosnippet>452</a>                library: root_unlib,
+<a href=#453 id=453 data-nosnippet>453</a>            },
+<a href=#454 id=454 data-nosnippet>454</a>            deps,
+<a href=#455 id=455 data-nosnippet>455</a>        )<span class="question-mark">?</span>;
+<a href=#456 id=456 data-nosnippet>456</a>
 <a href=#457 id=457 data-nosnippet>457</a>        <span class="macro">assert_eq!</span>(idx, lib.idx);
 <a href=#458 id=458 data-nosnippet>458</a>        <span class="self">self</span>.library_deps[idx] = LoadedOrUnloaded::Loaded(lib);
 <a href=#459 id=459 data-nosnippet>459</a>        <span class="prelude-val">Ok</span>(ids)
