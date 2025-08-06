@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["key_fprint"],"mod":["paged_object_store"],"struct":["Ext4Store","LetheIoWrapper","LetheObjectStore","LetheState","PerObjLetheState"]};
+window.SIDEBAR_ITEMS = {"constant":["PAGE_SIZE"],"mod":["paged_object_store"],"struct":["Ext4Store"]};
