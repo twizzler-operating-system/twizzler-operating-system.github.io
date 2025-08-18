@@ -4,7 +4,7 @@
 <a href=#4 id=4 data-nosnippet>4</a>};
 <a href=#5 id=5 data-nosnippet>5</a>
 <a href=#6 id=6 data-nosnippet>6</a><span class="kw">use </span>blocking::unblock;
-<a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span>object_store::{objid_to_ino, PagedObjectStore};
+<a href=#7 id=7 data-nosnippet>7</a><span class="kw">use </span>object_store::PagedObjectStore;
 <a href=#8 id=8 data-nosnippet>8</a><span class="kw">use </span>twizzler::{
 <a href=#9 id=9 data-nosnippet>9</a>    error::RawTwzError,
 <a href=#10 id=10 data-nosnippet>10</a>    object::{MetaFlags, MetaInfo, ObjID},
@@ -124,8 +124,8 @@
 <a href=#124 id=124 data-nosnippet>124</a>    } <span class="kw">else </span>{
 <a href=#125 id=125 data-nosnippet>125</a>        COUNT.fetch_sub(<span class="number">1</span>, Ordering::SeqCst);
 <a href=#126 id=126 data-nosnippet>126</a>    }
-<a href=#127 id=127 data-nosnippet>127</a>    <span class="kw">if </span>objid_to_ino(id.raw()).is_some() || prefetch {
-<a href=#128 id=128 data-nosnippet>128</a>        <span class="macro">tracing::debug!</span>(
+<a href=#127 id=127 data-nosnippet>127</a>    <span class="kw">if </span>prefetch {
+<a href=#128 id=128 data-nosnippet>128</a>        <span class="macro">tracing::info!</span>(
 <a href=#129 id=129 data-nosnippet>129</a>            <span class="string">"COMPLETED: {} {:?} in {} ms, {}:{} remaining"</span>,
 <a href=#130 id=130 data-nosnippet>130</a>            id,
 <a href=#131 id=131 data-nosnippet>131</a>            req_range,

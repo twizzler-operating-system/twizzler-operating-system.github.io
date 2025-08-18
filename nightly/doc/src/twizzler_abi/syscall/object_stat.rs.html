@@ -21,23 +21,25 @@
 <a href=#21 id=21 data-nosnippet>21</a>    </span><span class="kw">pub </span>life: LifetimeType,
 <a href=#22 id=22 data-nosnippet>22</a>    <span class="doccomment">/// The backing type of this object.
 <a href=#23 id=23 data-nosnippet>23</a>    </span><span class="kw">pub </span>backing: BackingType,
-<a href=#24 id=24 data-nosnippet>24</a>}
-<a href=#25 id=25 data-nosnippet>25</a>
-<a href=#26 id=26 data-nosnippet>26</a><span class="doccomment">/// Read information about a given object.
-<a href=#27 id=27 data-nosnippet>27</a></span><span class="kw">pub fn </span>sys_object_stat(id: ObjID) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectInfo&gt; {
-<a href=#28 id=28 data-nosnippet>28</a>    <span class="kw">let </span>[hi, lo] = id.parts();
-<a href=#29 id=29 data-nosnippet>29</a>    <span class="kw">let </span><span class="kw-2">mut </span>obj_info = MaybeUninit::&lt;ObjectInfo&gt;::uninit();
-<a href=#30 id=30 data-nosnippet>30</a>    <span class="kw">let </span>args = [
-<a href=#31 id=31 data-nosnippet>31</a>        hi,
-<a href=#32 id=32 data-nosnippet>32</a>        lo,
-<a href=#33 id=33 data-nosnippet>33</a>        <span class="kw-2">&amp;mut </span>obj_info <span class="kw">as </span><span class="kw-2">*mut </span>MaybeUninit&lt;ObjectInfo&gt; <span class="kw">as </span>usize <span class="kw">as </span>u64,
-<a href=#34 id=34 data-nosnippet>34</a>    ];
-<a href=#35 id=35 data-nosnippet>35</a>    <span class="kw">let </span>(code, val) = <span class="kw">unsafe </span>{ raw_syscall(Syscall::ObjectStat, <span class="kw-2">&amp;</span>args) };
-<a href=#36 id=36 data-nosnippet>36</a>    convert_codes_to_result(
-<a href=#37 id=37 data-nosnippet>37</a>        code,
-<a href=#38 id=38 data-nosnippet>38</a>        val,
-<a href=#39 id=39 data-nosnippet>39</a>        |c, <span class="kw">_</span>| c != <span class="number">0</span>,
-<a href=#40 id=40 data-nosnippet>40</a>        |<span class="kw">_</span>, <span class="kw">_</span>| <span class="kw">unsafe </span>{ obj_info.assume_init() },
-<a href=#41 id=41 data-nosnippet>41</a>        twzerr,
-<a href=#42 id=42 data-nosnippet>42</a>    )
-<a href=#43 id=43 data-nosnippet>43</a>}</code></pre></div></section></main></body></html>
+<a href=#24 id=24 data-nosnippet>24</a>    <span class="doccomment">/// The number of pages allocated to this object.
+<a href=#25 id=25 data-nosnippet>25</a>    </span><span class="kw">pub </span>pages: usize,
+<a href=#26 id=26 data-nosnippet>26</a>}
+<a href=#27 id=27 data-nosnippet>27</a>
+<a href=#28 id=28 data-nosnippet>28</a><span class="doccomment">/// Read information about a given object.
+<a href=#29 id=29 data-nosnippet>29</a></span><span class="kw">pub fn </span>sys_object_stat(id: ObjID) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectInfo&gt; {
+<a href=#30 id=30 data-nosnippet>30</a>    <span class="kw">let </span>[hi, lo] = id.parts();
+<a href=#31 id=31 data-nosnippet>31</a>    <span class="kw">let </span><span class="kw-2">mut </span>obj_info = MaybeUninit::&lt;ObjectInfo&gt;::uninit();
+<a href=#32 id=32 data-nosnippet>32</a>    <span class="kw">let </span>args = [
+<a href=#33 id=33 data-nosnippet>33</a>        hi,
+<a href=#34 id=34 data-nosnippet>34</a>        lo,
+<a href=#35 id=35 data-nosnippet>35</a>        <span class="kw-2">&amp;mut </span>obj_info <span class="kw">as </span><span class="kw-2">*mut </span>MaybeUninit&lt;ObjectInfo&gt; <span class="kw">as </span>usize <span class="kw">as </span>u64,
+<a href=#36 id=36 data-nosnippet>36</a>    ];
+<a href=#37 id=37 data-nosnippet>37</a>    <span class="kw">let </span>(code, val) = <span class="kw">unsafe </span>{ raw_syscall(Syscall::ObjectStat, <span class="kw-2">&amp;</span>args) };
+<a href=#38 id=38 data-nosnippet>38</a>    convert_codes_to_result(
+<a href=#39 id=39 data-nosnippet>39</a>        code,
+<a href=#40 id=40 data-nosnippet>40</a>        val,
+<a href=#41 id=41 data-nosnippet>41</a>        |c, <span class="kw">_</span>| c != <span class="number">0</span>,
+<a href=#42 id=42 data-nosnippet>42</a>        |<span class="kw">_</span>, <span class="kw">_</span>| <span class="kw">unsafe </span>{ obj_info.assume_init() },
+<a href=#43 id=43 data-nosnippet>43</a>        twzerr,
+<a href=#44 id=44 data-nosnippet>44</a>    )
+<a href=#45 id=45 data-nosnippet>45</a>}</code></pre></div></section></main></body></html>

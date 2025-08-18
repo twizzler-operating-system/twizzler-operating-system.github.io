@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["as_env","initialize_devmgr","initialize_namer","initialize_pager","main","run_tests"],"struct":["TwzIo"]};
+window.SIDEBAR_ITEMS = {"fn":["as_env","initialize_cache","initialize_devmgr","initialize_namer","initialize_pager","main","run_tests"],"struct":["TwzIo"]};

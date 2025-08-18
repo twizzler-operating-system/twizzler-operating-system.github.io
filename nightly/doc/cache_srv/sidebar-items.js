@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["drop","drop_direct","hold","hold_direct","list_nth","list_nth_direct","preload","preload_direct","stat","stat_direct"],"mod":["__twz_secgate_impl_drop_mod","__twz_secgate_impl_hold_mod","__twz_secgate_impl_list_nth_mod","__twz_secgate_impl_preload_mod","__twz_secgate_impl_stat_mod"],"struct":["CachedStats"]};
