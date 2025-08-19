@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">11.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">12.</strong> Assorted Notes</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -621,6 +621,32 @@ communicate with the device (e.g. DMA memory for a ring buffer). For this, twizz
 a <code>DmaPool</code> type that can be used to allocate DMA regions that share an access type and a set of
 <code>DmaOptions</code>. The pool will internally create new Twizzler objects that it uses to allocate DMA
 memory from, which it then uses to create DMA regions on-demand.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="tracing-and-performance-debugging"><a class="header" href="#tracing-and-performance-debugging">Tracing and Performance Debugging</a></h1>
+<p>Twizzler supports tracing facilities supported by the kernel. A utility program, <code>trace</code>, enables
+users to trace programs and collect statistics, thread sampling events, and other kernel events that
+may impact performance. The twizzler-abi crate provides a trace submodule that contains data definitions for tracing events.</p>
+<p>Do note that this work is in early stages, and as such, not all defined tracing events may be supported or generated. If you would like one added, feel free to open a PR or issue! Also note
+that the standard issues of tracing performance issues apply: you are interfering with the system
+by tracing it, and thus it may behave differently under tracing. The tracing system attempts to be
+as lightweight as possible so as to minimize this effect, but it cannot be nullified completely.</p>
+<h2 id="tracing-user-programs"><a class="header" href="#tracing-user-programs">Tracing user programs</a></h2>
+<p>The <code>trace</code> program provides functionality to trace user programs. It allows users to specify the target program and the events to be traced:</p>
+<pre><code>trace -e syscalls ls
+</code></pre>
+<p>This will trace the <code>ls</code> program and collect information on each syscall that the tracee makes.
+The currently supported events for -e are (specified abbreviations also work): syscalls (sys), page-faults (pf), tlb. More will be added in the future, as well as a flag to ask trace what
+events are supported directly.</p>
+<pre><code>trace -s ls
+</code></pre>
+<p>This will sample the threads running in the <code>ls</code> compartment at regular intervals and collect statistics on each thread's execution. It may be useful to specify the MONDEBUG=1 environment
+variable so as to show which libraries are loaded where.</p>
+<h2 id="todo"><a class="header" href="#todo">TODO</a></h2>
+<ul>
+<li>Allow changing sampling rate</li>
+<li>Allow more fine-grained sampling (requires kernel scheduler changes)</li>
+<li>Provide list of -e events from trace program directly</li>
+<li>Parse the debug info for the compartment so that we can output symbol names instead of addresses.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cargo-metadata-for-twizzler-crates-built-inside-xtask"><a class="header" href="#cargo-metadata-for-twizzler-crates-built-inside-xtask">Cargo metadata for Twizzler crates built inside xtask</a></h1>
 <p>The xtask program organizes the build into a series of &quot;collections&quot; that get built in different environments. There are:</p>
 <ul>
