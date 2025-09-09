@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["list","vec"]};
+window.SIDEBAR_ITEMS = {"mod":["hachage","list","vec"]};
