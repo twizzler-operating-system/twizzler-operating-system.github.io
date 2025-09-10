@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["DynlinkErrorKind","HeaderError"],"mod":["compartment","context","engines","library","symbol","tls"],"struct":["DynlinkError"]};
+window.SIDEBAR_ITEMS = {"constant":["SMALL_STRING_SIZE","SMALL_VEC_SIZE"],"enum":["DynlinkErrorKind","HeaderError"],"mod":["compartment","context","engines","library","symbol","tls"],"struct":["DynlinkError"],"type":["Vec"]};

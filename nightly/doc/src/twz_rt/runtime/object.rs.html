@@ -104,7 +104,7 @@
 <a href=#104 id=104 data-nosnippet>104</a>        }
 <a href=#105 id=105 data-nosnippet>105</a>
 <a href=#106 id=106 data-nosnippet>106</a>        <span class="kw">let </span>slot = ptr <span class="kw">as </span>usize / MAX_SIZE;
-<a href=#107 id=107 data-nosnippet>107</a>        <span class="kw">let </span><span class="prelude-val">Some</span>(id) = <span class="self">self</span>.get_alloc().get_id_from_ptr(ptr) <span class="kw">else </span>{
+<a href=#107 id=107 data-nosnippet>107</a>        <span class="kw">let </span><span class="prelude-val">Some</span>(id) = <span class="self">self</span>.get_id_from_heap_ptr(ptr) <span class="kw">else </span>{
 <a href=#108 id=108 data-nosnippet>108</a>            <span class="kw">let </span>map = sys_object_read_map(<span class="prelude-val">None</span>, slot)<span class="question-mark">?</span>;
 <a href=#109 id=109 data-nosnippet>109</a>            <span class="kw">return </span><span class="prelude-val">Ok</span>(object_handle {
 <a href=#110 id=110 data-nosnippet>110</a>                id: map.id.raw(),

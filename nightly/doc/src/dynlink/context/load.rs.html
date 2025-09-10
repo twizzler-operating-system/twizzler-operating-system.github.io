@@ -17,10 +17,10 @@
 <a href=#17 id=17 data-nosnippet>17</a>    engines::{LoadCtx, LoadDirective, LoadFlags},
 <a href=#18 id=18 data-nosnippet>18</a>    library::{AllowedGates, Library, LibraryId, SecgateInfo, UnloadedLibrary},
 <a href=#19 id=19 data-nosnippet>19</a>    tls::TlsModule,
-<a href=#20 id=20 data-nosnippet>20</a>    DynlinkError, DynlinkErrorKind, HeaderError,
+<a href=#20 id=20 data-nosnippet>20</a>    DynlinkError, DynlinkErrorKind, HeaderError, Vec, SMALL_VEC_SIZE,
 <a href=#21 id=21 data-nosnippet>21</a>};
 <a href=#22 id=22 data-nosnippet>22</a>
-<a href=#23 id=23 data-nosnippet>23</a><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash)]
+<a href=#23 id=23 data-nosnippet>23</a><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Ord, Eq, Hash, Default)]
 <a href=#24 id=24 data-nosnippet>24</a></span><span class="kw">pub struct </span>LoadIds {
 <a href=#25 id=25 data-nosnippet>25</a>    <span class="kw">pub </span>comp: CompartmentId,
 <a href=#26 id=26 data-nosnippet>26</a>    <span class="kw">pub </span>lib: LibraryId,
@@ -67,7 +67,7 @@
 <a href=#67 id=67 data-nosnippet>67</a>        <span class="kw">let </span>dynamic = elf
 <a href=#68 id=68 data-nosnippet>68</a>            .dynamic()<span class="question-mark">?
 <a href=#69 id=69 data-nosnippet>69</a>            </span>.ok_or_else(|| DynlinkErrorKind::MissingSection {
-<a href=#70 id=70 data-nosnippet>70</a>                name: <span class="string">"dynamic"</span>.to_string(),
+<a href=#70 id=70 data-nosnippet>70</a>                name: <span class="string">"dynamic"</span>.into(),
 <a href=#71 id=71 data-nosnippet>71</a>            })<span class="question-mark">?</span>;
 <a href=#72 id=72 data-nosnippet>72</a>
 <a href=#73 id=73 data-nosnippet>73</a>        <span class="comment">// If this isn't present, just call it 0, since if there's an init_array, this entry must be
@@ -198,10 +198,10 @@
 <a href=#198 id=198 data-nosnippet>198</a>
 <a href=#199 id=199 data-nosnippet>199</a>        <span class="comment">// Step 1: map the PT_LOAD directives to copy-from commands Twizzler can use for creating
 <a href=#200 id=200 data-nosnippet>200</a>        // objects.
-<a href=#201 id=201 data-nosnippet>201</a>        </span><span class="kw">let </span>directives: Vec&lt;<span class="kw">_</span>&gt; = elf
+<a href=#201 id=201 data-nosnippet>201</a>        </span><span class="kw">let </span>directives: Vec&lt;<span class="kw">_</span>, SMALL_VEC_SIZE&gt; = elf
 <a href=#202 id=202 data-nosnippet>202</a>            .segments()
 <a href=#203 id=203 data-nosnippet>203</a>            .ok_or_else(|| DynlinkErrorKind::MissingSection {
-<a href=#204 id=204 data-nosnippet>204</a>                name: <span class="string">"segment info"</span>.to_string(),
+<a href=#204 id=204 data-nosnippet>204</a>                name: <span class="string">"segment info"</span>.into(),
 <a href=#205 id=205 data-nosnippet>205</a>            })<span class="question-mark">?
 <a href=#206 id=206 data-nosnippet>206</a>            </span>.iter()
 <a href=#207 id=207 data-nosnippet>207</a>            .filter(|p| p.p_type == elf::abi::PT_LOAD)
@@ -345,142 +345,144 @@
 <a href=#345 id=345 data-nosnippet>345</a>        idx: NodeIndex,
 <a href=#346 id=346 data-nosnippet>346</a>        allowed_gates: AllowedGates,
 <a href=#347 id=347 data-nosnippet>347</a>        load_ctx: <span class="kw-2">&amp;mut </span>LoadCtx,
-<a href=#348 id=348 data-nosnippet>348</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;LoadIds&gt;, DynlinkError&gt; {
+<a href=#348 id=348 data-nosnippet>348</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;LoadIds, SMALL_VEC_SIZE&gt;, DynlinkError&gt; {
 <a href=#349 id=349 data-nosnippet>349</a>        <span class="kw">let </span>root_comp_name = <span class="self">self</span>.get_compartment(comp_id)<span class="question-mark">?</span>.name.clone();
-<a href=#350 id=350 data-nosnippet>350</a>        <span class="macro">debug!</span>(
+<a href=#350 id=350 data-nosnippet>350</a>        <span class="macro">tracing::debug!</span>(
 <a href=#351 id=351 data-nosnippet>351</a>            <span class="string">"loading library {} (idx = {:?}) in {}"</span>,
-<a href=#352 id=352 data-nosnippet>352</a>            root_unlib, idx, root_comp_name
-<a href=#353 id=353 data-nosnippet>353</a>        );
-<a href=#354 id=354 data-nosnippet>354</a>        <span class="kw">let </span><span class="kw-2">mut </span>ids = <span class="macro">vec!</span>[];
-<a href=#355 id=355 data-nosnippet>355</a>        <span class="comment">// First load the main library.
-<a href=#356 id=356 data-nosnippet>356</a>        </span><span class="kw">let </span>lib = <span class="self">self
-<a href=#357 id=357 data-nosnippet>357</a>            </span>.load(comp_id, root_unlib.clone(), idx, allowed_gates, load_ctx)
-<a href=#358 id=358 data-nosnippet>358</a>            .map_err(|e| {
-<a href=#359 id=359 data-nosnippet>359</a>                DynlinkError::new_collect(
-<a href=#360 id=360 data-nosnippet>360</a>                    DynlinkErrorKind::LibraryLoadFail {
-<a href=#361 id=361 data-nosnippet>361</a>                        library: root_unlib.clone(),
-<a href=#362 id=362 data-nosnippet>362</a>                    },
-<a href=#363 id=363 data-nosnippet>363</a>                    <span class="macro">vec!</span>[e],
-<a href=#364 id=364 data-nosnippet>364</a>                )
-<a href=#365 id=365 data-nosnippet>365</a>            })<span class="question-mark">?</span>;
-<a href=#366 id=366 data-nosnippet>366</a>        ids.push((<span class="kw-2">&amp;</span>lib).into());
-<a href=#367 id=367 data-nosnippet>367</a>
-<a href=#368 id=368 data-nosnippet>368</a>        <span class="macro">tracing::debug!</span>(<span class="string">"enumerating deps for {}"</span>, lib);
-<a href=#369 id=369 data-nosnippet>369</a>        <span class="comment">// Second, go through deps
-<a href=#370 id=370 data-nosnippet>370</a>        </span><span class="kw">let </span>deps = <span class="self">self</span>.enumerate_needed(<span class="kw-2">&amp;</span>lib).map_err(|e| {
-<a href=#371 id=371 data-nosnippet>371</a>            DynlinkError::new_collect(
-<a href=#372 id=372 data-nosnippet>372</a>                DynlinkErrorKind::DepEnumerationFail {
-<a href=#373 id=373 data-nosnippet>373</a>                    library: root_unlib.name.to_string(),
-<a href=#374 id=374 data-nosnippet>374</a>                },
-<a href=#375 id=375 data-nosnippet>375</a>                <span class="macro">vec!</span>[e],
-<a href=#376 id=376 data-nosnippet>376</a>            )
-<a href=#377 id=377 data-nosnippet>377</a>        })<span class="question-mark">?</span>;
-<a href=#378 id=378 data-nosnippet>378</a>        <span class="kw">if </span>!deps.is_empty() {
-<a href=#379 id=379 data-nosnippet>379</a>            <span class="macro">debug!</span>(<span class="string">"{}: loading {} dependencies"</span>, root_unlib, deps.len());
-<a href=#380 id=380 data-nosnippet>380</a>        }
-<a href=#381 id=381 data-nosnippet>381</a>        <span class="kw">let </span>deps = deps
-<a href=#382 id=382 data-nosnippet>382</a>            .into_iter()
-<a href=#383 id=383 data-nosnippet>383</a>            .map(|dep_unlib| {
-<a href=#384 id=384 data-nosnippet>384</a>                <span class="comment">// Dependency search + load alg:
-<a href=#385 id=385 data-nosnippet>385</a>                // 1. Search library name in current compartment. If found, use that.
-<a href=#386 id=386 data-nosnippet>386</a>                // 2. Fallback to searching globally for the name, by checking compartment by
-<a href=#387 id=387 data-nosnippet>387</a>                //    compartment. If found, use that.
-<a href=#388 id=388 data-nosnippet>388</a>                // 3. Okay, now we know we need to load the dep, so check if it can go in the
-<a href=#389 id=389 data-nosnippet>389</a>                //    current compartment. If not, create a new compartment.
-<a href=#390 id=390 data-nosnippet>390</a>                // 4. Finally, recurse to load it and its dependencies into either the current
-<a href=#391 id=391 data-nosnippet>391</a>                //    compartment or the new one, if created.
-<a href=#392 id=392 data-nosnippet>392</a>
-<a href=#393 id=393 data-nosnippet>393</a>                </span><span class="kw">let </span>comp = <span class="self">self</span>.get_compartment(comp_id)<span class="question-mark">?</span>;
-<a href=#394 id=394 data-nosnippet>394</a>                <span class="kw">let </span>(existing_idx, load_comp) =
-<a href=#395 id=395 data-nosnippet>395</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(existing) = comp.library_names.get(<span class="kw-2">&amp;</span>dep_unlib.name) {
-<a href=#396 id=396 data-nosnippet>396</a>                        <span class="macro">debug!</span>(
-<a href=#397 id=397 data-nosnippet>397</a>                            <span class="string">"{}: dep using existing library for {} (intra-compartment in {}): {:?}"</span>,
-<a href=#398 id=398 data-nosnippet>398</a>                            root_unlib, dep_unlib.name, comp.name, existing
-<a href=#399 id=399 data-nosnippet>399</a>                        );
-<a href=#400 id=400 data-nosnippet>400</a>                        (<span class="prelude-val">Some</span>(<span class="kw-2">*</span>existing), comp_id)
-<a href=#401 id=401 data-nosnippet>401</a>                    } <span class="kw">else if let </span><span class="prelude-val">Some</span>((existing, other_comp_id, other_comp)) =
-<a href=#402 id=402 data-nosnippet>402</a>                        <span class="self">self</span>.find_cross_compartment_library(<span class="kw-2">&amp;</span>dep_unlib)
-<a href=#403 id=403 data-nosnippet>403</a>                    {
-<a href=#404 id=404 data-nosnippet>404</a>                        <span class="macro">debug!</span>(
-<a href=#405 id=405 data-nosnippet>405</a>                            <span class="string">"{}: dep using existing library for {} (cross-compartment to {}): {:?}"</span>,
-<a href=#406 id=406 data-nosnippet>406</a>                            root_unlib, dep_unlib.name, other_comp.name, existing
-<a href=#407 id=407 data-nosnippet>407</a>                        );
-<a href=#408 id=408 data-nosnippet>408</a>                        (<span class="prelude-val">Some</span>(existing), other_comp_id)
-<a href=#409 id=409 data-nosnippet>409</a>                    } <span class="kw">else </span>{
-<a href=#410 id=410 data-nosnippet>410</a>                        (
-<a href=#411 id=411 data-nosnippet>411</a>                            <span class="prelude-val">None</span>,
-<a href=#412 id=412 data-nosnippet>412</a>                            <span class="self">self</span>.select_compartment(<span class="kw-2">&amp;</span>dep_unlib, root_comp_name.clone())
-<a href=#413 id=413 data-nosnippet>413</a>                                .unwrap_or(comp_id),
-<a href=#414 id=414 data-nosnippet>414</a>                        )
-<a href=#415 id=415 data-nosnippet>415</a>                    };
-<a href=#416 id=416 data-nosnippet>416</a>
-<a href=#417 id=417 data-nosnippet>417</a>                <span class="comment">// If we decided to use an existing library, then use that. Otherwise, load into the
-<a href=#418 id=418 data-nosnippet>418</a>                // chosen compartment.
-<a href=#419 id=419 data-nosnippet>419</a>                </span><span class="kw">let </span>idx = <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_idx) = existing_idx {
-<a href=#420 id=420 data-nosnippet>420</a>                    existing_idx
-<a href=#421 id=421 data-nosnippet>421</a>                } <span class="kw">else </span>{
-<a href=#422 id=422 data-nosnippet>422</a>                    <span class="kw">let </span>idx = <span class="self">self</span>.add_library(dep_unlib.clone());
-<a href=#423 id=423 data-nosnippet>423</a>
-<a href=#424 id=424 data-nosnippet>424</a>                    <span class="kw">let </span>comp = <span class="self">self</span>.get_compartment_mut(load_comp)<span class="question-mark">?</span>;
-<a href=#425 id=425 data-nosnippet>425</a>                    comp.library_names.insert(dep_unlib.name.clone(), idx);
-<a href=#426 id=426 data-nosnippet>426</a>                    <span class="kw">let </span>allowed_gates = <span class="kw">if </span>comp.id == comp_id {
-<a href=#427 id=427 data-nosnippet>427</a>                        AllowedGates::Private
-<a href=#428 id=428 data-nosnippet>428</a>                    } <span class="kw">else </span>{
-<a href=#429 id=429 data-nosnippet>429</a>                        AllowedGates::Public
-<a href=#430 id=430 data-nosnippet>430</a>                    };
-<a href=#431 id=431 data-nosnippet>431</a>                    <span class="kw">let </span><span class="kw-2">mut </span>recs = <span class="self">self
-<a href=#432 id=432 data-nosnippet>432</a>                        </span>.load_library(load_comp, dep_unlib.clone(), idx, allowed_gates, load_ctx)
-<a href=#433 id=433 data-nosnippet>433</a>                        .map_err(|e| {
-<a href=#434 id=434 data-nosnippet>434</a>                            <span class="macro">tracing::error!</span>(<span class="string">"failed to load dependency for {}: {}"</span>, lib, e);
-<a href=#435 id=435 data-nosnippet>435</a>                            DynlinkError::new_collect(
-<a href=#436 id=436 data-nosnippet>436</a>                                DynlinkErrorKind::LibraryLoadFail {
-<a href=#437 id=437 data-nosnippet>437</a>                                    library: dep_unlib.clone(),
-<a href=#438 id=438 data-nosnippet>438</a>                                },
-<a href=#439 id=439 data-nosnippet>439</a>                                <span class="macro">vec!</span>[e],
-<a href=#440 id=440 data-nosnippet>440</a>                            )
-<a href=#441 id=441 data-nosnippet>441</a>                        })<span class="question-mark">?</span>;
-<a href=#442 id=442 data-nosnippet>442</a>                    ids.append(<span class="kw-2">&amp;mut </span>recs);
-<a href=#443 id=443 data-nosnippet>443</a>                    idx
-<a href=#444 id=444 data-nosnippet>444</a>                };
-<a href=#445 id=445 data-nosnippet>445</a>                <span class="self">self</span>.add_dep(lib.idx, idx);
-<a href=#446 id=446 data-nosnippet>446</a>                <span class="prelude-val">Ok</span>(idx)
-<a href=#447 id=447 data-nosnippet>447</a>            })
-<a href=#448 id=448 data-nosnippet>448</a>            .collect::&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, DynlinkError&gt;&gt;&gt;();
-<a href=#449 id=449 data-nosnippet>449</a>
-<a href=#450 id=450 data-nosnippet>450</a>        <span class="kw">let _ </span>= DynlinkError::collect(
-<a href=#451 id=451 data-nosnippet>451</a>            DynlinkErrorKind::LibraryLoadFail {
-<a href=#452 id=452 data-nosnippet>452</a>                library: root_unlib,
-<a href=#453 id=453 data-nosnippet>453</a>            },
-<a href=#454 id=454 data-nosnippet>454</a>            deps,
-<a href=#455 id=455 data-nosnippet>455</a>        )<span class="question-mark">?</span>;
-<a href=#456 id=456 data-nosnippet>456</a>
-<a href=#457 id=457 data-nosnippet>457</a>        <span class="macro">assert_eq!</span>(idx, lib.idx);
-<a href=#458 id=458 data-nosnippet>458</a>        <span class="self">self</span>.library_deps[idx] = LoadedOrUnloaded::Loaded(lib);
-<a href=#459 id=459 data-nosnippet>459</a>        <span class="prelude-val">Ok</span>(ids)
-<a href=#460 id=460 data-nosnippet>460</a>    }
-<a href=#461 id=461 data-nosnippet>461</a>
-<a href=#462 id=462 data-nosnippet>462</a>    <span class="doccomment">/// Load a library into a given compartment.
-<a href=#463 id=463 data-nosnippet>463</a>    </span><span class="kw">pub fn </span>load_library_in_compartment(
-<a href=#464 id=464 data-nosnippet>464</a>        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-<a href=#465 id=465 data-nosnippet>465</a>        comp_id: CompartmentId,
-<a href=#466 id=466 data-nosnippet>466</a>        unlib: UnloadedLibrary,
-<a href=#467 id=467 data-nosnippet>467</a>        allowed_gates: AllowedGates,
-<a href=#468 id=468 data-nosnippet>468</a>        load_ctx: <span class="kw-2">&amp;mut </span>LoadCtx,
-<a href=#469 id=469 data-nosnippet>469</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;LoadIds&gt;, DynlinkError&gt; {
-<a href=#470 id=470 data-nosnippet>470</a>        <span class="kw">let </span>idx = <span class="self">self</span>.add_library(unlib.clone());
-<a href=#471 id=471 data-nosnippet>471</a>        <span class="comment">// Step 1: insert into the compartment's library names.
-<a href=#472 id=472 data-nosnippet>472</a>        </span><span class="kw">let </span>comp = <span class="self">self</span>.get_compartment_mut(comp_id)<span class="question-mark">?</span>;
-<a href=#473 id=473 data-nosnippet>473</a>
-<a href=#474 id=474 data-nosnippet>474</a>        <span class="comment">// At this level, it's an error to insert an already loaded library.
-<a href=#475 id=475 data-nosnippet>475</a>        </span><span class="kw">if </span>comp.library_names.contains_key(<span class="kw-2">&amp;</span>unlib.name) {
-<a href=#476 id=476 data-nosnippet>476</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::NameAlreadyExists {
-<a href=#477 id=477 data-nosnippet>477</a>                name: unlib.name.clone(),
-<a href=#478 id=478 data-nosnippet>478</a>            }
-<a href=#479 id=479 data-nosnippet>479</a>            .into());
-<a href=#480 id=480 data-nosnippet>480</a>        }
-<a href=#481 id=481 data-nosnippet>481</a>        comp.library_names.insert(unlib.name.clone(), idx);
-<a href=#482 id=482 data-nosnippet>482</a>
-<a href=#483 id=483 data-nosnippet>483</a>        <span class="comment">// Step 2: load the library. This call recurses on dependencies.
-<a href=#484 id=484 data-nosnippet>484</a>        </span><span class="self">self</span>.load_library(comp_id, unlib.clone(), idx, allowed_gates, load_ctx)
-<a href=#485 id=485 data-nosnippet>485</a>    }
-<a href=#486 id=486 data-nosnippet>486</a>}</code></pre></div></section></main></body></html>
+<a href=#352 id=352 data-nosnippet>352</a>            root_unlib,
+<a href=#353 id=353 data-nosnippet>353</a>            idx,
+<a href=#354 id=354 data-nosnippet>354</a>            root_comp_name
+<a href=#355 id=355 data-nosnippet>355</a>        );
+<a href=#356 id=356 data-nosnippet>356</a>        <span class="kw">let </span><span class="kw-2">mut </span>ids = Vec::new();
+<a href=#357 id=357 data-nosnippet>357</a>        <span class="comment">// First load the main library.
+<a href=#358 id=358 data-nosnippet>358</a>        </span><span class="kw">let </span>lib = <span class="self">self
+<a href=#359 id=359 data-nosnippet>359</a>            </span>.load(comp_id, root_unlib.clone(), idx, allowed_gates, load_ctx)
+<a href=#360 id=360 data-nosnippet>360</a>            .map_err(|e| {
+<a href=#361 id=361 data-nosnippet>361</a>                DynlinkError::new_collect(
+<a href=#362 id=362 data-nosnippet>362</a>                    DynlinkErrorKind::LibraryLoadFail {
+<a href=#363 id=363 data-nosnippet>363</a>                        library: root_unlib.clone(),
+<a href=#364 id=364 data-nosnippet>364</a>                    },
+<a href=#365 id=365 data-nosnippet>365</a>                    <span class="macro">vec!</span>[e],
+<a href=#366 id=366 data-nosnippet>366</a>                )
+<a href=#367 id=367 data-nosnippet>367</a>            })<span class="question-mark">?</span>;
+<a href=#368 id=368 data-nosnippet>368</a>        ids.push((<span class="kw-2">&amp;</span>lib).into());
+<a href=#369 id=369 data-nosnippet>369</a>
+<a href=#370 id=370 data-nosnippet>370</a>        <span class="macro">tracing::debug!</span>(<span class="string">"enumerating deps for {}"</span>, lib);
+<a href=#371 id=371 data-nosnippet>371</a>        <span class="comment">// Second, go through deps
+<a href=#372 id=372 data-nosnippet>372</a>        </span><span class="kw">let </span>deps = <span class="self">self</span>.enumerate_needed(<span class="kw-2">&amp;</span>lib).map_err(|e| {
+<a href=#373 id=373 data-nosnippet>373</a>            DynlinkError::new_collect(
+<a href=#374 id=374 data-nosnippet>374</a>                DynlinkErrorKind::DepEnumerationFail {
+<a href=#375 id=375 data-nosnippet>375</a>                    library: root_unlib.name.as_str().into(),
+<a href=#376 id=376 data-nosnippet>376</a>                },
+<a href=#377 id=377 data-nosnippet>377</a>                <span class="macro">vec!</span>[e],
+<a href=#378 id=378 data-nosnippet>378</a>            )
+<a href=#379 id=379 data-nosnippet>379</a>        })<span class="question-mark">?</span>;
+<a href=#380 id=380 data-nosnippet>380</a>        <span class="kw">if </span>!deps.is_empty() {
+<a href=#381 id=381 data-nosnippet>381</a>            <span class="macro">debug!</span>(<span class="string">"{}: loading {} dependencies"</span>, root_unlib, deps.len());
+<a href=#382 id=382 data-nosnippet>382</a>        }
+<a href=#383 id=383 data-nosnippet>383</a>        <span class="kw">let </span>deps = deps
+<a href=#384 id=384 data-nosnippet>384</a>            .iter()
+<a href=#385 id=385 data-nosnippet>385</a>            .map(|dep_unlib| {
+<a href=#386 id=386 data-nosnippet>386</a>                <span class="comment">// Dependency search + load alg:
+<a href=#387 id=387 data-nosnippet>387</a>                // 1. Search library name in current compartment. If found, use that.
+<a href=#388 id=388 data-nosnippet>388</a>                // 2. Fallback to searching globally for the name, by checking compartment by
+<a href=#389 id=389 data-nosnippet>389</a>                //    compartment. If found, use that.
+<a href=#390 id=390 data-nosnippet>390</a>                // 3. Okay, now we know we need to load the dep, so check if it can go in the
+<a href=#391 id=391 data-nosnippet>391</a>                //    current compartment. If not, create a new compartment.
+<a href=#392 id=392 data-nosnippet>392</a>                // 4. Finally, recurse to load it and its dependencies into either the current
+<a href=#393 id=393 data-nosnippet>393</a>                //    compartment or the new one, if created.
+<a href=#394 id=394 data-nosnippet>394</a>
+<a href=#395 id=395 data-nosnippet>395</a>                </span><span class="kw">let </span>comp = <span class="self">self</span>.get_compartment(comp_id)<span class="question-mark">?</span>;
+<a href=#396 id=396 data-nosnippet>396</a>                <span class="kw">let </span>(existing_idx, load_comp) =
+<a href=#397 id=397 data-nosnippet>397</a>                    <span class="kw">if let </span><span class="prelude-val">Some</span>(existing) = comp.library_names.get(<span class="kw-2">&amp;</span>dep_unlib.name) {
+<a href=#398 id=398 data-nosnippet>398</a>                        <span class="macro">debug!</span>(
+<a href=#399 id=399 data-nosnippet>399</a>                            <span class="string">"{}: dep using existing library for {} (intra-compartment in {}): {:?}"</span>,
+<a href=#400 id=400 data-nosnippet>400</a>                            root_unlib, dep_unlib.name, comp.name, existing
+<a href=#401 id=401 data-nosnippet>401</a>                        );
+<a href=#402 id=402 data-nosnippet>402</a>                        (<span class="prelude-val">Some</span>(<span class="kw-2">*</span>existing), comp_id)
+<a href=#403 id=403 data-nosnippet>403</a>                    } <span class="kw">else if let </span><span class="prelude-val">Some</span>((existing, other_comp_id, other_comp)) =
+<a href=#404 id=404 data-nosnippet>404</a>                        <span class="self">self</span>.find_cross_compartment_library(<span class="kw-2">&amp;</span>dep_unlib)
+<a href=#405 id=405 data-nosnippet>405</a>                    {
+<a href=#406 id=406 data-nosnippet>406</a>                        <span class="macro">debug!</span>(
+<a href=#407 id=407 data-nosnippet>407</a>                            <span class="string">"{}: dep using existing library for {} (cross-compartment to {}): {:?}"</span>,
+<a href=#408 id=408 data-nosnippet>408</a>                            root_unlib, dep_unlib.name, other_comp.name, existing
+<a href=#409 id=409 data-nosnippet>409</a>                        );
+<a href=#410 id=410 data-nosnippet>410</a>                        (<span class="prelude-val">Some</span>(existing), other_comp_id)
+<a href=#411 id=411 data-nosnippet>411</a>                    } <span class="kw">else </span>{
+<a href=#412 id=412 data-nosnippet>412</a>                        (
+<a href=#413 id=413 data-nosnippet>413</a>                            <span class="prelude-val">None</span>,
+<a href=#414 id=414 data-nosnippet>414</a>                            <span class="self">self</span>.select_compartment(<span class="kw-2">&amp;</span>dep_unlib, root_comp_name.clone())
+<a href=#415 id=415 data-nosnippet>415</a>                                .unwrap_or(comp_id),
+<a href=#416 id=416 data-nosnippet>416</a>                        )
+<a href=#417 id=417 data-nosnippet>417</a>                    };
+<a href=#418 id=418 data-nosnippet>418</a>
+<a href=#419 id=419 data-nosnippet>419</a>                <span class="comment">// If we decided to use an existing library, then use that. Otherwise, load into the
+<a href=#420 id=420 data-nosnippet>420</a>                // chosen compartment.
+<a href=#421 id=421 data-nosnippet>421</a>                </span><span class="kw">let </span>idx = <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_idx) = existing_idx {
+<a href=#422 id=422 data-nosnippet>422</a>                    existing_idx
+<a href=#423 id=423 data-nosnippet>423</a>                } <span class="kw">else </span>{
+<a href=#424 id=424 data-nosnippet>424</a>                    <span class="kw">let </span>idx = <span class="self">self</span>.add_library(dep_unlib.clone());
+<a href=#425 id=425 data-nosnippet>425</a>
+<a href=#426 id=426 data-nosnippet>426</a>                    <span class="kw">let </span>comp = <span class="self">self</span>.get_compartment_mut(load_comp)<span class="question-mark">?</span>;
+<a href=#427 id=427 data-nosnippet>427</a>                    comp.library_names.insert(dep_unlib.name.clone(), idx);
+<a href=#428 id=428 data-nosnippet>428</a>                    <span class="kw">let </span>allowed_gates = <span class="kw">if </span>comp.id == comp_id {
+<a href=#429 id=429 data-nosnippet>429</a>                        AllowedGates::Private
+<a href=#430 id=430 data-nosnippet>430</a>                    } <span class="kw">else </span>{
+<a href=#431 id=431 data-nosnippet>431</a>                        AllowedGates::Public
+<a href=#432 id=432 data-nosnippet>432</a>                    };
+<a href=#433 id=433 data-nosnippet>433</a>                    <span class="kw">let </span>recs = <span class="self">self
+<a href=#434 id=434 data-nosnippet>434</a>                        </span>.load_library(load_comp, dep_unlib.clone(), idx, allowed_gates, load_ctx)
+<a href=#435 id=435 data-nosnippet>435</a>                        .map_err(|e| {
+<a href=#436 id=436 data-nosnippet>436</a>                            <span class="macro">tracing::error!</span>(<span class="string">"failed to load dependency for {}: {}"</span>, lib, e);
+<a href=#437 id=437 data-nosnippet>437</a>                            DynlinkError::new_collect(
+<a href=#438 id=438 data-nosnippet>438</a>                                DynlinkErrorKind::LibraryLoadFail {
+<a href=#439 id=439 data-nosnippet>439</a>                                    library: dep_unlib.clone(),
+<a href=#440 id=440 data-nosnippet>440</a>                                },
+<a href=#441 id=441 data-nosnippet>441</a>                                <span class="macro">vec!</span>[e],
+<a href=#442 id=442 data-nosnippet>442</a>                            )
+<a href=#443 id=443 data-nosnippet>443</a>                        })<span class="question-mark">?</span>;
+<a href=#444 id=444 data-nosnippet>444</a>                    ids.extend_from_slice(recs.as_slice());
+<a href=#445 id=445 data-nosnippet>445</a>                    idx
+<a href=#446 id=446 data-nosnippet>446</a>                };
+<a href=#447 id=447 data-nosnippet>447</a>                <span class="self">self</span>.add_dep(lib.idx, idx);
+<a href=#448 id=448 data-nosnippet>448</a>                <span class="prelude-val">Ok</span>(idx)
+<a href=#449 id=449 data-nosnippet>449</a>            })
+<a href=#450 id=450 data-nosnippet>450</a>            .collect::&lt;std::vec::Vec&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>, DynlinkError&gt;&gt;&gt;();
+<a href=#451 id=451 data-nosnippet>451</a>
+<a href=#452 id=452 data-nosnippet>452</a>        <span class="kw">let _ </span>= DynlinkError::collect(
+<a href=#453 id=453 data-nosnippet>453</a>            DynlinkErrorKind::LibraryLoadFail {
+<a href=#454 id=454 data-nosnippet>454</a>                library: root_unlib,
+<a href=#455 id=455 data-nosnippet>455</a>            },
+<a href=#456 id=456 data-nosnippet>456</a>            deps,
+<a href=#457 id=457 data-nosnippet>457</a>        )<span class="question-mark">?</span>;
+<a href=#458 id=458 data-nosnippet>458</a>
+<a href=#459 id=459 data-nosnippet>459</a>        <span class="macro">assert_eq!</span>(idx, lib.idx);
+<a href=#460 id=460 data-nosnippet>460</a>        <span class="self">self</span>.library_deps[idx] = LoadedOrUnloaded::Loaded(lib);
+<a href=#461 id=461 data-nosnippet>461</a>        <span class="prelude-val">Ok</span>(ids)
+<a href=#462 id=462 data-nosnippet>462</a>    }
+<a href=#463 id=463 data-nosnippet>463</a>
+<a href=#464 id=464 data-nosnippet>464</a>    <span class="doccomment">/// Load a library into a given compartment.
+<a href=#465 id=465 data-nosnippet>465</a>    </span><span class="kw">pub fn </span>load_library_in_compartment(
+<a href=#466 id=466 data-nosnippet>466</a>        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+<a href=#467 id=467 data-nosnippet>467</a>        comp_id: CompartmentId,
+<a href=#468 id=468 data-nosnippet>468</a>        unlib: UnloadedLibrary,
+<a href=#469 id=469 data-nosnippet>469</a>        allowed_gates: AllowedGates,
+<a href=#470 id=470 data-nosnippet>470</a>        load_ctx: <span class="kw-2">&amp;mut </span>LoadCtx,
+<a href=#471 id=471 data-nosnippet>471</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;LoadIds, SMALL_VEC_SIZE&gt;, DynlinkError&gt; {
+<a href=#472 id=472 data-nosnippet>472</a>        <span class="kw">let </span>idx = <span class="self">self</span>.add_library(unlib.clone());
+<a href=#473 id=473 data-nosnippet>473</a>        <span class="comment">// Step 1: insert into the compartment's library names.
+<a href=#474 id=474 data-nosnippet>474</a>        </span><span class="kw">let </span>comp = <span class="self">self</span>.get_compartment_mut(comp_id)<span class="question-mark">?</span>;
+<a href=#475 id=475 data-nosnippet>475</a>
+<a href=#476 id=476 data-nosnippet>476</a>        <span class="comment">// At this level, it's an error to insert an already loaded library.
+<a href=#477 id=477 data-nosnippet>477</a>        </span><span class="kw">if </span>comp.library_names.contains_key(<span class="kw-2">&amp;</span>unlib.name) {
+<a href=#478 id=478 data-nosnippet>478</a>            <span class="kw">return </span><span class="prelude-val">Err</span>(DynlinkErrorKind::NameAlreadyExists {
+<a href=#479 id=479 data-nosnippet>479</a>                name: unlib.name.as_str().into(),
+<a href=#480 id=480 data-nosnippet>480</a>            }
+<a href=#481 id=481 data-nosnippet>481</a>            .into());
+<a href=#482 id=482 data-nosnippet>482</a>        }
+<a href=#483 id=483 data-nosnippet>483</a>        comp.library_names.insert(unlib.name.clone(), idx);
+<a href=#484 id=484 data-nosnippet>484</a>
+<a href=#485 id=485 data-nosnippet>485</a>        <span class="comment">// Step 2: load the library. This call recurses on dependencies.
+<a href=#486 id=486 data-nosnippet>486</a>        </span><span class="self">self</span>.load_library(comp_id, unlib.clone(), idx, allowed_gates, load_ctx)
+<a href=#487 id=487 data-nosnippet>487</a>    }
+<a href=#488 id=488 data-nosnippet>488</a>}</code></pre></div></section></main></body></html>

@@ -42,7 +42,7 @@
 <a href=#42 id=42 data-nosnippet>42</a>    ) -&gt; <span class="prelude-ty">Result</span>&lt;TlsRegion, DynlinkError&gt; {
 <a href=#43 id=43 data-nosnippet>43</a>        <span class="kw">let </span>tls_info = <span class="self">self</span>.tls_info.get(<span class="kw-2">&amp;</span><span class="self">self</span>.tls_gen).ok_or_else(|| {
 <a href=#44 id=44 data-nosnippet>44</a>            DynlinkError::new(DynlinkErrorKind::NoTLSInfo {
-<a href=#45 id=45 data-nosnippet>45</a>                library: <span class="self">self</span>.name.clone(),
+<a href=#45 id=45 data-nosnippet>45</a>                library: <span class="self">self</span>.name.as_str().into(),
 <a href=#46 id=46 data-nosnippet>46</a>            })
 <a href=#47 id=47 data-nosnippet>47</a>        })<span class="question-mark">?</span>;
 <a href=#48 id=48 data-nosnippet>48</a>        <span class="kw">let </span>alloc_layout = tls_info
@@ -50,7 +50,7 @@
 <a href=#50 id=50 data-nosnippet>50</a>            .map_err(DynlinkErrorKind::from)<span class="question-mark">?</span>;
 <a href=#51 id=51 data-nosnippet>51</a>        <span class="comment">// Each compartment has its own libstd, so we can just all alloc directly.
 <a href=#52 id=52 data-nosnippet>52</a>        </span><span class="kw">let </span>base = alloc(alloc_layout).ok_or_else(|| DynlinkErrorKind::FailedToAllocate {
-<a href=#53 id=53 data-nosnippet>53</a>            comp: <span class="self">self</span>.name.clone(),
+<a href=#53 id=53 data-nosnippet>53</a>            comp: <span class="self">self</span>.name.as_str().into(),
 <a href=#54 id=54 data-nosnippet>54</a>            layout: alloc_layout,
 <a href=#55 id=55 data-nosnippet>55</a>        })<span class="question-mark">?</span>;
 <a href=#56 id=56 data-nosnippet>56</a>        <span class="macro">debug!</span>(
@@ -63,7 +63,7 @@
 <a href=#63 id=63 data-nosnippet>63</a>
 <a href=#64 id=64 data-nosnippet>64</a>        <span class="kw">let </span>tls_info = <span class="self">self</span>.tls_info.get(<span class="kw-2">&amp;</span><span class="self">self</span>.tls_gen).ok_or_else(|| {
 <a href=#65 id=65 data-nosnippet>65</a>            DynlinkError::new(DynlinkErrorKind::NoTLSInfo {
-<a href=#66 id=66 data-nosnippet>66</a>                library: <span class="self">self</span>.name.clone(),
+<a href=#66 id=66 data-nosnippet>66</a>                library: <span class="self">self</span>.name.as_str().into(),
 <a href=#67 id=67 data-nosnippet>67</a>            })
 <a href=#68 id=68 data-nosnippet>68</a>        })<span class="question-mark">?</span>;
 <a href=#69 id=69 data-nosnippet>69</a>        <span class="kw">let </span>tls_region = tls_info.allocate(<span class="self">self</span>, base, tcb);

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["__monitor_ready","main","monitor_init"],"mod":["dlengine","gates","init","mon","upcall"],"struct":["MappedObjectAddrs"]};
+window.SIDEBAR_ITEMS = {"fn":["__monitor_ready","main","monitor_init","print_alloc_stats","reset_alloc_stats"],"mod":["dlengine","gates","init","mon","upcall"],"static":["MA"],"struct":["MappedObjectAddrs","MonAlloc","Track"]};

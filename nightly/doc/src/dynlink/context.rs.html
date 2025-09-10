@@ -132,7 +132,7 @@
 <a href=#132 id=132 data-nosnippet>132</a>        }
 <a href=#133 id=133 data-nosnippet>133</a>        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.library_deps[id.<span class="number">0</span>] {
 <a href=#134 id=134 data-nosnippet>134</a>            LoadedOrUnloaded::Unloaded(unlib) =&gt; <span class="prelude-val">Err</span>(DynlinkErrorKind::UnloadedLibrary {
-<a href=#135 id=135 data-nosnippet>135</a>                library: unlib.name.to_string(),
+<a href=#135 id=135 data-nosnippet>135</a>                library: unlib.name.as_str().into(),
 <a href=#136 id=136 data-nosnippet>136</a>            }
 <a href=#137 id=137 data-nosnippet>137</a>            .into()),
 <a href=#138 id=138 data-nosnippet>138</a>            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="prelude-val">Ok</span>(lib),
@@ -146,7 +146,7 @@
 <a href=#146 id=146 data-nosnippet>146</a>        }
 <a href=#147 id=147 data-nosnippet>147</a>        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.library_deps[id.<span class="number">0</span>] {
 <a href=#148 id=148 data-nosnippet>148</a>            LoadedOrUnloaded::Unloaded(unlib) =&gt; <span class="prelude-val">Err</span>(DynlinkErrorKind::UnloadedLibrary {
-<a href=#149 id=149 data-nosnippet>149</a>                library: unlib.name.to_string(),
+<a href=#149 id=149 data-nosnippet>149</a>                library: unlib.name.as_str().into(),
 <a href=#150 id=150 data-nosnippet>150</a>            }
 <a href=#151 id=151 data-nosnippet>151</a>            .into()),
 <a href=#152 id=152 data-nosnippet>152</a>            LoadedOrUnloaded::Loaded(lib) =&gt; <span class="prelude-val">Ok</span>(lib),

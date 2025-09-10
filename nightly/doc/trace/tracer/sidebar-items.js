@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["State"],"fn":["collector","start"],"struct":["BaseWrap","TraceDataIter","Tracer","TracingState"]};
+window.SIDEBAR_ITEMS = {"enum":["State"],"fn":["collector","start"],"struct":["BaseWrap","TraceDataIter","TraceSource","Tracer","TracingState"]};

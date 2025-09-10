@@ -66,14 +66,14 @@
 <a href=#66 id=66 data-nosnippet>66</a><span class="kw">unsafe impl </span>Sync <span class="kw">for </span>Backing {}
 <a href=#67 id=67 data-nosnippet>67</a>
 <a href=#68 id=68 data-nosnippet>68</a><span class="kw">impl </span>Backing {
-<a href=#69 id=69 data-nosnippet>69</a>    <span class="kw">pub fn </span>new(inner: ObjectHandle, full_name: String) -&gt; <span class="self">Self </span>{
+<a href=#69 id=69 data-nosnippet>69</a>    <span class="kw">pub fn </span>new(inner: ObjectHandle, full_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
 <a href=#70 id=70 data-nosnippet>70</a>        <span class="kw">unsafe </span>{
 <a href=#71 id=71 data-nosnippet>71</a>            <span class="self">Self</span>::new_owned(
 <a href=#72 id=72 data-nosnippet>72</a>                inner.start(),
 <a href=#73 id=73 data-nosnippet>73</a>                MAX_SIZE - NULLPAGE_SIZE * <span class="number">2</span>,
 <a href=#74 id=74 data-nosnippet>74</a>                inner.id(),
 <a href=#75 id=75 data-nosnippet>75</a>                Arc::new(inner),
-<a href=#76 id=76 data-nosnippet>76</a>                full_name,
+<a href=#76 id=76 data-nosnippet>76</a>                full_name.to_string(),
 <a href=#77 id=77 data-nosnippet>77</a>            )
 <a href=#78 id=78 data-nosnippet>78</a>        }
 <a href=#79 id=79 data-nosnippet>79</a>    }
