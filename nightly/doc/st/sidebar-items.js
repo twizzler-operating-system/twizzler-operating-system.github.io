@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main","thread_main"]};
+window.SIDEBAR_ITEMS = {"fn":["jointest","main","thread_main"]};

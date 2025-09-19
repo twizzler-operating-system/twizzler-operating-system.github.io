@@ -6,7 +6,7 @@
 <a href=#6 id=6 data-nosnippet>6</a><span class="kw">use crate</span>::{
 <a href=#7 id=7 data-nosnippet>7</a>    alloc::{Allocator, SingleObjectAllocator},
 <a href=#8 id=8 data-nosnippet>8</a>    marker::{Invariant, StoreCopy},
-<a href=#9 id=9 data-nosnippet>9</a>    object::{Object, ObjectBuilder, TypedObject},
+<a href=#9 id=9 data-nosnippet>9</a>    object::{Object, ObjectBuilder, RawObject, TypedObject},
 <a href=#10 id=10 data-nosnippet>10</a>    ptr::{Ref, RefMut, RefSlice},
 <a href=#11 id=11 data-nosnippet>11</a>    <span class="prelude-ty">Result</span>,
 <a href=#12 id=12 data-nosnippet>12</a>};
@@ -42,7 +42,7 @@
 <a href=#42 id=42 data-nosnippet>42</a>        <span class="kw">if </span><span class="self">self</span>.len() == <span class="number">0 </span>{
 <a href=#43 id=43 data-nosnippet>43</a>            <span class="kw">return </span>VecIter {
 <a href=#44 id=44 data-nosnippet>44</a>                pos: <span class="number">0</span>,
-<a href=#45 id=45 data-nosnippet>45</a>                data: core::ptr::null(),
+<a href=#45 id=45 data-nosnippet>45</a>                data: <span class="self">self</span>.object().handle().start().cast(),
 <a href=#46 id=46 data-nosnippet>46</a>                len: <span class="number">0</span>,
 <a href=#47 id=47 data-nosnippet>47</a>                _ref: <span class="prelude-val">None</span>,
 <a href=#48 id=48 data-nosnippet>48</a>            };

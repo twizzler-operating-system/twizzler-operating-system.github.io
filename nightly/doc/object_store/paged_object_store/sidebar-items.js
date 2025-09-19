@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["MAX_EXTERNAL_PATH","NAME_MAX"],"enum":["DevicePage","ExternalKind"],"fn":["ino_to_objid","objid_to_ino"],"struct":["ExternalFile","PageRequest","PagedPhysMem","PhysRange"],"trait":["PagedDevice","PagedObjectStore","PosIo"],"type":["ObjID"]};
+window.SIDEBAR_ITEMS = {"constant":["MAX_EXTERNAL_PATH","MAYHEAP_LEN","NAME_MAX"],"enum":["DevicePage","ExternalKind"],"fn":["ino_to_objid","objid_to_ino"],"struct":["ExternalFile","PageRequest","PagedPhysMem","PhysRange"],"trait":["PagedDevice","PagedObjectStore","PosIo"],"type":["ObjID"]};

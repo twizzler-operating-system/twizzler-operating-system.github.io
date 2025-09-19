@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["LockGuard","Mutex"]};
+window.SIDEBAR_ITEMS = {"struct":["LockGuard","Mutex","MutexImp"]};

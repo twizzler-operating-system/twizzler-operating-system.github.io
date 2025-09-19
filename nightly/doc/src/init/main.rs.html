@@ -333,11 +333,12 @@
 <a href=#333 id=333 data-nosnippet>333</a>        .expect(<span class="string">"failed to start unittest"</span>);
 <a href=#334 id=334 data-nosnippet>334</a>    <span class="kw">let </span><span class="kw-2">mut </span>flags = comp.info().flags;
 <a href=#335 id=335 data-nosnippet>335</a>    <span class="kw">while </span>!flags.contains(CompartmentFlags::EXITED) {
-<a href=#336 id=336 data-nosnippet>336</a>        flags = comp.wait(flags);
-<a href=#337 id=337 data-nosnippet>337</a>    }
-<a href=#338 id=338 data-nosnippet>338</a>
-<a href=#339 id=339 data-nosnippet>339</a>    <span class="macro">println!</span>(<span class="string">"unittests finished"</span>);
-<a href=#340 id=340 data-nosnippet>340</a>
-<a href=#341 id=341 data-nosnippet>341</a>    <span class="attr">#[allow(deprecated)]
-<a href=#342 id=342 data-nosnippet>342</a>    </span>twizzler_abi::syscall::sys_debug_shutdown(<span class="number">0</span>);
-<a href=#343 id=343 data-nosnippet>343</a>}</code></pre></div></section></main></body></html>
+<a href=#336 id=336 data-nosnippet>336</a>        <span class="macro">println!</span>(<span class="string">"waiting for comp state change: {:?}"</span>, flags);
+<a href=#337 id=337 data-nosnippet>337</a>        flags = comp.wait(flags);
+<a href=#338 id=338 data-nosnippet>338</a>    }
+<a href=#339 id=339 data-nosnippet>339</a>
+<a href=#340 id=340 data-nosnippet>340</a>    <span class="macro">println!</span>(<span class="string">"unittests finished"</span>);
+<a href=#341 id=341 data-nosnippet>341</a>
+<a href=#342 id=342 data-nosnippet>342</a>    <span class="attr">#[allow(deprecated)]
+<a href=#343 id=343 data-nosnippet>343</a>    </span>twizzler_abi::syscall::sys_debug_shutdown(<span class="number">0</span>);
+<a href=#344 id=344 data-nosnippet>344</a>}</code></pre></div></section></main></body></html>
