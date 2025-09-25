@@ -271,30 +271,33 @@
 <a href=#271 id=271 data-nosnippet>271</a>    <span class="kw">pub </span>phys: PhysRange,
 <a href=#272 id=272 data-nosnippet>272</a>    <span class="kw">pub </span>version: u64,
 <a href=#273 id=273 data-nosnippet>273</a>    <span class="kw">pub </span>flags: ObjectEvictFlags,
-<a href=#274 id=274 data-nosnippet>274</a>}
-<a href=#275 id=275 data-nosnippet>275</a>
-<a href=#276 id=276 data-nosnippet>276</a><span class="kw">impl </span>ObjectEvictInfo {
-<a href=#277 id=277 data-nosnippet>277</a>    <span class="kw">pub fn </span>new(
-<a href=#278 id=278 data-nosnippet>278</a>        obj_id: ObjID,
-<a href=#279 id=279 data-nosnippet>279</a>        range: ObjectRange,
-<a href=#280 id=280 data-nosnippet>280</a>        phys: PhysRange,
-<a href=#281 id=281 data-nosnippet>281</a>        version: u64,
-<a href=#282 id=282 data-nosnippet>282</a>        flags: ObjectEvictFlags,
-<a href=#283 id=283 data-nosnippet>283</a>    ) -&gt; <span class="self">Self </span>{
-<a href=#284 id=284 data-nosnippet>284</a>        <span class="self">Self </span>{
-<a href=#285 id=285 data-nosnippet>285</a>            obj_id,
-<a href=#286 id=286 data-nosnippet>286</a>            range,
-<a href=#287 id=287 data-nosnippet>287</a>            phys,
-<a href=#288 id=288 data-nosnippet>288</a>            version,
-<a href=#289 id=289 data-nosnippet>289</a>            flags,
-<a href=#290 id=290 data-nosnippet>290</a>        }
-<a href=#291 id=291 data-nosnippet>291</a>    }
-<a href=#292 id=292 data-nosnippet>292</a>}
-<a href=#293 id=293 data-nosnippet>293</a>
-<a href=#294 id=294 data-nosnippet>294</a><span class="macro">bitflags::bitflags!</span> {
-<a href=#295 id=295 data-nosnippet>295</a>    <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
-<a href=#296 id=296 data-nosnippet>296</a>    </span><span class="kw">pub struct </span>ObjectEvictFlags: u32 {
-<a href=#297 id=297 data-nosnippet>297</a>        <span class="kw">const </span>SYNC = <span class="number">1</span>;
-<a href=#298 id=298 data-nosnippet>298</a>        <span class="kw">const </span>FENCE = <span class="number">2</span>;
-<a href=#299 id=299 data-nosnippet>299</a>    }
-<a href=#300 id=300 data-nosnippet>300</a>}</code></pre></div></section></main></body></html>
+<a href=#274 id=274 data-nosnippet>274</a>    <span class="kw">pub </span>uniq_id: ObjID,
+<a href=#275 id=275 data-nosnippet>275</a>}
+<a href=#276 id=276 data-nosnippet>276</a>
+<a href=#277 id=277 data-nosnippet>277</a><span class="kw">impl </span>ObjectEvictInfo {
+<a href=#278 id=278 data-nosnippet>278</a>    <span class="kw">pub fn </span>new(
+<a href=#279 id=279 data-nosnippet>279</a>        obj_id: ObjID,
+<a href=#280 id=280 data-nosnippet>280</a>        range: ObjectRange,
+<a href=#281 id=281 data-nosnippet>281</a>        phys: PhysRange,
+<a href=#282 id=282 data-nosnippet>282</a>        version: u64,
+<a href=#283 id=283 data-nosnippet>283</a>        flags: ObjectEvictFlags,
+<a href=#284 id=284 data-nosnippet>284</a>        uniq_id: ObjID,
+<a href=#285 id=285 data-nosnippet>285</a>    ) -&gt; <span class="self">Self </span>{
+<a href=#286 id=286 data-nosnippet>286</a>        <span class="self">Self </span>{
+<a href=#287 id=287 data-nosnippet>287</a>            uniq_id,
+<a href=#288 id=288 data-nosnippet>288</a>            obj_id,
+<a href=#289 id=289 data-nosnippet>289</a>            range,
+<a href=#290 id=290 data-nosnippet>290</a>            phys,
+<a href=#291 id=291 data-nosnippet>291</a>            version,
+<a href=#292 id=292 data-nosnippet>292</a>            flags,
+<a href=#293 id=293 data-nosnippet>293</a>        }
+<a href=#294 id=294 data-nosnippet>294</a>    }
+<a href=#295 id=295 data-nosnippet>295</a>}
+<a href=#296 id=296 data-nosnippet>296</a>
+<a href=#297 id=297 data-nosnippet>297</a><span class="macro">bitflags::bitflags!</span> {
+<a href=#298 id=298 data-nosnippet>298</a>    <span class="attr">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+<a href=#299 id=299 data-nosnippet>299</a>    </span><span class="kw">pub struct </span>ObjectEvictFlags: u32 {
+<a href=#300 id=300 data-nosnippet>300</a>        <span class="kw">const </span>SYNC = <span class="number">1</span>;
+<a href=#301 id=301 data-nosnippet>301</a>        <span class="kw">const </span>FENCE = <span class="number">2</span>;
+<a href=#302 id=302 data-nosnippet>302</a>    }
+<a href=#303 id=303 data-nosnippet>303</a>}</code></pre></div></section></main></body></html>

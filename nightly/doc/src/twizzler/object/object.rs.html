@@ -150,30 +150,39 @@
 <a href=#150 id=150 data-nosnippet>150</a>    </span><span class="kw">pub fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
 <a href=#151 id=151 data-nosnippet>151</a>        twizzler_rt_abi::object::twz_rt_update_handle(<span class="kw-2">&amp;mut </span><span class="self">self</span>.handle)
 <a href=#152 id=152 data-nosnippet>152</a>    }
-<a href=#153 id=153 data-nosnippet>153</a>}
-<a href=#154 id=154 data-nosnippet>154</a>
-<a href=#155 id=155 data-nosnippet>155</a><span class="kw">impl</span>&lt;Base&gt; RawObject <span class="kw">for </span>Object&lt;Base&gt; {
-<a href=#156 id=156 data-nosnippet>156</a>    <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectHandle {
-<a href=#157 id=157 data-nosnippet>157</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.handle
-<a href=#158 id=158 data-nosnippet>158</a>    }
-<a href=#159 id=159 data-nosnippet>159</a>}
-<a href=#160 id=160 data-nosnippet>160</a>
-<a href=#161 id=161 data-nosnippet>161</a><span class="kw">impl</span>&lt;Base: BaseType&gt; TypedObject <span class="kw">for </span>Object&lt;Base&gt; {
-<a href=#162 id=162 data-nosnippet>162</a>    <span class="kw">type </span>Base = Base;
+<a href=#153 id=153 data-nosnippet>153</a>
+<a href=#154 id=154 data-nosnippet>154</a>    <span class="doccomment">/// Sync the underlying object.
+<a href=#155 id=155 data-nosnippet>155</a>    ///
+<a href=#156 id=156 data-nosnippet>156</a>    /// # Safety
+<a href=#157 id=157 data-nosnippet>157</a>    /// The caller must ensure that the object is not being concurrently modified by
+<a href=#158 id=158 data-nosnippet>158</a>    /// another thread, and that the memory is in a valid state to represent the object.
+<a href=#159 id=159 data-nosnippet>159</a>    </span><span class="kw">pub unsafe fn </span>sync(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+<a href=#160 id=160 data-nosnippet>160</a>        <span class="self">self</span>.as_mut()<span class="question-mark">?</span>.sync()
+<a href=#161 id=161 data-nosnippet>161</a>    }
+<a href=#162 id=162 data-nosnippet>162</a>}
 <a href=#163 id=163 data-nosnippet>163</a>
-<a href=#164 id=164 data-nosnippet>164</a>    <span class="kw">fn </span>base_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ref&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>::Base&gt; {
-<a href=#165 id=165 data-nosnippet>165</a>        <span class="kw">let </span>base = <span class="self">self</span>.base_ptr();
-<a href=#166 id=166 data-nosnippet>166</a>        <span class="kw">unsafe </span>{ Ref::from_raw_parts(base, <span class="self">self</span>.handle()) }
+<a href=#164 id=164 data-nosnippet>164</a><span class="kw">impl</span>&lt;Base&gt; RawObject <span class="kw">for </span>Object&lt;Base&gt; {
+<a href=#165 id=165 data-nosnippet>165</a>    <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectHandle {
+<a href=#166 id=166 data-nosnippet>166</a>        <span class="kw-2">&amp;</span><span class="self">self</span>.handle
 <a href=#167 id=167 data-nosnippet>167</a>    }
-<a href=#168 id=168 data-nosnippet>168</a>
-<a href=#169 id=169 data-nosnippet>169</a>    <span class="attr">#[inline]
-<a href=#170 id=170 data-nosnippet>170</a>    </span><span class="kw">fn </span>base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Base {
-<a href=#171 id=171 data-nosnippet>171</a>        <span class="kw">unsafe </span>{ <span class="self">self</span>.base_ptr::&lt;<span class="self">Self</span>::Base&gt;().as_ref().unwrap_unchecked() }
-<a href=#172 id=172 data-nosnippet>172</a>    }
-<a href=#173 id=173 data-nosnippet>173</a>}
-<a href=#174 id=174 data-nosnippet>174</a>
-<a href=#175 id=175 data-nosnippet>175</a><span class="kw">impl</span>&lt;T&gt; AsRef&lt;ObjectHandle&gt; <span class="kw">for </span>Object&lt;T&gt; {
-<a href=#176 id=176 data-nosnippet>176</a>    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectHandle {
-<a href=#177 id=177 data-nosnippet>177</a>        <span class="self">self</span>.handle()
-<a href=#178 id=178 data-nosnippet>178</a>    }
-<a href=#179 id=179 data-nosnippet>179</a>}</code></pre></div></section></main></body></html>
+<a href=#168 id=168 data-nosnippet>168</a>}
+<a href=#169 id=169 data-nosnippet>169</a>
+<a href=#170 id=170 data-nosnippet>170</a><span class="kw">impl</span>&lt;Base: BaseType&gt; TypedObject <span class="kw">for </span>Object&lt;Base&gt; {
+<a href=#171 id=171 data-nosnippet>171</a>    <span class="kw">type </span>Base = Base;
+<a href=#172 id=172 data-nosnippet>172</a>
+<a href=#173 id=173 data-nosnippet>173</a>    <span class="kw">fn </span>base_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ref&lt;<span class="lifetime">'_</span>, <span class="self">Self</span>::Base&gt; {
+<a href=#174 id=174 data-nosnippet>174</a>        <span class="kw">let </span>base = <span class="self">self</span>.base_ptr();
+<a href=#175 id=175 data-nosnippet>175</a>        <span class="kw">unsafe </span>{ Ref::from_raw_parts(base, <span class="self">self</span>.handle()) }
+<a href=#176 id=176 data-nosnippet>176</a>    }
+<a href=#177 id=177 data-nosnippet>177</a>
+<a href=#178 id=178 data-nosnippet>178</a>    <span class="attr">#[inline]
+<a href=#179 id=179 data-nosnippet>179</a>    </span><span class="kw">fn </span>base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Base {
+<a href=#180 id=180 data-nosnippet>180</a>        <span class="kw">unsafe </span>{ <span class="self">self</span>.base_ptr::&lt;<span class="self">Self</span>::Base&gt;().as_ref().unwrap_unchecked() }
+<a href=#181 id=181 data-nosnippet>181</a>    }
+<a href=#182 id=182 data-nosnippet>182</a>}
+<a href=#183 id=183 data-nosnippet>183</a>
+<a href=#184 id=184 data-nosnippet>184</a><span class="kw">impl</span>&lt;T&gt; AsRef&lt;ObjectHandle&gt; <span class="kw">for </span>Object&lt;T&gt; {
+<a href=#185 id=185 data-nosnippet>185</a>    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ObjectHandle {
+<a href=#186 id=186 data-nosnippet>186</a>        <span class="self">self</span>.handle()
+<a href=#187 id=187 data-nosnippet>187</a>    }
+<a href=#188 id=188 data-nosnippet>188</a>}</code></pre></div></section></main></body></html>
