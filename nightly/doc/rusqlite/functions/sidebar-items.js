@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["ConnectionRef","Context","FunctionFlags","SqlFnArg"],"trait":["Aggregate","SqlFnOutput"],"type":["SubType"]};
