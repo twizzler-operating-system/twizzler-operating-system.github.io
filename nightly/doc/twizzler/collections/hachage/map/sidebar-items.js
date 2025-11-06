@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Iter","IterMut","Keys","PHMsession","PersistentHashMap","Values","ValuesMut"]};
+window.SIDEBAR_ITEMS = {"struct":["Iter","IterMut","Keys","PHMsession","PersistentHashMap","Values","ValuesMut"],"trait":["Equivalent"]};

@@ -51,7 +51,7 @@
 <a href=#51 id=51 data-nosnippet>51</a>}
 <a href=#52 id=52 data-nosnippet>52</a>
 <a href=#53 id=53 data-nosnippet>53</a><span class="kw">fn </span>create_arena() -&gt; <span class="prelude-ty">Result</span>&lt;ArenaObject&gt; {
-<a href=#54 id=54 data-nosnippet>54</a>    <span class="kw">let </span>obj = ObjectBuilder::default().persist();
+<a href=#54 id=54 data-nosnippet>54</a>    <span class="kw">let </span>obj = ObjectBuilder::default().persist(<span class="bool-val">true</span>);
 <a href=#55 id=55 data-nosnippet>55</a>    ArenaObject::new(obj).into_diagnostic()
 <a href=#56 id=56 data-nosnippet>56</a>}
 <a href=#57 id=57 data-nosnippet>57</a>
@@ -60,7 +60,7 @@
 <a href=#60 id=60 data-nosnippet>60</a>}
 <a href=#61 id=61 data-nosnippet>61</a>
 <a href=#62 id=62 data-nosnippet>62</a><span class="kw">fn </span>create_vector_object&lt;T: Debug + Invariant&gt;() -&gt; <span class="prelude-ty">Result</span>&lt;VecObject&lt;T, VecObjectAlloc&gt;&gt; {
-<a href=#63 id=63 data-nosnippet>63</a>    <span class="kw">let </span>obj = ObjectBuilder::default().persist();
+<a href=#63 id=63 data-nosnippet>63</a>    <span class="kw">let </span>obj = ObjectBuilder::default().persist(<span class="bool-val">true</span>);
 <a href=#64 id=64 data-nosnippet>64</a>    VecObject::&lt;T, VecObjectAlloc&gt;::new(obj).into_diagnostic()
 <a href=#65 id=65 data-nosnippet>65</a>}
 <a href=#66 id=66 data-nosnippet>66</a>
@@ -294,7 +294,7 @@
 <a href=#294 id=294 data-nosnippet>294</a>                <span class="kw">return</span>;
 <a href=#295 id=295 data-nosnippet>295</a>            }
 <a href=#296 id=296 data-nosnippet>296</a>
-<a href=#297 id=297 data-nosnippet>297</a>            <span class="kw">let </span>obj = ObjectBuilder::default().persist().build(<span class="number">0u8</span>).unwrap();
+<a href=#297 id=297 data-nosnippet>297</a>            <span class="kw">let </span>obj = ObjectBuilder::default().persist(<span class="bool-val">true</span>).build(<span class="number">0u8</span>).unwrap();
 <a href=#298 id=298 data-nosnippet>298</a>            <span class="kw">let </span>obj = <span class="kw">unsafe </span>{ obj.cast::&lt;[u8; LEN]&gt;() };
 <a href=#299 id=299 data-nosnippet>299</a>            <span class="kw">let </span><span class="kw-2">mut </span>obj = <span class="kw">unsafe </span>{ obj.as_mut().unwrap() };
 <a href=#300 id=300 data-nosnippet>300</a>            <span class="macro">println!</span>(<span class="string">"filling..."</span>);
@@ -360,7 +360,7 @@
 <a href=#360 id=360 data-nosnippet>360</a>    let len = vo.iter().count();
 <a href=#361 id=361 data-nosnippet>361</a>    println!("pushing items");
 <a href=#362 id=362 data-nosnippet>362</a>    let start = std::time::Instant::now();
-<a href=#363 id=363 data-nosnippet>363</a>    let alloc = ArenaObject::new(ObjectBuilder::default().persist()).unwrap();
+<a href=#363 id=363 data-nosnippet>363</a>    let alloc = ArenaObject::new(ObjectBuilder::default().persist(true)).unwrap();
 <a href=#364 id=364 data-nosnippet>364</a>    for i in 0..3 {
 <a href=#365 id=365 data-nosnippet>365</a>        //println!("pushing: {}", i);
 <a href=#366 id=366 data-nosnippet>366</a>        //vo.push(i).unwrap();

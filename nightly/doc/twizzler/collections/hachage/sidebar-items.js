@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["map","raw"],"type":["DefaultHashBuilder"]};
+window.SIDEBAR_ITEMS = {"mod":["map","raw"],"type":["DefaultHashBuilder","PersistentHashMapBase"]};

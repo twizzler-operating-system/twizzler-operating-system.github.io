@@ -133,7 +133,7 @@
 <a href=#133 id=133 data-nosnippet>133</a>
 <a href=#134 id=134 data-nosnippet>134</a></span><span class="attr">#[bench]
 <a href=#135 id=135 data-nosnippet>135</a></span><span class="kw">fn </span>random_insert_500_persistent_batch(b: <span class="kw-2">&amp;mut </span>Bencher) {
-<a href=#136 id=136 data-nosnippet>136</a>    <span class="kw">let </span><span class="kw-2">mut </span>phm = PersistentHashMap::with_builder(ObjectBuilder::default().persist()).unwrap();
+<a href=#136 id=136 data-nosnippet>136</a>    <span class="kw">let </span><span class="kw-2">mut </span>phm = PersistentHashMap::with_builder(ObjectBuilder::default().persist(<span class="bool-val">true</span>)).unwrap();
 <a href=#137 id=137 data-nosnippet>137</a>    b.iter(|| {
 <a href=#138 id=138 data-nosnippet>138</a>        <span class="kw">let </span><span class="kw-2">mut </span>rng = ChaCha8Rng::seed_from_u64(<span class="number">42</span>);
 <a href=#139 id=139 data-nosnippet>139</a>
@@ -147,7 +147,7 @@
 <a href=#147 id=147 data-nosnippet>147</a>
 <a href=#148 id=148 data-nosnippet>148</a><span class="attr">#[bench]
 <a href=#149 id=149 data-nosnippet>149</a></span><span class="kw">fn </span>random_insert_1_persistent(b: <span class="kw-2">&amp;mut </span>Bencher) {
-<a href=#150 id=150 data-nosnippet>150</a>    <span class="kw">let </span><span class="kw-2">mut </span>phm = PersistentHashMap::with_builder(ObjectBuilder::default().persist()).unwrap();
+<a href=#150 id=150 data-nosnippet>150</a>    <span class="kw">let </span><span class="kw-2">mut </span>phm = PersistentHashMap::with_builder(ObjectBuilder::default().persist(<span class="bool-val">true</span>)).unwrap();
 <a href=#151 id=151 data-nosnippet>151</a>    b.iter(|| {
 <a href=#152 id=152 data-nosnippet>152</a>        <span class="kw">let </span><span class="kw-2">mut </span>rng = ChaCha8Rng::seed_from_u64(<span class="number">42</span>);
 <a href=#153 id=153 data-nosnippet>153</a>

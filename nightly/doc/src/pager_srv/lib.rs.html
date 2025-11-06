@@ -200,7 +200,7 @@
 <a href=#200 id=200 data-nosnippet>200</a>        } <span class="kw">else </span>{
 <a href=#201 id=201 data-nosnippet>201</a>            <span class="macro">tracing::info!</span>(<span class="string">"creating new naming object"</span>);
 <a href=#202 id=202 data-nosnippet>202</a>            <span class="kw">let </span>vo =
-<a href=#203 id=203 data-nosnippet>203</a>                VecObject::&lt;u32, VecObjectAlloc&gt;::new(ObjectBuilder::default().persist()).unwrap();
+<a href=#203 id=203 data-nosnippet>203</a>                VecObject::&lt;u32, VecObjectAlloc&gt;::new(ObjectBuilder::default().persist(<span class="bool-val">true</span>)).unwrap();
 <a href=#204 id=204 data-nosnippet>204</a>            run_async(po.set_config_id(vo.object().id().raw())).unwrap();
 <a href=#205 id=205 data-nosnippet>205</a>            vo.object().id().raw()
 <a href=#206 id=206 data-nosnippet>206</a>        }
