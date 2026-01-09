@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Commands","CtxAddCommands","CtxCommands","KeyCommands","ObjCommands"],"fn":["parse_obj_id"],"struct":["AccessArgs","CapAddArgs","CliArgs","CtxInspectArgs","NewCtxArgs","NewObjectArgs","ObjInspectArgs","SealedObjectArgs"]};

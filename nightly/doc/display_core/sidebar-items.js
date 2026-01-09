@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Buffer","BufferMut","BufferObject","DisplayBuffer","DisplayBufferBase","Rect","WindowConfig"]};

@@ -1,0 +1,1 @@
+searchState.loadedDescShard("virtio_gpu", 0, "Virtio network device driver.\nReturns the argument unchanged.\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nCalls <code>U::from(self)</code>.")

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["drop_window"],"static":["DROP_WINDOW_INFO"],"type":["Args","Ret","drop_window_EntryType"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["reconfigure_window"],"static":["RECONFIGURE_WINDOW_INFO"],"type":["Args","Ret","reconfigure_window_EntryType"]};
