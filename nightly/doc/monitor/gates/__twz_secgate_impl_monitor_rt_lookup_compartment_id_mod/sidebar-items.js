@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_lookup_compartment_id_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_LOOKUP_COMPARTMENT_ID_INFO"],"type":["Args","Ret","monitor_rt_lookup_compartment_id_EntryType"]};

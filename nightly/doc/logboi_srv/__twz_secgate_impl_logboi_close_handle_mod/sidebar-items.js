@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["logboi_close_handle"],"static":["LOGBOI_CLOSE_HANDLE_INFO"],"type":["Args","Ret","logboi_close_handle_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["LOGBOI_CLOSE_HANDLE_INFO"],"type":["Args","Ret","logboi_close_handle_EntryType"]};

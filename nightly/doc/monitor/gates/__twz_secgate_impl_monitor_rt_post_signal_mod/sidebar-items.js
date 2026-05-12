@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_post_signal_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_POST_SIGNAL_INFO"],"type":["Args","Ret","monitor_rt_post_signal_EntryType"]};

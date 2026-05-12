@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_comp_config","monitor_rt_get_comp_config_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_COMP_CONFIG_INFO"],"type":["Args","Ret","monitor_rt_get_comp_config_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_comp_config_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_COMP_CONFIG_INFO"],"type":["Args","Ret","monitor_rt_get_comp_config_EntryType"]};

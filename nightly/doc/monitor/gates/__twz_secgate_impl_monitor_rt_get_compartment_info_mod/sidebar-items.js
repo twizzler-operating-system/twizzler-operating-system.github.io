@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_compartment_info","monitor_rt_get_compartment_info_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_COMPARTMENT_INFO_INFO"],"type":["Args","Ret","monitor_rt_get_compartment_info_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_compartment_info_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_COMPARTMENT_INFO_INFO"],"type":["Args","Ret","monitor_rt_get_compartment_info_EntryType"]};

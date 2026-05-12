@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html" class="active"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><a href="Ports.html">Ported Applications and Libraries</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html" class="active"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -134,10 +134,67 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="gates"><a class="header" href="#gates">Gates</a></h1>
-<p>Gates, also known as secure API calls, are a means of exposing a limited set of functions available to an external user. This is similar to system calls, where the user can call into the kernel to do specific actions. Gates are used for interprocess communication.</p>
-<p>Gates are a way of an object exposing a system call like interface. This allows an object to define arbitrary behavior other threads can call. Because external threads can only access the object through the gate, they are restricted from detrimental actions, provided the gate is correctly written. While this does place the responsibility for secure code in the hands of any programmer rather than the typical relegation of secure code to security experts, gates are optional and can be avoided if there is worry about security flaws.</p>
-<p>When writing gates, best security practices are required to avoid vulnerabilities in the gates. As such, beware of timing attacks and other side channels that can be used to subtly exploit the object.</p>
+                        <h1 id="secure-gates"><a class="header" href="#secure-gates">Secure Gates</a></h1>
+<p>Secure gates enable a thread to cross between programs, calling a function
+in one program from another. More specifically, it allows threads to cross
+security context boundaries by defining particular entry points in the callee
+context that can be called from other contexts. The entry points are typically
+defined in a crate as functions to be called, and then exposed via a library.</p>
+<p>For example, consider the pager and the pager-srv crates. The pager crate
+defines a number of types and an API for calling the pager. The pager-srv crate
+contains the actual (long-running) pager code. Applications can then use the pager
+crate to call into that code. The pager crate, for example, provides a <code>struct PagerStats</code> and a gate function <code>pager_get_stats</code>. An application depending on
+the pager crate can call that function and get back a <code>PagerStats</code>. Internally,
+the pager crate will issue the correct instructions to jump from the security context
+of the application that made the call into the security context for the pager-srv crate. This is implemented as the pager-srv crate building a cdylib that can be
+loaded into a separate security context, and then linking to that via the pager crate.</p>
+<p>The result is that programmers can define &quot;cross-application system calls&quot; for
+interprocess communication and more. Calling a secure gate requires the appropriate 
+permissions, and not all functions or symbols are secure gates (they must be explicitly defined as such).</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<p>Let's say we have a service we want to provide that exposes a <code>increment_counter</code>
+function. We'll call the service 'counter'. First we'll create the wrapper library
+crate, called <code>counter</code>. It'll need to have the secgate library (in src/lib) added
+as a dependency.</p>
+<p>Then we create the service crate, <code>counter-srv</code>, as a library, and modify the
+Cargo.toml to include the following:</p>
+<pre><code>[lib]
+crate-type = [&quot;cdylib&quot;]
+
+[dependencies]
+secgate = { path = &lt;path to secgate, probably ../../lib/secgate&gt; }
+counter = { path = &lt;path to counter wrapper library&gt; }
+
+</code></pre>
+<p>In the counter crate's src/lib.rs, we'll add:</p>
+<pre><code>#[secgate::gatecall]
+pub fn increment_counter() -&gt; Result&lt;u32, secgate::TwzError&gt; {}
+</code></pre>
+<p>The attribute macro <code>gatecall</code> will fill out the function body automatically.
+Additionally, note that all secure gates must return <code>Result&lt;T, TwzError&gt;</code>.</p>
+<p>In the counter-srv crate's src/lib.rs, we can add:</p>
+<pre><code>#[secgate::entry(lib = &quot;counter&quot;)]
+pub fn increment_counter() -&gt; Result&lt;u32, secgate::TwzError&gt; {
+  static COUNTER: AtomicU32 = AtomicU32::new(0);
+  Ok(COUNTER.fetch_add(1, Ordering::SeqCst))
+}
+</code></pre>
+<p>The <code>lib = &quot;counter&quot;</code> option allows the <code>entry</code> macro to type check against the
+definition given in <code>counter</code>'s src/lib.rs.</p>
+<h3 id="adding-to-initrd-and-running"><a class="header" href="#adding-to-initrd-and-running">Adding to initrd and running</a></h3>
+<p>At this point, you can create a binary program as usual, and add it to the initrd.
+Add the <code>counter</code> crate as a dependency. Add to the initrd list: <code>lib:counter-srv</code>.
+This will cause the initrd builder to copy over the .so file for that crate.</p>
+<p>In the binary program's source, you can call the exposed increment_counter function
+from the counter crate.</p>
+<p>Once Twizzler has started, you can load the .so file via LD_PRELOAD (which will NOT
+put the .so file in a separate security context) or with SCTX_PRELOAD (which will):</p>
+<p><code>SCTX_PRELOAD=libcounter_srv.so &lt;binary-name&gt;</code></p>
+<h2 id="getting-caller-information"><a class="header" href="#getting-caller-information">Getting Caller Information</a></h2>
+<p>The counter-srv increment_counter implementation can get access to caller
+information via the secgate::get_caller() function. This function returns
+a <code>GateCallInfo</code>, which can be used to get the caller's thread ID and the
+security context ID.</p>
 
                     </main>
 

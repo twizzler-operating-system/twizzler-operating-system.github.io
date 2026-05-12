@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bin/trace/src/stat.rs`."><title>stat.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-916cea96.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="trace" data-themes="" data-resource-suffix="" data-rustdoc-version="1.87.0-dev" data-channel="nightly" data-search-js="search-e7298875.js" data-settings-js="settings-d72f25bb.js" ><script src="../../static.files/storage-82c7156e.js"></script><script defer src="../../static.files/src-script-63605ae7.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-fb8c74a8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-893ab5e7.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-6580c154.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer"></div><main><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">trace/</div>stat.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::{
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/bin/trace/src/stat.rs`."><title>stat.rs - source</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-6b053e98.ttf.woff2,FiraSans-Italic-81dc35de.woff2,FiraSans-Regular-0fe48ade.woff2,FiraSans-MediumItalic-ccf7e434.woff2,FiraSans-Medium-e1aa3f0a.woff2,SourceCodePro-Regular-8badfe75.ttf.woff2,SourceCodePro-Semibold-aa29a496.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2"href="../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../static.files/normalize-9960930a.css"><link rel="stylesheet" href="../../static.files/rustdoc-2eb46af5.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="trace" data-themes="" data-resource-suffix="" data-rustdoc-version="1.94.0-dev" data-channel="nightly" data-search-js="search-9e2438ea.js" data-stringdex-js="stringdex-b897f86f.js" data-settings-js="settings-c38705f0.js" ><script src="../../static.files/storage-e2aeef58.js"></script><script defer src="../../static.files/src-script-813739b1.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-7bab91a1.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-ffcac47a.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-eab170b8.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-044be391.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title"><h2>Files</h2></div></nav><div class="sidebar-resizer" title="Drag to resize sidebar"></div><main><section id="main-content" class="content"><div class="main-heading"><h1><div class="sub-heading">trace/</div>stat.rs</h1><rustdoc-toolbar></rustdoc-toolbar></div><div class="example-wrap digits-3"><pre class="rust"><code><a href=#1 id=1 data-nosnippet>1</a><span class="kw">use </span>std::{
 <a href=#2 id=2 data-nosnippet>2</a>    alloc::Layout,
 <a href=#3 id=3 data-nosnippet>3</a>    collections::{BTreeMap, HashMap},
 <a href=#4 id=4 data-nosnippet>4</a>    time::Duration,
@@ -101,11 +101,11 @@
 <a href=#101 id=101 data-nosnippet>101</a>    <span class="kw">if </span>tlbs.len() &gt; <span class="number">0 </span>{
 <a href=#102 id=102 data-nosnippet>102</a>        <span class="kw">let </span>invalidations = tlbs
 <a href=#103 id=103 data-nosnippet>103</a>            .iter()
-<a href=#104 id=104 data-nosnippet>104</a>            .filter(|t| t.<span class="number">0</span>.event &amp; CONTEXT_INVALIDATION != <span class="number">0</span>)
+<a href=#104 id=104 data-nosnippet>104</a>            .filter(|t| t.<span class="number">0</span>.event &amp; <span class="macro">CONTEXT_INVALIDATION !</span>= <span class="number">0</span>)
 <a href=#105 id=105 data-nosnippet>105</a>            .count();
 <a href=#106 id=106 data-nosnippet>106</a>        <span class="kw">let </span>shootdowns = tlbs
 <a href=#107 id=107 data-nosnippet>107</a>            .iter()
-<a href=#108 id=108 data-nosnippet>108</a>            .filter(|t| t.<span class="number">0</span>.event &amp; CONTEXT_SHOOTDOWN != <span class="number">0</span>)
+<a href=#108 id=108 data-nosnippet>108</a>            .filter(|t| t.<span class="number">0</span>.event &amp; <span class="macro">CONTEXT_SHOOTDOWN !</span>= <span class="number">0</span>)
 <a href=#109 id=109 data-nosnippet>109</a>            .count();
 <a href=#110 id=110 data-nosnippet>110</a>
 <a href=#111 id=111 data-nosnippet>111</a>        <span class="macro">println!</span>(
@@ -118,7 +118,7 @@
 <a href=#118 id=118 data-nosnippet>118</a>
 <a href=#119 id=119 data-nosnippet>119</a>    <span class="kw">let </span>syscalls = state
 <a href=#120 id=120 data-nosnippet>120</a>        .data()
-<a href=#121 id=121 data-nosnippet>121</a>        .filter(|p| p.<span class="number">0</span>.kind == TraceKind::Thread &amp;&amp; p.<span class="number">0</span>.event &amp; THREAD_SYSCALL_EXIT != <span class="number">0</span>)
+<a href=#121 id=121 data-nosnippet>121</a>        .filter(|p| p.<span class="number">0</span>.kind == TraceKind::Thread &amp;&amp; p.<span class="number">0</span>.event &amp; <span class="macro">THREAD_SYSCALL_EXIT !</span>= <span class="number">0</span>)
 <a href=#122 id=122 data-nosnippet>122</a>        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 <a href=#123 id=123 data-nosnippet>123</a>
 <a href=#124 id=124 data-nosnippet>124</a>    <span class="kw">if </span>syscalls.len() &gt; <span class="number">0 </span>{
@@ -279,10 +279,10 @@
 <a href=#279 id=279 data-nosnippet>279</a>
 <a href=#280 id=280 data-nosnippet>280</a>    <span class="kw">for </span>event <span class="kw">in </span>thread_events {
 <a href=#281 id=281 data-nosnippet>281</a>        <span class="kw">let </span>entry = threads.entry(event.<span class="number">0</span>.thread).or_default();
-<a href=#282 id=282 data-nosnippet>282</a>        <span class="kw">if </span>event.<span class="number">0</span>.event &amp; THREAD_MIGRATE != <span class="number">0 </span>{
+<a href=#282 id=282 data-nosnippet>282</a>        <span class="kw">if </span>event.<span class="number">0</span>.event &amp; <span class="macro">THREAD_MIGRATE !</span>= <span class="number">0 </span>{
 <a href=#283 id=283 data-nosnippet>283</a>            entry.migrations += <span class="number">1</span>;
 <a href=#284 id=284 data-nosnippet>284</a>        }
-<a href=#285 id=285 data-nosnippet>285</a>        <span class="kw">if </span>event.<span class="number">0</span>.event &amp; THREAD_CONTEXT_SWITCH != <span class="number">0 </span>{
+<a href=#285 id=285 data-nosnippet>285</a>        <span class="kw">if </span>event.<span class="number">0</span>.event &amp; <span class="macro">THREAD_CONTEXT_SWITCH !</span>= <span class="number">0 </span>{
 <a href=#286 id=286 data-nosnippet>286</a>            entry.switches += <span class="number">1</span>;
 <a href=#287 id=287 data-nosnippet>287</a>            <span class="kw-2">*</span>entry.cpu_map.entry(event.<span class="number">0</span>.cpuid).or_default() += <span class="number">1</span>;
 <a href=#288 id=288 data-nosnippet>288</a>            <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = event
@@ -316,7 +316,7 @@
 <a href=#316 id=316 data-nosnippet>316</a>            cpumap.sort_by_key(|x| <span class="kw-2">*</span>x.<span class="number">0</span>);
 <a href=#317 id=317 data-nosnippet>317</a>            <span class="macro">print!</span>(<span class="string">"                                                         ["</span>,);
 <a href=#318 id=318 data-nosnippet>318</a>            <span class="kw">for </span>(i, cpu) <span class="kw">in </span>cpumap.iter().enumerate() {
-<a href=#319 id=319 data-nosnippet>319</a>                <span class="kw">if </span>i != <span class="number">0 </span>{
+<a href=#319 id=319 data-nosnippet>319</a>                <span class="kw">if </span><span class="macro">i !</span>= <span class="number">0 </span>{
 <a href=#320 id=320 data-nosnippet>320</a>                    <span class="macro">print!</span>(<span class="string">", "</span>)
 <a href=#321 id=321 data-nosnippet>321</a>                }
 <a href=#322 id=322 data-nosnippet>322</a>                <span class="macro">print!</span>(<span class="string">"{}:{}"</span>, cpu.<span class="number">0</span>, cpu.<span class="number">1</span>);
@@ -328,7 +328,7 @@
 <a href=#328 id=328 data-nosnippet>328</a>    <span class="kw">let </span>samples = state
 <a href=#329 id=329 data-nosnippet>329</a>        .data()
 <a href=#330 id=330 data-nosnippet>330</a>        .filter_map(|p| {
-<a href=#331 id=331 data-nosnippet>331</a>            <span class="kw">if </span>p.<span class="number">0</span>.kind == TraceKind::Thread &amp;&amp; p.<span class="number">0</span>.event &amp; THREAD_SAMPLE != <span class="number">0 </span>{
+<a href=#331 id=331 data-nosnippet>331</a>            <span class="kw">if </span>p.<span class="number">0</span>.kind == TraceKind::Thread &amp;&amp; p.<span class="number">0</span>.event &amp; <span class="macro">THREAD_SAMPLE !</span>= <span class="number">0 </span>{
 <a href=#332 id=332 data-nosnippet>332</a>                <span class="prelude-val">Some</span>((
 <a href=#333 id=333 data-nosnippet>333</a>                    p.<span class="number">0</span>,
 <a href=#334 id=334 data-nosnippet>334</a>                    p.<span class="number">1</span>.and_then(|d| d.try_cast::&lt;ThreadSamplingEvent&gt;(THREAD_SAMPLE))
@@ -385,7 +385,7 @@
 <a href=#385 id=385 data-nosnippet>385</a>    <span class="kw">let </span><span class="kw-2">mut </span>rtalloc_map = HashMap::&lt;Layout, Vec&lt;Duration&gt;&gt;::new();
 <a href=#386 id=386 data-nosnippet>386</a>    <span class="kw">let </span><span class="kw-2">mut </span>rtfree_map = HashMap::&lt;Layout, Vec&lt;Duration&gt;&gt;::new();
 <a href=#387 id=387 data-nosnippet>387</a>    <span class="kw">for </span>rte <span class="kw">in </span>rt_events {
-<a href=#388 id=388 data-nosnippet>388</a>        <span class="kw">if </span>rte.<span class="number">0</span>.event &amp; RUNTIME_ALLOC != <span class="number">0 </span>{
+<a href=#388 id=388 data-nosnippet>388</a>        <span class="kw">if </span>rte.<span class="number">0</span>.event &amp; <span class="macro">RUNTIME_ALLOC !</span>= <span class="number">0 </span>{
 <a href=#389 id=389 data-nosnippet>389</a>            <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = rte
 <a href=#390 id=390 data-nosnippet>390</a>                .<span class="number">1
 <a href=#391 id=391 data-nosnippet>391</a>                </span>.and_then(|d| d.try_cast::&lt;RuntimeAllocationEvent&gt;(RUNTIME_ALLOC))
@@ -424,7 +424,7 @@
 <a href=#424 id=424 data-nosnippet>424</a>
 <a href=#425 id=425 data-nosnippet>425</a>    <span class="kw">let </span>kalloc_events = state
 <a href=#426 id=426 data-nosnippet>426</a>        .data()
-<a href=#427 id=427 data-nosnippet>427</a>        .filter(|e| e.<span class="number">0</span>.kind == TraceKind::Kernel &amp;&amp; e.<span class="number">0</span>.event &amp; KERNEL_ALLOC != <span class="number">0</span>);
+<a href=#427 id=427 data-nosnippet>427</a>        .filter(|e| e.<span class="number">0</span>.kind == TraceKind::Kernel &amp;&amp; e.<span class="number">0</span>.event &amp; <span class="macro">KERNEL_ALLOC !</span>= <span class="number">0</span>);
 <a href=#428 id=428 data-nosnippet>428</a>
 <a href=#429 id=429 data-nosnippet>429</a>    <span class="kw">let </span><span class="kw-2">mut </span>kalloc_map = HashMap::&lt;Layout, Vec&lt;Duration&gt;&gt;::new();
 <a href=#430 id=430 data-nosnippet>430</a>    <span class="kw">let </span><span class="kw-2">mut </span>kfree_map = HashMap::&lt;Layout, Vec&lt;Duration&gt;&gt;::new();
@@ -463,4 +463,5 @@
 <a href=#463 id=463 data-nosnippet>463</a>            arr.sum() / <span class="number">1_000_000.
 <a href=#464 id=464 data-nosnippet>464</a>        </span>);
 <a href=#465 id=465 data-nosnippet>465</a>    }
-<a href=#466 id=466 data-nosnippet>466</a>}</code></pre></div></section></main></body></html>
+<a href=#466 id=466 data-nosnippet>466</a>}
+</code></pre></div></section></main></body></html>

@@ -1,9 +1,9 @@
 (function() {
-    var type_impls = Object.fromEntries([["twizzler_rt_abi",[]]]);
+    var type_impls = Object.fromEntries([["twizzler_rt_abi",[["<details class=\"toggle implementors-toggle\" open><summary><section id=\"impl-BaseType-for-u64\" class=\"impl\"><a class=\"src rightside\" href=\"src/twizzler_rt_abi/marker.rs.html#70\">Source</a><a href=\"#impl-BaseType-for-u64\" class=\"anchor\">§</a><h3 class=\"code-header\">impl <a class=\"trait\" href=\"twizzler_rt_abi/marker/trait.BaseType.html\" title=\"trait twizzler_rt_abi::marker::BaseType\">BaseType</a> for <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/core/primitive.u64.html\">u64</a></h3></section></summary><div class=\"impl-items\"><details class=\"toggle method-toggle\" open><summary><section id=\"method.fingerprint\" class=\"method trait-impl\"><a class=\"src rightside\" href=\"src/twizzler_rt_abi/marker.rs.html#61-63\">Source</a><a href=\"#method.fingerprint\" class=\"anchor\">§</a><h4 class=\"code-header\">fn <a href=\"twizzler_rt_abi/marker/trait.BaseType.html#method.fingerprint\" class=\"fn\">fingerprint</a>() -&gt; <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/core/primitive.u64.html\">u64</a></h4></section></summary><div class='docblock'>The fingerprint of this type.</div></details></div></details>","BaseType","twizzler_rt_abi::bindings::twz_error"],["<section id=\"impl-Invariant-for-u64\" class=\"impl\"><a class=\"src rightside\" href=\"src/twizzler_rt_abi/marker.rs.html#17\">Source</a><a href=\"#impl-Invariant-for-u64\" class=\"anchor\">§</a><h3 class=\"code-header\">impl <a class=\"trait\" href=\"twizzler_rt_abi/marker/trait.Invariant.html\" title=\"trait twizzler_rt_abi::marker::Invariant\">Invariant</a> for <a class=\"primitive\" href=\"https://doc.rust-lang.org/nightly/core/primitive.u64.html\">u64</a></h3></section>","Invariant","twizzler_rt_abi::bindings::twz_error"]]]]);
     if (window.register_type_impls) {
         window.register_type_impls(type_impls);
     } else {
         window.pending_type_impls = type_impls;
     }
 })()
-//{"start":55,"fragment_lengths":[22]}
+//{"start":55,"fragment_lengths":[1789]}

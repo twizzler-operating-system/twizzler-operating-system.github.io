@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["TEST_INTERNAL_PANIC_INFO"],"type":["Args","Ret","test_internal_panic_EntryType"]};

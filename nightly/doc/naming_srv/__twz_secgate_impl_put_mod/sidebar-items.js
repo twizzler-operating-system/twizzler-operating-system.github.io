@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["put"],"static":["PUT_INFO"],"type":["Args","Ret","put_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["PUT_INFO"],"type":["Args","Ret","put_EntryType"]};

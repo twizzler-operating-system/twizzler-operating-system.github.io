@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["enumerate_names"],"type":["Args","Ret","enumerate_names_EntryType"]};

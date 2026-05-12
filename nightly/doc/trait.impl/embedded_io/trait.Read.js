@@ -1,9 +1,9 @@
 (function() {
-    var implementors = Object.fromEntries([["init",[["impl Read for <a class=\"struct\" href=\"init/struct.TwzIo.html\" title=\"struct init::TwzIo\">TwzIo</a>"]]]]);
+    const implementors = Object.fromEntries([["shell",[["impl Read for <a class=\"struct\" href=\"shell/struct.TwzIo.html\" title=\"struct shell::TwzIo\">TwzIo</a>",0]]]]);
     if (window.register_implementors) {
         window.register_implementors(implementors);
     } else {
         window.pending_implementors = implementors;
     }
 })()
-//{"start":57,"fragment_lengths":[119]}
+//{"start":59,"fragment_lengths":[124]}

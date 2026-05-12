@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_PACKET_BITS","MIN_PACKET_SIZE"],"struct":["PacketBufferBase","PacketObject"]};

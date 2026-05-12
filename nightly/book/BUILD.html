@@ -75,7 +75,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html" class="active">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html" class="active">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><a href="Ports.html">Ported Applications and Libraries</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -189,6 +189,7 @@ command available. On MacOS, with brew, it can be installed with <code>brew inst
 <ol start="0">
 <li>Building xtask.</li>
 <li>Fetching/Building the toolchain.</li>
+<li>(optional) Building third-party ports.</li>
 <li>Building Twizzler itself.</li>
 </ol>
 <p>Fortunately, step 0 is handled automatically whenever we try to do anything. That's because xtask is
@@ -209,16 +210,36 @@ cargo toolchain pull
 <p>If not, please make an issue requesting support for your OS/architecture combination,
 and in the meantime do the following to use a locally compiled toolchain.</p>
 <p>Warning! This will take around 1-3 hours depending on your machine, as well as
-requiring 50 gigs of free storage for that duration.</p>
+requiring 50 gigs of free storage for that duration. Make some tea while you wait.</p>
 <pre><code>cd where/you/cloned/twizzler
 git submodule update --init --recursive
 cargo toolchain bootstrap
 </code></pre>
 <p>This will compile llvm and bootstrap the rust compiler, both
-of which take a long time. At the end, you should see a &quot;build completed successfully&quot; message,
-followed by a few lines about building crti and friends.</p>
-<h2 id="step-2-building-twizzler"><a class="header" href="#step-2-building-twizzler">Step 2: Building Twizzler</a></h2>
-<p>Now that we've got the toolchain built and linked, we can compile the rest of Twizzler. Run</p>
+of which take a long time. At the end, you should see a &quot;ready!&quot; message.</p>
+<h2 id="step-2-optional-building-third-party-ports"><a class="header" href="#step-2-optional-building-third-party-ports">Step 2: (optional) Building third-party ports.</a></h2>
+<p>This step is optional, but provides additional common utilities for the Twizzler system.
+Note that many of them currently are compiled in debug mode while we continue to develop libc support.</p>
+<p>Currently supported ports include:</p>
+<ul>
+<li>zlib (required for all)</li>
+<li>ncurses</li>
+<li>psl (required for curl)</li>
+<li>openssl (required for curl and python3)</li>
+<li>llvm</li>
+<li>python3 </li>
+<li>binutils (not including ld, as we use llvm-ld)</li>
+<li>curl</li>
+</ul>
+<p>This list can also be viewed by running <code>cargo toolchain ports</code>.</p>
+<p>Any of these may be compiled and installed into the sysroot by running</p>
+<p><code>cargo toolchain ports &lt;port-name&gt;...</code></p>
+<p>Running <code>cargo toolchain ports @all</code> will install all currently supported ports.</p>
+<p>Important: after compiling any ports, you must update the disk image with
+<code>cargo xtask disk -f reset</code>.</p>
+<p>See <a href="Ports.html">Ports documentation</a> for more info.</p>
+<h2 id="step-3-building-twizzler"><a class="header" href="#step-3-building-twizzler">Step 3: Building Twizzler</a></h2>
+<p>Now that we've got the toolchain built , we can compile the rest of Twizzler. Run</p>
 <pre><code>cargo build-all
 </code></pre>
 <p>which will compile several &quot;collections&quot; of packages:</p>

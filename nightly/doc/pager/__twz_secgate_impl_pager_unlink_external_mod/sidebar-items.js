@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["pager_unlink_external"],"type":["Args","Ret","pager_unlink_external_EntryType"]};

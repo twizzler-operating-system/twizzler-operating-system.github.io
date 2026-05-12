@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["cd","echo","env","help","jobs","kill","pwd","set","unset","wait"],"struct":["BuiltinCtx"]};

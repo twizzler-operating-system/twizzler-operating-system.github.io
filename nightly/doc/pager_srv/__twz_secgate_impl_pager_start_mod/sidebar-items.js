@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["pager_start"],"static":["PAGER_START_INFO"],"type":["Args","Ret","pager_start_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["PAGER_START_INFO"],"type":["Args","Ret","pager_start_EntryType"]};

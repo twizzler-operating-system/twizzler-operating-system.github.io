@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="intro.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="BUILD.html">Building Twizzler</a></li><li class="chapter-item expanded affix "><a href="develop.html">Developing on Twizzler</a></li><li class="chapter-item expanded affix "><a href="Debug.html">Debugging Twizzler</a></li><li class="chapter-item expanded affix "><a href="Ports.html">Ported Applications and Libraries</a></li><li class="chapter-item expanded affix "><li class="part-title">Fundamentals</li><li class="chapter-item expanded "><a href="Object.html"><strong aria-hidden="true">1.</strong> Objects</a></li><li class="chapter-item expanded "><a href="Lifetime.html"><strong aria-hidden="true">2.</strong> Object Lifetime</a></li><li class="chapter-item expanded "><a href="Pointer.html"><strong aria-hidden="true">3.</strong> Pointers</a></li><li class="chapter-item expanded "><a href="Permissions.html"><strong aria-hidden="true">4.</strong> Permissions</a></li><li class="chapter-item expanded "><a href="ReferenceRuntime.html"><strong aria-hidden="true">5.</strong> Reference Runtime</a></li><li class="chapter-item expanded affix "><li class="part-title">Primitives</li><li class="chapter-item expanded "><a href="Views.html"><strong aria-hidden="true">6.</strong> Views</a></li><li class="chapter-item expanded "><a href="KSO.html"><strong aria-hidden="true">7.</strong> Kernel State Objects</a></li><li class="chapter-item expanded "><a href="Extensions.html"><strong aria-hidden="true">8.</strong> Extensions</a></li><li class="chapter-item expanded "><a href="Gates.html"><strong aria-hidden="true">9.</strong> Gates</a></li><li class="chapter-item expanded affix "><li class="part-title">Driver Development</li><li class="chapter-item expanded "><a href="DMA.html"><strong aria-hidden="true">10.</strong> DMA</a></li><li class="chapter-item expanded affix "><li class="part-title">Advanced Features</li><li class="chapter-item expanded "><a href="Trace.html"><strong aria-hidden="true">11.</strong> Tracing and Performance Debugging</a></li><li class="chapter-item expanded "><a href="CargoMetadata.html"><strong aria-hidden="true">12.</strong> Twizzler Build System Crate Metadata</a></li><li class="chapter-item expanded affix "><li class="part-title">Other</li><li class="chapter-item expanded "><a href="AssortedNotes.html"><strong aria-hidden="true">13.</strong> Assorted Notes</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -201,6 +201,7 @@ command available. On MacOS, with brew, it can be installed with <code>brew inst
 <ol start="0">
 <li>Building xtask.</li>
 <li>Fetching/Building the toolchain.</li>
+<li>(optional) Building third-party ports.</li>
 <li>Building Twizzler itself.</li>
 </ol>
 <p>Fortunately, step 0 is handled automatically whenever we try to do anything. That's because xtask is
@@ -221,16 +222,36 @@ cargo toolchain pull
 <p>If not, please make an issue requesting support for your OS/architecture combination,
 and in the meantime do the following to use a locally compiled toolchain.</p>
 <p>Warning! This will take around 1-3 hours depending on your machine, as well as
-requiring 50 gigs of free storage for that duration.</p>
+requiring 50 gigs of free storage for that duration. Make some tea while you wait.</p>
 <pre><code>cd where/you/cloned/twizzler
 git submodule update --init --recursive
 cargo toolchain bootstrap
 </code></pre>
 <p>This will compile llvm and bootstrap the rust compiler, both
-of which take a long time. At the end, you should see a &quot;build completed successfully&quot; message,
-followed by a few lines about building crti and friends.</p>
-<h2 id="step-2-building-twizzler"><a class="header" href="#step-2-building-twizzler">Step 2: Building Twizzler</a></h2>
-<p>Now that we've got the toolchain built and linked, we can compile the rest of Twizzler. Run</p>
+of which take a long time. At the end, you should see a &quot;ready!&quot; message.</p>
+<h2 id="step-2-optional-building-third-party-ports"><a class="header" href="#step-2-optional-building-third-party-ports">Step 2: (optional) Building third-party ports.</a></h2>
+<p>This step is optional, but provides additional common utilities for the Twizzler system.
+Note that many of them currently are compiled in debug mode while we continue to develop libc support.</p>
+<p>Currently supported ports include:</p>
+<ul>
+<li>zlib (required for all)</li>
+<li>ncurses</li>
+<li>psl (required for curl)</li>
+<li>openssl (required for curl and python3)</li>
+<li>llvm</li>
+<li>python3 </li>
+<li>binutils (not including ld, as we use llvm-ld)</li>
+<li>curl</li>
+</ul>
+<p>This list can also be viewed by running <code>cargo toolchain ports</code>.</p>
+<p>Any of these may be compiled and installed into the sysroot by running</p>
+<p><code>cargo toolchain ports &lt;port-name&gt;...</code></p>
+<p>Running <code>cargo toolchain ports @all</code> will install all currently supported ports.</p>
+<p>Important: after compiling any ports, you must update the disk image with
+<code>cargo xtask disk -f reset</code>.</p>
+<p>See <a href="Ports.html">Ports documentation</a> for more info.</p>
+<h2 id="step-3-building-twizzler"><a class="header" href="#step-3-building-twizzler">Step 3: Building Twizzler</a></h2>
+<p>Now that we've got the toolchain built , we can compile the rest of Twizzler. Run</p>
 <pre><code>cargo build-all
 </code></pre>
 <p>which will compile several &quot;collections&quot; of packages:</p>
@@ -359,6 +380,20 @@ the <code>--tests</code> argument to your cargo run commands.</p>
 userspace and kernelspace code. Note that writing tests for the kernel is slightly different, in
 that a test-case failing causes the whole system to stop, and you need to use the <code>#[kernel_test]</code>
 attribute from the <code>twizzler-kernel-macros</code> crate instead of <code>#[test]</code>.</p>
+<h2 id="developing-toolchain-components"><a class="header" href="#developing-toolchain-components">Developing Toolchain Components</a></h2>
+<p>The Twizzler toolchain has a number of components, including a libc, llvm, and rust itself. When working on these
+components, it's useful to build only part of the toolchain at a time. This can be done with the --step option:</p>
+<p><code>cargo toolchain bootstrap --step libc</code></p>
+<p>This will build and install only the libc part of the toolchain. Multiple steps can be specified. Current steps are:</p>
+<ul>
+<li>prep: downloads and installs tools for building the toolchain</li>
+<li>libc: compiles and installs libc</li>
+<li>libcxx: compiles and installs libc++ and libc++abi</li>
+<li>rt: builds the twizzler runtime as a cdylib for the toolchain sysroots</li>
+<li>crt: compiles and installs the C runtime files (crt*.o)</li>
+<li>rust: compiles and installs the rust compiler that can target twizzler</li>
+<li>llvm: compiles and installs LLVM with clang that can target twizzler</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="debugging"><a class="header" href="#debugging">Debugging</a></h1>
 <p>Debugging support is in-progress on Twizzler. Currently, you can debug userspace programs via GDB in a limited way.</p>
 <h2 id="using-the-debug-stub-in-qemu"><a class="header" href="#using-the-debug-stub-in-qemu">Using the debug stub in QEMU</a></h2>
@@ -395,6 +430,24 @@ of being added.</p>
 <li>Signals</li>
 <li>Support for aarch64</li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ports"><a class="header" href="#ports">Ports</a></h1>
+<p>Twizzler currently supports a number of third-party ported libraries and programs.
+The current list may be viewed by running <code>cargo toolchain ports</code>.</p>
+<h2 id="compiling-a-specific-port"><a class="header" href="#compiling-a-specific-port">Compiling a specific port</a></h2>
+<p>The xtask program currently does not enforce dependencies for these ports, so they
+will only build properly if the necessary dependencies are built first.</p>
+<p>Note that after compiling a port, you need to update the nvme image with <code>cargo xtask disk -f reset</code>.</p>
+<h2 id="adding-a-port"><a class="header" href="#adding-a-port">Adding a port</a></h2>
+<p>Adding a port involves extending the data structures and loops in xtask/src/toolchain/ports.rs,
+and then adding a file in xtask/src/toolchain/ports/ to handle building the program or library.
+I recommend copying from an existing port file depending on if it's cmake or autotools based.
+In the future, we'll abstract these into a better system, but it's small enough for now.</p>
+<h2 id="notes-on-ports"><a class="header" href="#notes-on-ports">Notes on ports</a></h2>
+<p>Ports are installed (on the host, when compiled) into toolchain/install/sysroot/x86_64-unknown-twizzler/pkg/port-name.
+(of course, depending on architecture and port name). When the nvme image is built, xtask will
+copy the sysroot/triple directory to nvme:/sysroot, and will be available from within Twizzler under /sysroot (and
+so ports can be found in /sysroot/pkg/port-name). The shell automatically searches ports' bin directories for
+commands, and libraries are loaded from respective lib directories.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="objects"><a class="header" href="#objects">Objects</a></h1>
 <h2 id="definition"><a class="header" href="#definition">Definition</a></h2>
 <p>Objects are an abstraction of a set of related data with the same lifetime and permissions. This vague definition allows for applications to define what data is contained in a single object in a way that is most reasonable for the particular use case. For example, a B-Tree could contain all nodes in the same object given that the nodes likely have the same permissions and lifetime. However, another tree with different permissions for children could separate these nodes into different objects. For this second example, managing their lifetime can be done with <a href="./Lifetime.html#Ties">ties</a>.</p>
@@ -522,10 +575,67 @@ from each other.</p>
 <p>Event is a way of waiting for something to happen to an object, similar to <code>poll()</code> on a file descriptor in Unix. Specific events can be waited for by using <code>event_wait()</code> with the object and event passed in as arguments. Because this is just an interface, an object can implement it in a way that makes sense to it, such as waiting for data from a network or a write to an object to complete.</p>
 <h2 id="tags"><a class="header" href="#tags">Tags</a></h2>
 <p>Tags are a way of uniquely identifying an extension, such as IO, and checking if the object supports the extension. These are stored in the metadata for the object, and when the tag is added to the metadata, a pointer to the functions that implement the interface are also added.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="gates"><a class="header" href="#gates">Gates</a></h1>
-<p>Gates, also known as secure API calls, are a means of exposing a limited set of functions available to an external user. This is similar to system calls, where the user can call into the kernel to do specific actions. Gates are used for interprocess communication.</p>
-<p>Gates are a way of an object exposing a system call like interface. This allows an object to define arbitrary behavior other threads can call. Because external threads can only access the object through the gate, they are restricted from detrimental actions, provided the gate is correctly written. While this does place the responsibility for secure code in the hands of any programmer rather than the typical relegation of secure code to security experts, gates are optional and can be avoided if there is worry about security flaws.</p>
-<p>When writing gates, best security practices are required to avoid vulnerabilities in the gates. As such, beware of timing attacks and other side channels that can be used to subtly exploit the object.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="secure-gates"><a class="header" href="#secure-gates">Secure Gates</a></h1>
+<p>Secure gates enable a thread to cross between programs, calling a function
+in one program from another. More specifically, it allows threads to cross
+security context boundaries by defining particular entry points in the callee
+context that can be called from other contexts. The entry points are typically
+defined in a crate as functions to be called, and then exposed via a library.</p>
+<p>For example, consider the pager and the pager-srv crates. The pager crate
+defines a number of types and an API for calling the pager. The pager-srv crate
+contains the actual (long-running) pager code. Applications can then use the pager
+crate to call into that code. The pager crate, for example, provides a <code>struct PagerStats</code> and a gate function <code>pager_get_stats</code>. An application depending on
+the pager crate can call that function and get back a <code>PagerStats</code>. Internally,
+the pager crate will issue the correct instructions to jump from the security context
+of the application that made the call into the security context for the pager-srv crate. This is implemented as the pager-srv crate building a cdylib that can be
+loaded into a separate security context, and then linking to that via the pager crate.</p>
+<p>The result is that programmers can define &quot;cross-application system calls&quot; for
+interprocess communication and more. Calling a secure gate requires the appropriate 
+permissions, and not all functions or symbols are secure gates (they must be explicitly defined as such).</p>
+<h2 id="example"><a class="header" href="#example">Example</a></h2>
+<p>Let's say we have a service we want to provide that exposes a <code>increment_counter</code>
+function. We'll call the service 'counter'. First we'll create the wrapper library
+crate, called <code>counter</code>. It'll need to have the secgate library (in src/lib) added
+as a dependency.</p>
+<p>Then we create the service crate, <code>counter-srv</code>, as a library, and modify the
+Cargo.toml to include the following:</p>
+<pre><code>[lib]
+crate-type = [&quot;cdylib&quot;]
+
+[dependencies]
+secgate = { path = &lt;path to secgate, probably ../../lib/secgate&gt; }
+counter = { path = &lt;path to counter wrapper library&gt; }
+
+</code></pre>
+<p>In the counter crate's src/lib.rs, we'll add:</p>
+<pre><code>#[secgate::gatecall]
+pub fn increment_counter() -&gt; Result&lt;u32, secgate::TwzError&gt; {}
+</code></pre>
+<p>The attribute macro <code>gatecall</code> will fill out the function body automatically.
+Additionally, note that all secure gates must return <code>Result&lt;T, TwzError&gt;</code>.</p>
+<p>In the counter-srv crate's src/lib.rs, we can add:</p>
+<pre><code>#[secgate::entry(lib = &quot;counter&quot;)]
+pub fn increment_counter() -&gt; Result&lt;u32, secgate::TwzError&gt; {
+  static COUNTER: AtomicU32 = AtomicU32::new(0);
+  Ok(COUNTER.fetch_add(1, Ordering::SeqCst))
+}
+</code></pre>
+<p>The <code>lib = &quot;counter&quot;</code> option allows the <code>entry</code> macro to type check against the
+definition given in <code>counter</code>'s src/lib.rs.</p>
+<h3 id="adding-to-initrd-and-running"><a class="header" href="#adding-to-initrd-and-running">Adding to initrd and running</a></h3>
+<p>At this point, you can create a binary program as usual, and add it to the initrd.
+Add the <code>counter</code> crate as a dependency. Add to the initrd list: <code>lib:counter-srv</code>.
+This will cause the initrd builder to copy over the .so file for that crate.</p>
+<p>In the binary program's source, you can call the exposed increment_counter function
+from the counter crate.</p>
+<p>Once Twizzler has started, you can load the .so file via LD_PRELOAD (which will NOT
+put the .so file in a separate security context) or with SCTX_PRELOAD (which will):</p>
+<p><code>SCTX_PRELOAD=libcounter_srv.so &lt;binary-name&gt;</code></p>
+<h2 id="getting-caller-information"><a class="header" href="#getting-caller-information">Getting Caller Information</a></h2>
+<p>The counter-srv increment_counter implementation can get access to caller
+information via the secgate::get_caller() function. This function returns
+a <code>GateCallInfo</code>, which can be used to get the caller's thread ID and the
+security context ID.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="direct-memory-access-dma"><a class="header" href="#direct-memory-access-dma">Direct Memory Access (DMA)</a></h1>
 <p>A key aspect of a device driver involves programming the device to access host memory. When a device
 accesses host memory, we usually call it Direct Memory Access (DMA). DMA is used, for example, by
@@ -685,7 +795,7 @@ twizzler-build = &quot;tool&quot;
 <h2 id="updating-the-toolchain"><a class="header" href="#updating-the-toolchain">Updating the toolchain</a></h2>
 <ol>
 <li>Update the repos. Go into toolchain/src/rust and, for each of ., library/libc, library/backtrace, and src/llvm-project, you'll need to:
-a. Add the upstream remote (usually github rust-lang/<name of repo>, though backtrace is called &quot;backtrace-rs&quot; there)
+a. Add the upstream remote (usually github rust-lang/&lt;name of repo&gt;, though backtrace is called &quot;backtrace-rs&quot; there)
 b. Ensure you've fetched the twizzler branch from origin, and the following branches from upstream:
 - libc: &quot;libc-2.0&quot;
 - bracktrace: &quot;master&quot;

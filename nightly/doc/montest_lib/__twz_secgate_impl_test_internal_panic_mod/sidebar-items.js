@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["test_internal_panic"],"static":["TEST_INTERNAL_PANIC_INFO"],"type":["Args","Ret","test_internal_panic_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["test_internal_panic"],"type":["Args","Ret","test_internal_panic_EntryType"]};

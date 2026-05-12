@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["link"],"static":["LINK_INFO"],"type":["Args","Ret","link_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["LINK_INFO"],"type":["Args","Ret","link_EntryType"]};

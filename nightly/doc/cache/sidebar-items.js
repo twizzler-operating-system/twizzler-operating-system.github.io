@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Command"],"fn":["do_drop","do_hold","do_preload","do_stat","main","per_arg"],"struct":["Args","TrailingArgs"]};
+window.SIDEBAR_ITEMS = {"enum":["Command"],"fn":["do_drop","do_hold","do_preload","do_stat","drop","hold","list_nth","main","per_arg","preload","stat"],"mod":["__twz_secgate_impl_drop_mod","__twz_secgate_impl_hold_mod","__twz_secgate_impl_list_nth_mod","__twz_secgate_impl_preload_mod","__twz_secgate_impl_stat_mod"],"struct":["Args","CachedStats","TrailingArgs"]};

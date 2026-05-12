@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["pager_open_handle"],"type":["Args","Ret","pager_open_handle_EntryType"]};

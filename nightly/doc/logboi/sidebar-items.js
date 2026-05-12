@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["LogHandle"]};
+window.SIDEBAR_ITEMS = {"fn":["logboi_close_handle","logboi_open_handle","logboi_post"],"mod":["__twz_secgate_impl_logboi_close_handle_mod","__twz_secgate_impl_logboi_open_handle_mod","__twz_secgate_impl_logboi_post_mod"],"struct":["LogHandle"]};

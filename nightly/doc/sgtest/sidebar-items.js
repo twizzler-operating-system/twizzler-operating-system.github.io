@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["bar","foo"],"mod":["__twz_secgate_impl_foo_mod"],"struct":["Foo"]};

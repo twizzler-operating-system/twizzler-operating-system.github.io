@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["logboi_open_handle"],"type":["Args","Ret","logboi_open_handle_EntryType"]};

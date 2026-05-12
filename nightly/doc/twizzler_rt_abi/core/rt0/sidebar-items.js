@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["_start","rust_entry"]};
+window.SIDEBAR_ITEMS = {"fn":["__rust_entry_from_c","rust_entry"]};

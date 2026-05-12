@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["devmgr_start"],"static":["DEVMGR_START_INFO"],"type":["Args","Ret","devmgr_start_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["DEVMGR_START_INFO"],"type":["Args","Ret","devmgr_start_EntryType"]};

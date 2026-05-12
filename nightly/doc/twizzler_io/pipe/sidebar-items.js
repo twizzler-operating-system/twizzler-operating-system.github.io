@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BUF_SZ"],"struct":["Pipe","PipeBase"]};

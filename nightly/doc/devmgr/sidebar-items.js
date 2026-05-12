@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["Supported"],"fn":["get_devices"],"struct":["DriverSpec","OwnedDevice"]};
+window.SIDEBAR_ITEMS = {"enum":["Supported"],"fn":["devmgr_start","enumerate_devices","get_devices"],"mod":["__twz_secgate_impl_devmgr_start_mod","__twz_secgate_impl_get_devices_mod"],"struct":["DriverSpec","OwnedDevice"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_libname_map_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_LIBNAME_MAP_INFO"],"type":["Args","Ret","monitor_rt_libname_map_EntryType"]};

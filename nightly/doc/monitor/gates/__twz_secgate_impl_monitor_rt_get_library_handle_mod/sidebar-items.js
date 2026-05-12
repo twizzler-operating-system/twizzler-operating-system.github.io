@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_library_handle","monitor_rt_get_library_handle_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_LIBRARY_HANDLE_INFO"],"type":["Args","Ret","monitor_rt_get_library_handle_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_get_library_handle_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_GET_LIBRARY_HANDLE_INFO"],"type":["Args","Ret","monitor_rt_get_library_handle_EntryType"]};

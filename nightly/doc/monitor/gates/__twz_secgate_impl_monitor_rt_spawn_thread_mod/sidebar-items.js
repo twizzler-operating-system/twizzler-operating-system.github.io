@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_spawn_thread","monitor_rt_spawn_thread_entry"],"mod":["trampoline_impl"],"static":["MONITOR_RT_SPAWN_THREAD_INFO"],"type":["Args","Ret","monitor_rt_spawn_thread_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["monitor_rt_spawn_thread_entry","type_check_args","type_check_ret"],"mod":["trampoline_impl"],"static":["MONITOR_RT_SPAWN_THREAD_INFO"],"type":["Args","Ret","monitor_rt_spawn_thread_EntryType"]};

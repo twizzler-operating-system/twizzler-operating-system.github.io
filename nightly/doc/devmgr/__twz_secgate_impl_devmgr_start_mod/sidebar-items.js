@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["devmgr_start"],"type":["Args","Ret","devmgr_start_EntryType"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["TWZ_NET_ALLOC_PORT_INFO"],"type":["Args","Ret","twz_net_alloc_port_EntryType"]};

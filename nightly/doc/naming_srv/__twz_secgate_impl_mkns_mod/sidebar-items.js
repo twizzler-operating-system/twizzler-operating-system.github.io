@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"fn":["mkns"],"static":["MKNS_INFO"],"type":["Args","Ret","mkns_EntryType"]};
+window.SIDEBAR_ITEMS = {"constant":["ARGS_SIZE","RET_SIZE"],"static":["MKNS_INFO"],"type":["Args","Ret","mkns_EntryType"]};
